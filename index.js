@@ -49,6 +49,7 @@ class Store {
     } else {
       this[listeners][symbol] = cb
     }
+    return this
   }
 
   listen(cb) {

@@ -115,7 +115,7 @@ var myActions = new MyActions()
 for(var Store____Key in Store){if(Store.hasOwnProperty(Store____Key)){MyStore[Store____Key]=Store[Store____Key];}}var ____SuperProtoOfStore=Store===null?null:Store.prototype;MyStore.prototype=Object.create(____SuperProtoOfStore);MyStore.prototype.constructor=MyStore;MyStore.__superConstructor__=Store;
   function MyStore() {"use strict";
     Store.call(this)
-    this.listenTo(myActions.updateName, this.onUpdateName)
+//    this.listenTo(myActions.updateName, this.onUpdateName)
   }
 
   MyStore.prototype.getInitialState=function() {"use strict";
@@ -129,6 +129,7 @@ for(var Store____Key in Store){if(Store.hasOwnProperty(Store____Key)){MyStore[St
   };
 
 var myStore = new MyStore()
+myStore.listenTo(myActions.updateName, myStore.onUpdateName)
 
 
 
