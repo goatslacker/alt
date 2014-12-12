@@ -7,11 +7,11 @@ Object.assign = Object.assign || require('object-assign')
 
 //console.log(Dispatcher)
 
-
-  function Unidirectional() {"use strict";
-    this.dispatcher = new Dispatcher()
-  }
-
+//class Unidirectional {
+//  constructor() {
+//    this.dispatcher = new Dispatcher()
+//  }
+//}
 
 var dispatcher = new Dispatcher()
 
@@ -79,12 +79,14 @@ var listeners = Symbol('action listeners')
   }
 
   Actions.prototype.dispatch=function(action, data) {"use strict";
-    console.log('OIOIOIOIOI', action)
     dispatcher.dispatch({
       action: action,
       data: data
     })
   };
+
+
+
 
 
 for(var Actions____Key in Actions){if(Actions.hasOwnProperty(Actions____Key)){MyActions[Actions____Key]=Actions[Actions____Key];}}var ____SuperProtoOfActions=Actions===null?null:Actions.prototype;MyActions.prototype=Object.create(____SuperProtoOfActions);MyActions.prototype.constructor=MyActions;MyActions.__superConstructor__=Actions;
@@ -93,29 +95,17 @@ for(var Actions____Key in Actions){if(Actions.hasOwnProperty(Actions____Key)){My
   }
 
   MyActions.prototype.updateName=function(name) {"use strict";
-    return name
-//    return new Promise((resolve, reject) => {
-//      resolve(name)
-//    })
+    return new Promise(function(resolve, reject)  {
+      return resolve(name)
+    })
   };
 
 
 var myActions = new MyActions()
 
-//var myActions = createActions({
-//  onUpdateName(name) {
-//    return new Promise((resolve, reject) => {
-//      resolve(name)
-//    })
-//    return name
-//  }
-//})
-
 for(var Store____Key in Store){if(Store.hasOwnProperty(Store____Key)){MyStore[Store____Key]=Store[Store____Key];}}var ____SuperProtoOfStore=Store===null?null:Store.prototype;MyStore.prototype=Object.create(____SuperProtoOfStore);MyStore.prototype.constructor=MyStore;MyStore.__superConstructor__=Store;
   function MyStore() {"use strict";
     Store.call(this)
-    // XXX or i can have magic myActions.UPDATE_NAME
-    // or I can make it not a class and overwrite its toString method
     this.listenTo(myActions.UPDATE_NAME, this.onUpdateName)
   }
 
@@ -123,21 +113,19 @@ for(var Store____Key in Store){if(Store.hasOwnProperty(Store____Key)){MyStore[St
     return { name: 'lol' }
   };
 
-  // XXX I need to explicitly listen to myActions.updateName for collission purposes
   MyStore.prototype.onUpdateName=function(name) {"use strict";
-//    return new Promise((resolve, reject) => {
-//      return resolve({ name: name })
-//    })
-    return { name: name }
+    return new Promise(function(resolve, reject)  {
+      return resolve({ name: name })
+    })
   };
 
 var myStore = new MyStore()
 
+
+
+
 myStore.listen(function()  {return console.log('Shit has changed', myStore.getCurrentState());})
 console.log('=1', myStore.getCurrentState())
-//console.log('@', myStore.setState({ name: 'foobar' }))
-
-//console.log('Initial state', myStore.getCurrentState())
 myActions.updateName('hello')
 
 },{"es6-promise":2,"es6-symbol":3,"flux":19,"object-assign":22}],2:[function(require,module,exports){

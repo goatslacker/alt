@@ -6,11 +6,11 @@ Object.assign = Object.assign || require('object-assign')
 
 //console.log(Dispatcher)
 
-class Unidirectional {
-  constructor() {
-    this.dispatcher = new Dispatcher()
-  }
-}
+//class Unidirectional {
+//  constructor() {
+//    this.dispatcher = new Dispatcher()
+//  }
+//}
 
 var dispatcher = new Dispatcher()
 
@@ -78,7 +78,6 @@ class Actions {
   }
 
   dispatch(action, data) {
-    console.log('OIOIOIOIOI', action)
     dispatcher.dispatch({
       action: action,
       data: data
@@ -86,35 +85,26 @@ class Actions {
   }
 }
 
+
+
+
 class MyActions extends Actions {
   constructor() {
     super()
   }
 
   updateName(name) {
-    return name
-//    return new Promise((resolve, reject) => {
-//      resolve(name)
-//    })
+    return new Promise((resolve, reject) => {
+      return resolve(name)
+    })
   }
 }
 
 var myActions = new MyActions()
 
-//var myActions = createActions({
-//  onUpdateName(name) {
-//    return new Promise((resolve, reject) => {
-//      resolve(name)
-//    })
-//    return name
-//  }
-//})
-
 class MyStore extends Store {
   constructor() {
     super()
-    // XXX or i can have magic myActions.UPDATE_NAME
-    // or I can make it not a class and overwrite its toString method
     this.listenTo(myActions.UPDATE_NAME, this.onUpdateName)
   }
 
@@ -122,19 +112,17 @@ class MyStore extends Store {
     return { name: 'lol' }
   }
 
-  // XXX I need to explicitly listen to myActions.updateName for collission purposes
   onUpdateName(name) {
-//    return new Promise((resolve, reject) => {
-//      return resolve({ name: name })
-//    })
-    return { name: name }
+    return new Promise((resolve, reject) => {
+      return resolve({ name: name })
+    })
   }
 }
 var myStore = new MyStore()
 
+
+
+
 myStore.listen(() => console.log('Shit has changed', myStore.getCurrentState()))
 console.log('=1', myStore.getCurrentState())
-//console.log('@', myStore.setState({ name: 'foobar' }))
-
-//console.log('Initial state', myStore.getCurrentState())
 myActions.updateName('hello')
