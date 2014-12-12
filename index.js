@@ -17,6 +17,7 @@ var dispatcher = new Dispatcher()
 // XXX use immutable data stores for stores
 
 var symState = Symbol('state container')
+var symActionKey = Symbol('action key')
 var listeners = Symbol('action listeners')
 class Store {
   constructor() {
@@ -42,7 +43,12 @@ class Store {
   }
 
   listenTo(symbol, cb) {
-    this[listeners][symbol] = cb
+    // XXX check if symbol properly
+    if (symbol[symActionKey]) {
+      this[listeners][symbol[symActionKey]] = cb
+    } else {
+      this[listeners][symbol] = cb
+    }
   }
 
   listen(cb) {
@@ -59,11 +65,12 @@ class Actions {
   constructor() {
     var proto = Object.getPrototypeOf(this)
     Object.keys(proto).forEach((action) => {
+
       var constant = action.replace(/[a-z]([A-Z])/g, (i) => {
         return i[0] + '_' + i[1].toLowerCase()
       }).toUpperCase()
+
       var actionName = Symbol('action ' + constant)
-      this[constant] = actionName
 
       this[action] = (...args) => {
         var value = proto[action].apply(this, args)
@@ -74,6 +81,8 @@ class Actions {
           this.dispatch(actionName, value)
         }
       }
+      this[constant] = actionName
+      this[action][symActionKey] = actionName
     })
   }
 
@@ -105,7 +114,7 @@ var myActions = new MyActions()
 class MyStore extends Store {
   constructor() {
     super()
-    this.listenTo(myActions.UPDATE_NAME, this.onUpdateName)
+    this.listenTo(myActions.updateName, this.onUpdateName)
   }
 
   getInitialState() {

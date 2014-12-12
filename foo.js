@@ -18,6 +18,7 @@ var dispatcher = new Dispatcher()
 // XXX use immutable data stores for stores
 
 var symState = Symbol('state container')
+var symActionKey = Symbol('action key')
 var listeners = Symbol('action listeners')
 
   function Store() {"use strict";
@@ -43,7 +44,12 @@ var listeners = Symbol('action listeners')
   }
 
   Store.prototype.listenTo=function(symbol, cb) {"use strict";
-    this[listeners][symbol] = cb
+    // XXX check if symbol properly
+    if (symbol[symActionKey]) {
+      this[listeners][symbol[symActionKey]] = cb
+    } else {
+      this[listeners][symbol] = cb
+    }
   };
 
   Store.prototype.listen=function(cb) {"use strict";
@@ -60,11 +66,12 @@ var listeners = Symbol('action listeners')
   function Actions() {"use strict";
     var proto = Object.getPrototypeOf(this)
     Object.keys(proto).forEach(function(action)  {
+
       var constant = action.replace(/[a-z]([A-Z])/g, function(i)  {
         return i[0] + '_' + i[1].toLowerCase()
       }).toUpperCase()
+
       var actionName = Symbol('action ' + constant)
-      this[constant] = actionName
 
       this[action] = function()  {for (var args=[],$__0=0,$__1=arguments.length;$__0<$__1;$__0++) args.push(arguments[$__0]);
         var value = proto[action].apply(this, args)
@@ -75,6 +82,8 @@ var listeners = Symbol('action listeners')
           this.dispatch(actionName, value)
         }
       }.bind(this)
+      this[constant] = actionName
+      this[action][symActionKey] = actionName
     }.bind(this))
   }
 
@@ -106,7 +115,7 @@ var myActions = new MyActions()
 for(var Store____Key in Store){if(Store.hasOwnProperty(Store____Key)){MyStore[Store____Key]=Store[Store____Key];}}var ____SuperProtoOfStore=Store===null?null:Store.prototype;MyStore.prototype=Object.create(____SuperProtoOfStore);MyStore.prototype.constructor=MyStore;MyStore.__superConstructor__=Store;
   function MyStore() {"use strict";
     Store.call(this)
-    this.listenTo(myActions.UPDATE_NAME, this.onUpdateName)
+    this.listenTo(myActions.updateName, this.onUpdateName)
   }
 
   MyStore.prototype.getInitialState=function() {"use strict";
