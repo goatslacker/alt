@@ -1,5 +1,6 @@
 var Dispatcher = require('flux').Dispatcher
-var Symbol = require('es6-symbol');
+var Symbol = require('es6-symbol')
+var Promise = require('es6-promise').Promise
 //var EventEmitter = require('events').EventEmitter
 Object.assign = Object.assign || require('object-assign')
 
@@ -22,25 +23,22 @@ class Store {
     this[symState] = this.getInitialState()
     this.cb = null
 
-    this.setState = (newState) => {
+    var setState = (newState) => {
       Object.assign(this[symState], newState)
-      this.trigger()
+      this.cb && this.cb()
     }
-
-//    console.log('im here')
 
     this.dispatcherToken = dispatcher.register((payload) => {
 //      console.log('@@@@@@')
       if (this[payload.action]) {
-        this[payload.action](payload.data)
+        var state = this[payload.action](payload.data)
+        if (state.then) {
+          state.then((data) => setState(data))
+        } else {
+          setState(state)
+        }
       }
     })
-  }
-
-  trigger(args) {
-    console.log('Triggering change')
-    // XXX use EE
-    this.cb && this.cb(args)
   }
 
   listen(cb) {
@@ -55,22 +53,24 @@ class Store {
 
 class Actions {
   constructor() {
-    // XXX one approach i can take is iterate through the damn prototype to find the actions
-    // or i can pass them in...
-//    console.log(this)
     var proto = Object.getPrototypeOf(this)
     Object.keys(proto).forEach((action) => {
       this[action] = (...args) => {
-        proto[action].apply(this, args)
+        var value = proto[action].apply(this, args)
+        // XXX this is a shitty way to know if its a promise
+        if (value.then) {
+          value.then((data) => this.dispatch(action, data))
+        } else {
+          this.dispatch(action, value)
+        }
       }
     })
-//    console.log('yes', Object.getPrototypeOf(this))
   }
 
-  dispatch(data) {
+  dispatch(action, data) {
     console.log('OIOIOIOIOI')
     dispatcher.dispatch({
-      action: 'onUpdateName',
+      action: action,
       data: data
     })
   }
@@ -82,12 +82,23 @@ class MyActions extends Actions {
   }
 
   updateName(name) {
-    // XXX I need to tell the dispatcher where im coming from :(
-    this.dispatch(name)
+    return name
+//    return new Promise((resolve, reject) => {
+//      resolve(name)
+//    })
   }
 }
 
 var myActions = new MyActions()
+
+//var myActions = createActions({
+//  onUpdateName(name) {
+//    return new Promise((resolve, reject) => {
+//      resolve(name)
+//    })
+//    return name
+//  }
+//})
 
 class MyStore extends Store {
   constructor() {
@@ -95,34 +106,22 @@ class MyStore extends Store {
   }
 
   getInitialState() {
-//    this.name = 'lol'
-//    console.log('XXXXXX')
-//    var log = {}
-//    Object.keys({ a: 0, b: 0 }).forEach((food) => log[food] = 0)
-
-    return {
-//      id: null,
-      name: 'lol',
-//      date: Date.now(),
-//      log
-    }
+    return { name: 'lol' }
   }
 
-  onUpdateName(name) {
-    console.log('Updating name to', name)
-    // XXX this setState as first arg is a hack...
-    this.setState({
-      name: name
-    })
+  // XXX I need to explicitly listen to myActions.updateName for collission purposes
+  updateName(name) {
+//    return new Promise((resolve, reject) => {
+//      return resolve({ name: name })
+//    })
+    return { name: name }
   }
 }
 var myStore = new MyStore()
 
+myStore.listen(() => console.log('Shit has changed', myStore.getCurrentState()))
 console.log('=1', myStore.getCurrentState())
-console.log('@', myStore.setState({ name: 'foobar' }))
-
-console.log('=2', myStore.getCurrentState())
+//console.log('@', myStore.setState({ name: 'foobar' }))
 
 //console.log('Initial state', myStore.getCurrentState())
-//myStore.listen(() => console.log('Shit has changed', myStore.getCurrentState()))
 myActions.updateName('hello')
