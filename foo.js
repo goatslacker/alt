@@ -18,10 +18,11 @@ var dispatcher = new Dispatcher()
 // XXX use immutable data stores for stores
 
 var symState = Symbol('state container')
-var setState = Symbol('setting state')
+var listeners = Symbol('action listeners')
 
   function Store() {"use strict";
     this[symState] = this.getInitialState()
+    this[listeners] = {}
     this.cb = null
 
     var setState = function(newState)  {
@@ -30,9 +31,8 @@ var setState = Symbol('setting state')
     }.bind(this)
 
     this.dispatcherToken = dispatcher.register(function(payload)  {
-//      console.log('@@@@@@')
-      if (this[payload.action]) {
-        var state = this[payload.action](payload.data)
+      if (this[listeners][payload.action]) {
+        var state = this[listeners][payload.action](payload.data)
         if (state.then) {
           state.then(function(data)  {return setState(data);})
         } else {
@@ -41,6 +41,10 @@ var setState = Symbol('setting state')
       }
     }.bind(this))
   }
+
+  Store.prototype.listenTo=function(symbol, cb) {"use strict";
+    this[listeners][symbol] = cb
+  };
 
   Store.prototype.listen=function(cb) {"use strict";
     // XXX use EE
@@ -52,24 +56,38 @@ var setState = Symbol('setting state')
   };
 
 
+var symActions = Symbol('store for action symbols')
 
   function Actions() {"use strict";
+    this[symActions] = {}
+
     var proto = Object.getPrototypeOf(this)
     Object.keys(proto).forEach(function(action)  {
+      var actionName = Symbol('action ' + action)
+      this[symActions][action] = actionName
+
       this[action] = function()  {for (var args=[],$__0=0,$__1=arguments.length;$__0<$__1;$__0++) args.push(arguments[$__0]);
         var value = proto[action].apply(this, args)
         // XXX this is a shitty way to know if its a promise
         if (value.then) {
-          value.then(function(data)  {return this.dispatch(action, data);}.bind(this))
+          value.then(function(data)  {return this.dispatch(actionName, data);}.bind(this))
         } else {
-          this.dispatch(action, value)
+          this.dispatch(actionName, value)
         }
       }.bind(this)
     }.bind(this))
   }
 
+  Actions.prototype.sym=function(action) {"use strict";
+    if (!this[symActions][action]) {
+      throw new ReferenceError()
+    }
+
+    return this[symActions][action]
+  };
+
   Actions.prototype.dispatch=function(action, data) {"use strict";
-    console.log('OIOIOIOIOI')
+    console.log('OIOIOIOIOI', action)
     dispatcher.dispatch({
       action: action,
       data: data
@@ -104,6 +122,9 @@ var myActions = new MyActions()
 for(var Store____Key in Store){if(Store.hasOwnProperty(Store____Key)){MyStore[Store____Key]=Store[Store____Key];}}var ____SuperProtoOfStore=Store===null?null:Store.prototype;MyStore.prototype=Object.create(____SuperProtoOfStore);MyStore.prototype.constructor=MyStore;MyStore.__superConstructor__=Store;
   function MyStore() {"use strict";
     Store.call(this)
+    // XXX or i can have magic myActions.UPDATE_NAME
+    // or I can make it not a class and overwrite its toString method
+    this.listenTo(myActions.sym('updateName'), this.onUpdateName)
   }
 
   MyStore.prototype.getInitialState=function() {"use strict";
@@ -111,7 +132,7 @@ for(var Store____Key in Store){if(Store.hasOwnProperty(Store____Key)){MyStore[St
   };
 
   // XXX I need to explicitly listen to myActions.updateName for collission purposes
-  MyStore.prototype.updateName=function(name) {"use strict";
+  MyStore.prototype.onUpdateName=function(name) {"use strict";
 //    return new Promise((resolve, reject) => {
 //      return resolve({ name: name })
 //    })
