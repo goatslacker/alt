@@ -1,5 +1,6 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 var Dispatcher = require('flux').Dispatcher
+var Symbol = require('es6-symbol');
 //var EventEmitter = require('events').EventEmitter
 Object.assign = Object.assign || require('object-assign')
 
@@ -15,15 +16,22 @@ var dispatcher = new Dispatcher()
 
 // XXX use immutable data stores for stores
 
+var symState = Symbol('state container')
+var setState = Symbol('setting state')
 
   function Store() {"use strict";
-    this.state = this.getInitialState()
+    this[symState] = this.getInitialState()
     this.cb = null
 
-    console.log('im here')
+    this.setState = function(newState)  {
+      Object.assign(this[symState], newState)
+      this.trigger()
+    }.bind(this)
+
+//    console.log('im here')
 
     this.dispatcherToken = dispatcher.register(function(payload)  {
-      console.log('@@@@@@')
+//      console.log('@@@@@@')
       if (this[payload.action]) {
         this[payload.action](payload.data)
       }
@@ -42,35 +50,26 @@ var dispatcher = new Dispatcher()
   };
 
   Store.prototype.getCurrentState=function() {"use strict";
-    // XXX make this priavate using Symbols
-    return this.state
-  };
-
-  Store.prototype.setState=function(obj) {"use strict";
-    Object.assign(this.state, obj)
-    this.trigger()
+    return this[symState]
   };
 
 
-//function createActions(actions) {
-//  return actions.reduce((obj, actionName) => {
-//    obj[actionName] = (data) => {
-//      console.log('Dispatching...', actionName, data)
-//      dispatcher.dispatch({
-//        action: actionName,
-//        data: data
-//      })
-//    }
-//    return obj
-//  }, {})
-//}
-//
-//var actions = createActions([
-//  'updateName'
-//])
 
-function Actions(){"use strict";}
+  function Actions() {"use strict";
+    // XXX one approach i can take is iterate through the damn prototype to find the actions
+    // or i can pass them in...
+//    console.log(this)
+    var proto = Object.getPrototypeOf(this)
+    Object.keys(proto).forEach(function(action)  {
+      this[action] = function()  {for (var args=[],$__0=0,$__1=arguments.length;$__0<$__1;$__0++) args.push(arguments[$__0]);
+        proto[action].apply(this, args)
+      }.bind(this)
+    }.bind(this))
+//    console.log('yes', Object.getPrototypeOf(this))
+  }
+
   Actions.prototype.dispatch=function(data) {"use strict";
+    console.log('OIOIOIOIOI')
     dispatcher.dispatch({
       action: 'onUpdateName',
       data: data
@@ -78,37 +77,18 @@ function Actions(){"use strict";}
   };
 
 
-for(var Actions____Key in Actions){if(Actions.hasOwnProperty(Actions____Key)){MyActions[Actions____Key]=Actions[Actions____Key];}}var ____SuperProtoOfActions=Actions===null?null:Actions.prototype;MyActions.prototype=Object.create(____SuperProtoOfActions);MyActions.prototype.constructor=MyActions;MyActions.__superConstructor__=Actions;function MyActions(){"use strict";if(Actions!==null){Actions.apply(this,arguments);}}
+for(var Actions____Key in Actions){if(Actions.hasOwnProperty(Actions____Key)){MyActions[Actions____Key]=Actions[Actions____Key];}}var ____SuperProtoOfActions=Actions===null?null:Actions.prototype;MyActions.prototype=Object.create(____SuperProtoOfActions);MyActions.prototype.constructor=MyActions;MyActions.__superConstructor__=Actions;
+  function MyActions() {"use strict";
+    Actions.call(this)
+  }
+
   MyActions.prototype.updateName=function(name) {"use strict";
+    // XXX I need to tell the dispatcher where im coming from :(
     this.dispatch(name)
   };
 
 
 var myActions = new MyActions()
-
-//var myStore = new Store({
-//  init() {
-//    var log = {}
-//    Object.keys({ a: 0, b: 0 }).forEach((food) => log[food] = 0)
-//
-//    return {
-//      id: null,
-//      name: 'lol',
-//      date: Date.now(),
-//      log
-//    }
-//  },
-//
-//  listeners: {
-//    updateName: (name) => {
-//      console.log('xxxxxxxxxxxx')
-//      this.name = name
-//    }
-//    [actions.updateName]: (name) => {
-//      this.name = name
-//    }
-//  }
-//})
 
 for(var Store____Key in Store){if(Store.hasOwnProperty(Store____Key)){MyStore[Store____Key]=Store[Store____Key];}}var ____SuperProtoOfStore=Store===null?null:Store.prototype;MyStore.prototype=Object.create(____SuperProtoOfStore);MyStore.prototype.constructor=MyStore;MyStore.__superConstructor__=Store;
   function MyStore() {"use strict";
@@ -116,21 +96,22 @@ for(var Store____Key in Store){if(Store.hasOwnProperty(Store____Key)){MyStore[St
   }
 
   MyStore.prototype.getInitialState=function() {"use strict";
-    console.log('XXXXXX')
-    var log = {}
-    Object.keys({ a: 0, b: 0 }).forEach(function(food)  {return log[food] = 0;})
+//    this.name = 'lol'
+//    console.log('XXXXXX')
+//    var log = {}
+//    Object.keys({ a: 0, b: 0 }).forEach((food) => log[food] = 0)
 
     return {
-      id: null,
+//      id: null,
       name: 'lol',
-      date: Date.now(),
-      log:log
+//      date: Date.now(),
+//      log
     }
   };
 
-  // XXX onUpdateName
   MyStore.prototype.onUpdateName=function(name) {"use strict";
     console.log('Updating name to', name)
+    // XXX this setState as first arg is a hack...
     this.setState({
       name: name
     })
@@ -138,11 +119,295 @@ for(var Store____Key in Store){if(Store.hasOwnProperty(Store____Key)){MyStore[St
 
 var myStore = new MyStore()
 
-console.log('Initial state', myStore.getCurrentState())
-myStore.listen(function()  {return console.log('Shit has changed', myStore.getCurrentState());})
+console.log('=1', myStore.getCurrentState())
+console.log('@', myStore.setState({ name: 'foobar' }))
+
+console.log('=2', myStore.getCurrentState())
+
+//console.log('Initial state', myStore.getCurrentState())
+//myStore.listen(() => console.log('Shit has changed', myStore.getCurrentState()))
 myActions.updateName('hello')
 
-},{"flux":2,"object-assign":5}],2:[function(require,module,exports){
+},{"es6-symbol":2,"flux":18,"object-assign":21}],2:[function(require,module,exports){
+'use strict';
+
+module.exports = require('./is-implemented')() ? Symbol : require('./polyfill');
+
+},{"./is-implemented":3,"./polyfill":17}],3:[function(require,module,exports){
+'use strict';
+
+module.exports = function () {
+	var symbol;
+	if (typeof Symbol !== 'function') return false;
+	symbol = Symbol('test symbol');
+	try { String(symbol); } catch (e) { return false; }
+	if (typeof Symbol.iterator === 'symbol') return true;
+
+	// Return 'true' for polyfills
+	if (typeof Symbol.isConcatSpreadable !== 'object') return false;
+	if (typeof Symbol.isRegExp !== 'object') return false;
+	if (typeof Symbol.iterator !== 'object') return false;
+	if (typeof Symbol.toPrimitive !== 'object') return false;
+	if (typeof Symbol.toStringTag !== 'object') return false;
+	if (typeof Symbol.unscopables !== 'object') return false;
+
+	return true;
+};
+
+},{}],4:[function(require,module,exports){
+'use strict';
+
+var assign        = require('es5-ext/object/assign')
+  , normalizeOpts = require('es5-ext/object/normalize-options')
+  , isCallable    = require('es5-ext/object/is-callable')
+  , contains      = require('es5-ext/string/#/contains')
+
+  , d;
+
+d = module.exports = function (dscr, value/*, options*/) {
+	var c, e, w, options, desc;
+	if ((arguments.length < 2) || (typeof dscr !== 'string')) {
+		options = value;
+		value = dscr;
+		dscr = null;
+	} else {
+		options = arguments[2];
+	}
+	if (dscr == null) {
+		c = w = true;
+		e = false;
+	} else {
+		c = contains.call(dscr, 'c');
+		e = contains.call(dscr, 'e');
+		w = contains.call(dscr, 'w');
+	}
+
+	desc = { value: value, configurable: c, enumerable: e, writable: w };
+	return !options ? desc : assign(normalizeOpts(options), desc);
+};
+
+d.gs = function (dscr, get, set/*, options*/) {
+	var c, e, options, desc;
+	if (typeof dscr !== 'string') {
+		options = set;
+		set = get;
+		get = dscr;
+		dscr = null;
+	} else {
+		options = arguments[3];
+	}
+	if (get == null) {
+		get = undefined;
+	} else if (!isCallable(get)) {
+		options = get;
+		get = set = undefined;
+	} else if (set == null) {
+		set = undefined;
+	} else if (!isCallable(set)) {
+		options = set;
+		set = undefined;
+	}
+	if (dscr == null) {
+		c = true;
+		e = false;
+	} else {
+		c = contains.call(dscr, 'c');
+		e = contains.call(dscr, 'e');
+	}
+
+	desc = { get: get, set: set, configurable: c, enumerable: e };
+	return !options ? desc : assign(normalizeOpts(options), desc);
+};
+
+},{"es5-ext/object/assign":5,"es5-ext/object/is-callable":8,"es5-ext/object/normalize-options":12,"es5-ext/string/#/contains":14}],5:[function(require,module,exports){
+'use strict';
+
+module.exports = require('./is-implemented')()
+	? Object.assign
+	: require('./shim');
+
+},{"./is-implemented":6,"./shim":7}],6:[function(require,module,exports){
+'use strict';
+
+module.exports = function () {
+	var assign = Object.assign, obj;
+	if (typeof assign !== 'function') return false;
+	obj = { foo: 'raz' };
+	assign(obj, { bar: 'dwa' }, { trzy: 'trzy' });
+	return (obj.foo + obj.bar + obj.trzy) === 'razdwatrzy';
+};
+
+},{}],7:[function(require,module,exports){
+'use strict';
+
+var keys  = require('../keys')
+  , value = require('../valid-value')
+
+  , max = Math.max;
+
+module.exports = function (dest, src/*, …srcn*/) {
+	var error, i, l = max(arguments.length, 2), assign;
+	dest = Object(value(dest));
+	assign = function (key) {
+		try { dest[key] = src[key]; } catch (e) {
+			if (!error) error = e;
+		}
+	};
+	for (i = 1; i < l; ++i) {
+		src = arguments[i];
+		keys(src).forEach(assign);
+	}
+	if (error !== undefined) throw error;
+	return dest;
+};
+
+},{"../keys":9,"../valid-value":13}],8:[function(require,module,exports){
+// Deprecated
+
+'use strict';
+
+module.exports = function (obj) { return typeof obj === 'function'; };
+
+},{}],9:[function(require,module,exports){
+'use strict';
+
+module.exports = require('./is-implemented')()
+	? Object.keys
+	: require('./shim');
+
+},{"./is-implemented":10,"./shim":11}],10:[function(require,module,exports){
+'use strict';
+
+module.exports = function () {
+	try {
+		Object.keys('primitive');
+		return true;
+	} catch (e) { return false; }
+};
+
+},{}],11:[function(require,module,exports){
+'use strict';
+
+var keys = Object.keys;
+
+module.exports = function (object) {
+	return keys(object == null ? object : Object(object));
+};
+
+},{}],12:[function(require,module,exports){
+'use strict';
+
+var assign = require('./assign')
+
+  , forEach = Array.prototype.forEach
+  , create = Object.create, getPrototypeOf = Object.getPrototypeOf
+
+  , process;
+
+process = function (src, obj) {
+	var proto = getPrototypeOf(src);
+	return assign(proto ? process(proto, obj) : obj, src);
+};
+
+module.exports = function (options/*, …options*/) {
+	var result = create(null);
+	forEach.call(arguments, function (options) {
+		if (options == null) return;
+		process(Object(options), result);
+	});
+	return result;
+};
+
+},{"./assign":5}],13:[function(require,module,exports){
+'use strict';
+
+module.exports = function (value) {
+	if (value == null) throw new TypeError("Cannot use null or undefined");
+	return value;
+};
+
+},{}],14:[function(require,module,exports){
+'use strict';
+
+module.exports = require('./is-implemented')()
+	? String.prototype.contains
+	: require('./shim');
+
+},{"./is-implemented":15,"./shim":16}],15:[function(require,module,exports){
+'use strict';
+
+var str = 'razdwatrzy';
+
+module.exports = function () {
+	if (typeof str.contains !== 'function') return false;
+	return ((str.contains('dwa') === true) && (str.contains('foo') === false));
+};
+
+},{}],16:[function(require,module,exports){
+'use strict';
+
+var indexOf = String.prototype.indexOf;
+
+module.exports = function (searchString/*, position*/) {
+	return indexOf.call(this, searchString, arguments[1]) > -1;
+};
+
+},{}],17:[function(require,module,exports){
+'use strict';
+
+var d = require('d')
+
+  , create = Object.create, defineProperties = Object.defineProperties
+  , generateName, Symbol;
+
+generateName = (function () {
+	var created = create(null);
+	return function (desc) {
+		var postfix = 0;
+		while (created[desc + (postfix || '')]) ++postfix;
+		desc += (postfix || '');
+		created[desc] = true;
+		return '@@' + desc;
+	};
+}());
+
+module.exports = Symbol = function (description) {
+	var symbol;
+	if (this instanceof Symbol) {
+		throw new TypeError('TypeError: Symbol is not a constructor');
+	}
+	symbol = create(Symbol.prototype);
+	description = (description === undefined ? '' : String(description));
+	return defineProperties(symbol, {
+		__description__: d('', description),
+		__name__: d('', generateName(description))
+	});
+};
+
+Object.defineProperties(Symbol, {
+	create: d('', Symbol('create')),
+	hasInstance: d('', Symbol('hasInstance')),
+	isConcatSpreadable: d('', Symbol('isConcatSpreadable')),
+	isRegExp: d('', Symbol('isRegExp')),
+	iterator: d('', Symbol('iterator')),
+	toPrimitive: d('', Symbol('toPrimitive')),
+	toStringTag: d('', Symbol('toStringTag')),
+	unscopables: d('', Symbol('unscopables'))
+});
+
+defineProperties(Symbol.prototype, {
+	properToString: d(function () {
+		return 'Symbol (' + this.__description__ + ')';
+	}),
+	toString: d('', function () { return this.__name__; })
+});
+Object.defineProperty(Symbol.prototype, Symbol.toPrimitive, d('',
+	function (hint) {
+		throw new TypeError("Conversion of symbol objects is not allowed");
+	}));
+Object.defineProperty(Symbol.prototype, Symbol.toStringTag, d('c', 'Symbol'));
+
+},{"d":4}],18:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -154,7 +419,7 @@ myActions.updateName('hello')
 
 module.exports.Dispatcher = require('./lib/Dispatcher')
 
-},{"./lib/Dispatcher":3}],3:[function(require,module,exports){
+},{"./lib/Dispatcher":19}],19:[function(require,module,exports){
 /*
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -406,7 +671,7 @@ var _prefix = 'ID_';
 
 module.exports = Dispatcher;
 
-},{"./invariant":4}],4:[function(require,module,exports){
+},{"./invariant":20}],20:[function(require,module,exports){
 /**
  * Copyright (c) 2014, Facebook, Inc.
  * All rights reserved.
@@ -461,7 +726,7 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
 
 module.exports = invariant;
 
-},{}],5:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 'use strict';
 
 function ToObject(val) {
