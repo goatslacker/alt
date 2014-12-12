@@ -1,6 +1,7 @@
 var Dispatcher = require('flux').Dispatcher
 var Symbol = require('es6-symbol')
 var Promise = require('es6-promise').Promise
+var EventEmitter = require('events').EventEmitter
 //var EventEmitter = require('events').EventEmitter
 Object.assign = Object.assign || require('object-assign')
 
@@ -19,7 +20,7 @@ var dispatcher = new Dispatcher()
 var symState = Symbol('state container')
 var symActionKey = Symbol('action key')
 var listeners = Symbol('action listeners')
-class Store {
+class Store extends EventEmitter {
   constructor() {
     this[symState] = this.getInitialState()
     this[listeners] = {}
@@ -27,7 +28,7 @@ class Store {
 
     var setState = (newState) => {
       Object.assign(this[symState], newState)
-      this.cb && this.cb()
+      this.emit('change')
     }
 
     this.dispatcherToken = dispatcher.register((payload) => {
@@ -42,7 +43,7 @@ class Store {
     })
   }
 
-  listenTo(symbol, cb) {
+  actionListener(symbol, cb) {
     // XXX check if symbol properly
     if (symbol[symActionKey]) {
       this[listeners][symbol[symActionKey]] = cb
@@ -52,9 +53,16 @@ class Store {
     return this
   }
 
+  emitChange() {
+    this.emit('change')
+  }
+
   listen(cb) {
-    // XXX use EE
-    this.cb = cb
+    this.on('change', cb)
+  }
+
+  unlisten(cb) {
+    this.removeListener('change', cb)
   }
 
   getCurrentState() {
@@ -62,35 +70,46 @@ class Store {
   }
 }
 
+var symDispatch = Symbol('dispatch action')
+var symHandler = Symbol('action creator handler')
+class ActionCreator {
+  constructor(name, action) {
+    this.name = name
+    this.action = action
+
+    this[symHandler] = (...args) => {
+      var value = this.action.apply(this, args)
+      // XXX this is a shitty way to know if its a promise
+      if (value.then) {
+        value.then((data) => this[symDispatch](data))
+      } else {
+        this[symDispatch](value)
+      }
+    }
+
+    this[symDispatch] = (data) => {
+      dispatcher.dispatch({
+        action: this.name,
+        data: data
+      })
+    }
+  }
+}
+
 class Actions {
   constructor() {
     var proto = Object.getPrototypeOf(this)
     Object.keys(proto).forEach((action) => {
-
       var constant = action.replace(/[a-z]([A-Z])/g, (i) => {
         return i[0] + '_' + i[1].toLowerCase()
       }).toUpperCase()
 
       var actionName = Symbol('action ' + constant)
 
-      this[action] = (...args) => {
-        var value = proto[action].apply(this, args)
-        // XXX this is a shitty way to know if its a promise
-        if (value.then) {
-          value.then((data) => this.dispatch(actionName, data))
-        } else {
-          this.dispatch(actionName, value)
-        }
-      }
-      this[constant] = actionName
+      var newAction = new ActionCreator(actionName, proto[action])
+      this[action] = newAction[symHandler]
       this[action][symActionKey] = actionName
-    })
-  }
-
-  dispatch(action, data) {
-    dispatcher.dispatch({
-      action: action,
-      data: data
+      this[constant] = actionName
     })
   }
 }
@@ -109,13 +128,14 @@ class MyActions extends Actions {
     })
   }
 }
-
 var myActions = new MyActions()
+
+
 
 class MyStore extends Store {
   constructor() {
     super()
-    this.listenTo(myActions.updateName, this.onUpdateName)
+    this.actionListener(myActions.updateName, this.onUpdateName)
   }
 
   getInitialState() {
