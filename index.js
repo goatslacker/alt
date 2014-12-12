@@ -55,15 +55,15 @@ class Store {
   }
 }
 
-var symActions = Symbol('store for action symbols')
 class Actions {
   constructor() {
-    this[symActions] = {}
-
     var proto = Object.getPrototypeOf(this)
     Object.keys(proto).forEach((action) => {
-      var actionName = Symbol('action ' + action)
-      this[symActions][action] = actionName
+      var constant = action.replace(/[a-z]([A-Z])/g, (i) => {
+        return i[0] + '_' + i[1].toLowerCase()
+      }).toUpperCase()
+      var actionName = Symbol('action ' + constant)
+      this[constant] = actionName
 
       this[action] = (...args) => {
         var value = proto[action].apply(this, args)
@@ -75,14 +75,6 @@ class Actions {
         }
       }
     })
-  }
-
-  sym(action) {
-    if (!this[symActions][action]) {
-      throw new ReferenceError()
-    }
-
-    return this[symActions][action]
   }
 
   dispatch(action, data) {
@@ -123,7 +115,7 @@ class MyStore extends Store {
     super()
     // XXX or i can have magic myActions.UPDATE_NAME
     // or I can make it not a class and overwrite its toString method
-    this.listenTo(myActions.sym('updateName'), this.onUpdateName)
+    this.listenTo(myActions.UPDATE_NAME, this.onUpdateName)
   }
 
   getInitialState() {

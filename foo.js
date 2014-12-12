@@ -56,15 +56,15 @@ var listeners = Symbol('action listeners')
   };
 
 
-var symActions = Symbol('store for action symbols')
 
   function Actions() {"use strict";
-    this[symActions] = {}
-
     var proto = Object.getPrototypeOf(this)
     Object.keys(proto).forEach(function(action)  {
-      var actionName = Symbol('action ' + action)
-      this[symActions][action] = actionName
+      var constant = action.replace(/[a-z]([A-Z])/g, function(i)  {
+        return i[0] + '_' + i[1].toLowerCase()
+      }).toUpperCase()
+      var actionName = Symbol('action ' + constant)
+      this[constant] = actionName
 
       this[action] = function()  {for (var args=[],$__0=0,$__1=arguments.length;$__0<$__1;$__0++) args.push(arguments[$__0]);
         var value = proto[action].apply(this, args)
@@ -77,14 +77,6 @@ var symActions = Symbol('store for action symbols')
       }.bind(this)
     }.bind(this))
   }
-
-  Actions.prototype.sym=function(action) {"use strict";
-    if (!this[symActions][action]) {
-      throw new ReferenceError()
-    }
-
-    return this[symActions][action]
-  };
 
   Actions.prototype.dispatch=function(action, data) {"use strict";
     console.log('OIOIOIOIOI', action)
@@ -124,7 +116,7 @@ for(var Store____Key in Store){if(Store.hasOwnProperty(Store____Key)){MyStore[St
     Store.call(this)
     // XXX or i can have magic myActions.UPDATE_NAME
     // or I can make it not a class and overwrite its toString method
-    this.listenTo(myActions.sym('updateName'), this.onUpdateName)
+    this.listenTo(myActions.UPDATE_NAME, this.onUpdateName)
   }
 
   MyStore.prototype.getInitialState=function() {"use strict";
