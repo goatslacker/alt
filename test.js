@@ -27,19 +27,14 @@ var myActions = fux.createActions({
 //  }
 })
 
-var myStore = fux.createStore('myStore', {
-  // XXX Either of these works ^_^ yay
-  listen: [myActions],
-//  init() {
-//    this.listenToActions(myActions)
-//  },
-  init() {
+var myStore = fux.createStore(class MyStore {
+  constructor() {
     this.listenTo(myActions.updateName, this.onUpdateName)
-  },
+  }
 
   getInitialState() {
     return { name: 'lol' }
-  },
+  }
 
   onUpdateName(name) {
     return new Fux.Promise((resolve, reject) => {
@@ -48,16 +43,18 @@ var myStore = fux.createStore('myStore', {
   }
 })
 
-var secondStore = fux.createStore('secondStore', {
-  listen: [myActions],
+var secondStore = fux.createStore(class SecondStore {
+  constructor() {
+    this.listenToActions(myActions)
+  }
 
   getInitialState() {
     return { foo: 'bar', name: myStore.getState().name }
-  },
+  }
 
   onUpdateFoo(x) {
     return { foo: x.a + x.b }
-  },
+  }
 
   onUpdateName(name) {
     fux.dispatcher.waitFor([myStore.dispatchToken])
