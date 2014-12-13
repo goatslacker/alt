@@ -152,18 +152,21 @@ var Fux = require('./fux')
 
 var fux = new Fux()
 
-// XXX need a single dispatcher instance now
+var myUtils = {
+  callServer:function(query, cb) {
+    setTimeout(function () {
+      cb('xhr-' + query)
+    }, 500)
+  }
+}
 
 var myActions = fux.createActions({
   updateName:function(name) {
     return new Fux.Promise(function(resolve, reject)  {
-      return resolve(name)
+      myUtils.callServer(name, resolve)
     })
   }
 })
-
-//var caca = myActions.updateName
-//listeners[
 
 var myStore = fux.createStore('myStore', {
   initListeners:function(on) {
@@ -181,11 +184,25 @@ var myStore = fux.createStore('myStore', {
   }
 })
 
-myStore.listen(function()  {return console.log('Shit has changed', myStore.getCurrentState());})
-console.log('=1', myStore.getCurrentState())
+// This store intentionally left blank.
+var secondStore = fux.createStore('secondStore', {
+  initListeners:function() { },
+
+  getInitialState:function() {
+    return { foo: 'bar' }
+  }
+})
+
+// XXX ok so how do you use waitFor then?
+myStore.listen(function()  {
+  console.log('Changed State:', myStore.getCurrentState())
+  console.log('Snapshot of entire app state:', fux.takeSnapshot())
+})
+
+console.log('Current State:', myStore.getCurrentState())
+
 myActions.updateName('hello')
 
-//console.log('snapshot', fux.takeSnapshot())
 
 },{"./fux":1}],3:[function(require,module,exports){
 (function (process,global){
