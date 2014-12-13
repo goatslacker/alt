@@ -14,9 +14,7 @@ var myUtils = {
 // XXX not a fan of always providing a function if the function is just an `id` function
 // what if the function takes two params? I'd still like to pass those through...
 var myActions = fux.createActions({
-  updateName(name) {
-    return name
-  },
+  updateName: Fux.id,
 
   updateFoo(a, b) {
     return {a, b}
@@ -71,17 +69,17 @@ var secondStore = fux.createStore('secondStore', {
 //  console.log('changed second', secondStore.getState())
 //})
 //
-//myStore.listen(() => {
-//  console.log('Changed State:', myStore.getState())
-//  console.log('Snapshot of entire app state:', fux.takeSnapshot())
-//})
-//
-//console.log('Current State:', myStore.getState())
+myStore.listen(() => {
+  console.log('Changed State:', myStore.getState())
+  console.log('Snapshot of entire app state:', fux.takeSnapshot())
+})
 
-var snapshot = '{"myStore":{"name":"hello"},"secondStore":{"yes": true}}'
+console.log('Current State:', myStore.getState())
 
-fux.bootstrap(snapshot)
-console.log(secondStore.getState())
+//var snapshot = '{"myStore":{"name":"hello"},"secondStore":{"yes": true}}'
 
-//myActions.updateName('hello')
+//fux.bootstrap(snapshot)
+//console.log(secondStore.getState())
+
+myActions.updateName('hello')
 //myActions.updateFoo(1, 2)

@@ -162,5 +162,6 @@ class Fux {
 }
 
 Fux.Promise = Promise
+Fux.id = (x) => x
 
 module.exports = Fux
