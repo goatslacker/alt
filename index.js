@@ -15,7 +15,7 @@ var myActions = fux.createActions({
 //var caca = myActions.updateName
 //listeners[
 
-var myStore = fux.createStore({
+var myStore = fux.createStore('myStore', {
 
   // XXX this is a bad idea...
   initListeners() {
@@ -35,11 +35,8 @@ var myStore = fux.createStore({
   }
 })
 
-//myStore.on(myActions.updateName, myStore.onUpdateName)
-
-
 myStore.listen(() => console.log('Shit has changed', myStore.getCurrentState()))
 console.log('=1', myStore.getCurrentState())
 myActions.updateName('hello')
 
-//console.log('snapshot', fux.Stores.takeSnapshot())
+//console.log('snapshot', fux.takeSnapshot())

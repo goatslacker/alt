@@ -100,14 +100,16 @@ var formatAsConstant = function(name)  {
 }
 
 var symDispatcher = Symbol('the dispatcher')
+var symStores = Symbol('stores storage')
 
 
   function Fux() {"use strict";
     this[symDispatcher] = new Dispatcher()
+    this[symStores] = {}
   }
 
-  Fux.prototype.createStore=function(store) {"use strict";
-    return new Store(this[symDispatcher], store)
+  Fux.prototype.createStore=function(key, store) {"use strict";
+    return this[symStores][key] = new Store(this[symDispatcher], store)
   };
 
   Fux.prototype.createActions=function(actions) {"use strict";
@@ -127,6 +129,20 @@ var symDispatcher = Symbol('the dispatcher')
 
       return obj
     }.bind(this), {})
+  };
+
+  Fux.prototype.takeSnapshot=function() {"use strict";
+    return JSON.stringify(Object.keys(this[symStores]).reduce(function(obj, key)  {
+      obj[key] = this[symStores][key].getCurrentState()
+      return obj
+    }.bind(this), {}))
+  };
+
+  Fux.prototype.bootstrap=function(data) {"use strict";
+    var obj = JSON.parse(data)
+    Object.keys(obj).forEach(function(key)  {
+      this[symStores][key][setState](obj[key])
+    }.bind(this))
   };
 
 
@@ -152,7 +168,7 @@ var myActions = fux.createActions({
 //var caca = myActions.updateName
 //listeners[
 
-var myStore = fux.createStore({
+var myStore = fux.createStore('myStore', {
 
   // XXX this is a bad idea...
   initListeners:function() {
@@ -172,14 +188,11 @@ var myStore = fux.createStore({
   }
 })
 
-//myStore.on(myActions.updateName, myStore.onUpdateName)
-
-
 myStore.listen(function()  {return console.log('Shit has changed', myStore.getCurrentState());})
 console.log('=1', myStore.getCurrentState())
 myActions.updateName('hello')
 
-//console.log('snapshot', fux.Stores.takeSnapshot())
+//console.log('snapshot', fux.takeSnapshot())
 
 },{"./fux":1}],3:[function(require,module,exports){
 (function (process,global){

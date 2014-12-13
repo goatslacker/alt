@@ -99,14 +99,16 @@ var formatAsConstant = (name) => {
 }
 
 var symDispatcher = Symbol('the dispatcher')
+var symStores = Symbol('stores storage')
 
 class Fux {
   constructor() {
     this[symDispatcher] = new Dispatcher()
+    this[symStores] = {}
   }
 
-  createStore(store) {
-    return new Store(this[symDispatcher], store)
+  createStore(key, store) {
+    return this[symStores][key] = new Store(this[symDispatcher], store)
   }
 
   createActions(actions) {
@@ -126,6 +128,20 @@ class Fux {
 
       return obj
     }, {})
+  }
+
+  takeSnapshot() {
+    return JSON.stringify(Object.keys(this[symStores]).reduce((obj, key) => {
+      obj[key] = this[symStores][key].getCurrentState()
+      return obj
+    }, {}))
+  }
+
+  bootstrap(data) {
+    var obj = JSON.parse(data)
+    Object.keys(obj).forEach((key) => {
+      this[symStores][key][setState](obj[key])
+    })
   }
 }
 
