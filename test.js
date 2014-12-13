@@ -26,16 +26,17 @@ var myActions = fux.createActions({
 })
 
 var myStore = fux.createStore('myStore', {
-  init() {
-    this.listenTo(myActions.updateName, this.onUpdateName)
-  },
+  // XXX Either of these works ^_^ yay
+  listen: [myActions],
+//  init() {
+//    this.listenToActions(myActions)
+//  },
 
   getInitialState() {
     return { name: 'lol' }
   },
 
   onUpdateName(name) {
-    fux.dispatcher.waitFor([secondStore.dispatchToken])
     return new Fux.Promise((resolve, reject) => {
       return resolve({ name: name })
     })
@@ -43,9 +44,6 @@ var myStore = fux.createStore('myStore', {
 })
 
 var secondStore = fux.createStore('secondStore', {
-  // XXX not a fan of this "special" method with this special `on` argument
-  // wish i could subscribe to all listeners for an action automatically
-  // and I need a global listen to all
   init() {
     this.listenTo(myActions.updateName, this.onUpdateName)
   },
@@ -55,6 +53,7 @@ var secondStore = fux.createStore('secondStore', {
   },
 
   onUpdateName(name) {
+    fux.dispatcher.waitFor([myStore.dispatchToken])
     return { name: name }
   }
 })

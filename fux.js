@@ -42,7 +42,25 @@ class Store extends EventEmitter {
       }
     }
 
-    store.init()
+    store.listenToActions = (actions) => {
+      Object.keys(actions).forEach((action) => {
+        var symbol = actions[action]
+        var assumedEventHandler = action.replace(
+          /./,
+          (x) => 'on' + x[0].toUpperCase()
+        )
+        if (store[assumedEventHandler]) {
+          if (symbol[symActionKey]) {
+            this[symListeners][symbol[symActionKey]] = store[assumedEventHandler]
+          } else {
+            this[symListeners][symbol] = store[assumedEventHandler]
+          }
+        }
+      })
+    }
+
+    typeof store.init == 'function' && store.init()
+    Array.isArray(store.listen) && store.listen.forEach(store.listenToActions)
   }
 
   emitChange() {
