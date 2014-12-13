@@ -5,6 +5,7 @@ var EventEmitter = require('events').EventEmitter
 var Promise = require('es6-promise').Promise
 var Symbol = require('./es6-symbol.js')
 Object.assign = Object.assign || require('object-assign')
+var isPromise = require('is-promise')
 
 var setState = Symbol('set state')
 var symActionKey = Symbol('action key name')
@@ -24,7 +25,8 @@ class Store extends EventEmitter {
     this.dispatchToken = dispatcher.register((payload) => {
       if (this[symListeners][payload.action]) {
         var state = this[symListeners][payload.action](payload.data)
-        if (state.then) {
+
+        if (isPromise(state)) {
           state.then((data) => this[setState](data))
         } else {
           this[setState](state)
@@ -69,8 +71,7 @@ class ActionCreator {
 
     this[symHandler] = (...args) => {
       var value = this.action.apply(this, args)
-      // XXX this is a shitty way to know if its a promise
-      if (value.then) {
+      if (isPromise(value)) {
         value.then((data) => this[symDispatch](data))
       } else {
         this[symDispatch](value)

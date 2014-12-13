@@ -7,6 +7,7 @@
     "es6-promise": "^2.0.1",
     "events": "^1.0.2",
     "flux": "^2.0.1",
+    "is-promise": "^1.0.1",
     "object-assign": "^2.0.0",
     "reactify": "^0.17.1",
     "reflux": "^0.1.15"

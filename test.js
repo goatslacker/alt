@@ -1,4 +1,5 @@
-var Fux = require('./dist/fux')
+// XXX test this with a require that compiles to es6
+var Fux = require('./fux')
 
 var fux = new Fux()
 
@@ -11,11 +12,12 @@ var myUtils = {
 }
 
 var myActions = fux.createActions({
-  updateName(name) {
-    return new Fux.Promise((resolve, reject) => {
-      myUtils.callServer(name, resolve)
-    })
-  }
+//  updateName: 1
+//  updateName(name) {
+//    return new Fux.Promise((resolve, reject) => {
+//      myUtils.callServer(name, resolve)
+//    })
+//  }
 })
 
 var myStore = fux.createStore('myStore', {
