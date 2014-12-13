@@ -75,7 +75,7 @@ class Store extends EventEmitter {
     this.removeListener('change', cb)
   }
 
-  getCurrentState() {
+  getState() {
     return this[symState]
 //    return Object.assign({}, this[symState])
   }
@@ -146,7 +146,7 @@ class Fux {
 
   takeSnapshot() {
     return JSON.stringify(Object.keys(this[symStores]).reduce((obj, key) => {
-      obj[key] = this[symStores][key].getCurrentState()
+      obj[key] = this[symStores][key].getState()
       return obj
     }, {}))
   }

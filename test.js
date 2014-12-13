@@ -16,6 +16,10 @@ var myUtils = {
 var myActions = fux.createActions({
   updateName(name) {
     return name
+  },
+
+  updateFoo(a, b) {
+    return {a, b}
   }
 //  updateName: 1
 //  updateName(name) {
@@ -49,7 +53,11 @@ var secondStore = fux.createStore('secondStore', {
   },
 
   getInitialState() {
-    return { foo: 'bar', name: myStore.getCurrentState().name }
+    return { foo: 'bar', name: myStore.getState().name }
+  },
+
+  onUpdateFoo(a, b) {
+    console.log('@', a, b)
   },
 
   onUpdateName(name) {
@@ -58,13 +66,16 @@ var secondStore = fux.createStore('secondStore', {
   }
 })
 
+secondStore.listen(() => {
+  console.log('changed second', secondStore.getState())
+})
 
 myStore.listen(() => {
-  console.log('Changed State:', myStore.getCurrentState())
+  console.log('Changed State:', myStore.getState())
   console.log('Snapshot of entire app state:', fux.takeSnapshot())
 })
 
-console.log('Current State:', myStore.getCurrentState())
+console.log('Current State:', myStore.getState())
 
 myActions.updateName('hello')
-
+//myActions.updateFoo(1, 2)
