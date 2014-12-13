@@ -35,6 +35,9 @@ var myStore = fux.createStore('myStore', {
 //  init() {
 //    this.listenToActions(myActions)
 //  },
+  init() {
+    this.listenTo(myActions.updateName, this.onUpdateName)
+  },
 
   getInitialState() {
     return { name: 'lol' }
@@ -48,16 +51,14 @@ var myStore = fux.createStore('myStore', {
 })
 
 var secondStore = fux.createStore('secondStore', {
-  init() {
-    this.listenTo(myActions.updateName, this.onUpdateName)
-  },
+  listen: [myActions],
 
   getInitialState() {
     return { foo: 'bar', name: myStore.getState().name }
   },
 
-  onUpdateFoo(a, b) {
-    console.log('@', a, b)
+  onUpdateFoo(x) {
+    return { foo: x.a + x.b }
   },
 
   onUpdateName(name) {
@@ -66,16 +67,21 @@ var secondStore = fux.createStore('secondStore', {
   }
 })
 
-secondStore.listen(() => {
-  console.log('changed second', secondStore.getState())
-})
+//secondStore.listen(() => {
+//  console.log('changed second', secondStore.getState())
+//})
+//
+//myStore.listen(() => {
+//  console.log('Changed State:', myStore.getState())
+//  console.log('Snapshot of entire app state:', fux.takeSnapshot())
+//})
+//
+//console.log('Current State:', myStore.getState())
 
-myStore.listen(() => {
-  console.log('Changed State:', myStore.getState())
-  console.log('Snapshot of entire app state:', fux.takeSnapshot())
-})
+var snapshot = '{"myStore":{"name":"hello"},"secondStore":{"yes": true}}'
 
-console.log('Current State:', myStore.getState())
+fux.bootstrap(snapshot)
+console.log(secondStore.getState())
 
-myActions.updateName('hello')
+//myActions.updateName('hello')
 //myActions.updateFoo(1, 2)

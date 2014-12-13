@@ -18,7 +18,9 @@ class Store extends EventEmitter {
     this[symListeners] = {}
 
     this[setState] = (newState) => {
-      Object.assign(this[symState], newState)
+      if (this[symState] !== newState) {
+        Object.assign(this[symState], newState)
+      }
       this.emit('change')
     }
 
