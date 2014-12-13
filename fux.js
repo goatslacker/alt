@@ -3,7 +3,7 @@
 var Dispatcher = require('flux').Dispatcher
 var EventEmitter = require('events').EventEmitter
 var Promise = require('es6-promise').Promise
-var Symbol = require('./es6-symbol.js')
+var Symbol = require('./polyfills/es6-symbol')
 Object.assign = Object.assign || require('object-assign')
 var isPromise = require('is-promise')
 
