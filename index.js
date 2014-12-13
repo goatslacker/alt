@@ -37,6 +37,8 @@ var myStore = new MyStore()
 
 
 
+// XXX now I need a global store registry so I can save all of the state into a single snapshot
+// and then be able to hydrate all of that with the serialized data <-- this one sort of goes against flux since i wouldn't be calling actions
 
 myStore.listen(() => console.log('Shit has changed', myStore.getCurrentState()))
 console.log('=1', myStore.getCurrentState())
