@@ -28,22 +28,28 @@ var myStore = fux.createStore('myStore', {
   },
 
   onUpdateName(name) {
+    fux.dispatcher.waitFor([secondStore.dispatchToken])
     return new Fux.Promise((resolve, reject) => {
       return resolve({ name: name })
     })
   }
 })
 
-// This store intentionally left blank.
 var secondStore = fux.createStore('secondStore', {
-  initListeners() { },
+  initListeners(on) {
+    on(myActions.updateName, this.onUpdateName)
+  },
 
   getInitialState() {
-    return { foo: 'bar' }
+    return { foo: 'bar', name: myStore.getCurrentState().name }
+  },
+
+  onUpdateName(name) {
+    return { name: name }
   }
 })
 
-// XXX ok so how do you use waitFor then?
+
 myStore.listen(() => {
   console.log('Changed State:', myStore.getCurrentState())
   console.log('Snapshot of entire app state:', fux.takeSnapshot())

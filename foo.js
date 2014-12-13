@@ -22,7 +22,7 @@ for(var EventEmitter____Key in EventEmitter){if(EventEmitter.hasOwnProperty(Even
       this.emit('change')
     }.bind(this)
 
-    this.dispatcherToken = dispatcher.register(function(payload)  {
+    this.dispatchToken = dispatcher.register(function(payload)  {
       if (this[symListeners][payload.action]) {
         var state = this[symListeners][payload.action](payload.data)
         if (state.then) {
@@ -56,10 +56,6 @@ for(var EventEmitter____Key in EventEmitter){if(EventEmitter.hasOwnProperty(Even
 
   Store.prototype.getCurrentState=function() {"use strict";
     return this[symState]
-  };
-
-  Store.prototype.getDispatcherToken=function() {"use strict";
-    return this.dispatcherToken
   };
 
 
@@ -96,17 +92,16 @@ var formatAsConstant = function(name)  {
   }).toUpperCase()
 }
 
-var symDispatcher = Symbol('the dispatcher')
 var symStores = Symbol('stores storage')
 
 
   function Fux() {"use strict";
-    this[symDispatcher] = new Dispatcher()
+    this.dispatcher = new Dispatcher()
     this[symStores] = {}
   }
 
   Fux.prototype.createStore=function(key, store) {"use strict";
-    return this[symStores][key] = new Store(this[symDispatcher], store)
+    return this[symStores][key] = new Store(this.dispatcher, store)
   };
 
   Fux.prototype.createActions=function(actions) {"use strict";
@@ -115,7 +110,7 @@ var symStores = Symbol('stores storage')
       var actionName = Symbol('action ' + constant)
 
       var newAction = new ActionCreator(
-        this[symDispatcher],
+        this.dispatcher,
         actionName,
         actions[action]
       )
@@ -178,6 +173,7 @@ var myStore = fux.createStore('myStore', {
   },
 
   onUpdateName:function(name) {
+    fux.dispatcher.waitFor([secondStore.dispatchToken])
     return new Fux.Promise(function(resolve, reject)  {
       return resolve({ name: name })
     })
@@ -186,10 +182,16 @@ var myStore = fux.createStore('myStore', {
 
 // This store intentionally left blank.
 var secondStore = fux.createStore('secondStore', {
-  initListeners:function() { },
+  initListeners:function(on) {
+    on(myActions.updateName, this.onUpdateName)
+  },
 
   getInitialState:function() {
-    return { foo: 'bar' }
+    return { foo: 'bar', name: myStore.getCurrentState().name }
+  },
+
+  onUpdateName:function(name) {
+    return { name: name }
   }
 })
 

@@ -21,7 +21,7 @@ class Store extends EventEmitter {
       this.emit('change')
     }
 
-    this.dispatcherToken = dispatcher.register((payload) => {
+    this.dispatchToken = dispatcher.register((payload) => {
       if (this[symListeners][payload.action]) {
         var state = this[symListeners][payload.action](payload.data)
         if (state.then) {
@@ -55,10 +55,6 @@ class Store extends EventEmitter {
 
   getCurrentState() {
     return this[symState]
-  }
-
-  getDispatcherToken() {
-    return this.dispatcherToken
   }
 }
 
@@ -95,17 +91,16 @@ var formatAsConstant = (name) => {
   }).toUpperCase()
 }
 
-var symDispatcher = Symbol('the dispatcher')
 var symStores = Symbol('stores storage')
 
 class Fux {
   constructor() {
-    this[symDispatcher] = new Dispatcher()
+    this.dispatcher = new Dispatcher()
     this[symStores] = {}
   }
 
   createStore(key, store) {
-    return this[symStores][key] = new Store(this[symDispatcher], store)
+    return this[symStores][key] = new Store(this.dispatcher, store)
   }
 
   createActions(actions) {
@@ -114,7 +109,7 @@ class Fux {
       var actionName = Symbol('action ' + constant)
 
       var newAction = new ActionCreator(
-        this[symDispatcher],
+        this.dispatcher,
         actionName,
         actions[action]
       )
