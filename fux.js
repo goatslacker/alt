@@ -1,7 +1,8 @@
 var Dispatcher = require('flux').Dispatcher
-var Symbol = require('es6-symbol')
-var Promise = require('es6-promise').Promise
 var EventEmitter = require('events').EventEmitter
+//var Immutable = require('immutable')
+var Promise = require('es6-promise').Promise
+var Symbol = require('es6-symbol')
 Object.assign = Object.assign || require('object-assign')
 
 // XXX use immutable data stores for stores
@@ -55,6 +56,7 @@ class Store extends EventEmitter {
 
   getCurrentState() {
     return this[symState]
+//    return Object.assign({}, this[symState])
   }
 }
 
