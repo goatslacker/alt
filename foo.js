@@ -5,16 +5,6 @@ var Promise = require('es6-promise').Promise
 var EventEmitter = require('events').EventEmitter
 Object.assign = Object.assign || require('object-assign')
 
-//console.log(Dispatcher)
-
-//class Unidirectional {
-//  constructor() {
-//    this.dispatcher = new Dispatcher()
-//  }
-//}
-
-var dispatcher = new Dispatcher()
-
 // XXX use immutable data stores for stores
 
 var setState = Symbol('set state')
@@ -22,9 +12,8 @@ var symActionKey = Symbol('action key name')
 var symListeners = Symbol('action listeners storage')
 var symState = Symbol('state container')
 
-// XXX pass in dispatcher
 for(var EventEmitter____Key in EventEmitter){if(EventEmitter.hasOwnProperty(EventEmitter____Key)){Store[EventEmitter____Key]=EventEmitter[EventEmitter____Key];}}var ____SuperProtoOfEventEmitter=EventEmitter===null?null:EventEmitter.prototype;Store.prototype=Object.create(____SuperProtoOfEventEmitter);Store.prototype.constructor=Store;Store.__superConstructor__=EventEmitter;
-  function Store(store) {"use strict";
+  function Store(dispatcher, store) {"use strict";
     this[symState] = store.getInitialState()
     this[symListeners] = {}
 
@@ -80,9 +69,8 @@ for(var EventEmitter____Key in EventEmitter){if(EventEmitter.hasOwnProperty(Even
 var symDispatch = Symbol('dispatch action')
 var symHandler = Symbol('action creator handler')
 
-// XXX pass in dispatcher as well
 
-  function ActionCreator(name, action) {"use strict";
+  function ActionCreator(dispatcher, name, action) {"use strict";
     this.name = name
     this.action = action
 
@@ -111,42 +99,51 @@ var formatAsConstant = function(name)  {
   }).toUpperCase()
 }
 
-// XXX this should be part of fux class
-// make sure this is assigned into the fux stores...
-var createStore = function(store)  {
-  return new Store(store)
-}
+var symDispatcher = Symbol('the dispatcher')
 
-var createActions = function(actions)  {
-  return Object.keys(actions).reduce(function(obj, action)  {
-    var constant = formatAsConstant(action)
-    var actionName = Symbol('action ' + constant)
-    var newAction = new ActionCreator(actionName, actions[action])
 
-    obj[action] = newAction[symHandler]
-    obj[action][symActionKey] = actionName
-    obj[constant] = actionName
+  function Fux() {"use strict";
+    this[symDispatcher] = new Dispatcher()
+  }
 
-    return obj
-  }, {})
-}
+  Fux.prototype.createStore=function(store) {"use strict";
+    return new Store(this[symDispatcher], store)
+  };
 
-module.exports = {
-  createActions: createActions,
-  createStore: createStore,
-//  Actions: Actions,
-//  Store: Store,
-  Promise: Promise
-}
+  Fux.prototype.createActions=function(actions) {"use strict";
+    return Object.keys(actions).reduce(function(obj, action)  {
+      var constant = formatAsConstant(action)
+      var actionName = Symbol('action ' + constant)
+
+      var newAction = new ActionCreator(
+        this[symDispatcher],
+        actionName,
+        actions[action]
+      )
+
+      obj[action] = newAction[symHandler]
+      obj[action][symActionKey] = actionName
+      obj[constant] = actionName
+
+      return obj
+    }.bind(this), {})
+  };
+
+
+Fux.Promise = Promise
+
+module.exports = Fux
 
 },{"es6-promise":3,"es6-symbol":4,"events":24,"flux":20,"object-assign":23}],2:[function(require,module,exports){
-var fux = require('./fux')
+var Fux = require('./fux')
+
+var fux = new Fux()
 
 // XXX need a single dispatcher instance now
 
 var myActions = fux.createActions({
   updateName:function(name) {
-    return new fux.Promise(function(resolve, reject)  {
+    return new Fux.Promise(function(resolve, reject)  {
       return resolve(name)
     })
   }
@@ -169,7 +166,7 @@ var myStore = fux.createStore({
   },
 
   onUpdateName:function(name) {
-    return new fux.Promise(function(resolve, reject)  {
+    return new Fux.Promise(function(resolve, reject)  {
       return resolve({ name: name })
     })
   }

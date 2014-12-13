@@ -1,10 +1,12 @@
-var fux = require('./fux')
+var Fux = require('./fux')
+
+var fux = new Fux()
 
 // XXX need a single dispatcher instance now
 
 var myActions = fux.createActions({
   updateName(name) {
-    return new fux.Promise((resolve, reject) => {
+    return new Fux.Promise((resolve, reject) => {
       return resolve(name)
     })
   }
@@ -27,7 +29,7 @@ var myStore = fux.createStore({
   },
 
   onUpdateName(name) {
-    return new fux.Promise((resolve, reject) => {
+    return new Fux.Promise((resolve, reject) => {
       return resolve({ name: name })
     })
   }

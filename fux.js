@@ -4,16 +4,6 @@ var Promise = require('es6-promise').Promise
 var EventEmitter = require('events').EventEmitter
 Object.assign = Object.assign || require('object-assign')
 
-//console.log(Dispatcher)
-
-//class Unidirectional {
-//  constructor() {
-//    this.dispatcher = new Dispatcher()
-//  }
-//}
-
-var dispatcher = new Dispatcher()
-
 // XXX use immutable data stores for stores
 
 var setState = Symbol('set state')
@@ -21,9 +11,8 @@ var symActionKey = Symbol('action key name')
 var symListeners = Symbol('action listeners storage')
 var symState = Symbol('state container')
 
-// XXX pass in dispatcher
 class Store extends EventEmitter {
-  constructor(store) {
+  constructor(dispatcher, store) {
     this[symState] = store.getInitialState()
     this[symListeners] = {}
 
@@ -79,9 +68,8 @@ class Store extends EventEmitter {
 var symDispatch = Symbol('dispatch action')
 var symHandler = Symbol('action creator handler')
 
-// XXX pass in dispatcher as well
 class ActionCreator {
-  constructor(name, action) {
+  constructor(dispatcher, name, action) {
     this.name = name
     this.action = action
 
@@ -110,30 +98,37 @@ var formatAsConstant = (name) => {
   }).toUpperCase()
 }
 
-// XXX this should be part of fux class
-// make sure this is assigned into the fux stores...
-var createStore = (store) => {
-  return new Store(store)
+var symDispatcher = Symbol('the dispatcher')
+
+class Fux {
+  constructor() {
+    this[symDispatcher] = new Dispatcher()
+  }
+
+  createStore(store) {
+    return new Store(this[symDispatcher], store)
+  }
+
+  createActions(actions) {
+    return Object.keys(actions).reduce((obj, action) => {
+      var constant = formatAsConstant(action)
+      var actionName = Symbol('action ' + constant)
+
+      var newAction = new ActionCreator(
+        this[symDispatcher],
+        actionName,
+        actions[action]
+      )
+
+      obj[action] = newAction[symHandler]
+      obj[action][symActionKey] = actionName
+      obj[constant] = actionName
+
+      return obj
+    }, {})
+  }
 }
 
-var createActions = (actions) => {
-  return Object.keys(actions).reduce((obj, action) => {
-    var constant = formatAsConstant(action)
-    var actionName = Symbol('action ' + constant)
-    var newAction = new ActionCreator(actionName, actions[action])
+Fux.Promise = Promise
 
-    obj[action] = newAction[symHandler]
-    obj[action][symActionKey] = actionName
-    obj[constant] = actionName
-
-    return obj
-  }, {})
-}
-
-module.exports = {
-  createActions: createActions,
-  createStore: createStore,
-//  Actions: Actions,
-//  Store: Store,
-  Promise: Promise
-}
+module.exports = Fux
