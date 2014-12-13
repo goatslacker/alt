@@ -26,8 +26,8 @@ var myActions = fux.createActions({
 })
 
 var myStore = fux.createStore('myStore', {
-  initListeners(on) {
-    on(myActions.updateName, this.onUpdateName)
+  init() {
+    this.listenTo(myActions.updateName, this.onUpdateName)
   },
 
   getInitialState() {
@@ -46,11 +46,9 @@ var secondStore = fux.createStore('secondStore', {
   // XXX not a fan of this "special" method with this special `on` argument
   // wish i could subscribe to all listeners for an action automatically
   // and I need a global listen to all
-  initListeners(on) {
-    on(myActions.updateName, this.onUpdateName)
+  init() {
+    this.listenTo(myActions.updateName, this.onUpdateName)
   },
-
-  listeners: [myActions.updateName],
 
   getInitialState() {
     return { foo: 'bar', name: myStore.getCurrentState().name }

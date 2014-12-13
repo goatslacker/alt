@@ -34,13 +34,15 @@ class Store extends EventEmitter {
       }
     })
 
-    store.initListeners((symbol, handler) => {
+    store.listenTo = (symbol, handler) => {
       if (symbol[symActionKey]) {
         this[symListeners][symbol[symActionKey]] = handler
       } else {
         this[symListeners][symbol] = handler
       }
-    })
+    }
+
+    store.init()
   }
 
   emitChange() {
