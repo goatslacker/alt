@@ -16,12 +16,8 @@ var myActions = fux.createActions({
 //listeners[
 
 var myStore = fux.createStore('myStore', {
-
-  // XXX this is a bad idea...
-  initListeners() {
-    var listeners = {}
-    listeners[myActions.UPDATE_NAME] = this.onUpdateName
-    return listeners
+  initListeners(on) {
+    on(myActions.updateName, this.onUpdateName)
   },
 
   getInitialState() {

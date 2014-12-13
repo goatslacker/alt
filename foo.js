@@ -33,14 +33,11 @@ for(var EventEmitter____Key in EventEmitter){if(EventEmitter.hasOwnProperty(Even
       }
     }.bind(this))
 
-    var toListen = store.initListeners()
-    Object.keys(toListen).forEach(function(symbol)  {
-      var cb = toListen[symbol]
-
+    store.initListeners(function(symbol, handler)  {
       if (symbol[symActionKey]) {
-        this[symListeners][symbol[symActionKey]] = cb
+        this[symListeners][symbol[symActionKey]] = handler
       } else {
-        this[symListeners][symbol] = cb
+        this[symListeners][symbol] = handler
       }
     }.bind(this))
   }
@@ -169,12 +166,8 @@ var myActions = fux.createActions({
 //listeners[
 
 var myStore = fux.createStore('myStore', {
-
-  // XXX this is a bad idea...
-  initListeners:function() {
-    var listeners = {}
-    listeners[myActions.UPDATE_NAME] = this.onUpdateName
-    return listeners
+  initListeners:function(on) {
+    on(myActions.updateName, this.onUpdateName)
   },
 
   getInitialState:function() {

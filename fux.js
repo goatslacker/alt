@@ -32,14 +32,11 @@ class Store extends EventEmitter {
       }
     })
 
-    var toListen = store.initListeners()
-    Object.keys(toListen).forEach((symbol) => {
-      var cb = toListen[symbol]
-
+    store.initListeners((symbol, handler) => {
       if (symbol[symActionKey]) {
-        this[symListeners][symbol[symActionKey]] = cb
+        this[symListeners][symbol[symActionKey]] = handler
       } else {
-        this[symListeners][symbol] = cb
+        this[symListeners][symbol] = handler
       }
     })
   }
