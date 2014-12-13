@@ -1,0 +1,27 @@
+{
+  "name": "fux",
+  "version": "1.0.0",
+  "description": "A flux implementation",
+  "main": "index.js",
+  "dependencies": {
+    "es6-symbol": "^0.1.1",
+    "es6-promise": "^2.0.0",
+    "flux": "^2.0.1",
+    "object-assign": "^2.0.0",
+    "reactify": "^0.17.1",
+    "reflux": "^0.1.15"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "build": "forge index.js [reactify --es6]",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "flux",
+    "react",
+    "flow",
+    "unidirectional"
+  ],
+  "author": "Josh Perez <josh@goatslacker.com>",
+  "license": "MIT"
+}
