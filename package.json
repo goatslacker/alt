@@ -2,10 +2,10 @@
   "name": "fux",
   "version": "1.0.0",
   "description": "A flux implementation",
-  "main": "index.js",
+  "main": "dist/fux.js",
   "dependencies": {
     "es6-promise": "^2.0.1",
-    "es6-symbol": "^0.1.1",
+    "events": "^1.0.2",
     "flux": "^2.0.1",
     "object-assign": "^2.0.0",
     "reactify": "^0.17.1",

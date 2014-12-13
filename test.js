@@ -1,4 +1,4 @@
-var Fux = require('./fux')
+var Fux = require('./dist/fux')
 
 var fux = new Fux()
 

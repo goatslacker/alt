@@ -1,11 +1,10 @@
+'use strict'
+
 var Dispatcher = require('flux').Dispatcher
 var EventEmitter = require('events').EventEmitter
-//var Immutable = require('immutable')
 var Promise = require('es6-promise').Promise
-var Symbol = require('es6-symbol')
+var Symbol = require('./es6-symbol.js')
 Object.assign = Object.assign || require('object-assign')
-
-// XXX use immutable data stores for stores
 
 var setState = Symbol('set state')
 var symActionKey = Symbol('action key name')
