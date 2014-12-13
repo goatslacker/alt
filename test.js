@@ -11,7 +11,12 @@ var myUtils = {
   }
 }
 
+// XXX not a fan of always providing a function if the function is just an `id` function
+// what if the function takes two params? I'd still like to pass those through...
 var myActions = fux.createActions({
+  updateName(name) {
+    return name
+  }
 //  updateName: 1
 //  updateName(name) {
 //    return new Fux.Promise((resolve, reject) => {
@@ -38,9 +43,14 @@ var myStore = fux.createStore('myStore', {
 })
 
 var secondStore = fux.createStore('secondStore', {
+  // XXX not a fan of this "special" method with this special `on` argument
+  // wish i could subscribe to all listeners for an action automatically
+  // and I need a global listen to all
   initListeners(on) {
     on(myActions.updateName, this.onUpdateName)
   },
+
+  listeners: [myActions.updateName],
 
   getInitialState() {
     return { foo: 'bar', name: myStore.getCurrentState().name }
