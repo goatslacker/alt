@@ -17,41 +17,44 @@ var dispatcher = new Dispatcher()
 
 // XXX use immutable data stores for stores
 
+var setState = Symbol('set state')
+var symActionKey = Symbol('action key name')
+var symListeners = Symbol('action listeners storage')
 var symState = Symbol('state container')
-var symActionKey = Symbol('action key')
-var listeners = Symbol('action listeners')
-for(var EventEmitter____Key in EventEmitter){if(EventEmitter.hasOwnProperty(EventEmitter____Key)){Store[EventEmitter____Key]=EventEmitter[EventEmitter____Key];}}var ____SuperProtoOfEventEmitter=EventEmitter===null?null:EventEmitter.prototype;Store.prototype=Object.create(____SuperProtoOfEventEmitter);Store.prototype.constructor=Store;Store.__superConstructor__=EventEmitter;
-  function Store() {"use strict";
-    this[symState] = this.getInitialState()
-    this[listeners] = {}
-    this.cb = null
 
-    var setState = function(newState)  {
+// XXX pass in dispatcher
+for(var EventEmitter____Key in EventEmitter){if(EventEmitter.hasOwnProperty(EventEmitter____Key)){Store[EventEmitter____Key]=EventEmitter[EventEmitter____Key];}}var ____SuperProtoOfEventEmitter=EventEmitter===null?null:EventEmitter.prototype;Store.prototype=Object.create(____SuperProtoOfEventEmitter);Store.prototype.constructor=Store;Store.__superConstructor__=EventEmitter;
+  function Store(store) {"use strict";
+    this[symState] = store.getInitialState()
+    this[symListeners] = {}
+
+    this[setState] = function(newState)  {
       Object.assign(this[symState], newState)
       this.emit('change')
     }.bind(this)
 
     this.dispatcherToken = dispatcher.register(function(payload)  {
-      if (this[listeners][payload.action]) {
-        var state = this[listeners][payload.action](payload.data)
+      if (this[symListeners][payload.action]) {
+        var state = this[symListeners][payload.action](payload.data)
         if (state.then) {
-          state.then(function(data)  {return setState(data);})
+          state.then(function(data)  {return this[setState](data);}.bind(this))
         } else {
-          setState(state)
+          this[setState](state)
         }
       }
     }.bind(this))
-  }
 
-  Store.prototype.actionListener=function(symbol, cb) {"use strict";
-    // XXX check if symbol properly
-    if (symbol[symActionKey]) {
-      this[listeners][symbol[symActionKey]] = cb
-    } else {
-      this[listeners][symbol] = cb
-    }
-    return this
-  };
+    var toListen = store.initListeners()
+    Object.keys(toListen).forEach(function(symbol)  {
+      var cb = toListen[symbol]
+
+      if (symbol[symActionKey]) {
+        this[symListeners][symbol[symActionKey]] = cb
+      } else {
+        this[symListeners][symbol] = cb
+      }
+    }.bind(this))
+  }
 
   Store.prototype.emitChange=function() {"use strict";
     this.emit('change')
@@ -69,9 +72,15 @@ for(var EventEmitter____Key in EventEmitter){if(EventEmitter.hasOwnProperty(Even
     return this[symState]
   };
 
+  Store.prototype.getDispatcherToken=function() {"use strict";
+    return this.dispatcherToken
+  };
+
 
 var symDispatch = Symbol('dispatch action')
 var symHandler = Symbol('action creator handler')
+
+// XXX pass in dispatcher as well
 
   function ActionCreator(name, action) {"use strict";
     this.name = name
@@ -96,76 +105,86 @@ var symHandler = Symbol('action creator handler')
   }
 
 
+var formatAsConstant = function(name)  {
+  return name.replace(/[a-z]([A-Z])/g, function(i)  {
+    return i[0] + '_' + i[1].toLowerCase()
+  }).toUpperCase()
+}
 
-  function Actions() {"use strict";
-    var proto = Object.getPrototypeOf(this)
-    Object.keys(proto).forEach(function(action)  {
-      var constant = action.replace(/[a-z]([A-Z])/g, function(i)  {
-        return i[0] + '_' + i[1].toLowerCase()
-      }).toUpperCase()
+// XXX this should be part of fux class
+// make sure this is assigned into the fux stores...
+var createStore = function(store)  {
+  return new Store(store)
+}
 
-      var actionName = Symbol('action ' + constant)
+var createActions = function(actions)  {
+  return Object.keys(actions).reduce(function(obj, action)  {
+    var constant = formatAsConstant(action)
+    var actionName = Symbol('action ' + constant)
+    var newAction = new ActionCreator(actionName, actions[action])
 
-      var newAction = new ActionCreator(actionName, proto[action])
-      this[action] = newAction[symHandler]
-      this[action][symActionKey] = actionName
-      this[constant] = actionName
-    }.bind(this))
-  }
+    obj[action] = newAction[symHandler]
+    obj[action][symActionKey] = actionName
+    obj[constant] = actionName
 
-
+    return obj
+  }, {})
+}
 
 module.exports = {
-  Actions: Actions,
-  Store: Store,
+  createActions: createActions,
+  createStore: createStore,
+//  Actions: Actions,
+//  Store: Store,
   Promise: Promise
 }
 
 },{"es6-promise":3,"es6-symbol":4,"events":24,"flux":20,"object-assign":23}],2:[function(require,module,exports){
-var $__0=      require('./1d'),Actions=$__0.Actions,Store=$__0.Store,Promise=$__0.Promise
+var fux = require('./fux')
 
+// XXX need a single dispatcher instance now
 
-for(var Actions____Key in Actions){if(Actions.hasOwnProperty(Actions____Key)){MyActions[Actions____Key]=Actions[Actions____Key];}}var ____SuperProtoOfActions=Actions===null?null:Actions.prototype;MyActions.prototype=Object.create(____SuperProtoOfActions);MyActions.prototype.constructor=MyActions;MyActions.__superConstructor__=Actions;
-  function MyActions() {"use strict";
-    Actions.call(this)
-  }
-
-  MyActions.prototype.updateName=function(name) {"use strict";
-    return new Promise(function(resolve, reject)  {
+var myActions = fux.createActions({
+  updateName:function(name) {
+    return new fux.Promise(function(resolve, reject)  {
       return resolve(name)
     })
-  };
-
-var myActions = new MyActions()
-
-
-
-for(var Store____Key in Store){if(Store.hasOwnProperty(Store____Key)){MyStore[Store____Key]=Store[Store____Key];}}var ____SuperProtoOfStore=Store===null?null:Store.prototype;MyStore.prototype=Object.create(____SuperProtoOfStore);MyStore.prototype.constructor=MyStore;MyStore.__superConstructor__=Store;
-  function MyStore() {"use strict";
-    Store.call(this)
-    this.actionListener(myActions.updateName, this.onUpdateName)
   }
+})
 
-  MyStore.prototype.getInitialState=function() {"use strict";
+//var caca = myActions.updateName
+//listeners[
+
+var myStore = fux.createStore({
+
+  // XXX this is a bad idea...
+  initListeners:function() {
+    var listeners = {}
+    listeners[myActions.UPDATE_NAME] = this.onUpdateName
+    return listeners
+  },
+
+  getInitialState:function() {
     return { name: 'lol' }
-  };
+  },
 
-  MyStore.prototype.onUpdateName=function(name) {"use strict";
-    return new Promise(function(resolve, reject)  {
+  onUpdateName:function(name) {
+    return new fux.Promise(function(resolve, reject)  {
       return resolve({ name: name })
     })
-  };
+  }
+})
 
-var myStore = new MyStore()
-
-
+//myStore.on(myActions.updateName, myStore.onUpdateName)
 
 
 myStore.listen(function()  {return console.log('Shit has changed', myStore.getCurrentState());})
 console.log('=1', myStore.getCurrentState())
 myActions.updateName('hello')
 
-},{"./1d":1}],3:[function(require,module,exports){
+//console.log('snapshot', fux.Stores.takeSnapshot())
+
+},{"./fux":1}],3:[function(require,module,exports){
 (function (process,global){
 /*!
  * @overview es6-promise - a tiny implementation of Promises/A+.

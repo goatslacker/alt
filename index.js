@@ -1,45 +1,43 @@
-var { Actions, Store, Promise } = require('./1d')
+var fux = require('./fux')
 
 // XXX need a single dispatcher instance now
 
-class MyActions extends Actions {
-  constructor() {
-    super()
-  }
-
+var myActions = fux.createActions({
   updateName(name) {
-    return new Promise((resolve, reject) => {
+    return new fux.Promise((resolve, reject) => {
       return resolve(name)
     })
   }
-}
-var myActions = new MyActions()
+})
 
+//var caca = myActions.updateName
+//listeners[
 
+var myStore = fux.createStore({
 
-class MyStore extends Store {
-  constructor() {
-    super()
-    this.actionListener(myActions.updateName, this.onUpdateName)
-  }
+  // XXX this is a bad idea...
+  initListeners() {
+    var listeners = {}
+    listeners[myActions.UPDATE_NAME] = this.onUpdateName
+    return listeners
+  },
 
   getInitialState() {
     return { name: 'lol' }
-  }
+  },
 
   onUpdateName(name) {
-    return new Promise((resolve, reject) => {
+    return new fux.Promise((resolve, reject) => {
       return resolve({ name: name })
     })
   }
-}
-var myStore = new MyStore()
+})
 
+//myStore.on(myActions.updateName, myStore.onUpdateName)
 
-
-// XXX now I need a global store registry so I can save all of the state into a single snapshot
-// and then be able to hydrate all of that with the serialized data <-- this one sort of goes against flux since i wouldn't be calling actions
 
 myStore.listen(() => console.log('Shit has changed', myStore.getCurrentState()))
 console.log('=1', myStore.getCurrentState())
 myActions.updateName('hello')
+
+//console.log('snapshot', fux.Stores.takeSnapshot())

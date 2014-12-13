@@ -16,40 +16,43 @@ var dispatcher = new Dispatcher()
 
 // XXX use immutable data stores for stores
 
+var setState = Symbol('set state')
+var symActionKey = Symbol('action key name')
+var symListeners = Symbol('action listeners storage')
 var symState = Symbol('state container')
-var symActionKey = Symbol('action key')
-var listeners = Symbol('action listeners')
-class Store extends EventEmitter {
-  constructor() {
-    this[symState] = this.getInitialState()
-    this[listeners] = {}
-    this.cb = null
 
-    var setState = (newState) => {
+// XXX pass in dispatcher
+class Store extends EventEmitter {
+  constructor(store) {
+    this[symState] = store.getInitialState()
+    this[symListeners] = {}
+
+    this[setState] = (newState) => {
       Object.assign(this[symState], newState)
       this.emit('change')
     }
 
     this.dispatcherToken = dispatcher.register((payload) => {
-      if (this[listeners][payload.action]) {
-        var state = this[listeners][payload.action](payload.data)
+      if (this[symListeners][payload.action]) {
+        var state = this[symListeners][payload.action](payload.data)
         if (state.then) {
-          state.then((data) => setState(data))
+          state.then((data) => this[setState](data))
         } else {
-          setState(state)
+          this[setState](state)
         }
       }
     })
-  }
 
-  actionListener(symbol, cb) {
-    // XXX check if symbol properly
-    if (symbol[symActionKey]) {
-      this[listeners][symbol[symActionKey]] = cb
-    } else {
-      this[listeners][symbol] = cb
-    }
-    return this
+    var toListen = store.initListeners()
+    Object.keys(toListen).forEach((symbol) => {
+      var cb = toListen[symbol]
+
+      if (symbol[symActionKey]) {
+        this[symListeners][symbol[symActionKey]] = cb
+      } else {
+        this[symListeners][symbol] = cb
+      }
+    })
   }
 
   emitChange() {
@@ -67,10 +70,16 @@ class Store extends EventEmitter {
   getCurrentState() {
     return this[symState]
   }
+
+  getDispatcherToken() {
+    return this.dispatcherToken
+  }
 }
 
 var symDispatch = Symbol('dispatch action')
 var symHandler = Symbol('action creator handler')
+
+// XXX pass in dispatcher as well
 class ActionCreator {
   constructor(name, action) {
     this.name = name
@@ -95,27 +104,36 @@ class ActionCreator {
   }
 }
 
-class Actions {
-  constructor() {
-    var proto = Object.getPrototypeOf(this)
-    Object.keys(proto).forEach((action) => {
-      var constant = action.replace(/[a-z]([A-Z])/g, (i) => {
-        return i[0] + '_' + i[1].toLowerCase()
-      }).toUpperCase()
-
-      var actionName = Symbol('action ' + constant)
-
-      var newAction = new ActionCreator(actionName, proto[action])
-      this[action] = newAction[symHandler]
-      this[action][symActionKey] = actionName
-      this[constant] = actionName
-    })
-  }
+var formatAsConstant = (name) => {
+  return name.replace(/[a-z]([A-Z])/g, (i) => {
+    return i[0] + '_' + i[1].toLowerCase()
+  }).toUpperCase()
 }
 
+// XXX this should be part of fux class
+// make sure this is assigned into the fux stores...
+var createStore = (store) => {
+  return new Store(store)
+}
+
+var createActions = (actions) => {
+  return Object.keys(actions).reduce((obj, action) => {
+    var constant = formatAsConstant(action)
+    var actionName = Symbol('action ' + constant)
+    var newAction = new ActionCreator(actionName, actions[action])
+
+    obj[action] = newAction[symHandler]
+    obj[action][symActionKey] = actionName
+    obj[constant] = actionName
+
+    return obj
+  }, {})
+}
 
 module.exports = {
-  Actions: Actions,
-  Store: Store,
+  createActions: createActions,
+  createStore: createStore,
+//  Actions: Actions,
+//  Store: Store,
   Promise: Promise
 }
