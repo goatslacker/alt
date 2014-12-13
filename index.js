@@ -31,6 +31,7 @@ var myStore = fux.createStore('myStore', {
   }
 })
 
+// XXX ok so how do you use waitFor then?
 myStore.listen(() => console.log('Shit has changed', myStore.getCurrentState()))
 console.log('=1', myStore.getCurrentState())
 myActions.updateName('hello')
