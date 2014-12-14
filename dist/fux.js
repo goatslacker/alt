@@ -1,7 +1,6 @@
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.Fux=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
 "use strict";
 
-var _slice = Array.prototype.slice;
 var _extends = function (child, parent) {
   child.prototype = Object.create(parent.prototype, {
     constructor: {
@@ -21,39 +20,50 @@ var EventEmitter = _dereq_("events").EventEmitter;
 var Symbol = _dereq_("./polyfills/es6-symbol");
 Object.assign = Object.assign || _dereq_("object-assign");
 
-var setState = Symbol("set state");
-var symActionKey = Symbol("holds the actions uid symbol");
-var symListeners = Symbol("action listeners storage");
-var symState = Symbol("state container");
+var ACTION_DISPATCHER = Symbol("action dispatcher storage");
+var ACTION_HANDLER = Symbol("action creator handler");
+var ACTION_KEY = Symbol("holds the actions uid symbol for listening");
+var ACTION_UID = Symbol("the actions uid name");
+var LISTENERS = Symbol("stores action listeners storage");
+var SET_STATE = Symbol("a set state method you should never call directly");
+var STATE_CONTAINER = Symbol("state container");
+var STORES_STORE = Symbol("stores storage");
+
+var formatAsConstant = function (name) {
+  return name.replace(/[a-z]([A-Z])/g, function (i) {
+    return "" + i[0] + "_" + i[1].toLowerCase();
+  }).toUpperCase();
+};
+
 
 var Store = (function (EventEmitter) {
   var Store = function Store(dispatcher, state, listeners) {
     var _this = this;
-    this[symListeners] = {};
-    this[symState] = state;
+    this[LISTENERS] = {};
+    this[STATE_CONTAINER] = state;
 
     // A special setState method we use to bootstrap and keep state current
-    this[setState] = function (newState) {
-      if (_this[symState] !== newState) {
-        Object.assign(_this[symState], newState);
+    this[SET_STATE] = function (newState) {
+      if (_this[STATE_CONTAINER] !== newState) {
+        Object.assign(_this[STATE_CONTAINER], newState);
       }
       _this.emit("change");
     };
 
     // Register dispatcher
     this.dispatchToken = dispatcher.register(function (payload) {
-      if (_this[symListeners][payload.action]) {
-        var state = _this[symListeners][payload.action](payload.data);
+      if (_this[LISTENERS][payload.action]) {
+        var state = _this[LISTENERS][payload.action](payload.data);
 
         if (state) {
-          _this[setState](state);
+          _this[SET_STATE](state);
         }
       }
     });
 
     // Transfer over the listeners
     Object.keys(listeners).forEach(function (listener) {
-      _this[symListeners][listener] = listeners[listener];
+      _this[LISTENERS][listener] = listeners[listener];
     });
   };
 
@@ -73,32 +83,22 @@ var Store = (function (EventEmitter) {
 
   Store.prototype.getState = function () {
     // Copy over state so it's RO.
-    return Object.assign({}, this[symState]);
+    return Object.assign({}, this[STATE_CONTAINER]);
   };
 
   return Store;
 })(EventEmitter);
 
-var symHandler = Symbol("action creator handler");
-var symActionName = Symbol("the actions uid name");
-var symDispatcher = Symbol("dispatcher storage");
-
 var ActionCreator = (function () {
   var ActionCreator = function ActionCreator(dispatcher, name, action) {
-    var _this2 = this;
-    this[symDispatcher] = dispatcher;
-    this[symActionName] = name;
-
-    this[symHandler] = function () {
-      var args = _slice.call(arguments);
-
-      action.apply(_this2, args);
-    };
+    this[ACTION_DISPATCHER] = dispatcher;
+    this[ACTION_UID] = name;
+    this[ACTION_HANDLER] = action.bind(this);
   };
 
   ActionCreator.prototype.dispatch = function (data) {
-    this[symDispatcher].dispatch({
-      action: this[symActionName],
+    this[ACTION_DISPATCHER].dispatch({
+      action: this[ACTION_UID],
       data: data
     });
   };
@@ -110,43 +110,35 @@ var ActionListeners = {
   listeners: {},
 
   listenTo: function (symbol, handler) {
-    if (symbol[symActionKey]) {
-      this.listeners[symbol[symActionKey]] = handler.bind(this);
+    if (symbol[ACTION_KEY]) {
+      this.listeners[symbol[ACTION_KEY]] = handler.bind(this);
     } else {
       this.listeners[symbol] = handler.bind(this);
     }
   },
 
   listenToActions: function (actions) {
-    var _this3 = this;
+    var _this2 = this;
     Object.keys(actions).forEach(function (action) {
       var symbol = actions[action];
       var assumedEventHandler = action.replace(/./, function (x) {
         return "on" + x[0].toUpperCase();
       });
-      if (_this3[assumedEventHandler]) {
-        if (symbol[symActionKey]) {
-          _this3.listeners[symbol[symActionKey]] = _this3[assumedEventHandler];
+      if (_this2[assumedEventHandler]) {
+        if (symbol[ACTION_KEY]) {
+          _this2.listeners[symbol[ACTION_KEY]] = _this2[assumedEventHandler];
         } else {
-          _this3.listeners[symbol] = _this3[assumedEventHandler];
+          _this2.listeners[symbol] = _this2[assumedEventHandler];
         }
       }
     });
   }
 };
 
-var formatAsConstant = function (name) {
-  return name.replace(/[a-z]([A-Z])/g, function (i) {
-    return "" + i[0] + "_" + i[1].toLowerCase();
-  }).toUpperCase();
-};
-
-var symStores = Symbol("stores storage");
-
 var Fux = (function () {
   var Fux = function Fux() {
     this.dispatcher = new Dispatcher();
-    this[symStores] = {};
+    this[STORES_STORE] = {};
   };
 
   Fux.prototype.createStore = function (StoreModel) {
@@ -154,23 +146,23 @@ var Fux = (function () {
     var key = StoreModel.displayName || StoreModel.name;
     var store = new StoreModel();
     var state = store.getInitialState();
-    return this[symStores][key] = new Store(this.dispatcher, state, store.listeners);
+    return this[STORES_STORE][key] = new Store(this.dispatcher, state, store.listeners);
   };
 
   Fux.prototype.createActions = function (actions) {
-    var _this4 = this;
+    var _this3 = this;
     return Object.keys(actions).reduce(function (obj, action) {
       var constant = formatAsConstant(action);
       var actionName = Symbol("action " + constant);
 
       var handler = typeof actions[action] === "function" ? actions[action] : function (x) {
-        return _this4.dispatch(x);
+        return _this3.dispatch(x);
       };
 
-      var newAction = new ActionCreator(_this4.dispatcher, actionName, handler);
+      var newAction = new ActionCreator(_this3.dispatcher, actionName, handler);
 
-      obj[action] = newAction[symHandler];
-      obj[action][symActionKey] = actionName;
+      obj[action] = newAction[ACTION_HANDLER];
+      obj[action][ACTION_KEY] = actionName;
       obj[constant] = actionName;
 
       return obj;
@@ -178,18 +170,18 @@ var Fux = (function () {
   };
 
   Fux.prototype.takeSnapshot = function () {
-    var _this5 = this;
-    return JSON.stringify(Object.keys(this[symStores]).reduce(function (obj, key) {
-      obj[key] = _this5[symStores][key].getState();
+    var _this4 = this;
+    return JSON.stringify(Object.keys(this[STORES_STORE]).reduce(function (obj, key) {
+      obj[key] = _this4[STORES_STORE][key].getState();
       return obj;
     }, {}));
   };
 
   Fux.prototype.bootstrap = function (data) {
-    var _this6 = this;
+    var _this5 = this;
     var obj = JSON.parse(data);
     Object.keys(obj).forEach(function (key) {
-      _this6[symStores][key][setState](obj[key]);
+      _this5[STORES_STORE][key][SET_STATE](obj[key]);
     });
   };
 

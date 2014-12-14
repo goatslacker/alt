@@ -5,38 +5,49 @@ var EventEmitter = require('events').EventEmitter
 var Symbol = require('./polyfills/es6-symbol')
 Object.assign = Object.assign || require('object-assign')
 
-var setState = Symbol('set state')
-var symActionKey = Symbol('holds the actions uid symbol')
-var symListeners = Symbol('action listeners storage')
-var symState = Symbol('state container')
+var ACTION_DISPATCHER = Symbol('action dispatcher storage')
+var ACTION_HANDLER = Symbol('action creator handler')
+var ACTION_KEY = Symbol('holds the actions uid symbol for listening')
+var ACTION_UID = Symbol('the actions uid name')
+var LISTENERS = Symbol('stores action listeners storage')
+var SET_STATE = Symbol('a set state method you should never call directly')
+var STATE_CONTAINER = Symbol('state container')
+var STORES_STORE = Symbol('stores storage')
+
+var formatAsConstant = (name) => {
+  return name.replace(/[a-z]([A-Z])/g, (i) => {
+    return `${i[0]}_${i[1].toLowerCase()}`
+  }).toUpperCase()
+}
+
 
 class Store extends EventEmitter {
   constructor(dispatcher, state, listeners) {
-    this[symListeners] = {}
-    this[symState] = state
+    this[LISTENERS] = {}
+    this[STATE_CONTAINER] = state
 
     // A special setState method we use to bootstrap and keep state current
-    this[setState] = (newState) => {
-      if (this[symState] !== newState) {
-        Object.assign(this[symState], newState)
+    this[SET_STATE] = (newState) => {
+      if (this[STATE_CONTAINER] !== newState) {
+        Object.assign(this[STATE_CONTAINER], newState)
       }
       this.emit('change')
     }
 
     // Register dispatcher
     this.dispatchToken = dispatcher.register((payload) => {
-      if (this[symListeners][payload.action]) {
-        var state = this[symListeners][payload.action](payload.data)
+      if (this[LISTENERS][payload.action]) {
+        var state = this[LISTENERS][payload.action](payload.data)
 
         if (state) {
-          this[setState](state)
+          this[SET_STATE](state)
         }
       }
     })
 
     // Transfer over the listeners
     Object.keys(listeners).forEach((listener) => {
-      this[symListeners][listener] = listeners[listener]
+      this[LISTENERS][listener] = listeners[listener]
     })
   }
 
@@ -54,27 +65,20 @@ class Store extends EventEmitter {
 
   getState() {
     // Copy over state so it's RO.
-    return Object.assign({}, this[symState])
+    return Object.assign({}, this[STATE_CONTAINER])
   }
 }
 
-var symHandler = Symbol('action creator handler')
-var symActionName = Symbol('the actions uid name')
-var symDispatcher = Symbol('dispatcher storage')
-
 class ActionCreator {
   constructor(dispatcher, name, action) {
-    this[symDispatcher] = dispatcher
-    this[symActionName] = name
-
-    this[symHandler] = (...args) => {
-      action.apply(this, args)
-    }
+    this[ACTION_DISPATCHER] = dispatcher
+    this[ACTION_UID] = name
+    this[ACTION_HANDLER] = action.bind(this)
   }
 
   dispatch(data) {
-    this[symDispatcher].dispatch({
-      action: this[symActionName],
+    this[ACTION_DISPATCHER].dispatch({
+      action: this[ACTION_UID],
       data: data
     })
   }
@@ -84,8 +88,8 @@ var ActionListeners = {
   listeners: {},
 
   listenTo(symbol, handler) {
-    if (symbol[symActionKey]) {
-      this.listeners[symbol[symActionKey]] = handler.bind(this)
+    if (symbol[ACTION_KEY]) {
+      this.listeners[symbol[ACTION_KEY]] = handler.bind(this)
     } else {
       this.listeners[symbol] = handler.bind(this)
     }
@@ -99,8 +103,8 @@ var ActionListeners = {
         (x) => `on${x[0].toUpperCase()}`
       )
       if (this[assumedEventHandler]) {
-        if (symbol[symActionKey]) {
-          this.listeners[symbol[symActionKey]] = this[assumedEventHandler]
+        if (symbol[ACTION_KEY]) {
+          this.listeners[symbol[ACTION_KEY]] = this[assumedEventHandler]
         } else {
           this.listeners[symbol] = this[assumedEventHandler]
         }
@@ -109,18 +113,10 @@ var ActionListeners = {
   }
 }
 
-var formatAsConstant = (name) => {
-  return name.replace(/[a-z]([A-Z])/g, (i) => {
-    return `${i[0]}_${i[1].toLowerCase()}`
-  }).toUpperCase()
-}
-
-var symStores = Symbol('stores storage')
-
 class Fux {
   constructor() {
     this.dispatcher = new Dispatcher()
-    this[symStores] = {}
+    this[STORES_STORE] = {}
   }
 
   createStore(StoreModel) {
@@ -128,7 +124,7 @@ class Fux {
     var key = StoreModel.displayName || StoreModel.name
     var store = new StoreModel()
     var state = store.getInitialState()
-    return this[symStores][key] = new Store(
+    return this[STORES_STORE][key] = new Store(
       this.dispatcher,
       state,
       store.listeners
@@ -150,8 +146,8 @@ class Fux {
         handler
       )
 
-      obj[action] = newAction[symHandler]
-      obj[action][symActionKey] = actionName
+      obj[action] = newAction[ACTION_HANDLER]
+      obj[action][ACTION_KEY] = actionName
       obj[constant] = actionName
 
       return obj
@@ -159,8 +155,8 @@ class Fux {
   }
 
   takeSnapshot() {
-    return JSON.stringify(Object.keys(this[symStores]).reduce((obj, key) => {
-      obj[key] = this[symStores][key].getState()
+    return JSON.stringify(Object.keys(this[STORES_STORE]).reduce((obj, key) => {
+      obj[key] = this[STORES_STORE][key].getState()
       return obj
     }, {}))
   }
@@ -168,7 +164,7 @@ class Fux {
   bootstrap(data) {
     var obj = JSON.parse(data)
     Object.keys(obj).forEach((key) => {
-      this[symStores][key][setState](obj[key])
+      this[STORES_STORE][key][SET_STATE](obj[key])
     })
   }
 }
