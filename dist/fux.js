@@ -45,20 +45,17 @@ var Store = (function (EventEmitter) {
 
     // A special setState method we use to bootstrap and keep state current
     this[SET_STATE] = function (newState) {
+      // XXX should we emit change when we bootstrap?
       if (_this[STATE_CONTAINER] !== newState) {
         Object.assign(_this[STATE_CONTAINER], newState);
       }
-      _this.emit("change");
     };
 
     // Register dispatcher
     this.dispatchToken = dispatcher.register(function (payload) {
       if (_this[LISTENERS][payload.action]) {
-        var state = _this[LISTENERS][payload.action](payload.data);
-
-        if (state) {
-          _this[SET_STATE](state);
-        }
+        var result = _this[LISTENERS][payload.action](payload.data);
+        result || _this.emit("change");
       }
     });
 
@@ -111,6 +108,13 @@ var ActionListeners = {
   listeners: {},
 
   listenTo: function (symbol, handler) {
+    if (!symbol) {
+      throw new ReferenceError("Invalid action reference passed in");
+    }
+    if (typeof handler !== "function") {
+      throw new TypeError("listenTo expects a function");
+    }
+
     if (symbol[ACTION_KEY]) {
       this.listeners[symbol[ACTION_KEY]] = handler.bind(this);
     } else {
@@ -146,12 +150,12 @@ var Fux = (function () {
     Object.assign(StoreModel.prototype, ActionListeners);
     var key = StoreModel.displayName || StoreModel.name;
     var store = new StoreModel();
-    var state = store.getInitialState();
-    return this[STORES_STORE][key] = new Store(this.dispatcher, state, store.listeners);
+    return this[STORES_STORE][key] = new Store(this.dispatcher, store, store.listeners);
   };
 
-  Fux.prototype.createActions = function (actions) {
+  Fux.prototype.createActions = function (ActionsClass) {
     var _this3 = this;
+    var actions = Object.assign(new ActionsClass(), ActionsClass.prototype);
     return Object.keys(actions).reduce(function (obj, action) {
       var constant = formatAsConstant(action);
       var actionName = Symbol("action " + constant);

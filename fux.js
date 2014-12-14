@@ -136,15 +136,13 @@ class Fux {
   }
 
   createActions(ActionsClass) {
-    // XXX so passing through directly to a dispatcher doesn't quite work
-    // perfectly right now with class syntax. This will need some work [1]
-    return Object.keys(ActionsClass.prototype).reduce((obj, action) => {
+    var actions = Object.assign(new ActionsClass(), ActionsClass.prototype)
+    return Object.keys(actions).reduce((obj, action) => {
       var constant = formatAsConstant(action)
       var actionName = Symbol(`action ${constant}`)
 
-      // XXX: [1]
-      var handler = typeof ActionsClass.prototype[action] === 'function'
-        ? ActionsClass.prototype[action]
+      var handler = typeof actions[action] === 'function'
+        ? actions[action]
         : function (x) { this.dispatch(x) }
 
       var newAction = new ActionCreator(
