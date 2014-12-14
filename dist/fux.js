@@ -29,10 +29,10 @@ var symListeners = Symbol("action listeners storage");
 var symState = Symbol("state container");
 
 var Store = (function (EventEmitter) {
-  var Store = function Store(dispatcher, store) {
+  var Store = function Store(dispatcher, state, listeners) {
     var _this = this;
     this[symListeners] = {};
-    this[symState] = store.getInitialState();
+    this[symState] = state;
 
     // A special setState method we use to bootstrap and keep state current
     this[setState] = function (newState) {
@@ -58,10 +58,9 @@ var Store = (function (EventEmitter) {
     });
 
     // Transfer over the listeners
-    store.listeners && Object.keys(store.listeners).forEach(function (listener) {
-      _this[symListeners][listener] = store.listeners[listener];
+    Object.keys(listeners).forEach(function (listener) {
+      _this[symListeners][listener] = listeners[listener];
     });
-    store.listeners = {};
   };
 
   _extends(Store, EventEmitter);
@@ -146,7 +145,7 @@ var ActionListeners = {
 
 var formatAsConstant = function (name) {
   return name.replace(/[a-z]([A-Z])/g, function (i) {
-    return i[0] + "_" + i[1].toLowerCase();
+    return "" + i[0] + "_" + i[1].toLowerCase();
   }).toUpperCase();
 };
 
@@ -162,7 +161,8 @@ var Fux = (function () {
     Object.assign(StoreModel.prototype, ActionListeners);
     var key = StoreModel.displayName || StoreModel.name;
     var store = new StoreModel();
-    return this[symStores][key] = new Store(this.dispatcher, store);
+    var state = store.getInitialState();
+    return this[symStores][key] = new Store(this.dispatcher, state, store.listeners);
   };
 
   Fux.prototype.createActions = function (actions) {

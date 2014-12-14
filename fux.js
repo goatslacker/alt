@@ -104,7 +104,7 @@ var ActionListeners = {
       var symbol = actions[action]
       var assumedEventHandler = action.replace(
         /./,
-        (x) => 'on' + x[0].toUpperCase()
+        (x) => `on${x[0].toUpperCase()}`
       )
       if (this[assumedEventHandler]) {
         if (symbol[symActionKey]) {
@@ -119,7 +119,7 @@ var ActionListeners = {
 
 var formatAsConstant = (name) => {
   return name.replace(/[a-z]([A-Z])/g, (i) => {
-    return i[0] + '_' + i[1].toLowerCase()
+    return `${i[0]}_${i[1].toLowerCase()}`
   }).toUpperCase()
 }
 
@@ -146,7 +146,7 @@ class Fux {
   createActions(actions) {
     return Object.keys(actions).reduce((obj, action) => {
       var constant = formatAsConstant(action)
-      var actionName = Symbol('action ' + constant)
+      var actionName = Symbol(`action ${constant}`)
 
       var handler = typeof actions[action] === 'function'
         ? actions[action]
