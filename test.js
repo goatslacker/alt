@@ -10,15 +10,19 @@ var myUtils = {
   }
 }
 
-var myActions = fux.createActions({
+var myActions = fux.createActions(class MyActions {
+  constructor() {
+//    this.thru('updateName')
+  }
+
   updateName(name) {
     this.dispatch(name)
-  },
+  }
 
   save(state) {
     // XXX db call that saves state
     console.log('Saving', state)
-  },
+  }
 
   updateFoo(a, b) {
     return {a, b}
@@ -28,6 +32,8 @@ var myActions = fux.createActions({
 var myStore = fux.createStore(class MyStore {
   constructor() {
     this.listenTo(myActions.updateName, this.onUpdateName)
+
+    this.name = 'lol'
   }
 
   getInitialState() {
