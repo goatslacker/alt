@@ -1,4 +1,4 @@
-var Fux = require('./dist/fux')
+var Fux = require('./fux')
 
 var fux = new Fux()
 
@@ -11,7 +11,9 @@ var myUtils = {
 }
 
 var myActions = fux.createActions({
-  updateName: true,
+  updateName(name) {
+    this.dispatch(name)
+  },
 
   save(state) {
     // XXX db call that saves state

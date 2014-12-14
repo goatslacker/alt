@@ -2,13 +2,11 @@
 
 var Dispatcher = require('flux').Dispatcher
 var EventEmitter = require('events').EventEmitter
-var Promise = require('es6-promise').Promise
 var Symbol = require('./polyfills/es6-symbol')
 Object.assign = Object.assign || require('object-assign')
-var isPromise = require('is-promise')
 
 var setState = Symbol('set state')
-var symActionKey = Symbol('action key name')
+var symActionKey = Symbol('holds the actions uid symbol')
 var symListeners = Symbol('action listeners storage')
 var symState = Symbol('state container')
 
@@ -60,29 +58,25 @@ class Store extends EventEmitter {
   }
 }
 
-var symDispatch = Symbol('dispatch action')
 var symHandler = Symbol('action creator handler')
+var symActionName = Symbol('the actions uid name')
+var symDispatcher = Symbol('dispatcher storage')
 
 class ActionCreator {
   constructor(dispatcher, name, action) {
-    this.name = name
-    this.action = action
+    this[symDispatcher] = dispatcher
+    this[symActionName] = name
 
     this[symHandler] = (...args) => {
-      var value = this.action.apply(this, args)
-      if (isPromise(value)) {
-        value.then((data) => this[symDispatch](data))
-      } else {
-        this[symDispatch](value)
-      }
+      action.apply(this, args)
     }
+  }
 
-    this[symDispatch] = (data) => {
-      dispatcher.dispatch({
-        action: this.name,
-        data: data
-      })
-    }
+  dispatch(data) {
+    this[symDispatcher].dispatch({
+      action: this[symActionName],
+      data: data
+    })
   }
 }
 
@@ -148,7 +142,7 @@ class Fux {
 
       var handler = typeof actions[action] === 'function'
         ? actions[action]
-        : (x) => x
+        : (x) => this.dispatch(x)
 
       var newAction = new ActionCreator(
         this.dispatcher,
@@ -178,7 +172,5 @@ class Fux {
     })
   }
 }
-
-Fux.Promise = Promise
 
 module.exports = Fux
