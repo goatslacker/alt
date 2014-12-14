@@ -157,7 +157,7 @@ var Fux = (function () {
       var actionName = Symbol("action " + constant);
 
       var handler = typeof actions[action] === "function" ? actions[action] : function (x) {
-        return _this3.dispatch(x);
+        this.dispatch(x);
       };
 
       var newAction = new ActionCreator(_this3.dispatcher, actionName, handler);

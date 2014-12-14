@@ -139,7 +139,7 @@ class Fux {
 
       var handler = typeof actions[action] === 'function'
         ? actions[action]
-        : (x) => this.dispatch(x)
+        : function (x) { this.dispatch(x) }
 
       var newAction = new ActionCreator(
         this.dispatcher,
