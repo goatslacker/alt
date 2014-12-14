@@ -144,10 +144,14 @@ class Fux {
       var constant = formatAsConstant(action)
       var actionName = Symbol('action ' + constant)
 
+      var handler = typeof actions[action] === 'function'
+        ? actions[action]
+        : (x) => x
+
       var newAction = new ActionCreator(
         this.dispatcher,
         actionName,
-        actions[action]
+        handler
       )
 
       obj[action] = newAction[symHandler]
@@ -174,7 +178,5 @@ class Fux {
 }
 
 Fux.Promise = Promise
-
-Fux.id = (x) => x
 
 module.exports = Fux

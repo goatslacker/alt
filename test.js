@@ -11,7 +11,7 @@ var myUtils = {
 }
 
 var myActions = fux.createActions({
-  updateName: Fux.id,
+  updateName: true,
 
   updateFoo(a, b) {
     return {a, b}

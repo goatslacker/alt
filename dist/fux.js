@@ -171,7 +171,11 @@ var Fux = (function () {
       var constant = formatAsConstant(action);
       var actionName = Symbol("action " + constant);
 
-      var newAction = new ActionCreator(_this4.dispatcher, actionName, actions[action]);
+      var handler = typeof actions[action] === "function" ? actions[action] : function (x) {
+        return x;
+      };
+
+      var newAction = new ActionCreator(_this4.dispatcher, actionName, handler);
 
       obj[action] = newAction[symHandler];
       obj[action][symActionKey] = actionName;
@@ -201,10 +205,6 @@ var Fux = (function () {
 })();
 
 Fux.Promise = Promise;
-
-Fux.id = function (x) {
-  return x;
-};
 
 module.exports = Fux;
 
