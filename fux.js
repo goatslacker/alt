@@ -13,9 +13,9 @@ var symListeners = Symbol('action listeners storage')
 var symState = Symbol('state container')
 
 class Store extends EventEmitter {
-  constructor(dispatcher, store) {
+  constructor(dispatcher, state, listeners) {
     this[symListeners] = {}
-    this[symState] = store.getInitialState()
+    this[symState] = state
 
     // A special setState method we use to bootstrap and keep state current
     this[setState] = (newState) => {
@@ -39,10 +39,9 @@ class Store extends EventEmitter {
     })
 
     // Transfer over the listeners
-    store.listeners && Object.keys(store.listeners).forEach((listener) => {
-      this[symListeners][listener] = store.listeners[listener]
+    Object.keys(listeners).forEach((listener) => {
+      this[symListeners][listener] = listeners[listener]
     })
-    store.listeners = {}
   }
 
   emitChange() {
@@ -136,7 +135,12 @@ class Fux {
     Object.assign(StoreModel.prototype, ActionListeners)
     var key = StoreModel.displayName || StoreModel.name
     var store = new StoreModel()
-    return this[symStores][key] = new Store(this.dispatcher, store)
+    var state = store.getInitialState()
+    return this[symStores][key] = new Store(
+      this.dispatcher,
+      state,
+      store.listeners
+    )
   }
 
   createActions(actions) {
