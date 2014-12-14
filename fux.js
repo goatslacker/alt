@@ -32,7 +32,6 @@ class Store extends EventEmitter {
       if (this[STATE_CONTAINER] !== newState) {
         Object.assign(this[STATE_CONTAINER], newState)
       }
-      this.emit('change')
     }
 
     // Register dispatcher
