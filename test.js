@@ -13,6 +13,11 @@ var myUtils = {
 var myActions = fux.createActions({
   updateName: true,
 
+  save(state) {
+    // XXX db call that saves state
+    console.log('Saving', state)
+  },
+
   updateFoo(a, b) {
     return {a, b}
   }
@@ -49,6 +54,9 @@ var secondStore = fux.createStore(class SecondStore {
 
   onUpdateName(name) {
     fux.dispatcher.waitFor([myStore.dispatchToken])
+//    setTimeout(() => {
+//      myActions.save(secondStore.getState())
+//    }, 1)
     return { name: name }
   }
 })
