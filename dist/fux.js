@@ -25,6 +25,7 @@ var ACTION_HANDLER = Symbol("action creator handler");
 var ACTION_KEY = Symbol("holds the actions uid symbol for listening");
 var ACTION_UID = Symbol("the actions uid name");
 var LISTENERS = Symbol("stores action listeners storage");
+var MIXIN_REGISTRY = Symbol("mixin registry");
 var SET_STATE = Symbol("a set state method you should never call directly");
 var STATE_CONTAINER = Symbol("state container");
 var STORES_STORE = Symbol("stores storage");
@@ -187,6 +188,29 @@ var Fux = (function () {
 
   return Fux;
 })();
+
+Fux.ListenerMixin = {
+  componentWillMount: function () {
+    this[MIXIN_REGISTRY] && this[MIXIN_REGISTRY].forEach(function (x) {
+      var store = x.store;
+      var handler = x.handler;
+      store.listen(handler);
+    });
+  },
+
+  componentWillUnmount: function () {
+    this[MIXIN_REGISTRY] && this[MIXIN_REGISTRY].forEach(function (x) {
+      var store = x.store;
+      var handler = x.handler;
+      store.unlisten(handler);
+    });
+  },
+
+  listenTo: function (store, handler) {
+    this[MIXIN_REGISTRY] = this[MIXIN_REGISTRY] || [];
+    this[MIXIN_REGISTRY][store.getName()].push({ store: store, handler: handler });
+  }
+};
 
 module.exports = Fux;
 

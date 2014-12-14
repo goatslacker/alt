@@ -10,6 +10,7 @@ var ACTION_HANDLER = Symbol('action creator handler')
 var ACTION_KEY = Symbol('holds the actions uid symbol for listening')
 var ACTION_UID = Symbol('the actions uid name')
 var LISTENERS = Symbol('stores action listeners storage')
+var MIXIN_REGISTRY = Symbol('mixin registry')
 var SET_STATE = Symbol('a set state method you should never call directly')
 var STATE_CONTAINER = Symbol('state container')
 var STORES_STORE = Symbol('stores storage')
@@ -166,6 +167,27 @@ class Fux {
     Object.keys(obj).forEach((key) => {
       this[STORES_STORE][key][SET_STATE](obj[key])
     })
+  }
+}
+
+Fux.ListenerMixin = {
+  componentWillMount() {
+    this[MIXIN_REGISTRY] && this[MIXIN_REGISTRY].forEach((x) => {
+      var { store, handler } = x
+      store.listen(handler)
+    })
+  },
+
+  componentWillUnmount() {
+    this[MIXIN_REGISTRY] && this[MIXIN_REGISTRY].forEach((x) => {
+      var { store, handler } = x
+      store.unlisten(handler)
+    })
+  },
+
+  listenTo(store, handler) {
+    this[MIXIN_REGISTRY] = this[MIXIN_REGISTRY] || []
+    this[MIXIN_REGISTRY][store.getName()].push({ store, handler })
   }
 }
 
