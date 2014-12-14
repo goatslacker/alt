@@ -30,10 +30,12 @@ class Store extends EventEmitter {
       if (this[symListeners][payload.action]) {
         var state = this[symListeners][payload.action](payload.data)
 
-        if (isPromise(state)) {
-          state.then((data) => this[setState](data))
-        } else {
-          this[setState](state)
+        if (state) {
+          if (isPromise(state)) {
+            state.then((data) => this[setState](data))
+          } else {
+            this[setState](state)
+          }
         }
       }
     })

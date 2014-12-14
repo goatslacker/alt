@@ -47,12 +47,14 @@ var Store = (function (EventEmitter) {
       if (_this[symListeners][payload.action]) {
         var state = _this[symListeners][payload.action](payload.data);
 
-        if (isPromise(state)) {
-          state.then(function (data) {
-            return _this[setState](data);
-          });
-        } else {
-          _this[setState](state);
+        if (state) {
+          if (isPromise(state)) {
+            state.then(function (data) {
+              return _this[setState](data);
+            });
+          } else {
+            _this[setState](state);
+          }
         }
       }
     });
