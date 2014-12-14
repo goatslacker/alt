@@ -1,4 +1,3 @@
-// XXX test this with a require that compiles to es6
 var Fux = require('./dist/fux')
 
 var fux = new Fux()
@@ -11,20 +10,12 @@ var myUtils = {
   }
 }
 
-// XXX not a fan of always providing a function if the function is just an `id` function
-// what if the function takes two params? I'd still like to pass those through...
 var myActions = fux.createActions({
   updateName: Fux.id,
 
   updateFoo(a, b) {
     return {a, b}
   }
-//  updateName: 1
-//  updateName(name) {
-//    return new Fux.Promise((resolve, reject) => {
-//      myUtils.callServer(name, resolve)
-//    })
-//  }
 })
 
 var myStore = fux.createStore(class MyStore {
