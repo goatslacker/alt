@@ -190,14 +190,6 @@ var Fux = (function () {
 })();
 
 Fux.ListenerMixin = {
-  componentWillMount: function () {
-    this[MIXIN_REGISTRY] && this[MIXIN_REGISTRY].forEach(function (x) {
-      var store = x.store;
-      var handler = x.handler;
-      store.listen(handler);
-    });
-  },
-
   componentWillUnmount: function () {
     this[MIXIN_REGISTRY] && this[MIXIN_REGISTRY].forEach(function (x) {
       var store = x.store;
@@ -209,6 +201,7 @@ Fux.ListenerMixin = {
   listenTo: function (store, handler) {
     this[MIXIN_REGISTRY] = this[MIXIN_REGISTRY] || [];
     this[MIXIN_REGISTRY].push({ store: store, handler: handler });
+    store.listen(handler);
   }
 };
 
