@@ -208,7 +208,7 @@ Fux.ListenerMixin = {
 
   listenTo: function (store, handler) {
     this[MIXIN_REGISTRY] = this[MIXIN_REGISTRY] || [];
-    this[MIXIN_REGISTRY][store.getName()].push({ store: store, handler: handler });
+    this[MIXIN_REGISTRY].push({ store: store, handler: handler });
   }
 };
 
