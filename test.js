@@ -32,39 +32,28 @@ var myActions = fux.createActions(class MyActions {
 var myStore = fux.createStore(class MyStore {
   constructor() {
     this.listenTo(myActions.updateName, this.onUpdateName)
-
     this.name = 'lol'
   }
 
-  getInitialState() {
-    return { name: 'lol' }
-  }
-
   onUpdateName(name) {
-    return { name }
+    this.name = name
   }
 })
 
 var secondStore = fux.createStore(class SecondStore {
   constructor() {
     this.listenToActions(myActions)
-  }
-
-  getInitialState() {
-    return { foo: 'bar', name: myStore.getState().name }
+    this.foo = 'bar'
+    this.name = myStore.getState().name
   }
 
   onUpdateFoo(x) {
-    return { foo: x.a + x.b }
+    this.foo = x.a + x.b
   }
 
   onUpdateName(name) {
     fux.dispatcher.waitFor([myStore.dispatchToken])
-//    myActions.save()
-//    setTimeout(() => {
-//      myActions.save(secondStore.getState())
-//    }, 1)
-    return { name: name }
+    this.name = name
   }
 })
 

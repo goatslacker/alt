@@ -38,11 +38,8 @@ class Store extends EventEmitter {
     // Register dispatcher
     this.dispatchToken = dispatcher.register((payload) => {
       if (this[LISTENERS][payload.action]) {
-        var state = this[LISTENERS][payload.action](payload.data)
-
-        if (state) {
-          this[SET_STATE](state)
-        }
+        var result = this[LISTENERS][payload.action](payload.data)
+        result || this.emit('change')
       }
     })
 
@@ -131,11 +128,9 @@ class Fux {
     Object.assign(StoreModel.prototype, ActionListeners)
     var key = StoreModel.displayName || StoreModel.name
     var store = new StoreModel()
-    var state = store.getInitialState()
-//    console.log('->', store)
     return this[STORES_STORE][key] = new Store(
       this.dispatcher,
-      state,
+      store,
       store.listeners
     )
   }
