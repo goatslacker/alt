@@ -17,7 +17,7 @@
   },
   "scripts": {
     "build": "forge index.js [reactify --es6]",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/6to5/bin/6to5-node test.js"
   },
   "keywords": [
     "flux",
