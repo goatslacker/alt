@@ -25,7 +25,7 @@ var myActions = fux.createActions(class MyActions {
   }
 
   updateFoo(a, b) {
-    return {a, b}
+    this.dispatch({ a, b })
   }
 })
 
