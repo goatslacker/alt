@@ -1,5 +1,14 @@
 'use strict'
 
+//import { Dispatcher } from 'flux'
+//import { EventEmitter } from 'events'
+//import { Promise } from 'es6-promise'
+//import Symbol from './polyfills/es6-symbol'
+//import assign from 'object-assign'
+//import isPromise from 'is-promise'
+//
+//Object.assign = Object.assign || assign
+
 var Dispatcher = require('flux').Dispatcher
 var EventEmitter = require('events').EventEmitter
 var Promise = require('es6-promise').Promise
