@@ -89,6 +89,13 @@ var ActionListeners = {
   listeners: {},
 
   listenTo(symbol, handler) {
+    if (!symbol) {
+      throw new ReferenceError('Invalid action reference passed in')
+    }
+    if (typeof handler !== 'function') {
+      throw new TypeError('listenTo expects a function')
+    }
+
     if (symbol[ACTION_KEY]) {
       this.listeners[symbol[ACTION_KEY]] = handler.bind(this)
     } else {
