@@ -18,7 +18,6 @@ var myActions = fux.createActions({
   }
 })
 
-// XXX I'd like to be able to use `this` in here...
 var myStore = fux.createStore(class MyStore {
   constructor() {
     this.listenTo(myActions.updateName, this.onUpdateName)

@@ -119,9 +119,9 @@ var ActionListeners = {
 
   listenTo: function (symbol, handler) {
     if (symbol[symActionKey]) {
-      this.listeners[symbol[symActionKey]] = handler;
+      this.listeners[symbol[symActionKey]] = handler.bind(this);
     } else {
-      this.listeners[symbol] = handler;
+      this.listeners[symbol] = handler.bind(this);
     }
   },
 
