@@ -1,259 +1,210 @@
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.Fux=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
-'use strict';
+"use strict";
 
-var $__Object$defineProperties = Object.defineProperties;
-var $__Object$defineProperty = Object.defineProperty;
-var $__Object$create = Object.create;
-
-var Dispatcher = _dereq_('flux').Dispatcher;
-var EventEmitter = _dereq_('events').EventEmitter;
-var Promise = _dereq_('es6-promise').Promise;
-var Symbol = _dereq_('./polyfills/es6-symbol');
-Object.assign = Object.assign || _dereq_('object-assign');
-var isPromise = _dereq_('is-promise');
-
-var setState = Symbol('set state');
-var symActionKey = Symbol('action key name');
-var symListeners = Symbol('action listeners storage');
-var symState = Symbol('state container');
-
-var Store = function($__super) {
-  "use strict";
-
-  function Store(dispatcher, store) {
-    this[symListeners] = {}
-    this[symState] = store.getInitialState()
-
-    // A special setState method we use to bootstrap and keep state current
-    this[setState] = function(newState) {
-      if (this[symState] !== newState) {
-        Object.assign(this[symState], newState)
-      }
-      this.emit('change')
-    }.bind(this)
-
-    // Register dispatcher
-    this.dispatchToken = dispatcher.register(function(payload) {
-      if (this[symListeners][payload.action]) {
-        var state = this[symListeners][payload.action](payload.data)
-
-        if (isPromise(state)) {
-          state.then(function(data) {
-            return this[setState](data);
-          }.bind(this))
-        } else {
-          this[setState](state)
-        }
-      }
-    }.bind(this))
-
-    // Transfer over the listeners
-    store.listeners && Object.keys(store.listeners).forEach(function(listener) {
-      this[symListeners][listener] = store.listeners[listener]
-    }.bind(this))
-    store.listeners = {}
-  }
-
-  Store.__proto__ = ($__super !== null ? $__super : Function.prototype);
-  Store.prototype = $__Object$create(($__super !== null ? $__super.prototype : null));
-
-  $__Object$defineProperty(Store.prototype, "constructor", {
-    value: Store
-  });
-
-  $__Object$defineProperties(Store.prototype, {
-    emitChange: {
-      value: function() {
-        this.emit('change')
-      },
-
+var _slice = Array.prototype.slice;
+var _extends = function (child, parent) {
+  child.prototype = Object.create(parent.prototype, {
+    constructor: {
+      value: child,
       enumerable: false,
-      writable: true
-    },
-
-    listen: {
-      value: function(cb) {
-        this.on('change', cb)
-      },
-
-      enumerable: false,
-      writable: true
-    },
-
-    unlisten: {
-      value: function(cb) {
-        this.removeListener('change', cb)
-      },
-
-      enumerable: false,
-      writable: true
-    },
-
-    getState: {
-      value: function() {
-        // Copy over state so it's RO.
-        return Object.assign({}, this[symState])
-      },
-
-      enumerable: false,
-      writable: true
+      writable: true,
+      configurable: true
     }
   });
+  child.__proto__ = parent;
+};
+
+"use strict";
+
+var Dispatcher = _dereq_("flux").Dispatcher;
+var EventEmitter = _dereq_("events").EventEmitter;
+var Promise = _dereq_("es6-promise").Promise;
+var Symbol = _dereq_("./polyfills/es6-symbol");
+Object.assign = Object.assign || _dereq_("object-assign");
+var isPromise = _dereq_("is-promise");
+
+var setState = Symbol("set state");
+var symActionKey = Symbol("action key name");
+var symListeners = Symbol("action listeners storage");
+var symState = Symbol("state container");
+
+var Store = (function (EventEmitter) {
+  var Store = function Store(dispatcher, store) {
+    var _this = this;
+    this[symListeners] = {};
+    this[symState] = store.getInitialState();
+
+    // A special setState method we use to bootstrap and keep state current
+    this[setState] = function (newState) {
+      if (_this[symState] !== newState) {
+        Object.assign(_this[symState], newState);
+      }
+      _this.emit("change");
+    };
+
+    // Register dispatcher
+    this.dispatchToken = dispatcher.register(function (payload) {
+      if (_this[symListeners][payload.action]) {
+        var state = _this[symListeners][payload.action](payload.data);
+
+        if (isPromise(state)) {
+          state.then(function (data) {
+            return _this[setState](data);
+          });
+        } else {
+          _this[setState](state);
+        }
+      }
+    });
+
+    // Transfer over the listeners
+    store.listeners && Object.keys(store.listeners).forEach(function (listener) {
+      _this[symListeners][listener] = store.listeners[listener];
+    });
+    store.listeners = {};
+  };
+
+  _extends(Store, EventEmitter);
+
+  Store.prototype.emitChange = function () {
+    this.emit("change");
+  };
+
+  Store.prototype.listen = function (cb) {
+    this.on("change", cb);
+  };
+
+  Store.prototype.unlisten = function (cb) {
+    this.removeListener("change", cb);
+  };
+
+  Store.prototype.getState = function () {
+    // Copy over state so it's RO.
+    return Object.assign({}, this[symState]);
+  };
 
   return Store;
-}(EventEmitter);
+})(EventEmitter);
 
-var symDispatch = Symbol('dispatch action');
-var symHandler = Symbol('action creator handler');
+var symDispatch = Symbol("dispatch action");
+var symHandler = Symbol("action creator handler");
 
-var ActionCreator = function() {
-  "use strict";
+var ActionCreator = function ActionCreator(dispatcher, name, action) {
+  var _this2 = this;
+  this.name = name;
+  this.action = action;
 
-  function ActionCreator(dispatcher, name, action) {
-    this.name = name
-    this.action = action
+  this[symHandler] = function () {
+    var args = _slice.call(arguments);
 
-    this[symHandler] = function() {
-      var $__arguments = arguments;
-      var args = [].slice.call($__arguments, 0);
-      var value = this.action.apply(this, args);
-      if (isPromise(value)) {
-        value.then(function(data) {
-          return this[symDispatch](data);
-        }.bind(this))
-      } else {
-        this[symDispatch](value)
-      }
-    }.bind(this)
+    var value = _this2.action.apply(_this2, args);
+    if (isPromise(value)) {
+      value.then(function (data) {
+        return _this2[symDispatch](data);
+      });
+    } else {
+      _this2[symDispatch](value);
+    }
+  };
 
-    this[symDispatch] = function(data) {
-      dispatcher.dispatch({
-        action: this.name,
-        data: data
-      })
-    }.bind(this)
-  }
-
-  return ActionCreator;
-}();
+  this[symDispatch] = function (data) {
+    dispatcher.dispatch({
+      action: _this2.name,
+      data: data
+    });
+  };
+};
 
 var ActionListeners = {
   listeners: {},
 
-  listenTo: function listenTo(symbol, handler) {
+  listenTo: function (symbol, handler) {
     if (symbol[symActionKey]) {
-      this.listeners[symbol[symActionKey]] = handler
+      this.listeners[symbol[symActionKey]] = handler;
     } else {
-      this.listeners[symbol] = handler
+      this.listeners[symbol] = handler;
     }
   },
 
-  listenToActions: function listenToActions(actions) {
-    Object.keys(actions).forEach(function(action) {
-      var symbol = actions[action]
-      var assumedEventHandler = action.replace(
-        /./,
-        function(x) {
-          return 'on' + x[0].toUpperCase();
-        }
-      )
-      if (this[assumedEventHandler]) {
+  listenToActions: function (actions) {
+    var _this3 = this;
+    Object.keys(actions).forEach(function (action) {
+      var symbol = actions[action];
+      var assumedEventHandler = action.replace(/./, function (x) {
+        return "on" + x[0].toUpperCase();
+      });
+      if (_this3[assumedEventHandler]) {
         if (symbol[symActionKey]) {
-          this.listeners[symbol[symActionKey]] = this[assumedEventHandler]
+          _this3.listeners[symbol[symActionKey]] = _this3[assumedEventHandler];
         } else {
-          this.listeners[symbol] = this[assumedEventHandler]
+          _this3.listeners[symbol] = _this3[assumedEventHandler];
         }
       }
-    }.bind(this))
+    });
   }
-}
+};
 
-var formatAsConstant = function(name) {
-  return name.replace(/[a-z]([A-Z])/g, function(i) {
-    return i[0] + '_' + i[1].toLowerCase()
-  }).toUpperCase()
-}
+var formatAsConstant = function (name) {
+  return name.replace(/[a-z]([A-Z])/g, function (i) {
+    return i[0] + "_" + i[1].toLowerCase();
+  }).toUpperCase();
+};
 
-var symStores = Symbol('stores storage');
+var symStores = Symbol("stores storage");
 
-var Fux = function() {
-  "use strict";
+var Fux = (function () {
+  var Fux = function Fux() {
+    this.dispatcher = new Dispatcher();
+    this[symStores] = {};
+  };
 
-  function Fux() {
-    this.dispatcher = new Dispatcher()
-    this[symStores] = {}
-  }
+  Fux.prototype.createStore = function (StoreModel) {
+    Object.assign(StoreModel.prototype, ActionListeners);
+    var key = StoreModel.displayName || StoreModel.name;
+    var store = new StoreModel();
+    return this[symStores][key] = new Store(this.dispatcher, store);
+  };
 
-  $__Object$defineProperties(Fux.prototype, {
-    createStore: {
-      value: function(StoreModel) {
-        Object.assign(StoreModel.prototype, ActionListeners)
-        var key = StoreModel.displayName || StoreModel.name
-        var store = new StoreModel()
-        return this[symStores][key] = new Store(this.dispatcher, store)
-      },
+  Fux.prototype.createActions = function (actions) {
+    var _this4 = this;
+    return Object.keys(actions).reduce(function (obj, action) {
+      var constant = formatAsConstant(action);
+      var actionName = Symbol("action " + constant);
 
-      enumerable: false,
-      writable: true
-    },
+      var newAction = new ActionCreator(_this4.dispatcher, actionName, actions[action]);
 
-    createActions: {
-      value: function(actions) {
-        return Object.keys(actions).reduce(function(obj, action) {
-          var constant = formatAsConstant(action)
-          var actionName = Symbol('action ' + constant)
+      obj[action] = newAction[symHandler];
+      obj[action][symActionKey] = actionName;
+      obj[constant] = actionName;
 
-          var newAction = new ActionCreator(
-            this.dispatcher,
-            actionName,
-            actions[action]
-          )
+      return obj;
+    }, {});
+  };
 
-          obj[action] = newAction[symHandler]
-          obj[action][symActionKey] = actionName
-          obj[constant] = actionName
+  Fux.prototype.takeSnapshot = function () {
+    var _this5 = this;
+    return JSON.stringify(Object.keys(this[symStores]).reduce(function (obj, key) {
+      obj[key] = _this5[symStores][key].getState();
+      return obj;
+    }, {}));
+  };
 
-          return obj
-        }.bind(this), {})
-      },
-
-      enumerable: false,
-      writable: true
-    },
-
-    takeSnapshot: {
-      value: function() {
-        return JSON.stringify(Object.keys(this[symStores]).reduce(function(obj, key) {
-          obj[key] = this[symStores][key].getState()
-          return obj
-        }.bind(this), {}))
-      },
-
-      enumerable: false,
-      writable: true
-    },
-
-    bootstrap: {
-      value: function(data) {
-        var obj = JSON.parse(data)
-        Object.keys(obj).forEach(function(key) {
-          this[symStores][key][setState](obj[key])
-        }.bind(this))
-      },
-
-      enumerable: false,
-      writable: true
-    }
-  });
+  Fux.prototype.bootstrap = function (data) {
+    var _this6 = this;
+    var obj = JSON.parse(data);
+    Object.keys(obj).forEach(function (key) {
+      _this6[symStores][key][setState](obj[key]);
+    });
+  };
 
   return Fux;
-}();
+})();
 
 Fux.Promise = Promise;
 
-Fux.id = function(x) {
+Fux.id = function (x) {
   return x;
-}
+};
 
 module.exports = Fux;
 
@@ -1965,77 +1916,75 @@ module.exports = Object.assign || function (target, source) {
 };
 
 },{}],10:[function(_dereq_,module,exports){
-'use strict'
+"use strict";
 
-var created = Object.create(null)
-var generateName = function(desc) {
-  var postfix = 0
-  while (created[desc + (postfix || '')]) {
-    ++postfix
+var created = Object.create(null);
+var generateName = function (desc) {
+  var postfix = 0;
+  while (created[desc + (postfix || "")]) {
+    ++postfix;
   }
-  desc += (postfix || '')
-  created[desc] = true
-  return '@@' + desc
-}
+  desc += (postfix || "");
+  created[desc] = true;
+  return "@@" + desc;
+};
 
-var def = function(value) {
+var def = function (value) {
   return {
     value: value,
     configurable: false,
     writable: false,
     enumerable: false
-  }
-}
+  };
+};
 
-var Symbol = function(description) {
+var Symbol = function (description) {
   if (this instanceof Symbol) {
-    throw new TypeError('TypeError: Symbol is not a constructor')
+    throw new TypeError("TypeError: Symbol is not a constructor");
   }
 
-  var symbol = Object.create(Symbol.prototype)
+  var symbol = Object.create(Symbol.prototype);
 
-  description = (description === undefined ? '' : String(description))
+  description = (description === undefined ? "" : String(description));
 
   return Object.defineProperties(symbol, {
     __description__: def(description),
     __name__: def(generateName(description))
-  })
-}
+  });
+};
 
 Object.defineProperties(Symbol, {
-	create: def(Symbol('create')),
-	hasInstance: def(Symbol('hasInstance')),
-	isConcatSpreadable: def(Symbol('isConcatSpreadable')),
-	isRegExp: def(Symbol('isRegExp')),
-	iterator: def(Symbol('iterator')),
-	toPrimitive: def(Symbol('toPrimitive')),
-	toStringTag: def(Symbol('toStringTag')),
-	unscopables: def(Symbol('unscopables'))
-})
+  create: def(Symbol("create")),
+  hasInstance: def(Symbol("hasInstance")),
+  isConcatSpreadable: def(Symbol("isConcatSpreadable")),
+  isRegExp: def(Symbol("isRegExp")),
+  iterator: def(Symbol("iterator")),
+  toPrimitive: def(Symbol("toPrimitive")),
+  toStringTag: def(Symbol("toStringTag")),
+  unscopables: def(Symbol("unscopables"))
+});
 
 Object.defineProperties(Symbol.prototype, {
-  properToString: def(function() {
-    return 'Symbol (' + this.__description__ + ')'
+  properToString: def(function () {
+    return "Symbol (" + this.__description__ + ")";
   }),
-  toString: def(function() { return this.__name__ })
-})
+  toString: def(function () {
+    return this.__name__;
+  })
+});
 
-Object.defineProperty(
-  Symbol.prototype,
-  Symbol.toPrimitive,
-  def(function(hint) {
-		throw new TypeError("Conversion of symbol objects is not allowed")
-	})
-)
+Object.defineProperty(Symbol.prototype, Symbol.toPrimitive, def(function (hint) {
+  throw new TypeError("Conversion of symbol objects is not allowed");
+}));
 
 Object.defineProperty(Symbol.prototype, Symbol.toStringTag, {
-  value: 'Symbol',
+  value: "Symbol",
   configurable: true,
   writable: false,
   enumerable: false
-})
+});
 
-module.exports = Symbol
+module.exports = Symbol;
 
 },{}]},{},[1])(1)
 });

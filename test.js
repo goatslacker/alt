@@ -1,5 +1,5 @@
 // XXX test this with a require that compiles to es6
-var Fux = require('./fux')
+var Fux = require('./dist/fux')
 
 var fux = new Fux()
 
