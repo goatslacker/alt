@@ -4,3 +4,6 @@ try out immutable
 make a this.Promise in stores
 
 add a defer later so you can fire actions after certain actions complete?
+
+ideally id remove the promises stuff and just have the actions call their own dispatches
+but then id have to know which action called from what

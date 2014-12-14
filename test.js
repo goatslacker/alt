@@ -33,9 +33,7 @@ var myStore = fux.createStore(class MyStore {
   }
 
   onUpdateName(name) {
-    return new Fux.Promise((resolve, reject) => {
-      return resolve({ name: name })
-    })
+    return { name }
   }
 })
 
@@ -54,6 +52,7 @@ var secondStore = fux.createStore(class SecondStore {
 
   onUpdateName(name) {
     fux.dispatcher.waitFor([myStore.dispatchToken])
+//    myActions.save()
 //    setTimeout(() => {
 //      myActions.save(secondStore.getState())
 //    }, 1)

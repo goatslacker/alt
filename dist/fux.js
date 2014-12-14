@@ -48,13 +48,7 @@ var Store = (function (EventEmitter) {
         var state = _this[symListeners][payload.action](payload.data);
 
         if (state) {
-          if (isPromise(state)) {
-            state.then(function (data) {
-              return _this[setState](data);
-            });
-          } else {
-            _this[setState](state);
-          }
+          _this[setState](state);
         }
       }
     });
