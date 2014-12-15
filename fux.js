@@ -124,7 +124,6 @@ class StoreMixin {
   }
 }
 
-// XXX rename listeners so it doesn't collide with anything
 class Fux {
   constructor() {
     this.dispatcher = new Dispatcher()
