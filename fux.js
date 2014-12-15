@@ -106,9 +106,9 @@ var ActionListeners = {
       )
       if (this[assumedEventHandler]) {
         if (symbol[ACTION_KEY]) {
-          this.listeners[symbol[ACTION_KEY]] = this[assumedEventHandler]
+          this.listeners[symbol[ACTION_KEY]] = this[assumedEventHandler].bind(this)
         } else {
-          this.listeners[symbol] = this[assumedEventHandler]
+          this.listeners[symbol] = this[assumedEventHandler].bind(this)
         }
       }
     })

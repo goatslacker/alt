@@ -128,9 +128,9 @@ var ActionListeners = {
       });
       if (_this2[assumedEventHandler]) {
         if (symbol[ACTION_KEY]) {
-          _this2.listeners[symbol[ACTION_KEY]] = _this2[assumedEventHandler];
+          _this2.listeners[symbol[ACTION_KEY]] = _this2[assumedEventHandler].bind(_this2);
         } else {
-          _this2.listeners[symbol] = _this2[assumedEventHandler];
+          _this2.listeners[symbol] = _this2[assumedEventHandler].bind(_this2);
         }
       }
     });
