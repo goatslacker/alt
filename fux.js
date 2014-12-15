@@ -150,6 +150,7 @@ class Fux {
       )
 
       obj[action] = newAction[ACTION_HANDLER]
+      obj[action].defer = (x) => setTimeout(() => newAction[ACTION_HANDLER](x))
       obj[action][ACTION_KEY] = actionName
       obj[constant] = actionName
 

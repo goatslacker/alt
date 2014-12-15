@@ -165,6 +165,11 @@ var Fux = (function () {
       var newAction = new ActionCreator(_this3.dispatcher, actionName, handler);
 
       obj[action] = newAction[ACTION_HANDLER];
+      obj[action].defer = function (x) {
+        return setTimeout(function () {
+          return newAction[ACTION_HANDLER](x);
+        });
+      };
       obj[action][ACTION_KEY] = actionName;
       obj[constant] = actionName;
 
