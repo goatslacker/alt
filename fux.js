@@ -138,8 +138,9 @@ class Fux {
   createActions(ActionsClass) {
     var actions = Object.assign(new ActionsClass(), ActionsClass.prototype)
     return Object.keys(actions).reduce((obj, action) => {
+      var key = ActionsClass.displayName || ActionsClass.name
       var constant = formatAsConstant(action)
-      var actionName = Symbol(`action ${constant}`)
+      var actionName = Symbol(`action ${key}.${constant}`)
 
       var handler = typeof actions[action] === 'function'
         ? actions[action]
