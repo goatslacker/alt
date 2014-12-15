@@ -54,7 +54,7 @@ var Store = (function (EventEmitter) {
     this.dispatchToken = dispatcher.register(function (payload) {
       if (_this[LISTENERS][payload.action]) {
         var result = _this[LISTENERS][payload.action](payload.data);
-        result !== false && _this.emit("change");
+        result !== false && _this.emitChange();
       }
     });
 
@@ -67,7 +67,7 @@ var Store = (function (EventEmitter) {
   _extends(Store, EventEmitter);
 
   Store.prototype.emitChange = function () {
-    this.emit("change");
+    this.emit("change", this[STATE_CONTAINER]);
   };
 
   Store.prototype.listen = function (cb) {

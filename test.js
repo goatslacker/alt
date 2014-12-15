@@ -58,7 +58,8 @@ var secondStore = fux.createStore(class SecondStore {
 //
 console.log('Current State:', myStore.getState())
 
-myStore.listen(() => {
+myStore.listen((...args) => {
+  console.log('Args', args)
   console.log('Changed State:', myStore.getState())
   console.log('Snapshot of entire app state:', fux.takeSnapshot())
 })
