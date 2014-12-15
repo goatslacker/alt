@@ -719,7 +719,6 @@ var _prefix = 'ID_';
         if (this.$Dispatcher_isPending[id]) {
           continue;
         }
-        console.log(id)
         this.$Dispatcher_invokeCallback(id);
       }
     } finally {
