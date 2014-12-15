@@ -66,6 +66,10 @@ myStore.listen((...args) => {
   console.log('Snapshot of entire app state:', fux.takeSnapshot())
 })
 
+fux.dispatcher.register((payload) => {
+  console.log('=>', payload)
+})
+
 //secondStore.listen(() => {
 //  console.log('Registering another store')
 //})
