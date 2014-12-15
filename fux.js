@@ -22,7 +22,7 @@ var formatAsConstant = (name) => {
 }
 
 class Store extends EventEmitter {
-  constructor(dispatcher, state, listeners) {
+  constructor(dispatcher, state) {
     this[LISTENERS] = {}
     this[STATE_CONTAINER] = state
 
@@ -43,8 +43,8 @@ class Store extends EventEmitter {
     })
 
     // Transfer over the listeners
-    Object.keys(listeners).forEach((listener) => {
-      this[LISTENERS][listener] = listeners[listener]
+    Object.keys(state.listeners).forEach((listener) => {
+      this[LISTENERS][listener] = state.listeners[listener]
     })
   }
 
@@ -81,7 +81,7 @@ class ActionCreator {
   }
 }
 
-var ActionListeners = {
+var ActionListenersMixin = {
   listenTo(symbol, handler) {
     if (!symbol) {
       throw new ReferenceError('Invalid action reference passed in')
@@ -115,6 +115,19 @@ var ActionListeners = {
   }
 }
 
+var DispatcherMixin = {
+  waitFor(tokens) {
+    if (!tokens) {
+      throw new ReferenceError('Dispatch tokens not provided')
+    }
+    if (!Array.isArray(tokens)) {
+      tokens = [tokens]
+    }
+    this.dispatcher.waitFor(tokens)
+  }
+}
+
+// XXX rename listeners so it doesn't collide with anything
 class Fux {
   constructor() {
     this.dispatcher = new Dispatcher()
@@ -122,14 +135,15 @@ class Fux {
   }
 
   createStore(StoreModel) {
-    Object.assign(StoreModel.prototype, { listeners: {} }, ActionListeners)
+    Object.assign(
+      StoreModel.prototype,
+      { listeners: {}, dispatcher: this.dispatcher },
+      DispatcherMixin,
+      ActionListenersMixin
+    )
     var key = StoreModel.displayName || StoreModel.name
     var store = new StoreModel()
-    return this[STORES_STORE][key] = new Store(
-      this.dispatcher,
-      store,
-      store.listeners
-    )
+    return this[STORES_STORE][key] = new Store(this.dispatcher, store)
   }
 
   createActions(ActionsClass) {

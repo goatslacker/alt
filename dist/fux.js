@@ -37,7 +37,7 @@ var formatAsConstant = function (name) {
 };
 
 var Store = (function (EventEmitter) {
-  var Store = function Store(dispatcher, state, listeners) {
+  var Store = function Store(dispatcher, state) {
     var _this = this;
     this[LISTENERS] = {};
     this[STATE_CONTAINER] = state;
@@ -59,8 +59,8 @@ var Store = (function (EventEmitter) {
     });
 
     // Transfer over the listeners
-    Object.keys(listeners).forEach(function (listener) {
-      _this[LISTENERS][listener] = listeners[listener];
+    Object.keys(state.listeners).forEach(function (listener) {
+      _this[LISTENERS][listener] = state.listeners[listener];
     });
   };
 
@@ -103,7 +103,7 @@ var ActionCreator = (function () {
   return ActionCreator;
 })();
 
-var ActionListeners = {
+var ActionListenersMixin = {
   listenTo: function (symbol, handler) {
     if (!symbol) {
       throw new ReferenceError("Invalid action reference passed in");
@@ -137,6 +137,19 @@ var ActionListeners = {
   }
 };
 
+var DispatcherMixin = {
+  waitFor: function (tokens) {
+    if (!tokens) {
+      throw new ReferenceError("Dispatch tokens not provided");
+    }
+    if (!Array.isArray(tokens)) {
+      tokens = [tokens];
+    }
+    this.dispatcher.waitFor(tokens);
+  }
+};
+
+// XXX rename listeners so it doesn't collide with anything
 var Fux = (function () {
   var Fux = function Fux() {
     this.dispatcher = new Dispatcher();
@@ -144,10 +157,10 @@ var Fux = (function () {
   };
 
   Fux.prototype.createStore = function (StoreModel) {
-    Object.assign(StoreModel.prototype, { listeners: {} }, ActionListeners);
+    Object.assign(StoreModel.prototype, { listeners: {}, dispatcher: this.dispatcher }, DispatcherMixin, ActionListenersMixin);
     var key = StoreModel.displayName || StoreModel.name;
     var store = new StoreModel();
-    return this[STORES_STORE][key] = new Store(this.dispatcher, store, store.listeners);
+    return this[STORES_STORE][key] = new Store(this.dispatcher, store);
   };
 
   Fux.prototype.createActions = function (ActionsClass) {

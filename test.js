@@ -48,7 +48,7 @@ var secondStore = fux.createStore(class SecondStore {
   }
 
   onUpdateName() {
-    fux.dispatcher.waitFor([myStore.dispatchToken])
+    this.waitFor(myStore.dispatchToken)
     console.log('when am i called?', myStore.getState())
     this.name = myStore.getState().name
   }
