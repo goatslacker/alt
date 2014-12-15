@@ -66,6 +66,7 @@ myStore.listen((...args) => {
   console.log('Snapshot of entire app state:', fux.takeSnapshot())
 })
 
+// Listen to all global events.
 fux.dispatcher.register((payload) => {
   console.log('=>', payload)
 })
