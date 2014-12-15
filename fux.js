@@ -39,7 +39,7 @@ class Store extends EventEmitter {
     this.dispatchToken = dispatcher.register((payload) => {
       if (this[LISTENERS][payload.action]) {
         var result = this[LISTENERS][payload.action](payload.data)
-        result || this.emit('change')
+        result !== false && this.emit('change')
       }
     })
 

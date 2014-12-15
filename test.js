@@ -11,8 +11,8 @@ var myUtils = {
 }
 
 var myActions = fux.createActions(class MyActions {
-  constructor() {
-    this.updateName = true
+  updateName(name) {
+    this.dispatch(name)
   }
 
   save(state) {

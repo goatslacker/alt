@@ -55,7 +55,7 @@ var Store = (function (EventEmitter) {
     this.dispatchToken = dispatcher.register(function (payload) {
       if (_this[LISTENERS][payload.action]) {
         var result = _this[LISTENERS][payload.action](payload.data);
-        result || _this.emit("change");
+        result !== false && _this.emit("change");
       }
     });
 
