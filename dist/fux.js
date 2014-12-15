@@ -28,6 +28,8 @@ var LISTENERS = Symbol("stores action listeners storage");
 var MIXIN_REGISTRY = Symbol("mixin registry");
 var SET_STATE = Symbol("a set state method you should never call directly");
 var STATE_CONTAINER = Symbol("state container");
+var STORE_BOOTSTRAP = Symbol("event handler onBootstrap");
+var STORE_SNAPSHOT = Symbol("event handler onTakeSnapshot");
 var STORES_STORE = Symbol("stores storage");
 
 var formatAsConstant = function (name) {
@@ -40,6 +42,12 @@ var Store = (function (EventEmitter) {
   var Store = function Store(dispatcher, state) {
     var _this = this;
     this[STATE_CONTAINER] = state;
+    if (state.onBootstrap) {
+      this[STORE_BOOTSTRAP] = state.onBootstrap.bind(state);
+    }
+    if (state.onTakeSnapshot) {
+      this[STORE_SNAPSHOT] = state.onTakeSnapshot.bind(state);
+    }
 
     // A special setState method we use to bootstrap and keep state current
     this[SET_STATE] = function (newState) {
@@ -191,6 +199,9 @@ var Fux = (function () {
   Fux.prototype.takeSnapshot = function () {
     var _this4 = this;
     return JSON.stringify(Object.keys(this[STORES_STORE]).reduce(function (obj, key) {
+      if (_this4[STORES_STORE][key][STORE_SNAPSHOT]) {
+        _this4[STORES_STORE][key][STORE_SNAPSHOT]();
+      }
       obj[key] = _this4[STORES_STORE][key].getState();
       return obj;
     }, {}));
@@ -201,6 +212,9 @@ var Fux = (function () {
     var obj = JSON.parse(data);
     Object.keys(obj).forEach(function (key) {
       _this5[STORES_STORE][key][SET_STATE](obj[key]);
+      if (_this5[STORES_STORE][key][STORE_BOOTSTRAP]) {
+        _this5[STORES_STORE][key][STORE_BOOTSTRAP]();
+      }
     });
   };
 
