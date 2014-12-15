@@ -21,7 +21,6 @@ var formatAsConstant = (name) => {
   }).toUpperCase()
 }
 
-
 class Store extends EventEmitter {
   constructor(dispatcher, state, listeners) {
     this[LISTENERS] = {}
@@ -83,8 +82,6 @@ class ActionCreator {
 }
 
 var ActionListeners = {
-  listeners: {},
-
   listenTo(symbol, handler) {
     if (!symbol) {
       throw new ReferenceError('Invalid action reference passed in')
@@ -125,7 +122,7 @@ class Fux {
   }
 
   createStore(StoreModel) {
-    Object.assign(StoreModel.prototype, ActionListeners)
+    Object.assign(StoreModel.prototype, { listeners: {} }, ActionListeners)
     var key = StoreModel.displayName || StoreModel.name
     var store = new StoreModel()
     return this[STORES_STORE][key] = new Store(
@@ -140,7 +137,7 @@ class Fux {
     return Object.keys(actions).reduce((obj, action) => {
       var key = ActionsClass.displayName || ActionsClass.name
       var constant = formatAsConstant(action)
-      var actionName = Symbol(`action ${key}.${constant}`)
+      var actionName = Symbol(`action ${key}.prototype.${action}`)
 
       var handler = typeof actions[action] === 'function'
         ? actions[action]

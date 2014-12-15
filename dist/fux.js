@@ -36,7 +36,6 @@ var formatAsConstant = function (name) {
   }).toUpperCase();
 };
 
-
 var Store = (function (EventEmitter) {
   var Store = function Store(dispatcher, state, listeners) {
     var _this = this;
@@ -105,8 +104,6 @@ var ActionCreator = (function () {
 })();
 
 var ActionListeners = {
-  listeners: {},
-
   listenTo: function (symbol, handler) {
     if (!symbol) {
       throw new ReferenceError("Invalid action reference passed in");
@@ -147,7 +144,7 @@ var Fux = (function () {
   };
 
   Fux.prototype.createStore = function (StoreModel) {
-    Object.assign(StoreModel.prototype, ActionListeners);
+    Object.assign(StoreModel.prototype, { listeners: {} }, ActionListeners);
     var key = StoreModel.displayName || StoreModel.name;
     var store = new StoreModel();
     return this[STORES_STORE][key] = new Store(this.dispatcher, store, store.listeners);
@@ -159,7 +156,7 @@ var Fux = (function () {
     return Object.keys(actions).reduce(function (obj, action) {
       var key = ActionsClass.displayName || ActionsClass.name;
       var constant = formatAsConstant(action);
-      var actionName = Symbol("action " + key + "." + constant);
+      var actionName = Symbol("action " + key + ".prototype." + action);
 
       var handler = typeof actions[action] === "function" ? actions[action] : function (x) {
         this.dispatch(x);
@@ -722,6 +719,7 @@ var _prefix = 'ID_';
         if (this.$Dispatcher_isPending[id]) {
           continue;
         }
+        console.log(id)
         this.$Dispatcher_invokeCallback(id);
       }
     } finally {

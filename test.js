@@ -38,7 +38,6 @@ var myStore = fux.createStore(class MyStore {
 
 var secondStore = fux.createStore(class SecondStore {
   constructor() {
-    this.listenToActions(myActions)
     this.foo = 'bar'
     this.name = myStore.getState().name
   }
@@ -48,8 +47,8 @@ var secondStore = fux.createStore(class SecondStore {
   }
 
   onUpdateName(name) {
-    fux.dispatcher.waitFor([myStore.dispatchToken])
-    this.name = name
+//    fux.dispatcher.waitFor([myStore.dispatchToken])
+//    this.name = name
   }
 })
 
@@ -57,12 +56,16 @@ var secondStore = fux.createStore(class SecondStore {
 //  console.log('changed second', secondStore.getState())
 //})
 //
+console.log('Current State:', myStore.getState())
+
 myStore.listen(() => {
   console.log('Changed State:', myStore.getState())
   console.log('Snapshot of entire app state:', fux.takeSnapshot())
 })
 
-console.log('Current State:', myStore.getState())
+secondStore.listen(() => {
+  console.log('Registering another store')
+})
 
 //var snapshot = '{"myStore":{"name":"hello"},"secondStore":{"yes": true}}'
 
