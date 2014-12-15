@@ -23,7 +23,6 @@ var formatAsConstant = (name) => {
 
 class Store extends EventEmitter {
   constructor(dispatcher, state) {
-    this[LISTENERS] = {}
     this[STATE_CONTAINER] = state
 
     // A special setState method we use to bootstrap and keep state current
@@ -36,15 +35,10 @@ class Store extends EventEmitter {
 
     // Register dispatcher
     this.dispatchToken = dispatcher.register((payload) => {
-      if (this[LISTENERS][payload.action]) {
-        var result = this[LISTENERS][payload.action](payload.data)
+      if (state[LISTENERS][payload.action]) {
+        var result = state[LISTENERS][payload.action](payload.data)
         result !== false && this.emitChange()
       }
-    })
-
-    // Transfer over the listeners
-    Object.keys(state.listeners).forEach((listener) => {
-      this[LISTENERS][listener] = state.listeners[listener]
     })
   }
 
@@ -81,7 +75,12 @@ class ActionCreator {
   }
 }
 
-var ActionListenersMixin = {
+class StoreMixin {
+  constructor(dispatcher) {
+    this[LISTENERS] = {}
+    this.dispatcher = dispatcher
+  }
+
   listenTo(symbol, handler) {
     if (!symbol) {
       throw new ReferenceError('Invalid action reference passed in')
@@ -91,11 +90,11 @@ var ActionListenersMixin = {
     }
 
     if (symbol[ACTION_KEY]) {
-      this.listeners[symbol[ACTION_KEY]] = handler.bind(this)
+      this[LISTENERS][symbol[ACTION_KEY]] = handler.bind(this)
     } else {
-      this.listeners[symbol] = handler.bind(this)
+      this[LISTENERS][symbol] = handler.bind(this)
     }
-  },
+  }
 
   listenToActions(actions) {
     Object.keys(actions).forEach((action) => {
@@ -106,16 +105,14 @@ var ActionListenersMixin = {
       )
       if (this[assumedEventHandler]) {
         if (symbol[ACTION_KEY]) {
-          this.listeners[symbol[ACTION_KEY]] = this[assumedEventHandler].bind(this)
+          this[LISTENERS][symbol[ACTION_KEY]] = this[assumedEventHandler].bind(this)
         } else {
-          this.listeners[symbol] = this[assumedEventHandler].bind(this)
+          this[LISTENERS][symbol] = this[assumedEventHandler].bind(this)
         }
       }
     })
   }
-}
 
-var DispatcherMixin = {
   waitFor(tokens) {
     if (!tokens) {
       throw new ReferenceError('Dispatch tokens not provided')
@@ -137,9 +134,8 @@ class Fux {
   createStore(StoreModel) {
     Object.assign(
       StoreModel.prototype,
-      { listeners: {}, dispatcher: this.dispatcher },
-      DispatcherMixin,
-      ActionListenersMixin
+      new StoreMixin(this.dispatcher),
+      StoreMixin.prototype
     )
     var key = StoreModel.displayName || StoreModel.name
     var store = new StoreModel()
