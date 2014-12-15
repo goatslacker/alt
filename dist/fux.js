@@ -39,7 +39,6 @@ var formatAsConstant = function (name) {
 var Store = (function (EventEmitter) {
   var Store = function Store(dispatcher, state) {
     var _this = this;
-    this[LISTENERS] = {};
     this[STATE_CONTAINER] = state;
 
     // A special setState method we use to bootstrap and keep state current
@@ -52,15 +51,10 @@ var Store = (function (EventEmitter) {
 
     // Register dispatcher
     this.dispatchToken = dispatcher.register(function (payload) {
-      if (_this[LISTENERS][payload.action]) {
-        var result = _this[LISTENERS][payload.action](payload.data);
+      if (state[LISTENERS][payload.action]) {
+        var result = state[LISTENERS][payload.action](payload.data);
         result !== false && _this.emitChange();
       }
-    });
-
-    // Transfer over the listeners
-    Object.keys(state.listeners).forEach(function (listener) {
-      _this[LISTENERS][listener] = state.listeners[listener];
     });
   };
 
@@ -103,8 +97,13 @@ var ActionCreator = (function () {
   return ActionCreator;
 })();
 
-var ActionListenersMixin = {
-  listenTo: function (symbol, handler) {
+var StoreMixin = (function () {
+  var StoreMixin = function StoreMixin(dispatcher) {
+    this[LISTENERS] = {};
+    this.dispatcher = dispatcher;
+  };
+
+  StoreMixin.prototype.listenTo = function (symbol, handler) {
     if (!symbol) {
       throw new ReferenceError("Invalid action reference passed in");
     }
@@ -113,13 +112,13 @@ var ActionListenersMixin = {
     }
 
     if (symbol[ACTION_KEY]) {
-      this.listeners[symbol[ACTION_KEY]] = handler.bind(this);
+      this[LISTENERS][symbol[ACTION_KEY]] = handler.bind(this);
     } else {
-      this.listeners[symbol] = handler.bind(this);
+      this[LISTENERS][symbol] = handler.bind(this);
     }
-  },
+  };
 
-  listenToActions: function (actions) {
+  StoreMixin.prototype.listenToActions = function (actions) {
     var _this2 = this;
     Object.keys(actions).forEach(function (action) {
       var symbol = actions[action];
@@ -128,17 +127,15 @@ var ActionListenersMixin = {
       });
       if (_this2[assumedEventHandler]) {
         if (symbol[ACTION_KEY]) {
-          _this2.listeners[symbol[ACTION_KEY]] = _this2[assumedEventHandler].bind(_this2);
+          _this2[LISTENERS][symbol[ACTION_KEY]] = _this2[assumedEventHandler].bind(_this2);
         } else {
-          _this2.listeners[symbol] = _this2[assumedEventHandler].bind(_this2);
+          _this2[LISTENERS][symbol] = _this2[assumedEventHandler].bind(_this2);
         }
       }
     });
-  }
-};
+  };
 
-var DispatcherMixin = {
-  waitFor: function (tokens) {
+  StoreMixin.prototype.waitFor = function (tokens) {
     if (!tokens) {
       throw new ReferenceError("Dispatch tokens not provided");
     }
@@ -146,10 +143,11 @@ var DispatcherMixin = {
       tokens = [tokens];
     }
     this.dispatcher.waitFor(tokens);
-  }
-};
+  };
 
-// XXX rename listeners so it doesn't collide with anything
+  return StoreMixin;
+})();
+
 var Fux = (function () {
   var Fux = function Fux() {
     this.dispatcher = new Dispatcher();
@@ -157,7 +155,7 @@ var Fux = (function () {
   };
 
   Fux.prototype.createStore = function (StoreModel) {
-    Object.assign(StoreModel.prototype, { listeners: {}, dispatcher: this.dispatcher }, DispatcherMixin, ActionListenersMixin);
+    Object.assign(StoreModel.prototype, new StoreMixin(this.dispatcher), StoreMixin.prototype);
     var key = StoreModel.displayName || StoreModel.name;
     var store = new StoreModel();
     return this[STORES_STORE][key] = new Store(this.dispatcher, store);
