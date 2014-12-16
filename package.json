@@ -10,14 +10,10 @@
   },
   "devDependencies": {
     "6to5": "^1.15.0",
-    "6to5ify": "^1.4.0",
-    "browserify": "^7.0.0",
-    "gulp": "^3.8.10",
-    "gulp-derequire": "^2.0.0",
-    "vinyl-source-stream": "^1.0.0"
+    "sixpack": "^1.0.0"
   },
   "scripts": {
-    "build": "gulp",
+    "build": "./node_modules/sixpack/bin/sixpack ./fux.js Fux > dist/fux.js",
     "test": "./node_modules/6to5/bin/6to5-node test.js"
   },
   "keywords": [
