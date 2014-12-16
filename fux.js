@@ -15,8 +15,6 @@ var LISTENERS = Symbol('stores action listeners storage')
 var MIXIN_REGISTRY = Symbol('mixin registry')
 var SET_STATE = Symbol(`${now} set state method you shouldnt call`)
 var STATE_CONTAINER = Symbol(`${now} the state container`)
-var STORE_BOOTSTRAP = Symbol('event handler onBootstrap')
-var STORE_SNAPSHOT = Symbol('event handler onTakeSnapshot')
 var STORES_STORE = Symbol('stores storage')
 
 var formatAsConstant = (name) => {
@@ -26,14 +24,8 @@ var formatAsConstant = (name) => {
 }
 
 class Store extends EventEmitter {
-  constructor(dispatcher, state) {
+  constructor(dispatcher, state, prototypeObject) {
     this[STATE_CONTAINER] = state
-    if (state.onBootstrap) {
-      this[STORE_BOOTSTRAP] = state.onBootstrap.bind(state)
-    }
-    if (state.onTakeSnapshot) {
-      this[STORE_SNAPSHOT] = state.onTakeSnapshot.bind(state)
-    }
 
     // A special setState method we use to bootstrap and keep state current
     this[SET_STATE] = (newState) => {
@@ -50,6 +42,9 @@ class Store extends EventEmitter {
         result !== false && this.emitChange()
       }
     })
+
+    // Make all the prototype methods available
+    Object.assign(this, prototypeObject)
   }
 
   emitChange() {
@@ -141,6 +136,7 @@ class Fux {
   }
 
   createStore(StoreModel) {
+    var classPrototype = Object.assign({}, StoreModel.prototype)
     Object.assign(
       StoreModel.prototype,
       new StoreMixin(this.dispatcher),
@@ -148,7 +144,11 @@ class Fux {
     )
     var key = StoreModel.displayName || StoreModel.name
     var store = new StoreModel()
-    return this[STORES_STORE][key] = new Store(this.dispatcher, store)
+    return this[STORES_STORE][key] = new Store(
+      this.dispatcher,
+      store,
+      classPrototype
+    )
   }
 
   createActions(ActionsClass) {
@@ -179,8 +179,8 @@ class Fux {
 
   takeSnapshot() {
     return JSON.stringify(Object.keys(this[STORES_STORE]).reduce((obj, key) => {
-      if (this[STORES_STORE][key][STORE_SNAPSHOT]) {
-        this[STORES_STORE][key][STORE_SNAPSHOT]()
+      if (this[STORES_STORE][key].onTakeSnapshot) {
+        this[STORES_STORE][key].onTakeSnapshot()
       }
       obj[key] = this[STORES_STORE][key].getState()
       return obj
@@ -191,8 +191,8 @@ class Fux {
     var obj = JSON.parse(data)
     Object.keys(obj).forEach((key) => {
       this[STORES_STORE][key][SET_STATE](obj[key])
-      if (this[STORES_STORE][key][STORE_BOOTSTRAP]) {
-        this[STORES_STORE][key][STORE_BOOTSTRAP]()
+      if (this[STORES_STORE][key].onBootstrap) {
+        this[STORES_STORE][key].onBootstrap()
       }
     })
   }

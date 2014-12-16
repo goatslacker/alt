@@ -38,6 +38,10 @@ var myStore = fux.createStore(class MyStore {
   methodICanCall() {
     return true
   }
+
+  onTakeSnapshot() {
+    console.log('**********SNAPSHOT*************')
+  }
 })
 
 var secondStore = fux.createStore(class SecondStore {
