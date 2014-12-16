@@ -21,6 +21,9 @@ var Symbol = _dereq_("./polyfills/es6-symbol");
 Object.assign = Object.assign || _dereq_("object-assign");
 
 var now = new Date().getTime();
+var PrivateSymbol = function (desc) {
+  return Symbol("" + now + "" + desc);
+};
 
 var ACTION_DISPATCHER = Symbol("action dispatcher storage");
 var ACTION_HANDLER = Symbol("action creator handler");
@@ -28,8 +31,9 @@ var ACTION_KEY = Symbol("holds the actions uid symbol for listening");
 var ACTION_UID = Symbol("the actions uid name");
 var LISTENERS = Symbol("stores action listeners storage");
 var MIXIN_REGISTRY = Symbol("mixin registry");
-var SET_STATE = Symbol("" + now + " set state method you shouldnt call");
-var STATE_CONTAINER = Symbol("" + now + " the state container");
+var BOOTSTRAP_FLAG = PrivateSymbol("have you bootstrapped yet?");
+var SET_STATE = PrivateSymbol("set state method you shouldnt call");
+var STATE_CONTAINER = PrivateSymbol("the state container");
 var STORES_STORE = Symbol("stores storage");
 
 var formatAsConstant = function (name) {
@@ -157,6 +161,7 @@ var Fux = (function () {
   var Fux = function Fux() {
     this.dispatcher = new Dispatcher();
     this[STORES_STORE] = {};
+    this[BOOTSTRAP_FLAG] = false;
   };
 
   Fux.prototype.createStore = function (StoreModel) {
@@ -210,6 +215,9 @@ var Fux = (function () {
 
   Fux.prototype.bootstrap = function (data) {
     var _this5 = this;
+    if (this[BOOTSTRAP_FLAG]) {
+      throw new ReferenceError("Stores have already been bootstrapped");
+    }
     var obj = JSON.parse(data);
     Object.keys(obj).forEach(function (key) {
       _this5[STORES_STORE][key][SET_STATE](obj[key]);
@@ -217,6 +225,7 @@ var Fux = (function () {
         _this5[STORES_STORE][key].onBootstrap();
       }
     });
+    this[BOOTSTRAP_FLAG] = true;
   };
 
   return Fux;

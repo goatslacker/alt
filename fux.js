@@ -6,6 +6,7 @@ var Symbol = require('./polyfills/es6-symbol')
 Object.assign = Object.assign || require('object-assign')
 
 var now = new Date().getTime()
+var PrivateSymbol = (desc) => Symbol(`${now}${desc}`)
 
 var ACTION_DISPATCHER = Symbol('action dispatcher storage')
 var ACTION_HANDLER = Symbol('action creator handler')
@@ -13,8 +14,9 @@ var ACTION_KEY = Symbol('holds the actions uid symbol for listening')
 var ACTION_UID = Symbol('the actions uid name')
 var LISTENERS = Symbol('stores action listeners storage')
 var MIXIN_REGISTRY = Symbol('mixin registry')
-var SET_STATE = Symbol(`${now} set state method you shouldnt call`)
-var STATE_CONTAINER = Symbol(`${now} the state container`)
+var BOOTSTRAP_FLAG = PrivateSymbol('have you bootstrapped yet?')
+var SET_STATE = PrivateSymbol('set state method you shouldnt call')
+var STATE_CONTAINER = PrivateSymbol('the state container')
 var STORES_STORE = Symbol('stores storage')
 
 var formatAsConstant = (name) => {
@@ -133,6 +135,7 @@ class Fux {
   constructor() {
     this.dispatcher = new Dispatcher()
     this[STORES_STORE] = {}
+    this[BOOTSTRAP_FLAG] = false
   }
 
   createStore(StoreModel) {
@@ -193,6 +196,9 @@ class Fux {
   }
 
   bootstrap(data) {
+    if (this[BOOTSTRAP_FLAG]) {
+      throw new ReferenceError('Stores have already been bootstrapped')
+    }
     var obj = JSON.parse(data)
     Object.keys(obj).forEach((key) => {
       this[STORES_STORE][key][SET_STATE](obj[key])
@@ -200,6 +206,7 @@ class Fux {
         this[STORES_STORE][key].onBootstrap()
       }
     })
+    this[BOOTSTRAP_FLAG] = true
   }
 }
 
