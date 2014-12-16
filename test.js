@@ -63,6 +63,16 @@ var secondStore = fux.createStore(class SecondStore {
   assert.equal(typeof fux.createActions, 'function', 'createActions function')
   assert.equal(typeof fux.createStore, 'function', 'createStore function')
 
+  var storePrototype = Object.getPrototypeOf(myStore)
+  var assertMethods = ['emitChange', 'listen', 'unlisten', 'getState']
+  assert.deepEqual(Object.keys(storePrototype), assertMethods, 'methods exist for store')
+  assert.equal(typeof myStore.on, 'function', 'event emitter methods')
+  assert.equal(typeof myStore.off, 'function', 'event emitter methods')
+  assert.equal(typeof myStore.addListener, 'function', 'event emitter methods')
+  assert.equal(typeof myStore.removeListener, 'function', 'event emitter methods')
+  assert.equal(typeof myStore.once, 'function', 'event emitter methods')
+  assert.equal(typeof myStore.emit, 'function', 'event emitter methods')
+
   var initialSnapshot = fux.takeSnapshot()
   var bootstrapReturnValue = fux.bootstrap(initialSnapshot)
   assert.equal(bootstrapReturnValue, undefined, 'bootstrap returns nothing')
@@ -139,4 +149,8 @@ var secondStore = fux.createStore(class SecondStore {
 
   myActions.updateTwo(4, 2)
   assert.equal(secondStore.getState().foo, 6, 'im able to pass two params into an action')
+
+  assert.equal(secondStore.foo, undefined, 'cant access state properties that live inside store')
+  assert.equal(secondStore.bindAction, undefined, 'cant access action listeners from outside store')
+  assert.equal(secondStore.bindActions, undefined, 'cant access action listeners from outside store')
 }()

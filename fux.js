@@ -111,8 +111,9 @@ class StoreMixin {
   bindActions(actions) {
     Object.keys(actions).forEach((action) => {
       var symbol = actions[action]
+      var matchFirstCharacter = /./
       var assumedEventHandler = action.replace(
-        /./,
+        matchFirstCharacter,
         (x) => `on${x[0].toUpperCase()}`
       )
       if (this[assumedEventHandler]) {

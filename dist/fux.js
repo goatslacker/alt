@@ -136,7 +136,8 @@ var StoreMixin = (function () {
     var _this2 = this;
     Object.keys(actions).forEach(function (action) {
       var symbol = actions[action];
-      var assumedEventHandler = action.replace(/./, function (x) {
+      var matchFirstCharacter = /./;
+      var assumedEventHandler = action.replace(matchFirstCharacter, function (x) {
         return "on" + x[0].toUpperCase();
       });
       if (_this2[assumedEventHandler]) {
