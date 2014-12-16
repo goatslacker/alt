@@ -1,7 +1,7 @@
 'use strict'
 
 var Dispatcher = require('flux').Dispatcher
-var EventEmitter = require('events').EventEmitter // XXX use EE3
+var EventEmitter = require('eventemitter3')
 var Symbol = require('./polyfills/es6-symbol')
 Object.assign = Object.assign || require('object-assign')
 
