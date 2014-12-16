@@ -16,9 +16,11 @@ var _extends = function (child, parent) {
 "use strict";
 
 var Dispatcher = _dereq_("flux").Dispatcher;
-var EventEmitter = _dereq_("events").EventEmitter;
+var EventEmitter = _dereq_("events").EventEmitter; // XXX use EE3
 var Symbol = _dereq_("./polyfills/es6-symbol");
 Object.assign = Object.assign || _dereq_("object-assign");
+
+var now = new Date().getTime();
 
 var ACTION_DISPATCHER = Symbol("action dispatcher storage");
 var ACTION_HANDLER = Symbol("action creator handler");
@@ -26,8 +28,8 @@ var ACTION_KEY = Symbol("holds the actions uid symbol for listening");
 var ACTION_UID = Symbol("the actions uid name");
 var LISTENERS = Symbol("stores action listeners storage");
 var MIXIN_REGISTRY = Symbol("mixin registry");
-var SET_STATE = Symbol("a set state method you should never call directly");
-var STATE_CONTAINER = Symbol("state container");
+var SET_STATE = Symbol("" + now + " set state method you shouldnt call");
+var STATE_CONTAINER = Symbol("" + now + " the state container");
 var STORE_BOOTSTRAP = Symbol("event handler onBootstrap");
 var STORE_SNAPSHOT = Symbol("event handler onTakeSnapshot");
 var STORES_STORE = Symbol("stores storage");
