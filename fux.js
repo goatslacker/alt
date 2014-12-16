@@ -186,13 +186,20 @@ class Fux {
   }
 
   takeSnapshot() {
-    return JSON.stringify(Object.keys(this[STORES_STORE]).reduce((obj, key) => {
+    var state = JSON.stringify(Object.keys(this[STORES_STORE]).reduce((obj, key) => {
       if (this[STORES_STORE][key].onTakeSnapshot) {
         this[STORES_STORE][key].onTakeSnapshot()
       }
       obj[key] = this[STORES_STORE][key].getState()
       return obj
     }, {}))
+    this._lastSnapshot = state
+    return state
+  }
+
+  rollback() {
+    this[BOOTSTRAP_FLAG] = false
+    this.bootstrap(this._lastSnapshot)
   }
 
   bootstrap(data) {

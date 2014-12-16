@@ -204,13 +204,20 @@ var Fux = (function () {
 
   Fux.prototype.takeSnapshot = function () {
     var _this4 = this;
-    return JSON.stringify(Object.keys(this[STORES_STORE]).reduce(function (obj, key) {
+    var state = JSON.stringify(Object.keys(this[STORES_STORE]).reduce(function (obj, key) {
       if (_this4[STORES_STORE][key].onTakeSnapshot) {
         _this4[STORES_STORE][key].onTakeSnapshot();
       }
       obj[key] = _this4[STORES_STORE][key].getState();
       return obj;
     }, {}));
+    this._lastSnapshot = state;
+    return state;
+  };
+
+  Fux.prototype.rollback = function () {
+    this[BOOTSTRAP_FLAG] = false;
+    this.bootstrap(this._lastSnapshot);
   };
 
   Fux.prototype.bootstrap = function (data) {

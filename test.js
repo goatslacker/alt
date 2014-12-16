@@ -95,5 +95,10 @@ fux.dispatcher.register((payload) => {
 //console.log(secondStore.getState())
 
 myActions.updateName('hello')
-console.log(myStore.methodICanCall())
+setTimeout(() => {
+  console.log('can i call methods defined in store prototype', myStore.methodICanCall())
+  console.log(myStore.getState(), secondStore.getState())
+  fux.rollback()
+  console.log('rolling back to', fux.takeSnapshot())
+}, 1000)
 //myActions.updateFoo(1, 2)
