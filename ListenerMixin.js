@@ -1,16 +1,15 @@
 var MIXIN_REGISTRY = '_fux store listener registry_'
 
 var ListenerMixin = {
-  componentWillUnmount() {
-    this[MIXIN_REGISTRY] && this[MIXIN_REGISTRY].forEach((x) => {
-      var { store, handler } = x
-      store.unlisten(handler)
+  componentWillUnmount: function () {
+    this[MIXIN_REGISTRY] && this[MIXIN_REGISTRY].forEach(function (x) {
+      x.store.unlisten(x.handler)
     })
   },
 
-  listenTo(store, handler) {
+  listenTo: function (store, handler) {
     this[MIXIN_REGISTRY] = this[MIXIN_REGISTRY] || []
-    this[MIXIN_REGISTRY].push({ store, handler })
+    this[MIXIN_REGISTRY].push({ store: store, handler: handler })
     store.listen(handler)
   }
 }
