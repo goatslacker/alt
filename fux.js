@@ -91,12 +91,12 @@ class StoreMixin {
     this.dispatcher = dispatcher
   }
 
-  listenTo(symbol, handler) {
+  bindAction(symbol, handler) {
     if (!symbol) {
       throw new ReferenceError('Invalid action reference passed in')
     }
     if (typeof handler !== 'function') {
-      throw new TypeError('listenTo expects a function')
+      throw new TypeError('bindAction expects a function')
     }
 
     if (symbol[ACTION_KEY]) {
@@ -106,7 +106,7 @@ class StoreMixin {
     }
   }
 
-  listenToActions(actions) {
+  bindActions(actions) {
     Object.keys(actions).forEach((action) => {
       var symbol = actions[action]
       var assumedEventHandler = action.replace(

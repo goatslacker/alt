@@ -113,12 +113,12 @@ var StoreMixin = (function () {
     this.dispatcher = dispatcher;
   };
 
-  StoreMixin.prototype.listenTo = function (symbol, handler) {
+  StoreMixin.prototype.bindAction = function (symbol, handler) {
     if (!symbol) {
       throw new ReferenceError("Invalid action reference passed in");
     }
     if (typeof handler !== "function") {
-      throw new TypeError("listenTo expects a function");
+      throw new TypeError("bindAction expects a function");
     }
 
     if (symbol[ACTION_KEY]) {
@@ -128,7 +128,7 @@ var StoreMixin = (function () {
     }
   };
 
-  StoreMixin.prototype.listenToActions = function (actions) {
+  StoreMixin.prototype.bindActions = function (actions) {
     var _this2 = this;
     Object.keys(actions).forEach(function (action) {
       var symbol = actions[action];
