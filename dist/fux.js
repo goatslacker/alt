@@ -31,7 +31,6 @@ var ACTION_KEY = Symbol("holds the actions uid symbol for listening");
 var ACTION_UID = Symbol("the actions uid name");
 var BOOTSTRAP_FLAG = PrivateSymbol("have you bootstrapped yet?");
 var LISTENERS = Symbol("stores action listeners storage");
-var MIXIN_REGISTRY = Symbol("mixin registry");
 var SET_STATE = Symbol("" + now + " set state method you shouldnt call");
 var STATE_CONTAINER = Symbol("" + now + " the state container");
 var STORE_BOOTSTRAP = Symbol("event handler onBootstrap");
@@ -242,22 +241,6 @@ var Fux = (function () {
 
   return Fux;
 })();
-
-Fux.ListenerMixin = {
-  componentWillUnmount: function () {
-    this[MIXIN_REGISTRY] && this[MIXIN_REGISTRY].forEach(function (x) {
-      var store = x.store;
-      var handler = x.handler;
-      store.unlisten(handler);
-    });
-  },
-
-  listenTo: function (store, handler) {
-    this[MIXIN_REGISTRY] = this[MIXIN_REGISTRY] || [];
-    this[MIXIN_REGISTRY].push({ store: store, handler: handler });
-    store.listen(handler);
-  }
-};
 
 module.exports = Fux;
 
