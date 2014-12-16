@@ -65,12 +65,9 @@ var secondStore = fux.createStore(class SecondStore {
 
 !() => {
   assert.equal(typeof myStore.getState, 'function')
-  assert.equal(typeof myStore.onTakeSnapshot, 'function')
-  assert.equal(typeof myStore.methodICanCall, 'function')
-  assert.equal(myStore.methodICanCall(), true)
-
-  // XXX I guess I can now call the onUpdateName methods directly which is kinda lame...
-  // I should think about removing the prototype methods. Loss of intuitiveness but you can't set shit directly, only through actions
+  assert.equal(typeof myStore.onTakeSnapshot, 'undefined')
+  assert.equal(typeof myStore.methodICanCall, 'undefined')
+//  assert.equal(myStore.methodICanCall(), true)
 }()
 
 
@@ -106,10 +103,11 @@ fux.dispatcher.register((payload) => {
 //console.log(secondStore.getState())
 
 myActions.updateName('hello')
-setTimeout(() => {
-  console.log('can i call methods defined in store prototype', myStore.methodICanCall())
-  console.log(myStore.getState(), secondStore.getState())
-  fux.rollback()
-  console.log('rolling back to', fux.takeSnapshot())
-}, 1000)
+//setTimeout(() => {
+//  console.log('can i call methods defined in store prototype', myStore.methodICanCall())
+//  console.log(myStore.getState(), secondStore.getState())
+//  fux.rollback()
+//  console.log('rolling back to', fux.takeSnapshot())
+//}, 1000)
+console.log('>>>>>>>>>', myStore)
 //myActions.updateFoo(1, 2)
