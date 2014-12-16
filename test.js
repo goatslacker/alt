@@ -1,4 +1,5 @@
 var Fux = require('./fux')
+var assert = require('assert')
 
 var fux = new Fux()
 
@@ -61,6 +62,16 @@ var secondStore = fux.createStore(class SecondStore {
     this.name = myStore.getState().name
   }
 })
+
+!() => {
+  assert.equal(typeof myStore.getState, 'function')
+  assert.equal(typeof myStore.onTakeSnapshot, 'function')
+  assert.equal(typeof myStore.methodICanCall, 'function')
+  assert.equal(myStore.methodICanCall(), true)
+
+  // XXX I guess I can now call the onUpdateName methods directly which is kinda lame...
+  // I should think about removing the prototype methods. Loss of intuitiveness but you can't set shit directly, only through actions
+}()
 
 
 var str = '{"MyStore":{"name":"wtf"}}'
