@@ -38,8 +38,8 @@ var formatAsConstant = function (name) {
   }).toUpperCase();
 };
 
-var Store = (function (EventEmitter) {
-  var Store = function Store(dispatcher, state, prototypeObject) {
+var FuxStore = (function (EventEmitter) {
+  var FuxStore = function FuxStore(dispatcher, state, prototypeObject) {
     var _this = this;
     this[STATE_CONTAINER] = state;
 
@@ -63,26 +63,26 @@ var Store = (function (EventEmitter) {
     Object.assign(this, prototypeObject);
   };
 
-  _extends(Store, EventEmitter);
+  _extends(FuxStore, EventEmitter);
 
-  Store.prototype.emitChange = function () {
+  FuxStore.prototype.emitChange = function () {
     this.emit("change", this[STATE_CONTAINER]);
   };
 
-  Store.prototype.listen = function (cb) {
+  FuxStore.prototype.listen = function (cb) {
     this.on("change", cb);
   };
 
-  Store.prototype.unlisten = function (cb) {
+  FuxStore.prototype.unlisten = function (cb) {
     this.removeListener("change", cb);
   };
 
-  Store.prototype.getState = function () {
+  FuxStore.prototype.getState = function () {
     // Copy over state so it's RO.
     return Object.assign({}, this[STATE_CONTAINER]);
   };
 
-  return Store;
+  return FuxStore;
 })(EventEmitter);
 
 var ActionCreator = (function () {
@@ -160,11 +160,14 @@ var Fux = (function () {
   };
 
   Fux.prototype.createStore = function (StoreModel) {
-    var classPrototype = Object.assign({}, StoreModel.prototype);
-    Object.assign(StoreModel.prototype, new StoreMixin(this.dispatcher), StoreMixin.prototype);
+    var Store = function Store() {
+      StoreModel.call(this);
+    };
+
+    Object.assign(Store.prototype, StoreModel.prototype, new StoreMixin(this.dispatcher), StoreMixin.prototype);
     var key = StoreModel.displayName || StoreModel.name;
-    var store = new StoreModel();
-    return this[STORES_STORE][key] = new Store(this.dispatcher, store, classPrototype);
+    var store = new Store();
+    return this[STORES_STORE][key] = new FuxStore(this.dispatcher, store, StoreModel.prototype);
   };
 
   Fux.prototype.createActions = function (ActionsClass) {

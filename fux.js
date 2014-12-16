@@ -23,7 +23,7 @@ var formatAsConstant = (name) => {
   }).toUpperCase()
 }
 
-class Store extends EventEmitter {
+class FuxStore extends EventEmitter {
   constructor(dispatcher, state, prototypeObject) {
     this[STATE_CONTAINER] = state
 
@@ -136,18 +136,23 @@ class Fux {
   }
 
   createStore(StoreModel) {
-    var classPrototype = Object.assign({}, StoreModel.prototype)
+    class Store {
+      constructor() {
+        StoreModel.call(this)
+      }
+    }
     Object.assign(
+      Store.prototype,
       StoreModel.prototype,
       new StoreMixin(this.dispatcher),
       StoreMixin.prototype
     )
     var key = StoreModel.displayName || StoreModel.name
-    var store = new StoreModel()
-    return this[STORES_STORE][key] = new Store(
+    var store = new Store()
+    return this[STORES_STORE][key] = new FuxStore(
       this.dispatcher,
       store,
-      classPrototype
+      StoreModel.prototype
     )
   }
 
