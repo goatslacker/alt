@@ -29,11 +29,13 @@ var ACTION_DISPATCHER = Symbol("action dispatcher storage");
 var ACTION_HANDLER = Symbol("action creator handler");
 var ACTION_KEY = Symbol("holds the actions uid symbol for listening");
 var ACTION_UID = Symbol("the actions uid name");
+var BOOTSTRAP_FLAG = PrivateSymbol("have you bootstrapped yet?");
 var LISTENERS = Symbol("stores action listeners storage");
 var MIXIN_REGISTRY = Symbol("mixin registry");
-var BOOTSTRAP_FLAG = PrivateSymbol("have you bootstrapped yet?");
-var SET_STATE = PrivateSymbol("set state method you shouldnt call");
-var STATE_CONTAINER = PrivateSymbol("the state container");
+var SET_STATE = Symbol("" + now + " set state method you shouldnt call");
+var STATE_CONTAINER = Symbol("" + now + " the state container");
+var STORE_BOOTSTRAP = Symbol("event handler onBootstrap");
+var STORE_SNAPSHOT = Symbol("event handler onTakeSnapshot");
 var STORES_STORE = Symbol("stores storage");
 
 var formatAsConstant = function (name) {
@@ -43,9 +45,15 @@ var formatAsConstant = function (name) {
 };
 
 var FuxStore = (function (EventEmitter) {
-  var FuxStore = function FuxStore(dispatcher, state, prototypeObject) {
+  var FuxStore = function FuxStore(dispatcher, state) {
     var _this = this;
     this[STATE_CONTAINER] = state;
+    if (state.onBootstrap) {
+      this[STORE_BOOTSTRAP] = state.onBootstrap.bind(state);
+    }
+    if (state.onTakeSnapshot) {
+      this[STORE_SNAPSHOT] = state.onTakeSnapshot.bind(state);
+    }
 
     // A special setState method we use to bootstrap and keep state current
     this[SET_STATE] = function (newState) {
@@ -62,9 +70,6 @@ var FuxStore = (function (EventEmitter) {
         result !== false && _this.emitChange();
       }
     });
-
-    // Make all the prototype methods available
-    Object.assign(this, prototypeObject);
   };
 
   _extends(FuxStore, EventEmitter);
@@ -172,7 +177,7 @@ var Fux = (function () {
     Object.assign(Store.prototype, StoreModel.prototype, new StoreMixin(this.dispatcher), StoreMixin.prototype);
     var key = StoreModel.displayName || StoreModel.name;
     var store = new Store();
-    return this[STORES_STORE][key] = new FuxStore(this.dispatcher, store, StoreModel.prototype);
+    return this[STORES_STORE][key] = new FuxStore(this.dispatcher, store);
   };
 
   Fux.prototype.createActions = function (ActionsClass) {
@@ -205,8 +210,8 @@ var Fux = (function () {
   Fux.prototype.takeSnapshot = function () {
     var _this4 = this;
     var state = JSON.stringify(Object.keys(this[STORES_STORE]).reduce(function (obj, key) {
-      if (_this4[STORES_STORE][key].onTakeSnapshot) {
-        _this4[STORES_STORE][key].onTakeSnapshot();
+      if (_this4[STORES_STORE][key][STORE_SNAPSHOT]) {
+        _this4[STORES_STORE][key][STORE_SNAPSHOT]();
       }
       obj[key] = _this4[STORES_STORE][key].getState();
       return obj;
@@ -228,8 +233,8 @@ var Fux = (function () {
     var obj = JSON.parse(data);
     Object.keys(obj).forEach(function (key) {
       _this5[STORES_STORE][key][SET_STATE](obj[key]);
-      if (_this5[STORES_STORE][key].onBootstrap) {
-        _this5[STORES_STORE][key].onBootstrap();
+      if (_this5[STORES_STORE][key][STORE_BOOTSTRAP]) {
+        _this5[STORES_STORE][key][STORE_BOOTSTRAP]();
       }
     });
     this[BOOTSTRAP_FLAG] = true;
