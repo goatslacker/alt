@@ -20,7 +20,7 @@ var EventEmitter = _dereq_("events").EventEmitter; // XXX use EE3
 var Symbol = _dereq_("./polyfills/es6-symbol");
 Object.assign = Object.assign || _dereq_("object-assign");
 
-var now = new Date().getTime();
+var now = Date.now();
 var PrivateSymbol = function (desc) {
   return Symbol("" + now + "" + desc);
 };

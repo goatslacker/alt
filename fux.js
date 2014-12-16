@@ -5,7 +5,7 @@ var EventEmitter = require('events').EventEmitter // XXX use EE3
 var Symbol = require('./polyfills/es6-symbol')
 Object.assign = Object.assign || require('object-assign')
 
-var now = new Date().getTime()
+var now = Date.now()
 var PrivateSymbol = (desc) => Symbol(`${now}${desc}`)
 
 var ACTION_DISPATCHER = Symbol('action dispatcher storage')
