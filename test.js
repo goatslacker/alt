@@ -62,10 +62,16 @@ var secondStore = fux.createStore(class SecondStore {
   }
 })
 
+
+var str = '{"MyStore":{"name":"wtf"}}'
+fux.bootstrap(str)
+
+console.log(myStore.getState())
+
 //secondStore.listen(() => {
 //  console.log('changed second', secondStore.getState())
 //})
-//
+
 console.log('Current State:', myStore.getState())
 
 myStore.listen((...args) => {
@@ -76,7 +82,7 @@ myStore.listen((...args) => {
 
 // Listen to all global events.
 fux.dispatcher.register((payload) => {
-  console.log('=>', payload)
+  console.log('  * Dispatcher => ', payload)
 })
 
 //secondStore.listen(() => {
