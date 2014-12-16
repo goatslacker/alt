@@ -57,7 +57,6 @@ var FuxStore = (function (EventEmitter) {
 
     // A special setState method we use to bootstrap and keep state current
     this[SET_STATE] = function (newState) {
-      // XXX should we emit change when we bootstrap?
       if (_this[STATE_CONTAINER] !== newState) {
         Object.assign(_this[STATE_CONTAINER], newState);
       }

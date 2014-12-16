@@ -39,7 +39,6 @@ class FuxStore extends EventEmitter {
 
     // A special setState method we use to bootstrap and keep state current
     this[SET_STATE] = (newState) => {
-      // XXX should we emit change when we bootstrap?
       if (this[STATE_CONTAINER] !== newState) {
         Object.assign(this[STATE_CONTAINER], newState)
       }
