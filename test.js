@@ -6,6 +6,7 @@ var fux = new Fux()
 var myActions = fux.createActions(class MyActions {
   constructor() {
     this.callInternalMethod = true
+    this.shortHandBinary = true
   }
 
   updateName(name) {
@@ -55,6 +56,10 @@ var secondStore = fux.createStore(class SecondStore {
 
   updateThree(x) {
     this.foo = x.a + x.b + x.c
+  }
+
+  shortHandBinary(arr) {
+    this.foo = arr
   }
 
   onUpdateName() {
@@ -165,4 +170,9 @@ var secondStore = fux.createStore(class SecondStore {
 
   myActions.updateThree(4, 2, 1)
   assert.equal(secondStore.getState().foo, 7, 'the store method updateThree works')
+
+  myActions.shortHandBinary(1, 0)
+  assert.equal(Array.isArray(secondStore.getState().foo), true, 'shorthand for multiple elements pass through goes as array')
+  assert.equal(secondStore.getState().foo[0], 1, 'shorthand for multiple elements pass through goes as array')
+  assert.equal(secondStore.getState().foo[1], 0, 'shorthand for multiple elements pass through goes as array')
 }()
