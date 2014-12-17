@@ -169,11 +169,17 @@ var Fux = (function () {
   };
 
   Fux.prototype.createStore = function (StoreModel) {
-    var Store = function Store() {
-      StoreModel.call(this);
-    };
+    var Store = (function (StoreModel) {
+      var Store = function Store() {
+        StoreModel.call(this);
+      };
 
-    Object.assign(Store.prototype, StoreModel.prototype, new StoreMixin(this.dispatcher), StoreMixin.prototype);
+      _extends(Store, StoreModel);
+
+      return Store;
+    })(StoreModel);
+
+    Object.assign(Store.prototype, new StoreMixin(this.dispatcher), StoreMixin.prototype);
     var key = StoreModel.displayName || StoreModel.name;
     var store = new Store();
     return this[STORES_STORE][key] = new FuxStore(this.dispatcher, store);

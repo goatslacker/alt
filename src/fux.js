@@ -143,14 +143,11 @@ class Fux {
   }
 
   createStore(StoreModel) {
-    class Store {
-      constructor() {
-        StoreModel.call(this)
-      }
+    class Store extends StoreModel {
+      constructor() { StoreModel.call(this) }
     }
     Object.assign(
       Store.prototype,
-      StoreModel.prototype,
       new StoreMixin(this.dispatcher),
       StoreMixin.prototype
     )
