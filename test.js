@@ -15,6 +15,10 @@ var myActions = fux.createActions(class MyActions {
   updateTwo(a, b) {
     this.dispatch({ a, b })
   }
+
+  updateThree(a, b, c) {
+    this.dispatch({ a, b, c })
+  }
 })
 
 var myStore = fux.createStore(class MyStore {
@@ -49,6 +53,10 @@ var secondStore = fux.createStore(class SecondStore {
     this.foo = x.a + x.b
   }
 
+  updateThree(x) {
+    this.foo = x.a + x.b + x.c
+  }
+
   onUpdateName() {
     this.waitFor(myStore.dispatchToken)
     this.name = myStore.getState().name
@@ -81,6 +89,7 @@ var secondStore = fux.createStore(class SecondStore {
   assert.equal(myActions.callInternalMethod.length, 1, 'shorthand function is an id function')
   assert.equal(typeof myActions.updateName, 'function', 'prototype defined actions exist')
   assert.equal(typeof myActions.updateTwo, 'function', 'prototype defined actions exist')
+  assert.equal(typeof myActions.updateThree, 'function', 'prototype defined actions exist')
   assert.equal(myActions.updateTwo.length, 2, 'actions can have > 1 arity')
 
   assert.equal(typeof myActions.UPDATE_NAME, 'object', 'a constant is created for each action')
@@ -153,4 +162,7 @@ var secondStore = fux.createStore(class SecondStore {
   assert.equal(secondStore.foo, undefined, 'cant access state properties that live inside store')
   assert.equal(secondStore.bindAction, undefined, 'cant access action listeners from outside store')
   assert.equal(secondStore.bindActions, undefined, 'cant access action listeners from outside store')
+
+  myActions.updateThree(4, 2, 1)
+  assert.equal(secondStore.getState().foo, 7, 'the store method updateThree works')
 }()

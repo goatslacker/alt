@@ -138,11 +138,18 @@ var StoreMixin = (function () {
       var assumedEventHandler = action.replace(matchFirstCharacter, function (x) {
         return "on" + x[0].toUpperCase();
       });
-      if (_this2[assumedEventHandler]) {
+      var handler = null;
+      if (_this2[action]) {
+        handler = _this2[action];
+      } else if (_this2[assumedEventHandler]) {
+        handler = _this2[assumedEventHandler];
+      }
+
+      if (handler) {
         if (symbol[ACTION_KEY]) {
-          _this2[LISTENERS][symbol[ACTION_KEY]] = _this2[assumedEventHandler].bind(_this2);
+          _this2[LISTENERS][symbol[ACTION_KEY]] = handler.bind(_this2);
         } else {
-          _this2[LISTENERS][symbol] = _this2[assumedEventHandler].bind(_this2);
+          _this2[LISTENERS][symbol] = handler.bind(_this2);
         }
       }
     });

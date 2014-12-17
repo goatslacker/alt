@@ -114,11 +114,18 @@ class StoreMixin {
         matchFirstCharacter,
         (x) => `on${x[0].toUpperCase()}`
       )
-      if (this[assumedEventHandler]) {
+      var handler = null
+      if (this[action]) {
+        handler = this[action]
+      } else if (this[assumedEventHandler]) {
+        handler = this[assumedEventHandler]
+      }
+
+      if (handler) {
         if (symbol[ACTION_KEY]) {
-          this[LISTENERS][symbol[ACTION_KEY]] = this[assumedEventHandler].bind(this)
+          this[LISTENERS][symbol[ACTION_KEY]] = handler.bind(this)
         } else {
-          this[LISTENERS][symbol] = this[assumedEventHandler].bind(this)
+          this[LISTENERS][symbol] = handler.bind(this)
         }
       }
     })
