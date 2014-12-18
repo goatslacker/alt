@@ -164,20 +164,28 @@ class Fux {
   }
 
   createActions(ActionsClass) {
-    var actions = Object.assign(new ActionsClass(), ActionsClass.prototype)
+    var actions = Object.assign({}, ActionsClass.prototype)
+    ActionsClass.call({
+      generateAction(actionName) {
+        // This is a function so we can later bind this to ActionCreator
+        actions[actionName] = function (x, ...a) {
+          this.dispatch(a.length ? [x].concat(a) : x)
+        }
+      },
+
+      generateActions(...actionNames) {
+        actionNames.forEach(this.generateAction)
+      }
+    })
     return Object.keys(actions).reduce((obj, action) => {
       var key = ActionsClass.displayName || ActionsClass.name
       var constant = formatAsConstant(action)
       var actionName = Symbol(`action ${key}.prototype.${action}`)
 
-      var handler = typeof actions[action] === 'function'
-        ? actions[action]
-        : function (x, ...a) { this.dispatch(a.length ? [x].concat(a) : x) }
-
       var newAction = new ActionCreator(
         this.dispatcher,
         actionName,
-        handler
+        actions[action]
       )
 
       obj[action] = newAction[ACTION_HANDLER]

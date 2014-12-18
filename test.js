@@ -5,8 +5,8 @@ var fux = new Fux()
 
 var myActions = fux.createActions(class MyActions {
   constructor() {
-    this.callInternalMethod = true
-    this.shortHandBinary = true
+    this.generateActions('callInternalMethod', 'shortHandBinary')
+    this.generateAction('anotherAction')
   }
 
   updateName(name) {
@@ -90,7 +90,8 @@ var secondStore = fux.createStore(class SecondStore {
   var bootstrapReturnValue = fux.bootstrap(initialSnapshot)
   assert.equal(bootstrapReturnValue, undefined, 'bootstrap returns nothing')
 
-  assert.equal(typeof myActions.callInternalMethod, 'function', 'shorthand function exists')
+  assert.equal(typeof myActions.anotherAction, 'function', 'shorthand function created with createAction exists')
+  assert.equal(typeof myActions.callInternalMethod, 'function', 'shorthand function created with createActions exists')
   assert.equal(myActions.callInternalMethod.length, 1, 'shorthand function is an id function')
   assert.equal(typeof myActions.updateName, 'function', 'prototype defined actions exist')
   assert.equal(typeof myActions.updateTwo, 'function', 'prototype defined actions exist')

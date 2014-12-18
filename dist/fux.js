@@ -195,19 +195,29 @@ var Fux = (function () {
 
   Fux.prototype.createActions = function (ActionsClass) {
     var _this3 = this;
-    var actions = Object.assign(new ActionsClass(), ActionsClass.prototype);
+    var actions = Object.assign({}, ActionsClass.prototype);
+    ActionsClass.call({
+      generateAction: function (actionName) {
+        // This is a function so we can later bind this to ActionCreator
+        actions[actionName] = function (x) {
+          var a = _slice.call(arguments, 1);
+
+          this.dispatch(a.length ? [x].concat(a) : x);
+        };
+      },
+
+      generateActions: function () {
+        var actionNames = _slice.call(arguments);
+
+        actionNames.forEach(this.generateAction);
+      }
+    });
     return Object.keys(actions).reduce(function (obj, action) {
       var key = ActionsClass.displayName || ActionsClass.name;
       var constant = formatAsConstant(action);
       var actionName = Symbol("action " + key + ".prototype." + action);
 
-      var handler = typeof actions[action] === "function" ? actions[action] : function (x) {
-        var a = _slice.call(arguments, 1);
-
-        this.dispatch(a.length ? [x].concat(a) : x);
-      };
-
-      var newAction = new ActionCreator(_this3.dispatcher, actionName, handler);
+      var newAction = new ActionCreator(_this3.dispatcher, actionName, actions[action]);
 
       obj[action] = newAction[ACTION_HANDLER];
       obj[action].defer = function (x) {

@@ -9,7 +9,7 @@ maybe it's the [static string tossing](https://github.com/facebook/flux/blob/mas
 or it could be the [massive switch statements](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/stores/MessageStore.js#L111) you're required to code.
 Whatever it is they're all not here.
 
-Fux is a flux. Data flows one way. Here's an ascii chart to prove it.
+Fux is flux. Data flows one way. Here's an ascii chart to prove it.
 
 ```txt
 ╔═══════════════╗             ╔══════════════╗             ╔════════════╗
@@ -20,7 +20,7 @@ Fux is a flux. Data flows one way. Here's an ascii chart to prove it.
         ╚════════════════════════════════════════════════════════╝
 ```
 
-If you're in a hurry [show me the code](#the-code) or [tl;dr](#tldr).
+If you're in a hurry [show me the code](#examples) or [tl;dr](#tldr).
 
 ## What the flux?
 
@@ -45,25 +45,30 @@ one can set up the view to listen to changes on the store.
 
 ## Differences
 
-There is no giant switch statement in the store and this is because constants have been removed.
-This has the wonderful side effect of making the custom dispatcher logic unnecessary for the developer to handle.
+Where fux is a tad different from flux.
 
-This actually removes one of the boxes from the flow chart (not pictured above) the dispatcher.
-Actions act as dispatchers where you can send data directly to the store, all without losing the benefit of
-being able to hook into the dispatcher if needed.
+There is no giant switch statement you have to write in your store and this is because fux removes the burden of constants from the developer.
+This has the wonderful side effect of making the custom dispatcher logic unnecessary, thus removing one of the boxes from the flow
+chart (not pictured above) the dispatcher. Make no mistake, there is still a single dispatcher through which actions flow through on their merry
+way to the store, in fact, you still get the benefit of being able to hook into the dispatcher to listen to all the global events for debugging, fun, or misery.
+The dispatcher is just a part of fux and something you don't necessarily have to write custom code for.
 
-These removals make the code lightweight and the barrier of entry to developing a new flux app really low. Think I'm lying? [Check out an example](#differences-example).
+These removals make the code terse and easy to follow, there is less indirection and the learning curve to grok is much lower.
+Think I'm lying? [Check out an example](#differences-example).
 
 ## Additions
 
-On really cool aspect of fux is that you can save snapshots of the entire application state at any given point in time, and if you really screw the state up beyond repair you can easily rollback to the last saved snapshot.
+What's new.
+
+One really cool aspect of fux is that you can save snapshots of the entire application's state at any given point in time.
+Best of all, if you really screw the state up beyond repair you can easily rollback to the last saved snapshot.
 
 There's also a method available that lets you bootstrap all the application's stores once, at startup, with a saved snapshot.
 This is particularly useful if you're writing isomorphic applications where you can send down a snapshot of the state the server was in, then bootstrap it back on the client and continue working where the program left off.
 
 Stores are immutable. Meaning you can't just update the store through your store instance, the objects returned by `getState` are immutable (well you can mutate them all you want but it won't affect the state inside the store), and other stores can't mutate other stores. This makes it easy to reason about how your application exactly changes and where.
 
-Fux is also meant to work with ES6. That is we're betting you'll be writing your stores and actions
+Last but not least, fux is meant to work with ES6. That is we're betting you'll be writing your stores and actions
 as classes. This part isn't necessary but you really should write some ES6 anyways because it's nice.
 
 ## Usage
@@ -109,11 +114,13 @@ Actions are the way you update state. They're kind of a big deal.
 `fux.createActions :: Class -> Actions`
 
 ```js
-var myActions = fux.createActions(class MyActions {
+class MyActions {
   updateLocation() {
     this.dispatch('Paris')
   }
-})
+}
+
+var myActions = fux.createActions(MyActions)
 ```
 
 Every action contains a `dispatch` method which is what sends your data to the dispatcher for dispatching to stores. The type signature for dispatch is `dispatch :: x -> undefined`.
@@ -127,27 +134,69 @@ myActions.updateLocation()
 You can also define actions that take a parameter like so
 
 ```js
-var myActions = fux.createActions(class MyActions {
+class MyActions {
   updateLocation(x) {
     this.dispatch(x)
   }
-})
+}
+
+var myActions = fux.createActions(MyActions)
 ```
 
 ```js
 myActions.updateLocation('San Francisco')
 ```
 
+Writing out actions that pass data through directly can get quite tedious so there's a shorthand for writing these what are essentially `identity` functions
+
+```js
+class MyActions {
+  constructor() {
+    // for single action
+    this.generateAction('updateLocation')
+
+    // for many actions
+    this.generateActions('updateCity', 'updateState', 'updateCountry')
+  }
+}
+
+var myActions = fux.createActions(MyActions)
+```
+
+```js
+myActions.updateLocation('Las Vegas')
+
+myActions.updateCity('Las Vegas')
+myActions.updateState('Nevada')
+myActions.updateCountry('US')
+```
+
 Remember, `dispatch` only takes one argument. Therefore, if you need to pass multiple arguments into a store you can use an Object.
 
 ```js
-var myActions = fux.createActions(class MyActions {
+class MyActions {
   updateLocation(x, y) {
     this.dispatch({ x, y })
   }
-})
+}
+
+var myActions = fux.createActions(MyActions)
 
 myActions.updateLocation('Miami', 'Florida')
+```
+
+An shorthand function created in the constructor will pass through the multiple parameters as an Array
+
+```js
+class MyActions {
+  constructor() {
+    this.updateLocation = true // ['South Lake Tahoe, 'California']
+  }
+}
+
+var myActions = fux.createActions(MyActions)
+
+myActions.updateLocation('South Lake Tahoe', 'California')
 ```
 
 ### Stores
@@ -157,7 +206,7 @@ Stores are where you keep a part of your application's state. It's a singleton, 
 `fux.createStore :: Class -> Store`
 
 ```js
-var myStore = fux.createStore(class MyStore {
+class MyStore {
   constructor() {
     this.bindAction(myActions.updateLocation, this.onUpdateLocation)
 
@@ -165,15 +214,17 @@ var myStore = fux.createStore(class MyStore {
     this.state = 'Colorado'
   }
 
-  onUpdateLocation(city, state) {
+  onUpdateLocation(obj) {
+    var { city, state } = obj
     this.city = city
     this.state = state
   }
-})
+}
+
+var myStore = fux.createStore(MyStore)
 ```
 
-Stores require a constructor, that's where you'll set your initial state and bind any actions to methods that update the state. All store instances returned by
-`fux.createStore` will have the following methods:
+Stores require a constructor, that's where you'll set your initial state and bind any actions to the methods that update the state, the `action handlers` if you will. All store instances returned by `fux.createStore` will have the following methods:
 
 #### createStore API
 
@@ -206,8 +257,8 @@ A token that can be used with waitFor.
 #### Disclaimer
 
 All defined methods in your Store class **will not** be available on the store instance. They are accessible within the class but not on the returned
-store via `fux.createStore`. This ensures that stores have no direct setters and the state remains mutable only through actions keeping the flow unidirectional.
-If you want to attach functions to your store you may do so after it's generated.
+Object via `fux.createStore`. This ensures that stores have no direct setters and the state remains mutable only through actions keeping the flow unidirectional.
+If you want to attach public/static functions to your store you may do so after it's generated.
 
 ```js
 myStore.myMethod = () => {
@@ -221,60 +272,64 @@ If you don't want the store to inform the view of an action make sure to return 
 from the action handler methods, fux won't judge you.
 
 ```js
-var myStore = fux.createStore(class MyStore {
+class MyStore {
   constructor() {
-    this.bindAction(myActions.updateLocation, this.onUpdateLocation)
+    this.bindAction(myActions.updateCity, this.onUpdateCity)
 
     this.city = 'Portland'
     this.state = 'Oregon'
   }
 
-  onUpdateLocation(city, state) {
+  onUpdateCity(city) {
     this.city = city
-    this.state = state
 
     // ensure the view never finds out
     return false
   }
-})
+}
+
+var myStore = fux.createStore(MyStore)
 ```
 
-#### Listening To Multiple Actions
+#### Constants
 
-In the ~~rare~~ very common case of binding multiple actions, calling `bindAction` with each
-handler is really no better than having to create a bunch of constants.
-
-Speaking of constants...
+I thought you said there were no constants? Well, yeah, sort of. The thing is, they're automagically created for you.
+Feel free to use them to bind your actions or use the method itself, whatever reads better in your opinion.
 
 ```js
-var myStore = fux.createStore(class MyStore {
+class MyStore {
   constructor() {
-    // I thought you said constants were a thing of the past?
-    this.bindAction(myActions.UPDATE_LOCATION, this.onUpdateLocation)
+    this.bindAction(myActions.UPDATE_STATE, this.onUpdateState)
 
-    this.city = 'Boise'
-    this.state = 'Idaho'
+    this.city = ''
+    this.state = ''
   }
-})
+}
+
+var myStore = fux.createStore(MyStore)
 ```
 
 Constants are automagically generated for you so feel free to use them to bind your actions or use the method itself, whatever reads better in your opinion.
 
-Back to the topic of binding multiple actions. Say you have:
+#### Listening To Multiple Actions
+
+In the ~~rare~~ very common case of binding multiple actions, calling `bindAction` with each
+handler is not anyone's idea of fun.
 
 ```js
-var myActions = fux.createActions(class MyActions {
+class MyActions {
   constructor() {
-    this.updateCity = true
-    this.updateState = true
+    this.generateActions('updateCity', 'updateState')
   }
-})
+}
+
+var myActions = fux.createActions(MyActions)
 ```
 
 You can bind all the actions inside `myActions` using the shortcut `bindActions`
 
 ```js
-var myStore = fux.createStore(class MyStore {
+class MyStore {
   constructor() {
     this.bindActions(myActions)
 
@@ -289,20 +344,22 @@ var myStore = fux.createStore(class MyStore {
   onUpdateState(state) {
     this.state = state
   }
-})
+}
+
+var myStore = fux.createStore(MyStore)
 ```
 
 Actions who have a `onCamelCasedAction` method or an `actionName` method available in the store will be bound.
 
 #### Methods available in Stores
 
-Thus brings us to our final store point. Stores have the following available methods:
+Thus brings us to our final store point. Stores have the following available methods internally:
 
 * `bindAction :: ActionsMethod, StoreMethod -> undefined`
 * `bindActions :: Actions`
 * `waitFor :: DispatcherToken | [DispatcherTokens]`
 
-`waitFor` is exactly like Flux's Dispatcher waitFor. Here's an excerpt from the flux docs on what waitFor is designed for:
+`waitFor` is mostly an alias to Flux's Dispatcher waitFor. Here's an excerpt from the flux docs on what waitFor is designed for:
 
 > As an application grows, dependencies across different stores are a near certainty. Store A will inevitably need Store B to update itself first, so that Store A can know how to update itself. We need the dispatcher to be able to invoke the callback for Store B, and finish that callback, before moving forward with Store A. To declaratively assert this dependency, a store needs to be able to say to the dispatcher, "I need to wait for Store B to finish processing this action." The dispatcher provides this functionality through its waitFor() method.
 
@@ -334,10 +391,11 @@ var myStore = fux.createStore(class MyStore {
 })
 ```
 
+You can also `waitFor` multiple stores by passing in an Array: `this.waitFor([store1.dispatchToken, store2.dispatchToken])`
+
 ### Views
 
-Views aren't important to fux, but they are to flux, and probably your application too if you want to ever show all your state.
-What's important is how the view consumes the store's data, and that is via event listeners.
+Your choice of view isn't important to fux. What's important is to know how the view consumes the store's data, and that is via event listeners.
 
 In this example I'll be using React, but you're free to use your library of choice.
 
@@ -417,19 +475,37 @@ Restart the loop by making your views kick off new actions.
 
 ### Snapshots
 
-> mention store API: emitChange, listen, unlisten, getState
+`takeSnapshot :: String`
+
+Snapshots are a core component of fux. The idea is that at any given point in time you can `takeSnapshot` and have your entire application's state
+serialized for persistence, transfering, logging, or debugging.
+
+Taking a snapshot is as easy as calling `fux.takeSnapshot()`.
 
 ### Bootstrapping
 
-> You can only bootstrap once, so you can't use it to set state.
+`bootstrap :: String -> undefined`
+
+Bootstrapping can only be done once, and usually is best to do when initializing your application. The `fux.bootstrap()` function takes in a snapshot
+you've saved and reloads all the state with that snapshot, no events will be emitted to your components during this process, so again, it's best to do this
+on init before the view has even rendered.
+
+Bootstrap is great if you're running an isomorphic app, or if you're persisting state to localstorage and then retrieving it on init later on. You can save a snapshot on the server side, send it down, and then bootstrap it back on the client.
 
 ### Rollback
 
-> Rollbacks are user initiated and lazy.
+`rollback :: undefined`
 
-### Life Cycle methods
+If you've screwed up the state, or you just feel like rolling back you can call `fux.rollback()`. Rollback is pretty dumb in the sense
+that it's not automatic in case of errors, and it only rolls back to the last saved snapshot, meaning you have to save a snapshot first in order to roll back.
 
-> talk about the special onBootstrap and onTakeSnapshot methods
+### Life Cycle Methods
+
+When bootstrapping or snapshotting there are special methods you can assign to your store to ensure any bookeeping that needs to be done.
+
+`onBootstrap()` is a method which is called after the store has been bootstrapped. Here you can add some logic to take your bootstrapped data and manipulate it.
+
+`onTakeSnapshot()` is a method which is called before the store's state is serialized. Here you can perform any final tasks you need to before the state is saved.
 
 ### Single Dispatcher
 
@@ -442,79 +518,14 @@ fux.dispatcher.register(console.log)
 
 ## Examples
 
-... XXX link to examples
-
-## TodoFlux
-
-A partial [todomvc](https://github.com/facebook/flux/tree/master/examples/flux-todomvc) example
-written using fux.
-
-```js
-var Fux = require('fux')
-var ListenerMixin = require('fux/ListenerMixin')
-var fux = new Fux()
-
-var todoActions = fux.createActions(class TodoActions {
-  addTodo(text) {
-    this.dispatch(text)
-  }
-})
-
-var todoStore = fux.createStore(class TodoStore {
-  constructor() {
-    this.bindAction(todoActions.addTodo, this.onAddTodo)
-
-    this.todos = []
-  }
-
-  onAddTodo(text) {
-    this.todos.push(text)
-  }
-})
-
-var TodosController = React.createClass({
-  mixins: [ListenerMixin],
-
-  getInitialState() {
-    return todoStore.getState()
-  },
-
-  componentWillMount() {
-    this.listenTo(todoStore, this.onChange)
-  },
-
-  onChange() {
-    this.setState(this.getInitialState())
-  },
-
-  render() {
-    return <Todos todos={this.state.todos} />
-  }
-})
-
-var Todos = React.createClass({
-  addTodo() {
-    todoActions.addTodo('test')
-  },
-
-  render() {
-    return (
-      <div>
-        <ul>
-          {this.props.todos.map((todo, index) => {
-            return <li key={index}>Todo {index}</li>
-          })}
-        </ul>
-        <button onClick={this.addTodo}>Add Todo</button>
-      </div>
-    )
-  }
-})
-
-React.render(<TodosController />, document.body)
-```
+* [todomvc](https://github.com/goatslacker/fux/blob/master/examples/todomvc)
 
 ## Differences Example
+
+Flux has constants, the dispatcher is also pretty dumb as in it just takes what you passed in the action
+and pipes it through to the store. This is completely fine but not something you should be expected to write.
+The nice thing about constants is that you can easily grep for them in your application and see where
+all the actions are being called, with fux you get the same benefit without having to manage them.
 
 #### Before: Flux
 
@@ -535,11 +546,13 @@ var AppDispatcher = Object.assign(new Dispatcher(), {
 #### After: Fux
 
 ```js
-var action = fux.createActions(class Action {
+class Action {
   handleAction() {
     this.dispatch('foo')
   }
-})
+}
+
+var action = fux.createActions(Action)
 ```
 
 ## Other Flux Implementations
