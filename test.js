@@ -200,4 +200,36 @@ var secondStore = fux.createStore(SecondStore)
   assert.equal(Array.isArray(secondStore.getState().foo), true, 'shorthand for multiple elements pass through goes as array')
   assert.equal(secondStore.getState().foo[0], 1, 'shorthand for multiple elements pass through goes as array')
   assert.equal(secondStore.getState().foo[1], 0, 'shorthand for multiple elements pass through goes as array')
+
+  try {
+    fux.createStore(class StoreWithManyListeners {
+      constructor() {
+        this.bindActions(myActions)
+      }
+
+      // listeners with same action
+      updateName() { }
+      onUpdateName() { }
+    })
+    assert.equal(true, false, 'a store was able to register with multiple action handlers on the same action')
+  } catch (e) {
+    assert.equal(e.message, 'You have multiple action handlers bound to an action: updateName and onUpdateName', 'error message is correct')
+  }
+
+  try {
+    class EvilStore {
+      updateName() { }
+    }
+
+    fux.createStore(class InnocentStore extends EvilStore {
+      constructor() {
+        this.bindActions(myActions)
+      }
+
+      onUpdateName() { }
+    })
+    assert.equal(true, false, 'an evil store was able to overload the innocent store\'s action handler')
+  } catch (e) {
+    assert.equal(e.message, 'You have multiple action handlers bound to an action: updateName and onUpdateName', 'error message is correct')
+  }
 }()

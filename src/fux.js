@@ -107,7 +107,13 @@ class StoreMixin {
         (x) => `on${x[0].toUpperCase()}`
       )
       var handler = null
-      if (this[action]) {
+
+      if (this[action] && this[assumedEventHandler]) {
+        throw new ReferenceError(
+          'You have multiple action handlers bound to an action: ' +
+          action + ' and ' + assumedEventHandler
+        )
+      } else if (this[action]) {
         handler = this[action]
       } else if (this[assumedEventHandler]) {
         handler = this[assumedEventHandler]

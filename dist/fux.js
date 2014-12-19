@@ -132,7 +132,10 @@ var StoreMixin = (function () {
         return "on" + x[0].toUpperCase();
       });
       var handler = null;
-      if (_this2[action]) {
+
+      if (_this2[action] && _this2[assumedEventHandler]) {
+        throw new ReferenceError("You have multiple action handlers bound to an action: " + action + " and " + assumedEventHandler);
+      } else if (_this2[action]) {
         handler = _this2[action];
       } else if (_this2[assumedEventHandler]) {
         handler = _this2[assumedEventHandler];
