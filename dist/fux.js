@@ -190,7 +190,7 @@ var Fux = (function () {
     Object.assign(Store.prototype, new StoreMixin(this.dispatcher), StoreMixin.prototype);
     var key = StoreModel.displayName || StoreModel.name;
     var store = new Store();
-    return this[STORES_STORE][key] = new FuxStore(this.dispatcher, store);
+    return this[STORES_STORE][key] = Object.assign(new FuxStore(this.dispatcher, store), StoreModel);
   };
 
   Fux.prototype.createActions = function (ActionsClass) {

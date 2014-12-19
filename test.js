@@ -75,8 +75,12 @@ class SecondStore {
     this.name = myStore.getState().name
   }
 
-  static externalMethod(inst) {
-    return inst.getState().name
+  static externalMethod() {
+    return this.getState().foo
+  }
+
+  static concatFooWith(x) {
+    return this.getState().foo + x
   }
 }
 
@@ -99,6 +103,12 @@ var secondStore = fux.createStore(SecondStore)
   assert.equal(typeof myStore.removeListener, 'function', 'event emitter methods')
   assert.equal(typeof myStore.once, 'function', 'event emitter methods')
   assert.equal(typeof myStore.emit, 'function', 'event emitter methods')
+
+  assert.equal(typeof myStore.externalMethod, 'function', 'static methods are made available')
+  assert.equal(myStore.externalMethod(), true, 'static methods return proper result')
+  assert.equal(typeof secondStore.externalMethod, 'function', 'static methods are made available')
+  assert.equal(secondStore.externalMethod(), 'bar', 'static methods have `this` bound to the instance')
+  assert.equal(secondStore.concatFooWith('baz'), 'barbaz', 'static methods may be called with params too')
 
   var initialSnapshot = fux.takeSnapshot()
   var bootstrapReturnValue = fux.bootstrap(initialSnapshot)
