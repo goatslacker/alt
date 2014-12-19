@@ -1,0 +1,29 @@
+{
+  "name": "todomvc-fux",
+  "version": "0.0.1",
+  "description": "Example Flux architecture using fux.",
+  "repository": "https://github.com/goatslacker/fux",
+  "main": "js/app.js",
+  "dependencies": {
+    "object-assign": "^2.0.0",
+    "react": "^0.12.2"
+  },
+  "devDependencies": {
+    "browserify": "~4.2.2",
+    "reactify": "^0.17.1",
+    "sixpack": "^1.0.0"
+  },
+  "scripts": {
+    "build": "./node_modules/sixpack/bin/sixpack ./js/app.js App > js/bundle.js",
+    "test": "jest"
+  },
+  "author": "Josh Perez <josh@goatslacker.com>",
+  "browserify": {
+    "transform": [
+      "reactify"
+    ]
+  },
+  "jest": {
+    "rootDir": "./js"
+  }
+}
