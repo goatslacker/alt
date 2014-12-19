@@ -3,7 +3,7 @@ var assert = require('assert')
 
 var fux = new Fux()
 
-var myActions = fux.createActions(class MyActions {
+class MyActions {
   constructor() {
     this.generateActions('callInternalMethod', 'shortHandBinary')
     this.generateAction('anotherAction')
@@ -20,9 +20,11 @@ var myActions = fux.createActions(class MyActions {
   updateThree(a, b, c) {
     this.dispatch({ a, b, c })
   }
-})
+}
 
-var myStore = fux.createStore(class MyStore {
+var myActions = fux.createActions(MyActions)
+
+class MyStore {
   constructor() {
     this.bindAction(myActions.updateName, this.onUpdateName)
     this.bindAction(myActions.CALL_INTERNAL_METHOD, this.doCallInternal)
@@ -41,9 +43,15 @@ var myStore = fux.createStore(class MyStore {
   internalOnly() {
     this.calledInternal = true
   }
-})
 
-var secondStore = fux.createStore(class SecondStore {
+  static externalMethod() {
+    return true
+  }
+}
+
+var myStore = fux.createStore(MyStore)
+
+class SecondStore {
   constructor() {
     this.foo = 'bar'
     this.name = myStore.getState().name
@@ -66,7 +74,13 @@ var secondStore = fux.createStore(class SecondStore {
     this.waitFor(myStore.dispatchToken)
     this.name = myStore.getState().name
   }
-})
+
+  static externalMethod(inst) {
+    return inst.getState().name
+  }
+}
+
+var secondStore = fux.createStore(SecondStore)
 
 !() => {
   assert.equal(typeof fux.bootstrap, 'function', 'bootstrap function exists')
