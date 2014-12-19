@@ -63,10 +63,11 @@ class FuxStore extends EventEmitter {
 }
 
 class ActionCreator {
-  constructor(dispatcher, name, action) {
+  constructor(dispatcher, name, action, actions) {
     this[ACTION_DISPATCHER] = dispatcher
     this[ACTION_UID] = name
     this[ACTION_HANDLER] = action.bind(this)
+    this.actions = actions
   }
 
   dispatch(data) {
@@ -184,6 +185,7 @@ class Fux {
         actionNames.forEach(this.generateAction)
       }
     })
+
     return Object.keys(actions).reduce((obj, action) => {
       var key = ActionsClass.displayName || ActionsClass.name
       var constant = formatAsConstant(action)
@@ -192,7 +194,8 @@ class Fux {
       var newAction = new ActionCreator(
         this.dispatcher,
         actionName,
-        actions[action]
+        actions[action],
+        obj
       )
 
       obj[action] = newAction[ACTION_HANDLER]

@@ -86,10 +86,11 @@ var FuxStore = (function (EventEmitter) {
 })(EventEmitter);
 
 var ActionCreator = (function () {
-  var ActionCreator = function ActionCreator(dispatcher, name, action) {
+  var ActionCreator = function ActionCreator(dispatcher, name, action, actions) {
     this[ACTION_DISPATCHER] = dispatcher;
     this[ACTION_UID] = name;
     this[ACTION_HANDLER] = action.bind(this);
+    this.actions = actions;
   };
 
   ActionCreator.prototype.dispatch = function (data) {
@@ -213,12 +214,13 @@ var Fux = (function () {
         actionNames.forEach(this.generateAction);
       }
     });
+
     return Object.keys(actions).reduce(function (obj, action) {
       var key = ActionsClass.displayName || ActionsClass.name;
       var constant = formatAsConstant(action);
       var actionName = Symbol("action " + key + ".prototype." + action);
 
-      var newAction = new ActionCreator(_this3.dispatcher, actionName, actions[action]);
+      var newAction = new ActionCreator(_this3.dispatcher, actionName, actions[action], obj);
 
       obj[action] = newAction[ACTION_HANDLER];
       obj[action].defer = function (x) {

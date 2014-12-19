@@ -13,6 +13,13 @@ class MyActions {
     this.dispatch(name)
   }
 
+  justTestingInternalActions() {
+    return {
+      updateThree: this.actions.updateThree,
+      updateName: this.actions.updateName
+    }
+  }
+
   updateTwo(a, b) {
     this.dispatch({ a, b })
   }
@@ -127,6 +134,12 @@ var secondStore = fux.createStore(SecondStore)
   assert.equal(typeof myActions.CALL_INTERNAL_METHOD, 'object', 'a constant is created for each action')
 
   assert.equal(typeof myActions.updateName.defer, 'function', 'actions have a defer method for async flow')
+
+  var internalActions = myActions.justTestingInternalActions()
+  assert.equal(typeof internalActions.updateThree, 'function', 'actions (below) are available internally through this.actions')
+  assert.equal(typeof internalActions.updateName, 'function', 'actions (above) are available internally through this.actions')
+  assert.equal(typeof internalActions.updateName.defer, 'function', 'making sure internal actions has a defer as well')
+  assert.equal(typeof internalActions.updateThree.defer, 'function', 'making sure internal actions has a defer as well')
 
   assert.equal(typeof myStore.getState, 'function', 'the store has a getState method exposed')
   assert.equal(typeof myStore.internalOnly, 'undefined', 'internal only method isnt available')
