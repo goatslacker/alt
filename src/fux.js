@@ -14,7 +14,6 @@ var ACTION_KEY = Symbol('holds the actions uid symbol for listening')
 var ACTION_UID = Symbol('the actions uid name')
 var BOOTSTRAP_FLAG = PrivateSymbol('have you bootstrapped yet?')
 var LISTENERS = Symbol('stores action listeners storage')
-var SET_STATE = Symbol(`${now} set state method you shouldnt call`)
 var STATE_CONTAINER = Symbol(`${now} the state container`)
 var STORE_BOOTSTRAP = Symbol('event handler onBootstrap')
 var STORE_SNAPSHOT = Symbol('event handler onTakeSnapshot')
@@ -34,13 +33,6 @@ class FuxStore extends EventEmitter {
     }
     if (state.onTakeSnapshot) {
       this[STORE_SNAPSHOT] = state.onTakeSnapshot.bind(state)
-    }
-
-    // A special setState method we use to bootstrap and keep state current
-    this[SET_STATE] = (newState) => {
-      if (this[STATE_CONTAINER] !== newState) {
-        Object.assign(this[STATE_CONTAINER], newState)
-      }
     }
 
     // Register dispatcher
@@ -231,7 +223,7 @@ class Fux {
     }
     var obj = JSON.parse(data)
     Object.keys(obj).forEach((key) => {
-      this[STORES_STORE][key][SET_STATE](obj[key])
+      Object.assign(this[STORES_STORE][key][STATE_CONTAINER], obj[key])
       if (this[STORES_STORE][key][STORE_BOOTSTRAP]) {
         this[STORES_STORE][key][STORE_BOOTSTRAP]()
       }
