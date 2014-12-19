@@ -177,6 +177,10 @@ var Fux = (function () {
   };
 
   Fux.prototype.createStore = function (StoreModel) {
+    // Creating a class here so we don't overload the store's prototype with
+    // the mixin behaviour
+    // and I'm extending from StoreModel so we can inherit any extensions
+    // from the store.
     var Store = (function (StoreModel) {
       var Store = function Store() {
         StoreModel.call(this);
@@ -190,6 +194,8 @@ var Fux = (function () {
     Object.assign(Store.prototype, new StoreMixin(this.dispatcher), StoreMixin.prototype);
     var key = StoreModel.displayName || StoreModel.name;
     var store = new Store();
+
+    // Assign StoreModel so static methods are available
     return this[STORES_STORE][key] = Object.assign(new FuxStore(this.dispatcher, store), StoreModel);
   };
 

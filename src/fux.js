@@ -150,6 +150,10 @@ class Fux {
   }
 
   createStore(StoreModel) {
+    // Creating a class here so we don't overload the store's prototype with
+    // the mixin behaviour
+    // and I'm extending from StoreModel so we can inherit any extensions
+    // from the store.
     class Store extends StoreModel {
       constructor() { StoreModel.call(this) }
     }
@@ -160,6 +164,8 @@ class Fux {
     )
     var key = StoreModel.displayName || StoreModel.name
     var store = new Store()
+
+    // Assign StoreModel so static methods are available
     return this[STORES_STORE][key] = Object.assign(
       new FuxStore(this.dispatcher, store),
       StoreModel
