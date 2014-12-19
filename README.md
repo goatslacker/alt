@@ -190,7 +190,7 @@ An shorthand function created in the constructor will pass through the multiple 
 ```js
 class LocationActions {
   constructor() {
-    this.updateLocation = true // ['South Lake Tahoe, 'California']
+    this.generateAction('updateLocation') // ['South Lake Tahoe, 'California']
   }
 }
 
