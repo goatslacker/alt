@@ -2,6 +2,8 @@
 
 > flux minus the l.
 
+If you're in a hurry [show me the code](#examples) or [tl;dr](#tldr).
+
 Fux is a [flux](http://facebook.github.io/flux/docs/overview.html) implementation where the `l` is left out.
 What's the L you say?
 It's probably all those [JS "constants"](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/constants/ChatConstants.js),
@@ -19,8 +21,6 @@ Fux is flux. Data flows one way. Here's an ascii chart to prove it.
         ║                                                        ║
         ╚════════════════════════════════════════════════════════╝
 ```
-
-If you're in a hurry [show me the code](#examples) or [tl;dr](#tldr).
 
 ## What the flux?
 
