@@ -1,6 +1,6 @@
 {
   "name": "fux",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A flux implementation",
   "main": "dist/fux.js",
   "dependencies": {
