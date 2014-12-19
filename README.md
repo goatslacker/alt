@@ -114,13 +114,13 @@ Actions are the way you update state. They're kind of a big deal.
 `fux.createActions :: Class -> Actions`
 
 ```js
-class MyActions {
+class LocationActions {
   updateLocation() {
     this.dispatch('Paris')
   }
 }
 
-var myActions = fux.createActions(MyActions)
+var locationActions = fux.createActions(LocationActions)
 ```
 
 Every action contains a `dispatch` method which is what sends your data to the dispatcher for dispatching to stores. The type signature for dispatch is `dispatch :: x -> undefined`.
@@ -128,29 +128,29 @@ Every action contains a `dispatch` method which is what sends your data to the d
 `fux.createActions` then returns an `Object` containing all the methods defined. You can then call your actions directly.
 
 ```js
-myActions.updateLocation()
+locationActions.updateLocation()
 ```
 
 You can also define actions that take a parameter like so
 
 ```js
-class MyActions {
+class LocationActions {
   updateLocation(x) {
     this.dispatch(x)
   }
 }
 
-var myActions = fux.createActions(MyActions)
+var locationActions = fux.createActions(LocationActions)
 ```
 
 ```js
-myActions.updateLocation('San Francisco')
+locationActions.updateLocation('San Francisco')
 ```
 
 Writing out actions that pass data through directly can get quite tedious so there's a shorthand for writing these what are essentially `identity` functions
 
 ```js
-class MyActions {
+class LocationActions {
   constructor() {
     // for single action
     this.generateAction('updateLocation')
@@ -160,43 +160,43 @@ class MyActions {
   }
 }
 
-var myActions = fux.createActions(MyActions)
+var locationActions = fux.createActions(LocationActions)
 ```
 
 ```js
-myActions.updateLocation('Las Vegas')
+locationActions.updateLocation('Las Vegas')
 
-myActions.updateCity('Las Vegas')
-myActions.updateState('Nevada')
-myActions.updateCountry('US')
+locationActions.updateCity('Las Vegas')
+locationActions.updateState('Nevada')
+locationActions.updateCountry('US')
 ```
 
 Remember, `dispatch` only takes one argument. Therefore, if you need to pass multiple arguments into a store you can use an Object.
 
 ```js
-class MyActions {
+class LocationActions {
   updateLocation(x, y) {
     this.dispatch({ x, y })
   }
 }
 
-var myActions = fux.createActions(MyActions)
+var locationActions = fux.createActions(LocationActions)
 
-myActions.updateLocation('Miami', 'Florida')
+locationActions.updateLocation('Miami', 'Florida')
 ```
 
 An shorthand function created in the constructor will pass through the multiple parameters as an Array
 
 ```js
-class MyActions {
+class LocationActions {
   constructor() {
     this.updateLocation = true // ['South Lake Tahoe, 'California']
   }
 }
 
-var myActions = fux.createActions(MyActions)
+var locationActions = fux.createActions(LocationActions)
 
-myActions.updateLocation('South Lake Tahoe', 'California')
+locationActions.updateLocation('South Lake Tahoe', 'California')
 ```
 
 ### Stores
@@ -206,9 +206,9 @@ Stores are where you keep a part of your application's state. It's a singleton, 
 `fux.createStore :: Class -> Store`
 
 ```js
-class MyStore {
+class LocationStore {
   constructor() {
-    this.bindAction(myActions.updateLocation, this.onUpdateLocation)
+    this.bindAction(locationActions.updateLocation, this.onUpdateLocation)
 
     this.city = 'Denver'
     this.state = 'Colorado'
@@ -221,7 +221,7 @@ class MyStore {
   }
 }
 
-var myStore = fux.createStore(MyStore)
+var locationStore = fux.createStore(LocationStore)
 ```
 
 Stores require a constructor, that's where you'll set your initial state and bind any actions to the methods that update the state, the `action handlers` if you will. All store instances returned by `fux.createStore` will have the following methods:
@@ -233,7 +233,7 @@ Stores require a constructor, that's where you'll set your initial state and bin
 `listen` is meant to be used by your View components in order to await changes made to each store.
 
 ```js
-myStore.listen((data) => {
+locationStore.listen((data) => {
   console.log(data)
 })
 ```
@@ -247,7 +247,7 @@ myStore.listen((data) => {
 `getState` will return a copy of your the current store's state.
 
 ```js
-myStore.getState().city === 'Denver'
+locationStore.getState().city === 'Denver'
 ```
 
 ##### dispatcherToken
@@ -258,12 +258,19 @@ A token that can be used with waitFor.
 
 All defined methods in your Store class **will not** be available on the store instance. They are accessible within the class but not on the returned
 Object via `fux.createStore`. This ensures that stores have no direct setters and the state remains mutable only through actions keeping the flow unidirectional.
-If you want to attach public/static functions to your store you may do so after it's generated.
+If you want to attach public/static functions to your store you may do so as a static method on the class itself.
 
 ```js
-myStore.myMethod = () => {
-  return true
+class LocationStore {
+  static myPublicMethod() {
+    var internalInstanceState = this.getState()
+    return internalInstanceState
+  }
 }
+
+var locationStore = fux.createStore(LocationStore)
+
+locationStore.myPublicMethod()
 ```
 
 #### Canceling An Event
@@ -272,9 +279,9 @@ If you don't want the store to inform the view of an action make sure to return 
 from the action handler methods, fux won't judge you.
 
 ```js
-class MyStore {
+class LocationStore {
   constructor() {
-    this.bindAction(myActions.updateCity, this.onUpdateCity)
+    this.bindAction(locationActions.updateCity, this.onUpdateCity)
 
     this.city = 'Portland'
     this.state = 'Oregon'
@@ -288,7 +295,7 @@ class MyStore {
   }
 }
 
-var myStore = fux.createStore(MyStore)
+var locationStore = fux.createStore(LocationStore)
 ```
 
 #### Constants
@@ -297,16 +304,16 @@ I thought you said there were no constants? Well, yeah, sort of. The thing is, t
 Feel free to use them to bind your actions or use the method itself, whatever reads better in your opinion.
 
 ```js
-class MyStore {
+class LocationStore {
   constructor() {
-    this.bindAction(myActions.UPDATE_STATE, this.onUpdateState)
+    this.bindAction(locationActions.UPDATE_STATE, this.onUpdateState)
 
     this.city = ''
     this.state = ''
   }
 }
 
-var myStore = fux.createStore(MyStore)
+var locationStore = fux.createStore(LocationStore)
 ```
 
 Constants are automagically generated for you so feel free to use them to bind your actions or use the method itself, whatever reads better in your opinion.
@@ -317,21 +324,21 @@ In the ~~rare~~ very common case of binding multiple actions, calling `bindActio
 handler is not anyone's idea of fun.
 
 ```js
-class MyActions {
+class LocationActions {
   constructor() {
     this.generateActions('updateCity', 'updateState')
   }
 }
 
-var myActions = fux.createActions(MyActions)
+var locationActions = fux.createActions(LocationActions)
 ```
 
-You can bind all the actions inside `myActions` using the shortcut `bindActions`
+You can bind all the actions inside `locationActions` using the shortcut `bindActions`
 
 ```js
-class MyStore {
+class LocationStore {
   constructor() {
-    this.bindActions(myActions)
+    this.bindActions(locationActions)
 
     this.city = 'Austin'
     this.state = 'Texas'
@@ -346,7 +353,7 @@ class MyStore {
   }
 }
 
-var myStore = fux.createStore(MyStore)
+var locationStore = fux.createStore(LocationStore)
 ```
 
 Actions who have a `onCamelCasedAction` method or an `actionName` method available in the store will be bound.
@@ -377,7 +384,7 @@ var dependingStore = fux.createStore(class DependingStore {
   }
 })
 
-var myStore = fux.createStore(class MyStore {
+var locationStore = fux.createStore(class LocationStore {
   constructor() {
     this.bindActions(someOtherActions)
 
@@ -402,15 +409,15 @@ In this example I'll be using React, but you're free to use your library of choi
 ```js
 var LocationComponent = React.createClass({
   getInitialState() {
-    return myStore.getState()
+    return locationStore.getState()
   },
 
   componentWillMount() {
-    myStore.listen(this.onChange)
+    locationStore.listen(this.onChange)
   },
 
   componentWillUnmount() {
-    myStore.unlisten(this.onChange)
+    locationStore.unlisten(this.onChange)
   },
 
   onChange() {
@@ -441,11 +448,11 @@ var LocationComponent = React.createClass({
   mixins: [ListenerMixin],
 
   getInitialState() {
-    return myStore.getState()
+    return locationStore.getState()
   },
 
   componentWillMount() {
-    this.listenTo(myStore, this.onChange)
+    this.listenTo(locationStore, this.onChange)
   },
 
   onChange() {
