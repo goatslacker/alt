@@ -237,6 +237,14 @@ var lifecycleStore = fux.createStore(LifeCycleStore)
   assert.equal(secondStore.getState().foo[0], 1, 'shorthand for multiple elements pass through goes as array')
   assert.equal(secondStore.getState().foo[1], 0, 'shorthand for multiple elements pass through goes as array')
 
+  myActions.updateName('gerenuk')
+  assert.equal(myStore.getState().name, 'gerenuk', 'store state was updated properly')
+  myActions.updateName.defer('marmot')
+  assert.equal(myStore.getState().name, 'gerenuk', 'store state has same name (for now)')
+  setTimeout(() => {
+    assert.equal(myStore.getState().name, 'marmot', 'store state was updated with defer')
+  })
+
   try {
     fux.createStore(class StoreWithManyListeners {
       constructor() {
@@ -267,5 +275,61 @@ var lifecycleStore = fux.createStore(LifeCycleStore)
     assert.equal(true, false, 'an evil store was able to overload the innocent store\'s action handler')
   } catch (e) {
     assert.equal(e.message, 'You have multiple action handlers bound to an action: updateName and onUpdateName', 'error message is correct')
+  }
+
+  try {
+    class StoreWithInvalidActionHandlers {
+      constructor() {
+        this.bindAction(myActions.THIS_DOES_NOT_EXIST, this.trololol)
+      }
+
+      trololol() { }
+    }
+
+    fux.createStore(StoreWithInvalidActionHandlers)
+
+    assert.equal(true, false, 'i was able to bind an undefined action handler')
+  } catch (e) {
+    assert.equal(e.message, 'Invalid action reference passed in', 'proper error message for undefined action')
+  }
+
+  try {
+    class StoreWithInvalidActionHandlers2 {
+      constructor() {
+        this.bindAction(myActions.UPDATE_NAME, this.invisibleFunction)
+      }
+    }
+
+    fux.createStore(StoreWithInvalidActionHandlers2)
+
+    assert.equal(true, false, 'i was able to bind an action handler to undefined')
+  } catch (e) {
+    assert.equal(e.message, 'bindAction expects a function', 'proper error message for undefined action')
+  }
+
+  try {
+    class WaitPlease {
+      constructor() {
+        this.generateAction('pleaseWait')
+      }
+    }
+    var waiter = fux.createActions(WaitPlease)
+
+    class WaitsForNobody {
+      constructor() {
+        this.bindActions(waiter)
+      }
+
+      pleaseWait() {
+        this.waitFor()
+      }
+    }
+    fux.createStore(WaitsForNobody)
+
+    waiter.pleaseWait()
+
+    assert.equal(true, false, 'i was able to waitFor nothing')
+  } catch (e) {
+    assert.equal(e.message, 'Dispatch tokens not provided', 'must provide dispatch tokens')
   }
 }()
