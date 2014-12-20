@@ -104,8 +104,9 @@ var ActionCreator = (function () {
 })();
 
 var StoreMixin = (function () {
-  var StoreMixin = function StoreMixin(dispatcher) {
+  var StoreMixin = function StoreMixin(key, dispatcher) {
     this[LISTENERS] = {};
+    this._storeName = key;
     this.dispatcher = dispatcher;
   };
 
@@ -115,6 +116,10 @@ var StoreMixin = (function () {
     }
     if (typeof handler !== "function") {
       throw new TypeError("bindAction expects a function");
+    }
+
+    if (handler.length > 1) {
+      throw new TypeError("Action handler in store " + this._storeName + " for " + (symbol[ACTION_KEY] || symbol) + " was defined with 2 parameters. " + " Only a single parameter is passed" + " through the dispatcher, did you mean to pass in an Object instead?");
     }
 
     // You can pass in the constant or the function itself
@@ -173,6 +178,7 @@ var Fux = (function () {
   };
 
   Fux.prototype.createStore = function (StoreModel) {
+    var key = StoreModel.displayName || StoreModel.name;
     // Creating a class here so we don't overload the store's prototype with
     // the mixin behaviour
     // and I'm extending from StoreModel so we can inherit any extensions
@@ -187,8 +193,7 @@ var Fux = (function () {
       return Store;
     })(StoreModel);
 
-    Object.assign(Store.prototype, new StoreMixin(this.dispatcher), StoreMixin.prototype);
-    var key = StoreModel.displayName || StoreModel.name;
+    Object.assign(Store.prototype, new StoreMixin(key, this.dispatcher), StoreMixin.prototype);
     var store = new Store();
 
     // Assign StoreModel so static methods are available

@@ -335,4 +335,19 @@ var lifecycleStore = fux.createStore(LifeCycleStore)
   } catch (e) {
     assert.equal(e.message, 'Dispatch tokens not provided', 'must provide dispatch tokens')
   }
+
+  try {
+    class MethodsAreUnary {
+      constructor() {
+        this.bindActions(myActions)
+      }
+
+      onUpdateName(name1, name2) { }
+    }
+
+    fux.createStore(MethodsAreUnary)
+    assert.equal(true, false, 'i bound a method with two args successfully')
+  } catch (e) {
+    assert.equal(e instanceof TypeError, true, 'A TypeError was thrown, you cant bind two args')
+  }
 }()
