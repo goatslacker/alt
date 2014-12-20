@@ -153,9 +153,9 @@ Writing out actions that pass data through directly can get quite tedious so the
 class LocationActions {
   constructor() {
     // for single action
-    this.generateAction('updateLocation')
+    this.generateActions('updateLocation')
 
-    // for many actions
+    // as well as for many actions
     this.generateActions('updateCity', 'updateState', 'updateCountry')
   }
 }
@@ -190,7 +190,7 @@ An shorthand function created in the constructor will pass through the multiple 
 ```js
 class LocationActions {
   constructor() {
-    this.generateAction('updateLocation') // ['South Lake Tahoe, 'California']
+    this.generateActions('updateLocation') // ['South Lake Tahoe, 'California']
   }
 }
 
