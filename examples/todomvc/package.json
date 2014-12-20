@@ -1,6 +1,6 @@
 {
   "name": "todomvc-fux",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Example Flux architecture using fux.",
   "repository": "https://github.com/goatslacker/fux",
   "main": "js/app.js",
