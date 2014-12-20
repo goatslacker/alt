@@ -134,9 +134,7 @@ class StoreMixin {
     if (!tokens) {
       throw new ReferenceError('Dispatch tokens not provided')
     }
-    if (!Array.isArray(tokens)) {
-      tokens = [tokens]
-    }
+    tokens = Array.isArray(tokens) ? tokens : [tokens]
     this.dispatcher.waitFor(tokens)
   }
 }
@@ -174,15 +172,13 @@ class Fux {
   createActions(ActionsClass) {
     var actions = Object.assign({}, ActionsClass.prototype)
     ActionsClass.call({
-      generateAction(actionName) {
-        // This is a function so we can later bind this to ActionCreator
-        actions[actionName] = function (x, ...a) {
-          this.dispatch(a.length ? [x].concat(a) : x)
-        }
-      },
-
       generateActions(...actionNames) {
-        actionNames.forEach(this.generateAction)
+        actionNames.forEach((actionName) => {
+          // This is a function so we can later bind this to ActionCreator
+          actions[actionName] = function (x, ...a) {
+            this.dispatch(a.length ? [x].concat(a) : x)
+          }
+        })
       }
     })
 

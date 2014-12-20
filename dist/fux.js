@@ -117,6 +117,7 @@ var StoreMixin = (function () {
       throw new TypeError("bindAction expects a function");
     }
 
+    // You can pass in the constant or the function itself
     if (symbol[ACTION_KEY]) {
       this[LISTENERS][symbol[ACTION_KEY]] = handler.bind(this);
     } else {
@@ -134,10 +135,15 @@ var StoreMixin = (function () {
       });
       var handler = null;
 
+      // If you have both action and onAction
       if (_this2[action] && _this2[assumedEventHandler]) {
-        throw new ReferenceError("You have multiple action handlers bound to an action: " + action + " and " + assumedEventHandler);
+        throw new ReferenceError("You have multiple action handlers bound to an action: " + action + " and " + assumedEventHandler)
+        // action
+        ;
       } else if (_this2[action]) {
-        handler = _this2[action];
+        handler = _this2[action]
+        // onAction
+        ;
       } else if (_this2[assumedEventHandler]) {
         handler = _this2[assumedEventHandler];
       }
@@ -152,9 +158,7 @@ var StoreMixin = (function () {
     if (!tokens) {
       throw new ReferenceError("Dispatch tokens not provided");
     }
-    if (!Array.isArray(tokens)) {
-      tokens = [tokens];
-    }
+    tokens = Array.isArray(tokens) ? tokens : [tokens];
     this.dispatcher.waitFor(tokens);
   };
 
@@ -195,19 +199,17 @@ var Fux = (function () {
     var _this3 = this;
     var actions = Object.assign({}, ActionsClass.prototype);
     ActionsClass.call({
-      generateAction: function (actionName) {
-        // This is a function so we can later bind this to ActionCreator
-        actions[actionName] = function (x) {
-          var a = _slice.call(arguments, 1);
-
-          this.dispatch(a.length ? [x].concat(a) : x);
-        };
-      },
-
       generateActions: function () {
         var actionNames = _slice.call(arguments);
 
-        actionNames.forEach(this.generateAction);
+        actionNames.forEach(function (actionName) {
+          // This is a function so we can later bind this to ActionCreator
+          actions[actionName] = function (x) {
+            var a = _slice.call(arguments, 1);
+
+            this.dispatch(a.length ? [x].concat(a) : x);
+          };
+        });
       }
     });
 
@@ -216,8 +218,10 @@ var Fux = (function () {
       var constant = formatAsConstant(action);
       var actionName = Symbol("action " + key + ".prototype." + action);
 
+      // Wrap the action so we can provide a dispatch method
       var newAction = new ActionCreator(_this3.dispatcher, actionName, actions[action], obj);
 
+      // Set all the properties on action
       obj[action] = newAction[ACTION_HANDLER];
       obj[action].defer = function (x) {
         return setTimeout(function () {
@@ -850,73 +854,78 @@ module.exports = Object.assign || function (target, source) {
 },{}],7:[function(_dereq_,module,exports){
 "use strict";
 
-var created = Object.create(null);
-var generateName = function (desc) {
-  var postfix = 0;
-  while (created[desc + (postfix || "")]) {
-    ++postfix;
-  }
-  desc += (postfix || "");
-  created[desc] = true;
-  return "@@" + desc;
-};
+/* istanbul ignore next */
+(function () {
+  "use strict";
 
-var def = function (value) {
-  return {
-    value: value,
-    configurable: false,
+  var created = Object.create(null);
+  var generateName = function (desc) {
+    var postfix = 0;
+    while (created[desc + (postfix || "")]) {
+      ++postfix;
+    }
+    desc += (postfix || "");
+    created[desc] = true;
+    return "@@" + desc;
+  };
+
+  var def = function (value) {
+    return {
+      value: value,
+      configurable: false,
+      writable: false,
+      enumerable: false
+    };
+  };
+
+  var Symbol = function (description) {
+    if (this instanceof Symbol) {
+      throw new TypeError("TypeError: Symbol is not a constructor");
+    }
+
+    var symbol = Object.create(Symbol.prototype);
+
+    description = (description === undefined ? "" : String(description));
+
+    return Object.defineProperties(symbol, {
+      __description__: def(description),
+      __name__: def(generateName(description))
+    });
+  };
+
+  Object.defineProperties(Symbol, {
+    create: def(Symbol("create")),
+    hasInstance: def(Symbol("hasInstance")),
+    isConcatSpreadable: def(Symbol("isConcatSpreadable")),
+    isRegExp: def(Symbol("isRegExp")),
+    iterator: def(Symbol("iterator")),
+    toPrimitive: def(Symbol("toPrimitive")),
+    toStringTag: def(Symbol("toStringTag")),
+    unscopables: def(Symbol("unscopables"))
+  });
+
+  Object.defineProperties(Symbol.prototype, {
+    properToString: def(function () {
+      return "Symbol (" + this.__description__ + ")";
+    }),
+    toString: def(function () {
+      return this.__name__;
+    })
+  });
+
+  Object.defineProperty(Symbol.prototype, Symbol.toPrimitive, def(function (hint) {
+    throw new TypeError("Conversion of symbol objects is not allowed");
+  }));
+
+  Object.defineProperty(Symbol.prototype, Symbol.toStringTag, {
+    value: "Symbol",
+    configurable: true,
     writable: false,
     enumerable: false
-  };
-};
-
-var Symbol = function (description) {
-  if (this instanceof Symbol) {
-    throw new TypeError("TypeError: Symbol is not a constructor");
-  }
-
-  var symbol = Object.create(Symbol.prototype);
-
-  description = (description === undefined ? "" : String(description));
-
-  return Object.defineProperties(symbol, {
-    __description__: def(description),
-    __name__: def(generateName(description))
   });
-};
 
-Object.defineProperties(Symbol, {
-  create: def(Symbol("create")),
-  hasInstance: def(Symbol("hasInstance")),
-  isConcatSpreadable: def(Symbol("isConcatSpreadable")),
-  isRegExp: def(Symbol("isRegExp")),
-  iterator: def(Symbol("iterator")),
-  toPrimitive: def(Symbol("toPrimitive")),
-  toStringTag: def(Symbol("toStringTag")),
-  unscopables: def(Symbol("unscopables"))
-});
-
-Object.defineProperties(Symbol.prototype, {
-  properToString: def(function () {
-    return "Symbol (" + this.__description__ + ")";
-  }),
-  toString: def(function () {
-    return this.__name__;
-  })
-});
-
-Object.defineProperty(Symbol.prototype, Symbol.toPrimitive, def(function (hint) {
-  throw new TypeError("Conversion of symbol objects is not allowed");
-}));
-
-Object.defineProperty(Symbol.prototype, Symbol.toStringTag, {
-  value: "Symbol",
-  configurable: true,
-  writable: false,
-  enumerable: false
-});
-
-module.exports = Symbol;
+  module.exports = Symbol;
+}());
 
 },{}]},{},[1])(1)
 });

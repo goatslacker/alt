@@ -6,7 +6,7 @@ var fux = new Fux()
 class MyActions {
   constructor() {
     this.generateActions('callInternalMethod', 'shortHandBinary')
-    this.generateAction('anotherAction')
+    this.generateActions('anotherAction')
   }
 
   updateName(name) {
@@ -70,6 +70,8 @@ class SecondStore {
   }
 
   updateThree(x) {
+    this.waitFor([myStore.dispatchToken])
+    this.name = myStore.getState().name
     this.foo = x.a + x.b + x.c
   }
 
@@ -110,6 +112,7 @@ class LifeCycleStore {
 
 var lifecycleStore = fux.createStore(LifeCycleStore)
 
+/* istanbul ignore next */
 !() => {
   assert.equal(typeof fux.bootstrap, 'function', 'bootstrap function exists')
   assert.equal(typeof fux.dispatcher, 'object', 'dispatcher exists')
@@ -310,7 +313,7 @@ var lifecycleStore = fux.createStore(LifeCycleStore)
   try {
     class WaitPlease {
       constructor() {
-        this.generateAction('pleaseWait')
+        this.generateActions('pleaseWait')
       }
     }
     var waiter = fux.createActions(WaitPlease)
