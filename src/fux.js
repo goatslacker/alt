@@ -121,11 +121,7 @@ class StoreMixin {
       }
 
       if (handler) {
-        if (symbol[ACTION_KEY]) {
-          this[LISTENERS][symbol[ACTION_KEY]] = handler.bind(this)
-        } else {
-          this[LISTENERS][symbol] = handler.bind(this)
-        }
+        this.bindAction(symbol, handler)
       }
     })
   }

@@ -143,11 +143,7 @@ var StoreMixin = (function () {
       }
 
       if (handler) {
-        if (symbol[ACTION_KEY]) {
-          _this2[LISTENERS][symbol[ACTION_KEY]] = handler.bind(_this2);
-        } else {
-          _this2[LISTENERS][symbol] = handler.bind(_this2);
-        }
+        _this2.bindAction(symbol, handler);
       }
     });
   };
