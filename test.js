@@ -1,4 +1,4 @@
-var Fux = require('./dist/fux')
+var Fux = require('./src/coverage-fux')
 var assert = require('assert')
 
 var fux = new Fux()
