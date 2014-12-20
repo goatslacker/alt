@@ -92,6 +92,7 @@ class StoreMixin {
       throw new TypeError('bindAction expects a function')
     }
 
+    // You can pass in the constant or the function itself
     if (symbol[ACTION_KEY]) {
       this[LISTENERS][symbol[ACTION_KEY]] = handler.bind(this)
     } else {
@@ -109,13 +110,16 @@ class StoreMixin {
       )
       var handler = null
 
+      // If you have both action and onAction
       if (this[action] && this[assumedEventHandler]) {
         throw new ReferenceError(
           'You have multiple action handlers bound to an action: ' +
           action + ' and ' + assumedEventHandler
         )
+      // action
       } else if (this[action]) {
         handler = this[action]
+      // onAction
       } else if (this[assumedEventHandler]) {
         handler = this[assumedEventHandler]
       }
@@ -187,6 +191,7 @@ class Fux {
       var constant = formatAsConstant(action)
       var actionName = Symbol(`action ${key}.prototype.${action}`)
 
+      // Wrap the action so we can provide a dispatch method
       var newAction = new ActionCreator(
         this.dispatcher,
         actionName,
@@ -194,6 +199,7 @@ class Fux {
         obj
       )
 
+      // Set all the properties on action
       obj[action] = newAction[ACTION_HANDLER]
       obj[action].defer = (x) => setTimeout(() => newAction[ACTION_HANDLER](x))
       obj[action][ACTION_KEY] = actionName
