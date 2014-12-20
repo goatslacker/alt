@@ -93,6 +93,23 @@ class SecondStore {
 
 var secondStore = fux.createStore(SecondStore)
 
+class LifeCycleStore {
+  constructor() {
+    this.bootstrapped = false
+    this.snapshotted = false
+  }
+
+  onBootstrap() {
+    this.bootstrapped = true
+  }
+
+  onTakeSnapshot() {
+    this.snapshotted = true
+  }
+}
+
+var lifecycleStore = fux.createStore(LifeCycleStore)
+
 !() => {
   assert.equal(typeof fux.bootstrap, 'function', 'bootstrap function exists')
   assert.equal(typeof fux.dispatcher, 'object', 'dispatcher exists')
@@ -117,9 +134,15 @@ var secondStore = fux.createStore(SecondStore)
   assert.equal(secondStore.externalMethod(), 'bar', 'static methods have `this` bound to the instance')
   assert.equal(secondStore.concatFooWith('baz'), 'barbaz', 'static methods may be called with params too')
 
+  assert.equal(lifecycleStore.getState().bootstrapped, false, 'bootstrap has not been called yet')
+  assert.equal(lifecycleStore.getState().snapshotted, false, 'takeSnapshot has not been called yet')
+
   var initialSnapshot = fux.takeSnapshot()
+  assert.equal(lifecycleStore.getState().snapshotted, true, 'takeSnapshot was called and the life cycle event was triggered')
+
   var bootstrapReturnValue = fux.bootstrap(initialSnapshot)
   assert.equal(bootstrapReturnValue, undefined, 'bootstrap returns nothing')
+  assert.equal(lifecycleStore.getState().bootstrapped, true, 'bootstrap was called and the life cycle event was triggered')
 
   assert.equal(typeof myActions.anotherAction, 'function', 'shorthand function created with createAction exists')
   assert.equal(typeof myActions.callInternalMethod, 'function', 'shorthand function created with createActions exists')
