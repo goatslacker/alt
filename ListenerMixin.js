@@ -1,4 +1,4 @@
-var MIXIN_REGISTRY = '_fux store listener registry_'
+var MIXIN_REGISTRY = '_alt store listener registry_'
 
 var ListenerMixin = {
   componentWillUnmount: function () {

@@ -1,4 +1,4 @@
-var fux = require('../fux')
+var alt = require('../alt')
 
 class TodoActions {
   constructor() {
@@ -13,4 +13,4 @@ class TodoActions {
   }
 }
 
-module.exports = fux.createActions(TodoActions)
+module.exports = alt.createActions(TodoActions)

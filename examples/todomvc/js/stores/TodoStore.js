@@ -1,9 +1,9 @@
-var fux = require('../fux')
+var alt = require('../alt')
 var merge = require('object-assign')
 
 var TodoActions = require('../actions/TodoActions')
 
-var todoStore = fux.createStore(class TodoStore {
+var todoStore = alt.createStore(class TodoStore {
   constructor() {
     this.bindActions(TodoActions)
 

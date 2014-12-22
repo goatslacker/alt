@@ -1,23 +1,22 @@
-# fux
+# alt
 
-> flux minus the l.
+> To alter. Altered; Changed.
 
-[![NPM version](https://badge.fury.io/js/fux.svg)](http://badge.fury.io/js/fux)
-[![Build Status](https://secure.travis-ci.org/goatslacker/fux.svg)](http://travis-ci.org/goatslacker/fux)
-[![Coverage Status](https://img.shields.io/coveralls/goatslacker/fux.svg)](https://coveralls.io/r/goatslacker/fux)
-[![Dependency Status](https://david-dm.org/goatslacker/testla.svg)](https://david-dm.org/goatslacker/fux)
+[![NPM version](https://badge.fury.io/js/alt.svg)](http://badge.fury.io/js/alt)
+[![Build Status](https://secure.travis-ci.org/goatslacker/alt.svg)](http://travis-ci.org/goatslacker/alt)
+[![Coverage Status](https://img.shields.io/coveralls/goatslacker/alt.svg)](https://coveralls.io/r/goatslacker/alt)
+[![Dependency Status](https://david-dm.org/goatslacker/testla.svg)](https://david-dm.org/goatslacker/alt)
 
 
 If you're in a hurry [show me the code](#examples) or [tl;dr](#tldr).
 
-Fux is a [flux](http://facebook.github.io/flux/docs/overview.html) implementation where the `l` is left out.
-What's the L you say?
-It's probably all those [JS "constants"](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/constants/ChatConstants.js),
-maybe it's the [static string tossing](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/dispatcher/ChatAppDispatcher.js#L39),
-or it could be the [massive switch statements](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/stores/MessageStore.js#L111) you're required to code.
-Whatever it is they're all not here.
+Alt is a [flux](http://facebook.github.io/flux/docs/overview.html) where some bits have been intentionally left out.
+Which bits?
+The [JS "constants"](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/constants/ChatConstants.js),
+the [static string tossing](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/dispatcher/ChatAppDispatcher.js#L39),
+and the [massive switch statements](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/stores/MessageStore.js#L111) you're required to code.
 
-Fux is flux. Data flows one way. Here's an ascii chart to prove it.
+Alt is pure flux though. Data flows one way. Here's an ascii chart to prove it.
 
 ```txt
 ╔═══════════════╗             ╔══════════════╗             ╔════════════╗
@@ -36,7 +35,7 @@ the store informs the view via event listeners so the view can update. The view 
 
 ## Pure flux
 
-Fux is a terse implementation of Flux that encourages unadulterated flux and all the nice ideas that come along with it:
+Alt is a terse implementation of Flux that encourages unadulterated flux and all the nice ideas that come along with it:
 
 * The Flux [dispatcher](https://github.com/facebook/flux/blob/master/src/Dispatcher.js), which
 means one can only dispatch one action per cycle to ensure a predictable and simple data flow (rather than cascading actions).
@@ -51,13 +50,13 @@ one can set up the view to listen to changes on the store.
 
 ## Differences
 
-Where fux is a tad different from flux.
+Where alt is a tad different from flux.
 
-There is no giant switch statement you have to write in your store and this is because fux removes the burden of constants from the developer.
+There is no giant switch statement you have to write in your store and this is because alt removes the burden of constants from the developer.
 This has the wonderful side effect of making the custom dispatcher logic unnecessary, thus removing one of the boxes from the flow
 chart (not pictured above) the dispatcher. Make no mistake, there is still a single dispatcher through which actions flow through on their merry
 way to the store, in fact, you still get the benefit of being able to hook into the dispatcher to listen to all the global events for debugging, fun, or misery.
-The dispatcher is just a part of fux and something you don't necessarily have to write custom code for.
+The dispatcher is just a part of alt and something you don't necessarily have to write custom code for.
 
 These removals make the code terse and easy to follow, there is less indirection and the learning curve to grok is much lower.
 Think I'm lying? [Check out an example](#differences-example).
@@ -66,7 +65,7 @@ Think I'm lying? [Check out an example](#differences-example).
 
 What's new.
 
-One really cool aspect of fux is that you can save snapshots of the entire application's state at any given point in time.
+One really cool aspect of alt is that you can save snapshots of the entire application's state at any given point in time.
 Best of all, if you really screw the state up beyond repair you can easily rollback to the last saved snapshot.
 
 There's also a method available that lets you bootstrap all the application's stores once, at startup, with a saved snapshot.
@@ -74,7 +73,7 @@ This is particularly useful if you're writing isomorphic applications where you 
 
 Stores are immutable. Meaning you can't just update the store through your store instance, the objects returned by `getState` are immutable (well you can mutate them all you want but it won't affect the state inside the store), and other stores can't mutate other stores. This makes it easy to reason about how your application exactly changes and where.
 
-Last but not least, fux is meant to work with ES6. That is we're betting you'll be writing your stores and actions
+Last but not least, alt is meant to work with ES6. That is we're betting you'll be writing your stores and actions
 as classes. This part isn't necessary but you really should write some ES6 anyways because it's nice.
 
 ## Usage
@@ -82,7 +81,7 @@ as classes. This part isn't necessary but you really should write some ES6 anywa
 ### Installing
 
 ```sh
-npm install fux
+npm install alt
 ```
 
 ### Running tests
@@ -95,19 +94,19 @@ npm test
 
 ### Actually Using It
 
-We'll be referring back to this code a lot by using the `fux` variable declared.
+We'll be referring back to this code a lot by using the `alt` variable declared.
 
 ```js
-var Fux = require('fux')
-var fux = new Fux()
+var Alt = require('alt')
+var alt = new Alt()
 ```
 
 ### ES Versions Disclaimer
 
-Fux depends on ES5 features, the good news is so does React. You can use [es5-shim](https://github.com/es-shims/es5-shim)
+Alt depends on ES5 features, the good news is so does React. You can use [es5-shim](https://github.com/es-shims/es5-shim)
 to support those pesky old browsers.
 
-Fux encourages ES6 features, the good news is it's pleasant to write. You can use the es6 transpiler that comes
+Alt encourages ES6 features, the good news is it's pleasant to write. You can use the es6 transpiler that comes
 with react courtesy of [jstransform](https://github.com/facebook/jstransform) or you can use your own favorite ES6 transpiler:
 [6to5](https://6to5.org/), [es-next](https://esnext.github.io/esnext/), or [any es6 transpiler](https://www.npmjs.com/search?q=es6) you fancy.
 
@@ -117,7 +116,7 @@ You won't need an [es6-shim](https://github.com/paulmillr/es6-shim) but you can 
 
 Actions are the way you update state. They're kind of a big deal.
 
-`fux.createActions :: Class -> Actions`
+`alt.createActions :: Class -> Actions`
 
 ```js
 class LocationActions {
@@ -126,12 +125,12 @@ class LocationActions {
   }
 }
 
-var locationActions = fux.createActions(LocationActions)
+var locationActions = alt.createActions(LocationActions)
 ```
 
 Every action contains a `dispatch` method which is what sends your data to the dispatcher for dispatching to stores. The type signature for dispatch is `dispatch :: x -> undefined`.
 
-`fux.createActions` then returns an `Object` containing all the methods defined. You can then call your actions directly.
+`alt.createActions` then returns an `Object` containing all the methods defined. You can then call your actions directly.
 
 ```js
 locationActions.updateLocation()
@@ -146,7 +145,7 @@ class LocationActions {
   }
 }
 
-var locationActions = fux.createActions(LocationActions)
+var locationActions = alt.createActions(LocationActions)
 ```
 
 ```js
@@ -166,7 +165,7 @@ class LocationActions {
   }
 }
 
-var locationActions = fux.createActions(LocationActions)
+var locationActions = alt.createActions(LocationActions)
 ```
 
 ```js
@@ -186,7 +185,7 @@ class LocationActions {
   }
 }
 
-var locationActions = fux.createActions(LocationActions)
+var locationActions = alt.createActions(LocationActions)
 
 locationActions.updateLocation('Miami', 'Florida')
 ```
@@ -200,7 +199,7 @@ class LocationActions {
   }
 }
 
-var locationActions = fux.createActions(LocationActions)
+var locationActions = alt.createActions(LocationActions)
 
 locationActions.updateLocation('South Lake Tahoe', 'California')
 ```
@@ -209,7 +208,7 @@ locationActions.updateLocation('South Lake Tahoe', 'California')
 
 Stores are where you keep a part of your application's state. It's a singleton, holds your data, and is immutable.
 
-`fux.createStore :: Class -> Store`
+`alt.createStore :: Class -> Store`
 
 ```js
 class LocationStore {
@@ -227,10 +226,10 @@ class LocationStore {
   }
 }
 
-var locationStore = fux.createStore(LocationStore)
+var locationStore = alt.createStore(LocationStore)
 ```
 
-Stores require a constructor, that's where you'll set your initial state and bind any actions to the methods that update the state, the `action handlers` if you will. All store instances returned by `fux.createStore` will have the following methods:
+Stores require a constructor, that's where you'll set your initial state and bind any actions to the methods that update the state, the `action handlers` if you will. All store instances returned by `alt.createStore` will have the following methods:
 
 #### createStore API
 
@@ -263,7 +262,7 @@ A token that can be used with waitFor.
 #### Disclaimer
 
 All defined methods in your Store class **will not** be available on the store instance. They are accessible within the class but not on the returned
-Object via `fux.createStore`. This ensures that stores have no direct setters and the state remains mutable only through actions keeping the flow unidirectional.
+Object via `alt.createStore`. This ensures that stores have no direct setters and the state remains mutable only through actions keeping the flow unidirectional.
 If you want to attach public/static functions to your store you may do so as a static method on the class itself.
 
 ```js
@@ -274,7 +273,7 @@ class LocationStore {
   }
 }
 
-var locationStore = fux.createStore(LocationStore)
+var locationStore = alt.createStore(LocationStore)
 
 locationStore.myPublicMethod()
 ```
@@ -282,7 +281,7 @@ locationStore.myPublicMethod()
 #### Canceling An Event
 
 If you don't want the store to inform the view of an action make sure to return false
-from the action handler methods, fux won't judge you.
+from the action handler methods, alt won't judge you.
 
 ```js
 class LocationStore {
@@ -301,7 +300,7 @@ class LocationStore {
   }
 }
 
-var locationStore = fux.createStore(LocationStore)
+var locationStore = alt.createStore(LocationStore)
 ```
 
 #### Constants
@@ -319,7 +318,7 @@ class LocationStore {
   }
 }
 
-var locationStore = fux.createStore(LocationStore)
+var locationStore = alt.createStore(LocationStore)
 ```
 
 Constants are automagically generated for you so feel free to use them to bind your actions or use the method itself, whatever reads better in your opinion.
@@ -336,7 +335,7 @@ class LocationActions {
   }
 }
 
-var locationActions = fux.createActions(LocationActions)
+var locationActions = alt.createActions(LocationActions)
 ```
 
 You can bind all the actions inside `locationActions` using the shortcut `bindActions`
@@ -359,7 +358,7 @@ class LocationStore {
   }
 }
 
-var locationStore = fux.createStore(LocationStore)
+var locationStore = alt.createStore(LocationStore)
 ```
 
 Actions who have a `onCamelCasedAction` method or an `actionName` method available in the store will be bound.
@@ -379,7 +378,7 @@ Thus brings us to our final store point. Stores have the following available met
 You can use waitFor like so:
 
 ```js
-var dependingStore = fux.createStore(class DependingStore {
+var dependingStore = alt.createStore(class DependingStore {
   constructor() {
     this.bindActions(someActions)
     this.data = 42
@@ -390,7 +389,7 @@ var dependingStore = fux.createStore(class DependingStore {
   }
 })
 
-var locationStore = fux.createStore(class LocationStore {
+var locationStore = alt.createStore(class LocationStore {
   constructor() {
     this.bindActions(someOtherActions)
 
@@ -408,7 +407,7 @@ You can also `waitFor` multiple stores by passing in an Array: `this.waitFor([st
 
 ### Views
 
-Your choice of view isn't important to fux. What's important is to know how the view consumes the store's data, and that is via event listeners.
+Your choice of view isn't important to alt. What's important is to know how the view consumes the store's data, and that is via event listeners.
 
 In this example I'll be using React, but you're free to use your library of choice.
 
@@ -445,10 +444,10 @@ var LocationComponent = React.createClass({
 })
 ```
 
-Fux provides a free `ListenerMixin` for React so you don't have to remember to unregister your listener. You can use said mixin like this:
+Alt provides a free `ListenerMixin` for React so you don't have to remember to unregister your listener. You can use said mixin like this:
 
 ```js
-var ListenerMixin = require('fux/ListenerMixin')
+var ListenerMixin = require('alt/ListenerMixin')
 
 var LocationComponent = React.createClass({
   mixins: [ListenerMixin],
@@ -484,22 +483,22 @@ var LocationComponent = React.createClass({
 
 Restart the loop by making your views kick off new actions.
 
-## Fux Features
+## Alt Features
 
 ### Snapshots
 
 `takeSnapshot :: String`
 
-Snapshots are a core component of fux. The idea is that at any given point in time you can `takeSnapshot` and have your entire application's state
+Snapshots are a core component of alt. The idea is that at any given point in time you can `takeSnapshot` and have your entire application's state
 serialized for persistence, transfering, logging, or debugging.
 
-Taking a snapshot is as easy as calling `fux.takeSnapshot()`.
+Taking a snapshot is as easy as calling `alt.takeSnapshot()`.
 
 ### Bootstrapping
 
 `bootstrap :: String -> undefined`
 
-Bootstrapping can only be done once, and usually is best to do when initializing your application. The `fux.bootstrap()` function takes in a snapshot
+Bootstrapping can only be done once, and usually is best to do when initializing your application. The `alt.bootstrap()` function takes in a snapshot
 you've saved and reloads all the state with that snapshot, no events will be emitted to your components during this process, so again, it's best to do this
 on init before the view has even rendered.
 
@@ -509,7 +508,7 @@ Bootstrap is great if you're running an isomorphic app, or if you're persisting 
 
 `rollback :: undefined`
 
-If you've screwed up the state, or you just feel like rolling back you can call `fux.rollback()`. Rollback is pretty dumb in the sense
+If you've screwed up the state, or you just feel like rolling back you can call `alt.rollback()`. Rollback is pretty dumb in the sense
 that it's not automatic in case of errors, and it only rolls back to the last saved snapshot, meaning you have to save a snapshot first in order to roll back.
 
 ### Life Cycle Methods
@@ -522,23 +521,23 @@ When bootstrapping or snapshotting there are special methods you can assign to y
 
 ### Single Dispatcher
 
-A single dispatcher instance is made available for listening to all events passing through. You can access this via the `dispatcher` property: `fux.dispatcher`
+A single dispatcher instance is made available for listening to all events passing through. You can access this via the `dispatcher` property: `alt.dispatcher`
 and listening to all events is as easy as
 
 ```js
-fux.dispatcher.register(console.log)
+alt.dispatcher.register(console.log)
 ```
 
 ## Examples
 
-* [todomvc](https://github.com/goatslacker/fux/blob/master/examples/todomvc)
+* [todomvc](https://github.com/goatslacker/alt/blob/master/examples/todomvc)
 
 ## Differences Example
 
 Flux has constants, the dispatcher is also pretty dumb as in it just takes what you passed in the action
 and pipes it through to the store. This is completely fine but not something you should be expected to write.
 The nice thing about constants is that you can easily grep for them in your application and see where
-all the actions are being called, with fux you get the same benefit without having to manage them.
+all the actions are being called, with alt you get the same benefit without having to manage them.
 
 #### Before: Flux
 
@@ -556,7 +555,7 @@ var AppDispatcher = Object.assign(new Dispatcher(), {
 })
 ```
 
-#### After: Fux
+#### After: Alt
 
 ```js
 class Action {
@@ -565,13 +564,13 @@ class Action {
   }
 }
 
-var action = fux.createActions(Action)
+var action = alt.createActions(Action)
 ```
 
 ## Other Flux Implementations
 
 [Reflux](https://github.com/spoike/refluxjs) is a fun to work with and terse "flux implementation".
-It's not actually flux, but it's still a pleasure to use. Fux brings the terseness of reflux to actual flux.
+It's not actually flux, but it's still a pleasure to use. Alt brings the terseness of reflux to actual flux.
 
 [Fluxxor](http://fluxxor.com/) is a neat implementation of flux with good documentation and examples.
 

@@ -1,7 +1,7 @@
-var Fux = require('./src/coverage-fux')
+var Alt = require('./src/coverage-alt')
 var assert = require('assert')
 
-var fux = new Fux()
+var alt = new Alt()
 
 class MyActions {
   constructor() {
@@ -29,7 +29,7 @@ class MyActions {
   }
 }
 
-var myActions = fux.createActions(MyActions)
+var myActions = alt.createActions(MyActions)
 
 class MyStore {
   constructor() {
@@ -56,7 +56,7 @@ class MyStore {
   }
 }
 
-var myStore = fux.createStore(MyStore)
+var myStore = alt.createStore(MyStore)
 
 class SecondStore {
   constructor() {
@@ -93,7 +93,7 @@ class SecondStore {
   }
 }
 
-var secondStore = fux.createStore(SecondStore)
+var secondStore = alt.createStore(SecondStore)
 
 class LifeCycleStore {
   constructor() {
@@ -110,16 +110,16 @@ class LifeCycleStore {
   }
 }
 
-var lifecycleStore = fux.createStore(LifeCycleStore)
+var lifecycleStore = alt.createStore(LifeCycleStore)
 
 /* istanbul ignore next */
 !() => {
-  assert.equal(typeof fux.bootstrap, 'function', 'bootstrap function exists')
-  assert.equal(typeof fux.dispatcher, 'object', 'dispatcher exists')
-  assert.equal(typeof fux.dispatcher.register, 'function', 'dispatcher function exists for listening to all events')
-  assert.equal(typeof fux.takeSnapshot, 'function', 'snapshot function exists for saving app state')
-  assert.equal(typeof fux.createActions, 'function', 'createActions function')
-  assert.equal(typeof fux.createStore, 'function', 'createStore function')
+  assert.equal(typeof alt.bootstrap, 'function', 'bootstrap function exists')
+  assert.equal(typeof alt.dispatcher, 'object', 'dispatcher exists')
+  assert.equal(typeof alt.dispatcher.register, 'function', 'dispatcher function exists for listening to all events')
+  assert.equal(typeof alt.takeSnapshot, 'function', 'snapshot function exists for saving app state')
+  assert.equal(typeof alt.createActions, 'function', 'createActions function')
+  assert.equal(typeof alt.createStore, 'function', 'createStore function')
 
   var storePrototype = Object.getPrototypeOf(myStore)
   var assertMethods = ['emitChange', 'listen', 'unlisten', 'getState']
@@ -140,10 +140,10 @@ var lifecycleStore = fux.createStore(LifeCycleStore)
   assert.equal(lifecycleStore.getState().bootstrapped, false, 'bootstrap has not been called yet')
   assert.equal(lifecycleStore.getState().snapshotted, false, 'takeSnapshot has not been called yet')
 
-  var initialSnapshot = fux.takeSnapshot()
+  var initialSnapshot = alt.takeSnapshot()
   assert.equal(lifecycleStore.getState().snapshotted, true, 'takeSnapshot was called and the life cycle event was triggered')
 
-  var bootstrapReturnValue = fux.bootstrap(initialSnapshot)
+  var bootstrapReturnValue = alt.bootstrap(initialSnapshot)
   assert.equal(bootstrapReturnValue, undefined, 'bootstrap returns nothing')
   assert.equal(lifecycleStore.getState().bootstrapped, true, 'bootstrap was called and the life cycle event was triggered')
 
@@ -183,7 +183,7 @@ var lifecycleStore = fux.createStore(LifeCycleStore)
   myActions.callInternalMethod()
   assert.equal(myStore.getState().calledInternal, true, 'internal method has been called successfully by an action')
 
-  var snapshot = fux.takeSnapshot()
+  var snapshot = alt.takeSnapshot()
   assert.equal(typeof snapshot, 'string', 'a snapshot json is returned')
   assert.equal(JSON.parse(snapshot).MyStore.name, 'bear', 'the state is current')
 
@@ -196,7 +196,7 @@ var lifecycleStore = fux.createStore(LifeCycleStore)
   assert.equal(state.name, 'foobar', 'mutated returned state')
   assert.equal(myStore.getState().name, 'blossom', 'store state was not mutated')
 
-  var rollbackValue = fux.rollback()
+  var rollbackValue = alt.rollback()
   assert.equal(rollbackValue, undefined, 'rollback returns nothing')
 
   assert.equal(myStore.getState().name, 'bear', 'state has been rolledback to last snapshot')
@@ -216,7 +216,7 @@ var lifecycleStore = fux.createStore(LifeCycleStore)
   assert.equal(myStore.getState().name, 'badger', 'new store state present')
 
   try {
-    fux.bootstrap('{"MyStore":{"name":"elk"}}')
+    alt.bootstrap('{"MyStore":{"name":"elk"}}')
     assert.equal(true, false, 'I was able bootstrap more than once which is bad')
   } catch (e) {
     assert.equal(e instanceof ReferenceError, true, 'can only bootstrap once')
@@ -249,7 +249,7 @@ var lifecycleStore = fux.createStore(LifeCycleStore)
   })
 
   try {
-    fux.createStore(class StoreWithManyListeners {
+    alt.createStore(class StoreWithManyListeners {
       constructor() {
         this.bindActions(myActions)
       }
@@ -268,7 +268,7 @@ var lifecycleStore = fux.createStore(LifeCycleStore)
       updateName() { }
     }
 
-    fux.createStore(class InnocentStore extends EvilStore {
+    alt.createStore(class InnocentStore extends EvilStore {
       constructor() {
         this.bindActions(myActions)
       }
@@ -289,7 +289,7 @@ var lifecycleStore = fux.createStore(LifeCycleStore)
       trololol() { }
     }
 
-    fux.createStore(StoreWithInvalidActionHandlers)
+    alt.createStore(StoreWithInvalidActionHandlers)
 
     assert.equal(true, false, 'i was able to bind an undefined action handler')
   } catch (e) {
@@ -303,7 +303,7 @@ var lifecycleStore = fux.createStore(LifeCycleStore)
       }
     }
 
-    fux.createStore(StoreWithInvalidActionHandlers2)
+    alt.createStore(StoreWithInvalidActionHandlers2)
 
     assert.equal(true, false, 'i was able to bind an action handler to undefined')
   } catch (e) {
@@ -316,7 +316,7 @@ var lifecycleStore = fux.createStore(LifeCycleStore)
         this.generateActions('pleaseWait')
       }
     }
-    var waiter = fux.createActions(WaitPlease)
+    var waiter = alt.createActions(WaitPlease)
 
     class WaitsForNobody {
       constructor() {
@@ -327,7 +327,7 @@ var lifecycleStore = fux.createStore(LifeCycleStore)
         this.waitFor()
       }
     }
-    fux.createStore(WaitsForNobody)
+    alt.createStore(WaitsForNobody)
 
     waiter.pleaseWait()
 
@@ -345,7 +345,7 @@ var lifecycleStore = fux.createStore(LifeCycleStore)
       onUpdateName(name1, name2) { }
     }
 
-    fux.createStore(MethodsAreUnary)
+    alt.createStore(MethodsAreUnary)
     assert.equal(true, false, 'i bound a method with two args successfully')
   } catch (e) {
     assert.equal(e instanceof TypeError, true, 'A TypeError was thrown, you cant bind two args')

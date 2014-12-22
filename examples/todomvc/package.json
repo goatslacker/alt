@@ -1,8 +1,8 @@
 {
-  "name": "todomvc-fux",
+  "name": "todomvc-alt",
   "version": "1.0.0",
-  "description": "Example Flux architecture using fux.",
-  "repository": "https://github.com/goatslacker/fux",
+  "description": "Example Flux architecture using alt.",
+  "repository": "https://github.com/goatslacker/alt",
   "main": "js/app.js",
   "dependencies": {
     "object-assign": "^2.0.0",

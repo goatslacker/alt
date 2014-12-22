@@ -1,23 +1,23 @@
-# Fux TodoMVC Example
+# Alt TodoMVC Example
 
-> A copy of [flux-todomvc](https://github.com/facebook/flux/tree/master/examples/flux-todomvc) but using fux
+> A copy of [flux-todomvc](https://github.com/facebook/flux/tree/master/examples/flux-todomvc) but using alt
 
 ## What is this?
 
-This is todomvc written to work with fux. It's mostly the same code as flux's todomvc, in fact I only changed a couple of lines in the view layer. The bulk of the changes were in the store and actions, and the removal of the dispatcher and the constants since fux handles those two for you.
+This is todomvc written to work with alt. It's mostly the same code as flux's todomvc, in fact I only changed a couple of lines in the view layer. The bulk of the changes were in the store and actions, and the removal of the dispatcher and the constants since alt handles those two for you.
 
 ## Learning Flux
 
-I won't document learning flux here, you can check out Flux's todomvc [README](https://github.com/facebook/flux/tree/master/examples/flux-todomvc/README.md) which has a great overview. Fux is essentially flux so the concepts translate over well.
+I won't document learning flux here, you can check out Flux's todomvc [README](https://github.com/facebook/flux/tree/master/examples/flux-todomvc/README.md) which has a great overview. Alt is essentially flux so the concepts translate over well.
 
-## Fux and Flux
+## Alt and Flux
 
-Instead, I'll use this space to talk about why fux and compare it to flux.
+Instead, I'll use this space to talk about why alt and compare it to flux.
 
 
 ### Folder Structure
 
-The folder structure is very similar with the difference in that fux omits the `constants` and `dispatcher`
+The folder structure is very similar with the difference in that alt omits the `constants` and `dispatcher`
 
 Your tree would look something like this:
 
@@ -44,12 +44,12 @@ You can read more about what the rest of the files do [here](https://github.com/
 
 ### Terse Syntax
 
-One of the main benefits of fux is the terse syntax. The actions in flux are ~80 LOC, and the dispatcher is ~15 LOC. With fux you can write both in ~15 LOC.
+One of the main benefits of alt is the terse syntax. The actions in flux are ~80 LOC, and the dispatcher is ~15 LOC. With alt you can write both in ~15 LOC.
 
 Here are the actions:
 
 ```js
-var fux = require('../fux')
+var alt = require('../alt')
 
 class TodoActions {
   constructor() {
@@ -64,20 +64,20 @@ class TodoActions {
   }
 }
 
-module.exports = fux.createActions(TodoActions)
+module.exports = alt.createActions(TodoActions)
 ```
 
-The store on flux closk in at ~160 LOC. In fux the store is 80 LOC.
+The store on flux closk in at ~160 LOC. In alt the store is 80 LOC.
 
 Here's the store:
 
 ```js
-var fux = require('../fux')
+var alt = require('../alt')
 var merge = require('object-assign')
 
 var TodoActions = require('../actions/TodoActions')
 
-var todoStore = fux.createStore(class TodoStore {
+var todoStore = alt.createStore(class TodoStore {
   constructor() {
     this.bindActions(TodoActions)
 
@@ -176,4 +176,4 @@ open index.html
 
 ## Credit
 
-The original flux TodoMVC application was created by [Bill Fisher](https://www.facebook.com/bill.fisher.771). All the view components and most of the rest of the code was written by Bill. The actions and stores have been fuxed by [Josh Perez](https://github.com/goatslacker)
+The original flux TodoMVC application was created by [Bill Fisher](https://www.facebook.com/bill.fisher.771). All the view components and most of the rest of the code was written by Bill. The actions and stores have been alted by [Josh Perez](https://github.com/goatslacker)

@@ -25,7 +25,7 @@ var formatAsConstant = (name) => {
   }).toUpperCase()
 }
 
-class FuxStore extends EventEmitter {
+class AltStore extends EventEmitter {
   constructor(dispatcher, state) {
     this[STATE_CONTAINER] = state
     if (state.onBootstrap) {
@@ -149,7 +149,7 @@ class StoreMixin {
   }
 }
 
-class Fux {
+class Alt {
   constructor() {
     this.dispatcher = new Dispatcher()
     this[STORES_STORE] = {}
@@ -174,7 +174,7 @@ class Fux {
 
     // Assign StoreModel so static methods are available
     return this[STORES_STORE][key] = Object.assign(
-      new FuxStore(this.dispatcher, store),
+      new AltStore(this.dispatcher, store),
       StoreModel
     )
   }
@@ -249,4 +249,4 @@ class Fux {
   }
 }
 
-module.exports = Fux
+module.exports = Alt
