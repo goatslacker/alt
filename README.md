@@ -2,6 +2,12 @@
 
 > flux minus the l.
 
+[![NPM version](https://badge.fury.io/js/fux.svg)](http://badge.fury.io/js/fux)
+[![Build Status](https://secure.travis-ci.org/goatslacker/fux.svg)](http://travis-ci.org/goatslacker/fux)
+[![Coverage Status](https://img.shields.io/coveralls/goatslacker/fux.svg)](https://coveralls.io/r/goatslacker/fux)
+[![Dependency Status](https://david-dm.org/goatslacker/testla.svg)](https://david-dm.org/goatslacker/fux)
+
+
 If you're in a hurry [show me the code](#examples) or [tl;dr](#tldr).
 
 Fux is a [flux](http://facebook.github.io/flux/docs/overview.html) implementation where the `l` is left out.
