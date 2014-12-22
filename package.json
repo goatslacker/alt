@@ -10,6 +10,7 @@
   },
   "devDependencies": {
     "6to5": "^1.15.0",
+    "coveralls": "^2.11.2",
     "istanbul": "^0.3.5",
     "sixpack": "^1.0.0"
   },
