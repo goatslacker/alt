@@ -10,9 +10,9 @@
 
 If you're in a hurry [show me the code](#examples) or [tl;dr](#tldr).
 
-Alt is a [flux](http://facebook.github.io/flux/docs/overview.html) where some bits have been intentionally left out.
-Which bits?
-The [JS "constants"](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/constants/ChatConstants.js),
+Alt is a [flux](http://facebook.github.io/flux/docs/overview.html) implementation that is [small](https://github.com/goatslacker/alt/blob/master/src/alt.js) (~3.9kb & 300 LOC), [well tested](https://github.com/goatslacker/alt/blob/master/test.js), [terse](https://github.com/goatslacker/alt#differences), and meant to be used with ES6.
+
+Some boilerplate has been removed from flux such as the [JS "constants"](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/constants/ChatConstants.js),
 the [static string tossing](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/dispatcher/ChatAppDispatcher.js#L39),
 and the [massive switch statements](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/stores/MessageStore.js#L111) you're required to code.
 
@@ -579,7 +579,7 @@ It's not actually flux, but it's still a pleasure to use. Alt brings the tersene
 ## TL;DR
 
 * Pure Flux
-* No Constants
+* No constants
 * No static string checking
 * No giant switch statement
 * Save state snapshots
@@ -591,6 +591,7 @@ It's not actually flux, but it's still a pleasure to use. Alt brings the tersene
 * Immutable stores
 * Single dispatcher
 * Global listening for debugging
+* Small library ~3.9kb gzipped and less than 300 LOC
 
 ## License
 
