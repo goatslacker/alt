@@ -50,12 +50,13 @@ one can set up the view to listen to changes on the store.
 
 ## Differences
 
-Where alt is a tad different from flux.
+Some boilerplate has been removed from flux.
 
 There is no giant switch statement you have to write in your store and this is because alt removes the burden of constants from the developer.
 This has the wonderful side effect of making the custom dispatcher logic unnecessary, thus removing one of the boxes from the flow
-chart (not pictured above) the dispatcher. Make no mistake, there is still a single dispatcher through which actions flow through on their merry
-way to the store, in fact, you still get the benefit of being able to hook into the dispatcher to listen to all the global events for debugging, fun, or misery.
+chart (not pictured above) the dispatcher.
+
+Make no mistake, there is still a single dispatcher through which actions flow through on their merry way to the store, in fact, you still get the benefit of being able to hook into the dispatcher to listen to all the global events for debugging, fun, or misery.
 The dispatcher is just a part of alt and something you don't necessarily have to write custom code for.
 
 These removals make the code terse and easy to follow, there is less indirection and the learning curve to grok is much lower.
