@@ -32,6 +32,7 @@ var formatAsConstant = function (name) {
   }).toUpperCase();
 };
 
+/* istanbul ignore next */
 function NoopClass() {}
 
 var builtIns = Object.getOwnPropertyNames(NoopClass);
@@ -190,7 +191,7 @@ var Alt = (function () {
       StoreModel.call(this);
     }
     Store.prototype = StoreModel.prototype;
-    Object.assign(Store.prototype, new StoreMixin(key, this.dispatcher), StoreMixin.prototype);
+    Object.assign(Store.prototype, new StoreMixin(key, this.dispatcher), getInternalMethods(StoreMixin.prototype, builtInProto));
     var store = new Store();
 
     return this[STORES_STORE][key] = Object.assign(new AltStore(this.dispatcher, store), getInternalMethods(StoreModel, builtIns));

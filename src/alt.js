@@ -26,6 +26,7 @@ var formatAsConstant = (name) => {
   }).toUpperCase()
 }
 
+/* istanbul ignore next */
 function NoopClass() { }
 
 var builtIns = Object.getOwnPropertyNames(NoopClass)
@@ -184,7 +185,7 @@ class Alt {
     Object.assign(
       Store.prototype,
       new StoreMixin(key, this.dispatcher),
-      StoreMixin.prototype
+      getInternalMethods(StoreMixin.prototype, builtInProto)
     )
     var store = new Store()
 
