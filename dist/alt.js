@@ -31,6 +31,7 @@ var ACTION_HANDLER = Symbol("action creator handler");
 var ACTION_KEY = Symbol("holds the actions uid symbol for listening");
 var ACTION_UID = Symbol("the actions uid name");
 var BOOTSTRAP_FLAG = PrivateSymbol("have you bootstrapped yet?");
+var EE = Symbol("event emitter instance");
 var LISTENERS = Symbol("stores action listeners storage");
 var STATE_CONTAINER = Symbol("" + now + " the state container");
 var STORE_BOOTSTRAP = Symbol("event handler onBootstrap");
@@ -43,10 +44,11 @@ var formatAsConstant = function (name) {
   }).toUpperCase();
 };
 
-var AltStore = (function (EventEmitter) {
+var AltStore = (function () {
   var AltStore = function AltStore(dispatcher, state) {
     var _this = this;
     this[STATE_CONTAINER] = state;
+    this[EE] = new EventEmitter();
     if (state.onBootstrap) {
       this[STORE_BOOTSTRAP] = state.onBootstrap.bind(state);
     }
@@ -63,18 +65,16 @@ var AltStore = (function (EventEmitter) {
     });
   };
 
-  _extends(AltStore, EventEmitter);
-
   AltStore.prototype.emitChange = function () {
-    this.emit("change", this[STATE_CONTAINER]);
+    this[EE].emit("change", this[STATE_CONTAINER]);
   };
 
   AltStore.prototype.listen = function (cb) {
-    this.on("change", cb);
+    this[EE].on("change", cb);
   };
 
   AltStore.prototype.unlisten = function (cb) {
-    this.removeListener("change", cb);
+    this[EE].removeListener("change", cb);
   };
 
   AltStore.prototype.getState = function () {
@@ -83,7 +83,7 @@ var AltStore = (function (EventEmitter) {
   };
 
   return AltStore;
-})(EventEmitter);
+})();
 
 var ActionCreator = (function () {
   var ActionCreator = function ActionCreator(dispatcher, name, action, actions) {
@@ -179,10 +179,9 @@ var Alt = (function () {
 
   Alt.prototype.createStore = function (StoreModel) {
     var key = StoreModel.displayName || StoreModel.name;
-    // Creating a class here so we don't overload the store's prototype with
-    // the mixin behaviour
-    // and I'm extending from StoreModel so we can inherit any extensions
-    // from the store.
+    // Creating a class here so we don't overload the provided store's
+    // prototype with the mixin behaviour and I'm extending from StoreModel
+    // so we can inherit any extensions from the provided store.
     var Store = (function (StoreModel) {
       var Store = function Store() {
         StoreModel.call(this);
