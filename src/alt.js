@@ -26,6 +26,22 @@ var formatAsConstant = (name) => {
   }).toUpperCase()
 }
 
+function NoopClass() { }
+
+var builtIns = Object.getOwnPropertyNames(NoopClass)
+var builtInProto = Object.getOwnPropertyNames(NoopClass.prototype)
+
+var getInternalMethods = (obj, excluded) => {
+  return Object.getOwnPropertyNames(obj).reduce((value, m) => {
+    if (excluded.indexOf(m) !== -1) {
+      return value
+    }
+
+    value[m] = obj[m]
+    return value
+  }, {})
+}
+
 class AltStore {
   constructor(dispatcher, state) {
     this[STATE_CONTAINER] = state
@@ -172,15 +188,18 @@ class Alt {
     )
     var store = new Store()
 
-    // Assign StoreModel so static methods are available
     return this[STORES_STORE][key] = Object.assign(
       new AltStore(this.dispatcher, store),
-      StoreModel
+      getInternalMethods(StoreModel, builtIns)
     )
   }
 
   createActions(ActionsClass) {
-    var actions = Object.assign({}, ActionsClass.prototype)
+    var actions = Object.assign(
+      {},
+      getInternalMethods(ActionsClass.prototype, builtInProto)
+    )
+
     ActionsClass.call({
       generateActions(...actionNames) {
         actionNames.forEach((actionName) => {

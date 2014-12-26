@@ -32,6 +32,22 @@ var formatAsConstant = function (name) {
   }).toUpperCase();
 };
 
+function NoopClass() {}
+
+var builtIns = Object.getOwnPropertyNames(NoopClass);
+var builtInProto = Object.getOwnPropertyNames(NoopClass.prototype);
+
+var getInternalMethods = function (obj, excluded) {
+  return Object.getOwnPropertyNames(obj).reduce(function (value, m) {
+    if (excluded.indexOf(m) !== -1) {
+      return value;
+    }
+
+    value[m] = obj[m];
+    return value;
+  }, {});
+};
+
 var AltStore = (function () {
   var AltStore = function AltStore(dispatcher, state) {
     var _this = this;
@@ -177,13 +193,13 @@ var Alt = (function () {
     Object.assign(Store.prototype, new StoreMixin(key, this.dispatcher), StoreMixin.prototype);
     var store = new Store();
 
-    // Assign StoreModel so static methods are available
-    return this[STORES_STORE][key] = Object.assign(new AltStore(this.dispatcher, store), StoreModel);
+    return this[STORES_STORE][key] = Object.assign(new AltStore(this.dispatcher, store), getInternalMethods(StoreModel, builtIns));
   };
 
   Alt.prototype.createActions = function (ActionsClass) {
     var _this3 = this;
-    var actions = Object.assign({}, ActionsClass.prototype);
+    var actions = Object.assign({}, getInternalMethods(ActionsClass.prototype, builtInProto));
+
     ActionsClass.call({
       generateActions: function () {
         var actionNames = _slice.call(arguments);
