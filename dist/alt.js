@@ -10,7 +10,7 @@ var Symbol = _dereq_("./polyfills/es6-symbol");
 Object.assign = Object.assign || _dereq_("object-assign");
 
 var now = Date.now();
-var PrivateSymbol = function (desc) {
+var VariableSymbol = function (desc) {
   return Symbol("" + now + "" + desc);
 };
 
@@ -18,10 +18,10 @@ var ACTION_DISPATCHER = Symbol("action dispatcher storage");
 var ACTION_HANDLER = Symbol("action creator handler");
 var ACTION_KEY = Symbol("holds the actions uid symbol for listening");
 var ACTION_UID = Symbol("the actions uid name");
-var BOOTSTRAP_FLAG = PrivateSymbol("have you bootstrapped yet?");
+var BOOTSTRAP_FLAG = VariableSymbol("have you bootstrapped yet?");
 var EE = Symbol("event emitter instance");
 var LISTENERS = Symbol("stores action listeners storage");
-var STATE_CONTAINER = Symbol("" + now + " the state container");
+var STATE_CONTAINER = VariableSymbol("the state container");
 var STORE_BOOTSTRAP = Symbol("event handler onBootstrap");
 var STORE_SNAPSHOT = Symbol("event handler onTakeSnapshot");
 var STORES_STORE = Symbol("stores storage");
