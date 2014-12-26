@@ -108,14 +108,8 @@ var ActionCreator = (function () {
   return ActionCreator;
 })();
 
-var StoreMixin = (function () {
-  var StoreMixin = function StoreMixin(key, dispatcher) {
-    this[LISTENERS] = {};
-    this._storeName = key;
-    this.dispatcher = dispatcher;
-  };
-
-  StoreMixin.prototype.bindAction = function (symbol, handler) {
+var StoreMixin = {
+  bindAction: function (symbol, handler) {
     if (!symbol) {
       throw new ReferenceError("Invalid action reference passed in");
     }
@@ -133,9 +127,9 @@ var StoreMixin = (function () {
     } else {
       this[LISTENERS][symbol] = handler.bind(this);
     }
-  };
+  },
 
-  StoreMixin.prototype.bindActions = function (actions) {
+  bindActions: function (actions) {
     var _this2 = this;
     Object.keys(actions).forEach(function (action) {
       var symbol = actions[action];
@@ -162,18 +156,16 @@ var StoreMixin = (function () {
         _this2.bindAction(symbol, handler);
       }
     });
-  };
+  },
 
-  StoreMixin.prototype.waitFor = function (tokens) {
+  waitFor: function (tokens) {
     if (!tokens) {
       throw new ReferenceError("Dispatch tokens not provided");
     }
     tokens = Array.isArray(tokens) ? tokens : [tokens];
     this.dispatcher.waitFor(tokens);
-  };
-
-  return StoreMixin;
-})();
+  }
+};
 
 var Alt = (function () {
   var Alt = function Alt() {
@@ -191,7 +183,12 @@ var Alt = (function () {
       StoreModel.call(this);
     }
     Store.prototype = StoreModel.prototype;
-    Object.assign(Store.prototype, new StoreMixin(key, this.dispatcher), getInternalMethods(StoreMixin.prototype, builtInProto));
+    Store.prototype[LISTENERS] = {};
+    Object.assign(Store.prototype, StoreMixin, {
+      dispatcher: this.dispatcher,
+      _storeName: key
+    });
+
     var store = new Store();
 
     return this[STORES_STORE][key] = Object.assign(new AltStore(this.dispatcher, store), getInternalMethods(StoreModel, builtIns));

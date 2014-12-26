@@ -97,13 +97,7 @@ class ActionCreator {
   }
 }
 
-class StoreMixin {
-  constructor(key, dispatcher) {
-    this[LISTENERS] = {}
-    this._storeName = key
-    this.dispatcher = dispatcher
-  }
-
+var StoreMixin = {
   bindAction(symbol, handler) {
     if (!symbol) {
       throw new ReferenceError('Invalid action reference passed in')
@@ -127,7 +121,7 @@ class StoreMixin {
     } else {
       this[LISTENERS][symbol] = handler.bind(this)
     }
-  }
+  },
 
   bindActions(actions) {
     Object.keys(actions).forEach((action) => {
@@ -157,7 +151,7 @@ class StoreMixin {
         this.bindAction(symbol, handler)
       }
     })
-  }
+  },
 
   waitFor(tokens) {
     if (!tokens) {
@@ -182,11 +176,12 @@ class Alt {
     // so we can inherit any extensions from the provided store.
     function Store() { StoreModel.call(this) }
     Store.prototype = StoreModel.prototype
-    Object.assign(
-      Store.prototype,
-      new StoreMixin(key, this.dispatcher),
-      getInternalMethods(StoreMixin.prototype, builtInProto)
-    )
+    Store.prototype[LISTENERS] = {}
+    Object.assign(Store.prototype, StoreMixin, {
+      dispatcher: this.dispatcher,
+      _storeName: key
+    })
+
     var store = new Store()
 
     return this[STORES_STORE][key] = Object.assign(
