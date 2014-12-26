@@ -2,18 +2,6 @@
 "use strict";
 
 var _slice = Array.prototype.slice;
-var _extends = function (child, parent) {
-  child.prototype = Object.create(parent.prototype, {
-    constructor: {
-      value: child,
-      enumerable: false,
-      writable: true,
-      configurable: true
-    }
-  });
-  child.__proto__ = parent;
-};
-
 "use strict";
 
 var Dispatcher = _dereq_("flux").Dispatcher;
@@ -182,16 +170,10 @@ var Alt = (function () {
     // Creating a class here so we don't overload the provided store's
     // prototype with the mixin behaviour and I'm extending from StoreModel
     // so we can inherit any extensions from the provided store.
-    var Store = (function (StoreModel) {
-      var Store = function Store() {
-        StoreModel.call(this);
-      };
-
-      _extends(Store, StoreModel);
-
-      return Store;
-    })(StoreModel);
-
+    function Store() {
+      StoreModel.call(this);
+    }
+    Store.prototype = StoreModel.prototype;
     Object.assign(Store.prototype, new StoreMixin(key, this.dispatcher), StoreMixin.prototype);
     var store = new Store();
 

@@ -163,9 +163,8 @@ class Alt {
     // Creating a class here so we don't overload the provided store's
     // prototype with the mixin behaviour and I'm extending from StoreModel
     // so we can inherit any extensions from the provided store.
-    class Store extends StoreModel {
-      constructor() { StoreModel.call(this) }
-    }
+    function Store() { StoreModel.call(this) }
+    Store.prototype = StoreModel.prototype
     Object.assign(
       Store.prototype,
       new StoreMixin(key, this.dispatcher),
