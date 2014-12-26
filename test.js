@@ -120,7 +120,7 @@ class LifeCycleStore {
 var lifecycleStore = alt.createStore(LifeCycleStore)
 
 /* istanbul ignore next */
-!() => {
+!function () {
   assert.equal(typeof alt.bootstrap, 'function', 'bootstrap function exists')
   assert.equal(typeof alt.dispatcher, 'object', 'dispatcher exists')
   assert.equal(typeof alt.dispatcher.register, 'function', 'dispatcher function exists for listening to all events')
@@ -129,8 +129,8 @@ var lifecycleStore = alt.createStore(LifeCycleStore)
   assert.equal(typeof alt.createStore, 'function', 'createStore function')
 
   var storePrototype = Object.getPrototypeOf(myStore)
-  var assertMethods = ['emitChange', 'listen', 'unlisten', 'getState']
-  assert.deepEqual(Object.keys(storePrototype), assertMethods, 'methods exist for store')
+  var assertMethods = ['constructor', 'emitChange', 'listen', 'unlisten', 'getState']
+  assert.deepEqual(Object.getOwnPropertyNames(storePrototype), assertMethods, 'methods exist for store')
   assert.equal(typeof myStore.addListener, 'undefined', 'event emitter methods not present')
   assert.equal(typeof myStore.removeListener, 'undefined', 'event emitter methods not present')
   assert.equal(typeof myStore.emit, 'undefined', 'event emitter methods not present')
