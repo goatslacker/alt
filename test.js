@@ -337,7 +337,7 @@ var lifecycleStore = alt.createStore(LifeCycleStore)
   }
 
   try {
-    class MethodsAreUnary {
+    class MethodsAreUnary1 {
       constructor() {
         this.bindActions(myActions)
       }
@@ -345,9 +345,24 @@ var lifecycleStore = alt.createStore(LifeCycleStore)
       onUpdateName(name1, name2) { }
     }
 
-    alt.createStore(MethodsAreUnary)
-    assert.equal(true, false, 'i bound a method with two args successfully')
+    alt.createStore(MethodsAreUnary1)
+    assert.equal(true, false, 'i bound a method with two args successfully using bindActions')
   } catch (e) {
-    assert.equal(e instanceof TypeError, true, 'A TypeError was thrown, you cant bind two args')
+    assert.equal(e instanceof TypeError, true, 'A TypeError was thrown, you cant bind two args with bindActions')
+  }
+
+  try {
+    class MethodsAreUnary2 {
+      constructor() {
+        this.bindAction(myActions.UPDATE_TWO, this.onUpdateName)
+      }
+
+      onUpdateName(name1, name2) { }
+    }
+
+    alt.createStore(MethodsAreUnary2)
+    assert.equal(true, false, 'i bound a method with two args successfully using bindAction')
+  } catch (e) {
+    assert.equal(e instanceof TypeError, true, 'A TypeError was thrown, you cant bind two args with bindAction')
   }
 }()
