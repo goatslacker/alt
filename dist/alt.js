@@ -107,7 +107,7 @@ var StoreMixin = (function () {
     }
 
     if (handler.length > 1) {
-      throw new TypeError("Action handler in store " + this._storeName + " for " + (symbol[ACTION_KEY] || symbol) + " was defined with 2 parameters. " + " Only a single parameter is passed" + " through the dispatcher, did you mean to pass in an Object instead?");
+      throw new TypeError("Action handler in store " + this._storeName + " for " + ("" + (symbol[ACTION_KEY] || symbol) + " was defined with 2 parameters. ") + "Only a single parameter is passed through the dispatcher, did you " + "mean to pass in an Object instead?");
     }
 
     // You can pass in the constant or the function itself
@@ -130,7 +130,7 @@ var StoreMixin = (function () {
 
       // If you have both action and onAction
       if (_this2[action] && _this2[assumedEventHandler]) {
-        throw new ReferenceError("You have multiple action handlers bound to an action: " + action + " and " + assumedEventHandler)
+        throw new ReferenceError("You have multiple action handlers bound to an action: " + ("" + action + " and " + assumedEventHandler))
         // action
         ;
       } else if (_this2[action]) {

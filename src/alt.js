@@ -97,10 +97,10 @@ class StoreMixin {
 
     if (handler.length > 1) {
       throw new TypeError(
-        'Action handler in store ' + this._storeName + ' for ' +
-        (symbol[ACTION_KEY] || symbol) + ' was defined with 2 parameters. ' +
-        ' Only a single parameter is passed' +
-        ' through the dispatcher, did you mean to pass in an Object instead?'
+        `Action handler in store ${this._storeName} for ` +
+        `${(symbol[ACTION_KEY] || symbol)} was defined with 2 parameters. ` +
+        `Only a single parameter is passed through the dispatcher, did you ` +
+        `mean to pass in an Object instead?`
       )
     }
 
@@ -125,8 +125,8 @@ class StoreMixin {
       // If you have both action and onAction
       if (this[action] && this[assumedEventHandler]) {
         throw new ReferenceError(
-          'You have multiple action handlers bound to an action: ' +
-          action + ' and ' + assumedEventHandler
+          `You have multiple action handlers bound to an action: ` +
+          `${action} and ${assumedEventHandler}`
         )
       // action
       } else if (this[action]) {
