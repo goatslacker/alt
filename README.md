@@ -41,7 +41,7 @@ Alt is a terse implementation of Flux that encourages unadulterated flux and all
 means one can only dispatch one action per cycle to ensure a predictable and simple data flow (rather than cascading actions).
 The `waitFor` method is also available to help you marshall callback order.
 
-* Extends from an event emitter, in our case [EventEmitter3](https://github.com/primus/EventEmitter3), so
+* Store uses an event emitter, in our case [EventEmitter3](https://github.com/primus/EventEmitter3), so
 one can set up the view to listen to changes on the store.
 
 * Singleton stores making your store logic simple to follow and easy to test.
