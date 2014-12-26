@@ -5,7 +5,7 @@ var alt = new Alt()
 
 class MyActions {
   constructor() {
-    this.generateActions('callInternalMethod', 'shortHandBinary')
+    this.generateActions('callInternalMethod', 'shortHandBinary', 'dontEmit')
     this.generateActions('anotherAction')
   }
 
@@ -35,8 +35,10 @@ class MyStore {
   constructor() {
     this.bindAction(myActions.updateName, this.onUpdateName)
     this.bindAction(myActions.CALL_INTERNAL_METHOD, this.doCallInternal)
+    this.bindAction(myActions.dontEmit, this.dontEmitEvent)
     this.name = 'first'
     this.calledInternal = false
+    this.dontEmitEventCalled = false
   }
 
   onUpdateName(name) {
@@ -49,6 +51,11 @@ class MyStore {
 
   internalOnly() {
     this.calledInternal = true
+  }
+
+  dontEmitEvent() {
+    this.dontEmitEventCalled = true
+    return false
   }
 
   static externalMethod() {
@@ -365,4 +372,12 @@ var lifecycleStore = alt.createStore(LifeCycleStore)
   } catch (e) {
     assert.equal(e instanceof TypeError, true, 'A TypeError was thrown, you cant bind two args with bindAction')
   }
+
+  function eventEmittedFail() {
+    assert.equal(true, false, 'event was emitted but I did not want it to be')
+  }
+  myStore.listen(eventEmittedFail)
+  myActions.dontEmit()
+  myStore.unlisten(eventEmittedFail)
+  assert.equal(myStore.getState().dontEmitEventCalled, true, 'dont emit event was called successfully and event was not emitted')
 }()
