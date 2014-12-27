@@ -401,4 +401,24 @@ var lifecycleStore = alt.createStore(LifeCycleStore)
   myActions.dontEmit()
   myStore.unlisten(eventEmittedFail)
   assert.equal(myStore.getState().dontEmitEventCalled, true, 'dont emit event was called successfully and event was not emitted')
+
+  try {
+    var MyStore = (function () {
+      return function MyStore() { }
+    }())
+    alt.createStore(MyStore)
+    assert.equal(true, false, 'I was able to create a store with the same name')
+  } catch (e) {
+    assert.equal(e instanceof ReferenceError, true, 'error was thrown for store with same name')
+  }
+
+  try {
+    var mystore = (function () {
+      return function mystore() { }
+    }())
+    alt.createStore(mystore, 'MyStore')
+    assert.equal(true, false, 'I was able to create a store with the same name by passing in an identifier')
+  } catch (e) {
+    assert.equal(e instanceof ReferenceError, true, 'error was thrown for store with same name')
+  }
 }()

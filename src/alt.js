@@ -185,6 +185,13 @@ class Alt {
 
     var store = new Store()
 
+    if (this[STORES_STORE][key]) {
+      throw new ReferenceError(
+`A store named ${key} already exists, double check your store names or pass in
+your own custom identifier for each store`
+      )
+    }
+
     return this[STORES_STORE][key] = Object.assign(
       new AltStore(this.dispatcher, store),
       getInternalMethods(StoreModel, builtIns)
