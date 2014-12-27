@@ -44,6 +44,8 @@ class MyStore {
     this.name = 'first'
     this.calledInternal = false
     this.dontEmitEventCalled = false
+
+    this._dispatcher = this.dispatcher
   }
 
   onUpdateName(name) {
@@ -151,6 +153,8 @@ var lifecycleStore = alt.createStore(LifeCycleStore)
   assert.equal(typeof secondStore.externalMethod, 'function', 'static methods are made available')
   assert.equal(secondStore.externalMethod(), 'bar', 'static methods have `this` bound to the instance')
   assert.equal(secondStore.concatFooWith('baz'), 'barbaz', 'static methods may be called with params too')
+
+  assert.equal(typeof myStore.getState()._dispatcher, 'object', 'the dispatcher is exposed internally')
 
   assert.equal(lifecycleStore.getState().bootstrapped, false, 'bootstrap has not been called yet')
   assert.equal(lifecycleStore.getState().snapshotted, false, 'takeSnapshot has not been called yet')
