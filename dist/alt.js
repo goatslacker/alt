@@ -200,6 +200,7 @@ var Alt = (function () {
 
   Alt.prototype.createActions = function (ActionsClass) {
     var _this4 = this;
+    var key = ActionsClass.displayName || ActionsClass.name;
     var actions = Object.assign({}, getInternalMethods(ActionsClass.prototype, builtInProto));
 
     ActionsClass.call({
@@ -218,7 +219,6 @@ var Alt = (function () {
     });
 
     return Object.keys(actions).reduce(function (obj, action) {
-      var key = ActionsClass.displayName || ActionsClass.name;
       var constant = formatAsConstant(action);
       var actionName = Symbol("action " + key + ".prototype." + action);
 

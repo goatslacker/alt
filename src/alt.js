@@ -192,6 +192,7 @@ class Alt {
   }
 
   createActions(ActionsClass) {
+    var key = ActionsClass.displayName || ActionsClass.name
     var actions = Object.assign(
       {},
       getInternalMethods(ActionsClass.prototype, builtInProto)
@@ -209,7 +210,6 @@ class Alt {
     })
 
     return Object.keys(actions).reduce((obj, action) => {
-      var key = ActionsClass.displayName || ActionsClass.name
       var constant = formatAsConstant(action)
       var actionName = Symbol(`action ${key}.prototype.${action}`)
 
