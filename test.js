@@ -111,7 +111,7 @@ class SecondStore {
   }
 }
 
-var secondStore = alt.createStore(SecondStore)
+var secondStore = alt.createStore(SecondStore, 'AltSecondStore')
 
 class LifeCycleStore {
   constructor() {
@@ -201,6 +201,7 @@ var lifecycleStore = alt.createStore(LifeCycleStore)
   var snapshot = alt.takeSnapshot()
   assert.equal(typeof snapshot, 'string', 'a snapshot json is returned')
   assert.equal(JSON.parse(snapshot).MyStore.name, 'bear', 'the state is current')
+  assert.equal(typeof JSON.parse(snapshot).AltSecondStore, 'object', 'the custom identifier name works')
 
   myActions.updateName('blossom')
   assert.equal(myStore.getState().name, 'blossom', 'action was called, state was updated properly')

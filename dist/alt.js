@@ -174,9 +174,9 @@ var Alt = (function () {
     this[BOOTSTRAP_FLAG] = false;
   };
 
-  Alt.prototype.createStore = function (StoreModel) {
+  Alt.prototype.createStore = function (StoreModel, iden) {
     var _this3 = this;
-    var key = StoreModel.displayName || StoreModel.name;
+    var key = iden || StoreModel.displayName || StoreModel.name;
     // Creating a class here so we don't overload the provided store's
     // prototype with the mixin behaviour and I'm extending from StoreModel
     // so we can inherit any extensions from the provided store.

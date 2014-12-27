@@ -169,8 +169,8 @@ class Alt {
     this[BOOTSTRAP_FLAG] = false
   }
 
-  createStore(StoreModel) {
-    var key = StoreModel.displayName || StoreModel.name
+  createStore(StoreModel, iden) {
+    var key = iden || StoreModel.displayName || StoreModel.name
     // Creating a class here so we don't overload the provided store's
     // prototype with the mixin behaviour and I'm extending from StoreModel
     // so we can inherit any extensions from the provided store.
