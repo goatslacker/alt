@@ -178,8 +178,9 @@ class Alt {
     Store.prototype = StoreModel.prototype
     Store.prototype[LISTENERS] = {}
     Object.assign(Store.prototype, StoreMixin, {
+      _storeName: key,
       dispatcher: this.dispatcher,
-      _storeName: key
+      getInstance: () => this[STORES_STORE][key]
     })
 
     var store = new Store()

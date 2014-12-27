@@ -5,7 +5,12 @@ var alt = new Alt()
 
 class MyActions {
   constructor() {
-    this.generateActions('callInternalMethod', 'shortHandBinary', 'dontEmit')
+    this.generateActions(
+      'callInternalMethod',
+      'shortHandBinary',
+      'getInstanceInside',
+      'dontEmit'
+    )
     this.generateActions('anotherAction')
   }
 
@@ -69,6 +74,8 @@ class SecondStore {
   constructor() {
     this.foo = 'bar'
     this.name = myStore.getState().name
+    this.instance = null
+
     this.bindActions(myActions)
   }
 
@@ -89,6 +96,10 @@ class SecondStore {
   onUpdateName() {
     this.waitFor(myStore.dispatchToken)
     this.name = myStore.getState().name
+  }
+
+  onGetInstanceInside() {
+    this.instance = this.getInstance()
   }
 
   static externalMethod() {
@@ -251,6 +262,14 @@ var lifecycleStore = alt.createStore(LifeCycleStore)
   setTimeout(() => {
     assert.equal(myStore.getState().name, 'marmot', 'store state was updated with defer')
   })
+
+  assert.equal(typeof myActions.getInstanceInside, 'function', 'action for getting the instance inside')
+  assert.equal(secondStore.getState().instance, null, 'instance is null because it has not been set')
+  myActions.getInstanceInside()
+  assert.equal(typeof secondStore.getState().instance, 'object', 'instance has been now set')
+  assert.equal(typeof secondStore.getState().instance.getState, 'function', 'instance is a pointer to secondStore')
+  assert.equal(typeof secondStore.getState().instance.externalMethod, 'function', 'instance has the static methods available')
+  assert.deepEqual(secondStore.getState().instance.externalMethod(), [1, 0], 'calling a static method from instance and able to use this inside')
 
   try {
     alt.createStore(class StoreWithManyListeners {

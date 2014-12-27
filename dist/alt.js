@@ -175,6 +175,7 @@ var Alt = (function () {
   };
 
   Alt.prototype.createStore = function (StoreModel) {
+    var _this3 = this;
     var key = StoreModel.displayName || StoreModel.name;
     // Creating a class here so we don't overload the provided store's
     // prototype with the mixin behaviour and I'm extending from StoreModel
@@ -185,8 +186,11 @@ var Alt = (function () {
     Store.prototype = StoreModel.prototype;
     Store.prototype[LISTENERS] = {};
     Object.assign(Store.prototype, StoreMixin, {
+      _storeName: key,
       dispatcher: this.dispatcher,
-      _storeName: key
+      getInstance: function () {
+        return _this3[STORES_STORE][key];
+      }
     });
 
     var store = new Store();
@@ -195,7 +199,7 @@ var Alt = (function () {
   };
 
   Alt.prototype.createActions = function (ActionsClass) {
-    var _this3 = this;
+    var _this4 = this;
     var actions = Object.assign({}, getInternalMethods(ActionsClass.prototype, builtInProto));
 
     ActionsClass.call({
@@ -219,7 +223,7 @@ var Alt = (function () {
       var actionName = Symbol("action " + key + ".prototype." + action);
 
       // Wrap the action so we can provide a dispatch method
-      var newAction = new ActionCreator(_this3.dispatcher, actionName, actions[action], obj);
+      var newAction = new ActionCreator(_this4.dispatcher, actionName, actions[action], obj);
 
       // Set all the properties on action
       obj[action] = newAction[ACTION_HANDLER];
@@ -236,12 +240,12 @@ var Alt = (function () {
   };
 
   Alt.prototype.takeSnapshot = function () {
-    var _this4 = this;
+    var _this5 = this;
     var state = JSON.stringify(Object.keys(this[STORES_STORE]).reduce(function (obj, key) {
-      if (_this4[STORES_STORE][key][STORE_SNAPSHOT]) {
-        _this4[STORES_STORE][key][STORE_SNAPSHOT]();
+      if (_this5[STORES_STORE][key][STORE_SNAPSHOT]) {
+        _this5[STORES_STORE][key][STORE_SNAPSHOT]();
       }
-      obj[key] = _this4[STORES_STORE][key].getState();
+      obj[key] = _this5[STORES_STORE][key].getState();
       return obj;
     }, {}));
     this._lastSnapshot = state;
@@ -254,15 +258,15 @@ var Alt = (function () {
   };
 
   Alt.prototype.bootstrap = function (data) {
-    var _this5 = this;
+    var _this6 = this;
     if (this[BOOTSTRAP_FLAG]) {
       throw new ReferenceError("Stores have already been bootstrapped");
     }
     var obj = JSON.parse(data);
     Object.keys(obj).forEach(function (key) {
-      Object.assign(_this5[STORES_STORE][key][STATE_CONTAINER], obj[key]);
-      if (_this5[STORES_STORE][key][STORE_BOOTSTRAP]) {
-        _this5[STORES_STORE][key][STORE_BOOTSTRAP]();
+      Object.assign(_this6[STORES_STORE][key][STATE_CONTAINER], obj[key]);
+      if (_this6[STORES_STORE][key][STORE_BOOTSTRAP]) {
+        _this6[STORES_STORE][key][STORE_BOOTSTRAP]();
       }
     });
     this[BOOTSTRAP_FLAG] = true;
