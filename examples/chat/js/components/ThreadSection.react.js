@@ -33,13 +33,13 @@ var ThreadSection = React.createClass({
   },
 
   componentDidMount: function() {
-    ThreadStore.addChangeListener(this._onChange);
-    UnreadThreadStore.addChangeListener(this._onChange);
+    ThreadStore.listen(this._onChange);
+    UnreadThreadStore.listen(this._onChange);
   },
 
   componentWillUnmount: function() {
-    ThreadStore.removeChangeListener(this._onChange);
-    UnreadThreadStore.removeChangeListener(this._onChange);
+    ThreadStore.unlisten(this._onChange);
+    UnreadThreadStore.unlisten(this._onChange);
   },
 
   render: function() {

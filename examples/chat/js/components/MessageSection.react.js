@@ -42,13 +42,13 @@ var MessageSection = React.createClass({
 
   componentDidMount: function() {
     this._scrollToBottom();
-    MessageStore.addChangeListener(this._onChange);
-    ThreadStore.addChangeListener(this._onChange);
+    MessageStore.listen(this._onChange);
+    ThreadStore.listen(this._onChange);
   },
 
   componentWillUnmount: function() {
-    MessageStore.removeChangeListener(this._onChange);
-    ThreadStore.removeChangeListener(this._onChange);
+    MessageStore.unlisten(this._onChange);
+    ThreadStore.unlisten(this._onChange);
   },
 
   render: function() {
