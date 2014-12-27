@@ -1,78 +1,42 @@
-/**
- * This file is provided by Facebook for testing and evaluation purposes
- * only. Facebook reserves all rights not expressly granted.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * FACEBOOK BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
- * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
+var alt = require('../alt')
 
-var ChatAppDispatcher = require('../dispatcher/ChatAppDispatcher');
-var ChatConstants = require('../constants/ChatConstants');
-var EventEmitter = require('events').EventEmitter;
-var MessageStore = require('../stores/MessageStore');
-var ThreadStore = require('../stores/ThreadStore');
-var merge = require('react/lib/merge');
+var ChatThreadActionCreators = require('../actions/ChatThreadActionCreators')
+var ChatServerActionCreators = require('../actions/ChatServerActionCreators')
 
-var ActionTypes = ChatConstants.ActionTypes;
-var CHANGE_EVENT = 'change';
+var MessageStore = require('../stores/MessageStore')
+var ThreadStore = require('../stores/ThreadStore')
 
-var UnreadThreadStore = merge(EventEmitter.prototype, {
+class UnreadThreadStore {
+  constructor() {
+    this.bindActions(ChatThreadActionCreators)
+    this.bindActions(ChatServerActionCreators)
+  }
 
-  emitChange: function() {
-    this.emit(CHANGE_EVENT);
-  },
+  onClickThread(threadID) {
+    this.wait()
+  }
 
-  /**
-   * @param {function} callback
-   */
-  addChangeListener: function(callback) {
-    this.on(CHANGE_EVENT, callback);
-  },
+  onReceiveRawMessages(rawMessages) {
+    this.wait()
+  }
 
-  /**
-   * @param {function} callback
-   */
-  removeChangeListener: function(callback) {
-    this.removeListener(CHANGE_EVENT, callback);
-  },
+  wait() {
+    this.waitFor([
+      ThreadStore.dispatchToken,
+      MessageStore.dispatchToken
+    ])
+  }
 
-  getCount: function() {
-    var threads = ThreadStore.getAll();
-    var unreadCount = 0;
+  static getCount() {
+    var threads = ThreadStore.getAll()
+    var unreadCount = 0
     for (var id in threads) {
       if (!threads[id].lastMessage.isRead) {
-        unreadCount++;
+        unreadCount++
       }
     }
-    return unreadCount;
+    return unreadCount
   }
+}
 
-});
-
-UnreadThreadStore.dispatchToken = ChatAppDispatcher.register(function(payload) {
-  ChatAppDispatcher.waitFor([
-    ThreadStore.dispatchToken,
-    MessageStore.dispatchToken
-  ]);
-
-  var action = payload.action;
-  switch (action.type) {
-
-    case ActionTypes.CLICK_THREAD:
-      UnreadThreadStore.emitChange();
-      break;
-
-    case ActionTypes.RECEIVE_RAW_MESSAGES:
-      UnreadThreadStore.emitChange();
-      break;
-
-    default:
-      // do nothing
-  }
-});
-
-module.exports = UnreadThreadStore;
+module.exports = alt.createStore(UnreadThreadStore, 'UnreadThreadStore')
