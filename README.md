@@ -552,6 +552,12 @@ all the actions are being called, with alt you get the same benefit without havi
 #### Before: Flux
 
 ```js
+var keyMirror = require('keymirror')
+
+var actionConstants = keyMirror({
+  HANDLE_ACTION: null
+})
+
 var action = {
   foo() {
     AppDispatcher.handleAction({ type: actionConstants.HANDLE_ACTION, data: 'foo' })
