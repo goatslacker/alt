@@ -535,6 +535,16 @@ and listening to all events is as easy as
 alt.dispatcher.register(console.log)
 ```
 
+Each store has a reference to the dispatcher as well
+
+```js
+alt.createStore(class MyStore {
+  constructor() {
+    this.dispatcher.register(console.log)
+  }
+})
+```
+
 ## Examples
 
 * [todomvc](https://github.com/goatslacker/alt/blob/master/examples/todomvc)
