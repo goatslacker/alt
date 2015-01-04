@@ -209,7 +209,7 @@ locationActions.updateLocation('South Lake Tahoe', 'California')
 
 Stores are where you keep a part of your application's state. It's a singleton, holds your data, and is immutable.
 
-`alt.createStore :: Class -> Store`
+`alt.createStore :: Class, String -> Store`
 
 ```js
 class LocationStore {
@@ -504,6 +504,12 @@ you've saved and reloads all the state with that snapshot, no events will be emi
 on init before the view has even rendered.
 
 Bootstrap is great if you're running an isomorphic app, or if you're persisting state to localstorage and then retrieving it on init later on. You can save a snapshot on the server side, send it down, and then bootstrap it back on the client.
+
+If you're bootstrapping then it is recommended you pass in a unique Identifier, name of the class is good enough, to createStore so that it can be referenced later for bootstrapping.
+
+```js
+alt.createStore(LocationStore, 'LocationStore')
+```
 
 ### Rollback
 
