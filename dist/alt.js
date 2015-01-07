@@ -18,7 +18,6 @@ var ACTION_DISPATCHER = Symbol("action dispatcher storage");
 var ACTION_HANDLER = Symbol("action creator handler");
 var ACTION_KEY = Symbol("holds the actions uid symbol for listening");
 var ACTION_UID = Symbol("the actions uid name");
-var BOOTSTRAP_FLAG = VariableSymbol("have you bootstrapped yet?");
 var EE = Symbol("event emitter instance");
 var LISTENERS = Symbol("stores action listeners storage");
 var STATE_CONTAINER = VariableSymbol("the state container");
@@ -167,11 +166,30 @@ var StoreMixin = {
   }
 };
 
+var bootstrap = function (instance, data) {
+  var obj = JSON.parse(data);
+  Object.keys(obj).forEach(function (key) {
+    Object.assign(instance[STORES_STORE][key][STATE_CONTAINER], obj[key]);
+    if (instance[STORES_STORE][key][STORE_BOOTSTRAP]) {
+      instance[STORES_STORE][key][STORE_BOOTSTRAP]();
+    }
+  });
+};
+
+var snapshot = function (instance) {
+  return JSON.stringify(Object.keys(instance[STORES_STORE]).reduce(function (obj, key) {
+    if (instance[STORES_STORE][key][STORE_SNAPSHOT]) {
+      instance[STORES_STORE][key][STORE_SNAPSHOT]();
+    }
+    obj[key] = instance[STORES_STORE][key].getState();
+    return obj;
+  }, {}));
+};
+
 var Alt = (function () {
   var Alt = function Alt() {
     this.dispatcher = new Dispatcher();
     this[STORES_STORE] = {};
-    this[BOOTSTRAP_FLAG] = false;
   };
 
   Alt.prototype.createStore = function (StoreModel, iden) {
@@ -244,36 +262,30 @@ var Alt = (function () {
   };
 
   Alt.prototype.takeSnapshot = function () {
-    var _this5 = this;
-    var state = JSON.stringify(Object.keys(this[STORES_STORE]).reduce(function (obj, key) {
-      if (_this5[STORES_STORE][key][STORE_SNAPSHOT]) {
-        _this5[STORES_STORE][key][STORE_SNAPSHOT]();
-      }
-      obj[key] = _this5[STORES_STORE][key].getState();
-      return obj;
-    }, {}));
+    var state = snapshot(this);
     this._lastSnapshot = state;
     return state;
   };
 
   Alt.prototype.rollback = function () {
-    this[BOOTSTRAP_FLAG] = false;
-    this.bootstrap(this._lastSnapshot);
+    bootstrap(this, this._lastSnapshot);
   };
 
   Alt.prototype.bootstrap = function (data) {
-    var _this6 = this;
-    if (this[BOOTSTRAP_FLAG]) {
-      throw new ReferenceError("Stores have already been bootstrapped");
+    var _this5 = this;
+    var state = snapshot(this);
+
+    if (typeof window === "undefined") {
+      bootstrap(this, data);
+      setTimeout(function () {
+        return bootstrap(_this5, state);
+      });
+    } else {
+      bootstrap(this, data);
+      this.bootstrap = function () {
+        throw new ReferenceError("Stores have already been bootstrapped");
+      };
     }
-    var obj = JSON.parse(data);
-    Object.keys(obj).forEach(function (key) {
-      Object.assign(_this6[STORES_STORE][key][STATE_CONTAINER], obj[key]);
-      if (_this6[STORES_STORE][key][STORE_BOOTSTRAP]) {
-        _this6[STORES_STORE][key][STORE_BOOTSTRAP]();
-      }
-    });
-    this[BOOTSTRAP_FLAG] = true;
   };
 
   return Alt;

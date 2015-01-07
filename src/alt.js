@@ -12,7 +12,6 @@ var ACTION_DISPATCHER = Symbol('action dispatcher storage')
 var ACTION_HANDLER = Symbol('action creator handler')
 var ACTION_KEY = Symbol('holds the actions uid symbol for listening')
 var ACTION_UID = Symbol('the actions uid name')
-var BOOTSTRAP_FLAG = VariableSymbol('have you bootstrapped yet?')
 var EE = Symbol('event emitter instance')
 var LISTENERS = Symbol('stores action listeners storage')
 var STATE_CONTAINER = VariableSymbol('the state container')
@@ -162,11 +161,32 @@ var StoreMixin = {
   }
 }
 
+var bootstrap = (instance, data) => {
+  var obj = JSON.parse(data)
+  Object.keys(obj).forEach((key) => {
+    Object.assign(instance[STORES_STORE][key][STATE_CONTAINER], obj[key])
+    if (instance[STORES_STORE][key][STORE_BOOTSTRAP]) {
+      instance[STORES_STORE][key][STORE_BOOTSTRAP]()
+    }
+  })
+}
+
+var snapshot = (instance) => {
+  return JSON.stringify(
+    Object.keys(instance[STORES_STORE]).reduce((obj, key) => {
+      if (instance[STORES_STORE][key][STORE_SNAPSHOT]) {
+        instance[STORES_STORE][key][STORE_SNAPSHOT]()
+      }
+      obj[key] = instance[STORES_STORE][key].getState()
+      return obj
+    }, {})
+  )
+}
+
 class Alt {
   constructor() {
     this.dispatcher = new Dispatcher()
     this[STORES_STORE] = {}
-    this[BOOTSTRAP_FLAG] = false
   }
 
   createStore(StoreModel, iden) {
@@ -239,36 +259,27 @@ your own custom identifier for each store`
   }
 
   takeSnapshot() {
-    var state = JSON.stringify(
-      Object.keys(this[STORES_STORE]).reduce((obj, key) => {
-        if (this[STORES_STORE][key][STORE_SNAPSHOT]) {
-          this[STORES_STORE][key][STORE_SNAPSHOT]()
-        }
-        obj[key] = this[STORES_STORE][key].getState()
-        return obj
-      }, {})
-    )
+    var state = snapshot(this)
     this._lastSnapshot = state
     return state
   }
 
   rollback() {
-    this[BOOTSTRAP_FLAG] = false
-    this.bootstrap(this._lastSnapshot)
+    bootstrap(this, this._lastSnapshot)
   }
 
   bootstrap(data) {
-    if (this[BOOTSTRAP_FLAG]) {
-      throw new ReferenceError('Stores have already been bootstrapped')
-    }
-    var obj = JSON.parse(data)
-    Object.keys(obj).forEach((key) => {
-      Object.assign(this[STORES_STORE][key][STATE_CONTAINER], obj[key])
-      if (this[STORES_STORE][key][STORE_BOOTSTRAP]) {
-        this[STORES_STORE][key][STORE_BOOTSTRAP]()
+    var state = snapshot(this)
+
+    if (typeof window === 'undefined') {
+      bootstrap(this, data)
+      setTimeout(() => bootstrap(this, state))
+    } else {
+      bootstrap(this, data)
+      this.bootstrap = () => {
+        throw new ReferenceError('Stores have already been bootstrapped')
       }
-    })
-    this[BOOTSTRAP_FLAG] = true
+    }
   }
 }
 

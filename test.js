@@ -235,15 +235,28 @@ var lifecycleStore = alt.createStore(LifeCycleStore)
 
   assert.equal(myStore.getState().name, 'badger', 'new store state present')
 
+  // Store on server side bootstraps and then returns to previous state
+  alt.bootstrap('{"MyStore":{"name":"elk"}}')
+  assert.equal(myStore.getState().name, 'elk', 'temporary store state')
+  setTimeout(() => {
+    assert.equal(myStore.getState().name, 'badger', 'the state is reset to last state though')
+  })
+
   try {
+    // Creating a global window object so we are in browser mode.
+    global.window = {}
+
+    // Attempting to bootstrap more than once
+    alt.bootstrap('{}')
     alt.bootstrap('{"MyStore":{"name":"elk"}}')
+
     assert.equal(true, false, 'I was able bootstrap more than once which is bad')
   } catch (e) {
     assert.equal(e instanceof ReferenceError, true, 'can only bootstrap once')
     assert.equal(e.message, 'Stores have already been bootstrapped', 'can only bootstrap once')
   }
 
-  assert.equal(myStore.getState().name, 'badger', 'store state still the same')
+//  assert.equal(myStore.getState().name, 'badger', 'store state still the same')
 
   myActions.updateTwo(4, 2)
   assert.equal(secondStore.getState().foo, 6, 'im able to pass two params into an action')
