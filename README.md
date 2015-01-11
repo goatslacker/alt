@@ -628,4 +628,4 @@ It's not actually flux, but it's still a pleasure to use. Alt brings the tersene
 
 ## License
 
-[MIT](http://josh.mit-license.org/)
+[![MIT](https://img.shields.io/npm/l/alt.svg?style=flat)](http://josh.mit-license.org)
