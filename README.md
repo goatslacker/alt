@@ -4,8 +4,9 @@
 
 [![NPM version](https://badge.fury.io/js/alt.svg)](http://badge.fury.io/js/alt)
 [![Build Status](https://secure.travis-ci.org/goatslacker/alt.svg)](http://travis-ci.org/goatslacker/alt)
-[![Coverage Status](https://img.shields.io/coveralls/goatslacker/alt.svg)](https://coveralls.io/r/goatslacker/alt)
-[![Dependency Status](https://david-dm.org/goatslacker/testla.svg)](https://david-dm.org/goatslacker/alt)
+[![Coverage Status](https://img.shields.io/coveralls/goatslacker/alt.svg?style=flat)](https://coveralls.io/r/goatslacker/alt)
+[![Dependency Status](https://david-dm.org/goatslacker/alt.svg)](https://david-dm.org/goatslacker/alt)
+[![Download Count](https://img.shields.io/npm/dm/alt.svg?style=flat)](https://www.npmjs.com/package/alt)
 
 
 If you're in a hurry [show me the code](#examples) or [tl;dr](#tldr).
