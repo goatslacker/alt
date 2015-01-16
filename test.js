@@ -9,7 +9,9 @@ class MyActions {
       'callInternalMethod',
       'shortHandBinary',
       'getInstanceInside',
-      'dontEmit'
+      'dontEmit',
+      'moreActions2',
+      'moreActions3'
     )
     this.generateActions('anotherAction')
   }
@@ -23,6 +25,12 @@ class MyActions {
       updateThree: this.actions.updateThree,
       updateName: this.actions.updateName
     }
+  }
+
+  moreActions() {
+    this.dispatch(1)
+    this.actions.moreActions2.defer(2)
+    this.actions.moreActions3.defer(3)
   }
 
   updateTwo(a, b) {
@@ -78,6 +86,8 @@ class SecondStore {
     this.name = myStore.getState().name
     this.instance = null
 
+    this.deferrals = 0
+
     this.bindActions(myActions)
   }
 
@@ -102,6 +112,18 @@ class SecondStore {
 
   onGetInstanceInside() {
     this.instance = this.getInstance()
+  }
+
+  onMoreActions(x) {
+    this.deferrals = x
+  }
+
+  onMoreActions2(x) {
+    this.deferrals = x
+  }
+
+  onMoreActions3(x) {
+    this.deferrals = x
   }
 
   static externalMethod() {
@@ -255,8 +277,6 @@ var lifecycleStore = alt.createStore(LifeCycleStore)
     assert.equal(e instanceof ReferenceError, true, 'can only bootstrap once')
     assert.equal(e.message, 'Stores have already been bootstrapped', 'can only bootstrap once')
   }
-
-//  assert.equal(myStore.getState().name, 'badger', 'store state still the same')
 
   myActions.updateTwo(4, 2)
   assert.equal(secondStore.getState().foo, 6, 'im able to pass two params into an action')
@@ -434,4 +454,10 @@ var lifecycleStore = alt.createStore(LifeCycleStore)
   } catch (e) {
     assert.equal(e instanceof ReferenceError, true, 'error was thrown for store with same name')
   }
+
+  myActions.moreActions()
+  assert.equal(secondStore.getState().deferrals, 1, 'deferrals is initially set to 1')
+  setTimeout(() => {
+    assert.equal(secondStore.getState().deferrals, 3, 'but deferrals ends up being set to 3 after all actions complete')
+  })
 }()
