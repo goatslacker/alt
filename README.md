@@ -1,5 +1,7 @@
 # alt
 
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/goatslacker/alt?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 > To alter. Altered; Changed.
 
 [![NPM version](https://badge.fury.io/js/alt.svg)](http://badge.fury.io/js/alt)
