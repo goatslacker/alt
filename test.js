@@ -170,6 +170,8 @@ var lifecycleStore = alt.createStore(LifeCycleStore)
   assert.equal(typeof myStore.removeListener, 'undefined', 'event emitter methods not present')
   assert.equal(typeof myStore.emit, 'undefined', 'event emitter methods not present')
 
+  assert.equal(typeof alt.stores.AltSecondStore, 'object', 'store exists in alt.stores')
+
   assert.equal(typeof myStore.externalMethod, 'function', 'static methods are made available')
   assert.equal(myStore.externalMethod(), true, 'static methods return proper result')
   assert.equal(typeof secondStore.externalMethod, 'function', 'static methods are made available')

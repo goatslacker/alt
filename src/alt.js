@@ -17,7 +17,6 @@ var LISTENERS = Symbol('stores action listeners storage')
 var STATE_CONTAINER = VariableSymbol('the state container')
 var STORE_BOOTSTRAP = Symbol('event handler onBootstrap')
 var STORE_SNAPSHOT = Symbol('event handler onTakeSnapshot')
-var STORES_STORE = Symbol('stores storage')
 
 var formatAsConstant = (name) => {
   return name.replace(/[a-z]([A-Z])/g, (i) => {
@@ -164,20 +163,20 @@ var StoreMixin = {
 var bootstrap = (instance, data) => {
   var obj = JSON.parse(data)
   Object.keys(obj).forEach((key) => {
-    Object.assign(instance[STORES_STORE][key][STATE_CONTAINER], obj[key])
-    if (instance[STORES_STORE][key][STORE_BOOTSTRAP]) {
-      instance[STORES_STORE][key][STORE_BOOTSTRAP]()
+    Object.assign(instance.stores[key][STATE_CONTAINER], obj[key])
+    if (instance.stores[key][STORE_BOOTSTRAP]) {
+      instance.stores[key][STORE_BOOTSTRAP]()
     }
   })
 }
 
 var snapshot = (instance) => {
   return JSON.stringify(
-    Object.keys(instance[STORES_STORE]).reduce((obj, key) => {
-      if (instance[STORES_STORE][key][STORE_SNAPSHOT]) {
-        instance[STORES_STORE][key][STORE_SNAPSHOT]()
+    Object.keys(instance.stores).reduce((obj, key) => {
+      if (instance.stores[key][STORE_SNAPSHOT]) {
+        instance.stores[key][STORE_SNAPSHOT]()
       }
-      obj[key] = instance[STORES_STORE][key].getState()
+      obj[key] = instance.stores[key].getState()
       return obj
     }, {})
   )
@@ -186,7 +185,7 @@ var snapshot = (instance) => {
 class Alt {
   constructor() {
     this.dispatcher = new Dispatcher()
-    this[STORES_STORE] = {}
+    this.stores = {}
   }
 
   createStore(StoreModel, iden) {
@@ -200,19 +199,19 @@ class Alt {
     Object.assign(Store.prototype, StoreMixin, {
       _storeName: key,
       dispatcher: this.dispatcher,
-      getInstance: () => this[STORES_STORE][key]
+      getInstance: () => this.stores[key]
     })
 
     var store = new Store()
 
-    if (this[STORES_STORE][key]) {
+    if (this.stores[key]) {
       throw new ReferenceError(
 `A store named ${key} already exists, double check your store names or pass in
 your own custom identifier for each store`
       )
     }
 
-    return this[STORES_STORE][key] = Object.assign(
+    return this.stores[key] = Object.assign(
       new AltStore(this.dispatcher, store),
       getInternalMethods(StoreModel, builtIns)
     )

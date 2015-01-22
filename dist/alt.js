@@ -23,7 +23,6 @@ var LISTENERS = Symbol("stores action listeners storage");
 var STATE_CONTAINER = VariableSymbol("the state container");
 var STORE_BOOTSTRAP = Symbol("event handler onBootstrap");
 var STORE_SNAPSHOT = Symbol("event handler onTakeSnapshot");
-var STORES_STORE = Symbol("stores storage");
 
 var formatAsConstant = function (name) {
   return name.replace(/[a-z]([A-Z])/g, function (i) {
@@ -169,19 +168,19 @@ var StoreMixin = {
 var bootstrap = function (instance, data) {
   var obj = JSON.parse(data);
   Object.keys(obj).forEach(function (key) {
-    Object.assign(instance[STORES_STORE][key][STATE_CONTAINER], obj[key]);
-    if (instance[STORES_STORE][key][STORE_BOOTSTRAP]) {
-      instance[STORES_STORE][key][STORE_BOOTSTRAP]();
+    Object.assign(instance.stores[key][STATE_CONTAINER], obj[key]);
+    if (instance.stores[key][STORE_BOOTSTRAP]) {
+      instance.stores[key][STORE_BOOTSTRAP]();
     }
   });
 };
 
 var snapshot = function (instance) {
-  return JSON.stringify(Object.keys(instance[STORES_STORE]).reduce(function (obj, key) {
-    if (instance[STORES_STORE][key][STORE_SNAPSHOT]) {
-      instance[STORES_STORE][key][STORE_SNAPSHOT]();
+  return JSON.stringify(Object.keys(instance.stores).reduce(function (obj, key) {
+    if (instance.stores[key][STORE_SNAPSHOT]) {
+      instance.stores[key][STORE_SNAPSHOT]();
     }
-    obj[key] = instance[STORES_STORE][key].getState();
+    obj[key] = instance.stores[key].getState();
     return obj;
   }, {}));
 };
@@ -189,7 +188,7 @@ var snapshot = function (instance) {
 var Alt = (function () {
   var Alt = function Alt() {
     this.dispatcher = new Dispatcher();
-    this[STORES_STORE] = {};
+    this.stores = {};
   };
 
   Alt.prototype.createStore = function (StoreModel, iden) {
@@ -207,17 +206,17 @@ var Alt = (function () {
       _storeName: key,
       dispatcher: this.dispatcher,
       getInstance: function () {
-        return _this3[STORES_STORE][key];
+        return _this3.stores[key];
       }
     });
 
     var store = new Store();
 
-    if (this[STORES_STORE][key]) {
+    if (this.stores[key]) {
       throw new ReferenceError("A store named " + key + " already exists, double check your store names or pass in\nyour own custom identifier for each store");
     }
 
-    return this[STORES_STORE][key] = Object.assign(new AltStore(this.dispatcher, store), getInternalMethods(StoreModel, builtIns));
+    return this.stores[key] = Object.assign(new AltStore(this.dispatcher, store), getInternalMethods(StoreModel, builtIns));
   };
 
   Alt.prototype.createActions = function (ActionsClass) {
