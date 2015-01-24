@@ -19,6 +19,8 @@ var ACTION_HANDLER = Symbol("action creator handler");
 var ACTION_KEY = Symbol("holds the actions uid symbol for listening");
 var ACTION_UID = Symbol("the actions uid name");
 var EE = Symbol("event emitter instance");
+var INIT_SNAPSHOT = Symbol("init snapshot storage");
+var LAST_SNAPSHOT = Symbol("last snapshot storage");
 var LISTENERS = Symbol("stores action listeners storage");
 var STATE_CONTAINER = VariableSymbol("the state container");
 var STORE_BOOTSTRAP = Symbol("event handler onBootstrap");
@@ -185,10 +187,19 @@ var snapshot = function (instance) {
   }, {}));
 };
 
+var saveInitialSnapshot = function (instance, key) {
+  var state = instance.stores[key][STATE_CONTAINER];
+  var initial = JSON.parse(instance[INIT_SNAPSHOT]);
+  initial[key] = state;
+  instance[INIT_SNAPSHOT] = JSON.stringify(initial);
+};
+
 var Alt = (function () {
   var Alt = function Alt() {
     this.dispatcher = new Dispatcher();
     this.stores = {};
+    this[LAST_SNAPSHOT] = null;
+    this[INIT_SNAPSHOT] = "{}";
   };
 
   Alt.prototype.createStore = function (StoreModel, iden) {
@@ -216,7 +227,11 @@ var Alt = (function () {
       throw new ReferenceError("A store named " + key + " already exists, double check your store names or pass in\nyour own custom identifier for each store");
     }
 
-    return this.stores[key] = Object.assign(new AltStore(this.dispatcher, store), getInternalMethods(StoreModel, builtIns));
+    this.stores[key] = Object.assign(new AltStore(this.dispatcher, store), getInternalMethods(StoreModel, builtIns));
+
+    saveInitialSnapshot(this, key);
+
+    return this.stores[key];
   };
 
   Alt.prototype.createActions = function (ActionsClass) {
@@ -262,29 +277,29 @@ var Alt = (function () {
 
   Alt.prototype.takeSnapshot = function () {
     var state = snapshot(this);
-    this._lastSnapshot = state;
+    this[LAST_SNAPSHOT] = state;
     return state;
   };
 
   Alt.prototype.rollback = function () {
-    bootstrap(this, this._lastSnapshot);
+    bootstrap(this, this[LAST_SNAPSHOT]);
+  };
+
+  Alt.prototype.recycle = function () {
+    bootstrap(this, this[INIT_SNAPSHOT]);
+  };
+
+  Alt.prototype.flush = function () {
+    var state = snapshot(this);
+    this.recycle();
+    return state;
   };
 
   Alt.prototype.bootstrap = function (data) {
-    var _this5 = this;
-    var state = snapshot(this);
-
-    if (typeof window === "undefined") {
-      bootstrap(this, data);
-      setTimeout(function () {
-        return bootstrap(_this5, state);
-      });
-    } else {
-      bootstrap(this, data);
-      this.bootstrap = function () {
-        throw new ReferenceError("Stores have already been bootstrapped");
-      };
-    }
+    bootstrap(this, data);
+    this.bootstrap = function () {
+      throw new ReferenceError("Stores have already been bootstrapped");
+    };
   };
 
   return Alt;
