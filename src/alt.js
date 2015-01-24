@@ -13,6 +13,8 @@ var ACTION_HANDLER = Symbol('action creator handler')
 var ACTION_KEY = Symbol('holds the actions uid symbol for listening')
 var ACTION_UID = Symbol('the actions uid name')
 var EE = Symbol('event emitter instance')
+var INIT_SNAPSHOT = Symbol('init snapshot storage')
+var LAST_SNAPSHOT = Symbol('last snapshot storage')
 var LISTENERS = Symbol('stores action listeners storage')
 var STATE_CONTAINER = VariableSymbol('the state container')
 var STORE_BOOTSTRAP = Symbol('event handler onBootstrap')
@@ -182,10 +184,19 @@ var snapshot = (instance) => {
   )
 }
 
+var saveInitialSnapshot = (instance, key) => {
+  var state = instance.stores[key][STATE_CONTAINER]
+  var initial = JSON.parse(instance[INIT_SNAPSHOT])
+  initial[key] = state
+  instance[INIT_SNAPSHOT] = JSON.stringify(initial)
+}
+
 class Alt {
   constructor() {
     this.dispatcher = new Dispatcher()
     this.stores = {}
+    this[LAST_SNAPSHOT] = null
+    this[INIT_SNAPSHOT] = '{}'
   }
 
   createStore(StoreModel, iden) {
@@ -211,10 +222,14 @@ your own custom identifier for each store`
       )
     }
 
-    return this.stores[key] = Object.assign(
+    this.stores[key] = Object.assign(
       new AltStore(this.dispatcher, store),
       getInternalMethods(StoreModel, builtIns)
     )
+
+    saveInitialSnapshot(this, key)
+
+    return this.stores[key]
   }
 
   createActions(ActionsClass) {
@@ -259,25 +274,28 @@ your own custom identifier for each store`
 
   takeSnapshot() {
     var state = snapshot(this)
-    this._lastSnapshot = state
+    this[LAST_SNAPSHOT] = state
     return state
   }
 
   rollback() {
-    bootstrap(this, this._lastSnapshot)
+    bootstrap(this, this[LAST_SNAPSHOT])
+  }
+
+  recycle() {
+    bootstrap(this, this[INIT_SNAPSHOT])
+  }
+
+  flush() {
+    var state = snapshot(this)
+    this.recycle()
+    return state
   }
 
   bootstrap(data) {
-    var state = snapshot(this)
-
-    if (typeof window === 'undefined') {
-      bootstrap(this, data)
-      setTimeout(() => bootstrap(this, state))
-    } else {
-      bootstrap(this, data)
-      this.bootstrap = () => {
-        throw new ReferenceError('Stores have already been bootstrapped')
-      }
+    bootstrap(this, data)
+    this.bootstrap = () => {
+      throw new ReferenceError('Stores have already been bootstrapped')
     }
   }
 }

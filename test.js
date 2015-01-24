@@ -259,20 +259,9 @@ var lifecycleStore = alt.createStore(LifeCycleStore)
 
   assert.equal(myStore.getState().name, 'badger', 'new store state present')
 
-  // Store on server side bootstraps and then returns to previous state
-  alt.bootstrap('{"MyStore":{"name":"elk"}}')
-  assert.equal(myStore.getState().name, 'elk', 'temporary store state')
-  setTimeout(() => {
-    assert.equal(myStore.getState().name, 'badger', 'the state is reset to last state though')
-  })
-
   try {
-    // Creating a global window object so we are in browser mode.
-    global.window = {}
-
     // Attempting to bootstrap more than once
-    alt.bootstrap('{}')
-    alt.bootstrap('{"MyStore":{"name":"elk"}}')
+    alt.bootstrap('{"MyStore":{"name":"bee"}}')
 
     assert.equal(true, false, 'I was able bootstrap more than once which is bad')
   } catch (e) {
@@ -462,4 +451,12 @@ var lifecycleStore = alt.createStore(LifeCycleStore)
   setTimeout(() => {
     assert.equal(secondStore.getState().deferrals, 3, 'but deferrals ends up being set to 3 after all actions complete')
   })
+
+  alt.recycle()
+  assert.equal(myStore.getState().name, 'first', 'recycle sets the state back to its origin')
+
+  myActions.updateName('goat')
+  var flushed = JSON.parse(alt.flush())
+  assert.equal(myStore.getState().name, 'first', 'flush is a lot like recycle')
+  assert.equal(flushed.MyStore.name, 'goat', 'except that flush returns the state before recycling')
 }()
