@@ -7,7 +7,7 @@ var _slice = Array.prototype.slice;
 var Dispatcher = _dereq_("flux").Dispatcher;
 var EventEmitter = _dereq_("eventemitter3");
 var Symbol = _dereq_("./polyfills/es6-symbol");
-Object.assign = Object.assign || _dereq_("object-assign");
+var assign = _dereq_("object-assign");
 
 var now = Date.now();
 var VariableSymbol = function (desc) {
@@ -84,7 +84,7 @@ var AltStore = (function () {
 
   AltStore.prototype.getState = function () {
     // Copy over state so it's RO.
-    return Object.assign({}, this[STATE_CONTAINER]);
+    return assign({}, this[STATE_CONTAINER]);
   };
 
   return AltStore;
@@ -170,7 +170,7 @@ var StoreMixin = {
 var bootstrap = function (instance, data) {
   var obj = JSON.parse(data);
   Object.keys(obj).forEach(function (key) {
-    Object.assign(instance.stores[key][STATE_CONTAINER], obj[key]);
+    assign(instance.stores[key][STATE_CONTAINER], obj[key]);
     if (instance.stores[key][STORE_BOOTSTRAP]) {
       instance.stores[key][STORE_BOOTSTRAP]();
     }
@@ -213,7 +213,7 @@ var Alt = (function () {
     }
     Store.prototype = StoreModel.prototype;
     Store.prototype[LISTENERS] = {};
-    Object.assign(Store.prototype, StoreMixin, {
+    assign(Store.prototype, StoreMixin, {
       _storeName: key,
       dispatcher: this.dispatcher,
       getInstance: function () {
@@ -227,7 +227,7 @@ var Alt = (function () {
       throw new ReferenceError("A store named " + key + " already exists, double check your store names or pass in\nyour own custom identifier for each store");
     }
 
-    this.stores[key] = Object.assign(new AltStore(this.dispatcher, store), getInternalMethods(StoreModel, builtIns));
+    this.stores[key] = assign(new AltStore(this.dispatcher, store), getInternalMethods(StoreModel, builtIns));
 
     saveInitialSnapshot(this, key);
 
@@ -237,7 +237,7 @@ var Alt = (function () {
   Alt.prototype.createActions = function (ActionsClass) {
     var _this4 = this;
     var key = ActionsClass.displayName || ActionsClass.name;
-    var actions = Object.assign({}, getInternalMethods(ActionsClass.prototype, builtInProto));
+    var actions = assign({}, getInternalMethods(ActionsClass.prototype, builtInProto));
 
     ActionsClass.call({
       generateActions: function () {
@@ -892,6 +892,10 @@ module.exports = Object.assign || function (target, source) {
 (function () {
   "use strict";
 
+  if (typeof Symbol === "function") {
+    return module.exports = Symbol;
+  }
+
   var created = Object.create(null);
   var generateName = function (desc) {
     var postfix = 0;
@@ -912,12 +916,12 @@ module.exports = Object.assign || function (target, source) {
     };
   };
 
-  var Symbol = function (description) {
-    if (this instanceof Symbol) {
+  var SymbolPolyfill = function (description) {
+    if (this instanceof SymbolPolyfill) {
       throw new TypeError("TypeError: Symbol is not a constructor");
     }
 
-    var symbol = Object.create(Symbol.prototype);
+    var symbol = Object.create(SymbolPolyfill.prototype);
 
     description = (description === undefined ? "" : String(description));
 
@@ -927,18 +931,18 @@ module.exports = Object.assign || function (target, source) {
     });
   };
 
-  Object.defineProperties(Symbol, {
-    create: def(Symbol("create")),
-    hasInstance: def(Symbol("hasInstance")),
-    isConcatSpreadable: def(Symbol("isConcatSpreadable")),
-    isRegExp: def(Symbol("isRegExp")),
-    iterator: def(Symbol("iterator")),
-    toPrimitive: def(Symbol("toPrimitive")),
-    toStringTag: def(Symbol("toStringTag")),
-    unscopables: def(Symbol("unscopables"))
+  Object.defineProperties(SymbolPolyfill, {
+    create: def(SymbolPolyfill("create")),
+    hasInstance: def(SymbolPolyfill("hasInstance")),
+    isConcatSpreadable: def(SymbolPolyfill("isConcatSpreadable")),
+    isRegExp: def(SymbolPolyfill("isRegExp")),
+    iterator: def(SymbolPolyfill("iterator")),
+    toPrimitive: def(SymbolPolyfill("toPrimitive")),
+    toStringTag: def(SymbolPolyfill("toStringTag")),
+    unscopables: def(SymbolPolyfill("unscopables"))
   });
 
-  Object.defineProperties(Symbol.prototype, {
+  Object.defineProperties(SymbolPolyfill.prototype, {
     properToString: def(function () {
       return "Symbol (" + this.__description__ + ")";
     }),
@@ -947,18 +951,18 @@ module.exports = Object.assign || function (target, source) {
     })
   });
 
-  Object.defineProperty(Symbol.prototype, Symbol.toPrimitive, def(function (hint) {
+  Object.defineProperty(SymbolPolyfill.prototype, SymbolPolyfill.toPrimitive, def(function (hint) {
     throw new TypeError("Conversion of symbol objects is not allowed");
   }));
 
-  Object.defineProperty(Symbol.prototype, Symbol.toStringTag, {
+  Object.defineProperty(SymbolPolyfill.prototype, SymbolPolyfill.toStringTag, {
     value: "Symbol",
     configurable: true,
     writable: false,
     enumerable: false
   });
 
-  module.exports = Symbol;
+  module.exports = SymbolPolyfill;
 }());
 
 },{}]},{},[1])(1)

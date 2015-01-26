@@ -2,6 +2,10 @@
 (function() {
   'use strict'
 
+  if (typeof Symbol === 'function') {
+    return module.exports = Symbol
+  }
+
   var created = Object.create(null)
   var generateName = function (desc) {
     var postfix = 0
@@ -22,12 +26,12 @@
     }
   }
 
-  var Symbol = function (description) {
-    if (this instanceof Symbol) {
+  var SymbolPolyfill = function (description) {
+    if (this instanceof SymbolPolyfill) {
       throw new TypeError('TypeError: Symbol is not a constructor')
     }
 
-    var symbol = Object.create(Symbol.prototype)
+    var symbol = Object.create(SymbolPolyfill.prototype)
 
     description = (description === undefined ? '' : String(description))
 
@@ -37,18 +41,18 @@
     })
   }
 
-  Object.defineProperties(Symbol, {
-    create: def(Symbol('create')),
-    hasInstance: def(Symbol('hasInstance')),
-    isConcatSpreadable: def(Symbol('isConcatSpreadable')),
-    isRegExp: def(Symbol('isRegExp')),
-    iterator: def(Symbol('iterator')),
-    toPrimitive: def(Symbol('toPrimitive')),
-    toStringTag: def(Symbol('toStringTag')),
-    unscopables: def(Symbol('unscopables'))
+  Object.defineProperties(SymbolPolyfill, {
+    create: def(SymbolPolyfill('create')),
+    hasInstance: def(SymbolPolyfill('hasInstance')),
+    isConcatSpreadable: def(SymbolPolyfill('isConcatSpreadable')),
+    isRegExp: def(SymbolPolyfill('isRegExp')),
+    iterator: def(SymbolPolyfill('iterator')),
+    toPrimitive: def(SymbolPolyfill('toPrimitive')),
+    toStringTag: def(SymbolPolyfill('toStringTag')),
+    unscopables: def(SymbolPolyfill('unscopables'))
   })
 
-  Object.defineProperties(Symbol.prototype, {
+  Object.defineProperties(SymbolPolyfill.prototype, {
     properToString: def(function () {
       return 'Symbol (' + this.__description__ + ')'
     }),
@@ -56,19 +60,19 @@
   })
 
   Object.defineProperty(
-    Symbol.prototype,
-    Symbol.toPrimitive,
+    SymbolPolyfill.prototype,
+    SymbolPolyfill.toPrimitive,
     def(function (hint) {
       throw new TypeError("Conversion of symbol objects is not allowed")
     })
   )
 
-  Object.defineProperty(Symbol.prototype, Symbol.toStringTag, {
+  Object.defineProperty(SymbolPolyfill.prototype, SymbolPolyfill.toStringTag, {
     value: 'Symbol',
     configurable: true,
     writable: false,
     enumerable: false
   })
 
-  module.exports = Symbol
+  module.exports = SymbolPolyfill
 }())

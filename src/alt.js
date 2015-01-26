@@ -3,7 +3,7 @@
 var Dispatcher = require('flux').Dispatcher
 var EventEmitter = require('eventemitter3')
 var Symbol = require('./polyfills/es6-symbol')
-Object.assign = Object.assign || require('object-assign')
+var assign = require('object-assign')
 
 var now = Date.now()
 var VariableSymbol = (desc) => Symbol(`${now}${desc}`)
@@ -77,7 +77,7 @@ class AltStore {
 
   getState() {
     // Copy over state so it's RO.
-    return Object.assign({}, this[STATE_CONTAINER])
+    return assign({}, this[STATE_CONTAINER])
   }
 }
 
@@ -165,7 +165,7 @@ var StoreMixin = {
 var bootstrap = (instance, data) => {
   var obj = JSON.parse(data)
   Object.keys(obj).forEach((key) => {
-    Object.assign(instance.stores[key][STATE_CONTAINER], obj[key])
+    assign(instance.stores[key][STATE_CONTAINER], obj[key])
     if (instance.stores[key][STORE_BOOTSTRAP]) {
       instance.stores[key][STORE_BOOTSTRAP]()
     }
@@ -207,7 +207,7 @@ class Alt {
     function Store() { StoreModel.call(this) }
     Store.prototype = StoreModel.prototype
     Store.prototype[LISTENERS] = {}
-    Object.assign(Store.prototype, StoreMixin, {
+    assign(Store.prototype, StoreMixin, {
       _storeName: key,
       dispatcher: this.dispatcher,
       getInstance: () => this.stores[key]
@@ -222,7 +222,7 @@ your own custom identifier for each store`
       )
     }
 
-    this.stores[key] = Object.assign(
+    this.stores[key] = assign(
       new AltStore(this.dispatcher, store),
       getInternalMethods(StoreModel, builtIns)
     )
@@ -234,7 +234,7 @@ your own custom identifier for each store`
 
   createActions(ActionsClass) {
     var key = ActionsClass.displayName || ActionsClass.name
-    var actions = Object.assign(
+    var actions = assign(
       {},
       getInternalMethods(ActionsClass.prototype, builtInProto)
     )

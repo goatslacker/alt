@@ -198,9 +198,9 @@ var lifecycleStore = alt.createStore(LifeCycleStore)
   assert.equal(typeof myActions.updateThree, 'function', 'prototype defined actions exist')
   assert.equal(myActions.updateTwo.length, 2, 'actions can have > 1 arity')
 
-  assert.equal(typeof myActions.UPDATE_NAME, 'object', 'a constant is created for each action')
-  assert.equal(typeof myActions.UPDATE_TWO, 'object', 'a constant is created for each action')
-  assert.equal(typeof myActions.CALL_INTERNAL_METHOD, 'object', 'a constant is created for each action')
+  assert.notEqual(typeof myActions.UPDATE_NAME, 'undefined', 'a constant is created for each action')
+  assert.notEqual(typeof myActions.UPDATE_TWO, 'undefined', 'a constant is created for each action')
+  assert.notEqual(typeof myActions.CALL_INTERNAL_METHOD, 'undefined', 'a constant is created for each action')
 
   assert.equal(typeof myActions.updateName.defer, 'function', 'actions have a defer method for async flow')
 
