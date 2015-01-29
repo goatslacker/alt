@@ -259,7 +259,14 @@ var lifecycleStore = alt.createStore(LifeCycleStore)
 
   assert.equal(myStore.getState().name, 'badger', 'new store state present')
 
+  alt.bootstrap('{"MyStore":{"name":"bee"}}')
+  assert.equal(myStore.getState().name, 'bee', 'on server I can bootstrap many times')
+
   try {
+    // simulate the browser
+    global.window = {};
+
+    alt.bootstrap('{}')
     // Attempting to bootstrap more than once
     alt.bootstrap('{"MyStore":{"name":"bee"}}')
 

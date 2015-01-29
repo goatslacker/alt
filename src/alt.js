@@ -294,8 +294,10 @@ your own custom identifier for each store`
 
   bootstrap(data) {
     bootstrap(this, data)
-    this.bootstrap = () => {
-      throw new ReferenceError('Stores have already been bootstrapped')
+    if (typeof window !== 'undefined') {
+      this.bootstrap = () => {
+        throw new ReferenceError('Stores have already been bootstrapped')
+      }
     }
   }
 }

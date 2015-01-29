@@ -297,9 +297,11 @@ var Alt = (function () {
 
   Alt.prototype.bootstrap = function (data) {
     bootstrap(this, data);
-    this.bootstrap = function () {
-      throw new ReferenceError("Stores have already been bootstrapped");
-    };
+    if (typeof window !== "undefined") {
+      this.bootstrap = function () {
+        throw new ReferenceError("Stores have already been bootstrapped");
+      };
+    }
   };
 
   return Alt;
