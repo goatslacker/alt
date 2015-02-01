@@ -1,26 +1,26 @@
 'use strict'
 
-var Dispatcher = require('flux').Dispatcher
-var EventEmitter = require('eventemitter3')
-var Symbol = require('./polyfills/es6-symbol')
-var assign = require('object-assign')
+let Dispatcher = require('flux').Dispatcher
+let EventEmitter = require('eventemitter3')
+let Symbol = require('./polyfills/es6-symbol')
+let assign = require('object-assign')
 
-var now = Date.now()
-var VariableSymbol = (desc) => Symbol(`${now}${desc}`)
+let now = Date.now()
+let VariableSymbol = (desc) => Symbol(`${now}${desc}`)
 
-var ACTION_DISPATCHER = Symbol('action dispatcher storage')
-var ACTION_HANDLER = Symbol('action creator handler')
-var ACTION_KEY = Symbol('holds the actions uid symbol for listening')
-var ACTION_UID = Symbol('the actions uid name')
-var EE = Symbol('event emitter instance')
-var INIT_SNAPSHOT = Symbol('init snapshot storage')
-var LAST_SNAPSHOT = Symbol('last snapshot storage')
-var LISTENERS = Symbol('stores action listeners storage')
-var STATE_CONTAINER = VariableSymbol('the state container')
-var STORE_BOOTSTRAP = Symbol('event handler onBootstrap')
-var STORE_SNAPSHOT = Symbol('event handler onTakeSnapshot')
+let ACTION_DISPATCHER = Symbol('action dispatcher storage')
+let ACTION_HANDLER = Symbol('action creator handler')
+let ACTION_KEY = Symbol('holds the actions uid symbol for listening')
+let ACTION_UID = Symbol('the actions uid name')
+let EE = Symbol('event emitter instance')
+let INIT_SNAPSHOT = Symbol('init snapshot storage')
+let LAST_SNAPSHOT = Symbol('last snapshot storage')
+let LISTENERS = Symbol('stores action listeners storage')
+let STATE_CONTAINER = VariableSymbol('the state container')
+let STORE_BOOTSTRAP = Symbol('event handler onBootstrap')
+let STORE_SNAPSHOT = Symbol('event handler onTakeSnapshot')
 
-var formatAsConstant = (name) => {
+let formatAsConstant = (name) => {
   return name.replace(/[a-z]([A-Z])/g, (i) => {
     return `${i[0]}_${i[1].toLowerCase()}`
   }).toUpperCase()
@@ -29,10 +29,10 @@ var formatAsConstant = (name) => {
 /* istanbul ignore next */
 function NoopClass() { }
 
-var builtIns = Object.getOwnPropertyNames(NoopClass)
-var builtInProto = Object.getOwnPropertyNames(NoopClass.prototype)
+let builtIns = Object.getOwnPropertyNames(NoopClass)
+let builtInProto = Object.getOwnPropertyNames(NoopClass.prototype)
 
-var getInternalMethods = (obj, excluded) => {
+let getInternalMethods = (obj, excluded) => {
   return Object.getOwnPropertyNames(obj).reduce((value, m) => {
     if (excluded.indexOf(m) !== -1) {
       return value
@@ -57,7 +57,7 @@ class AltStore {
     // Register dispatcher
     this.dispatchToken = dispatcher.register((payload) => {
       if (state[LISTENERS][payload.action]) {
-        var result = state[LISTENERS][payload.action](payload.data)
+        let result = state[LISTENERS][payload.action](payload.data)
         result !== false && this.emitChange()
       }
     })
@@ -97,7 +97,7 @@ class ActionCreator {
   }
 }
 
-var StoreMixin = {
+let StoreMixin = {
   bindAction(symbol, handler) {
     if (!symbol) {
       throw new ReferenceError('Invalid action reference passed in')
@@ -125,13 +125,13 @@ var StoreMixin = {
 
   bindActions(actions) {
     Object.keys(actions).forEach((action) => {
-      var symbol = actions[action]
-      var matchFirstCharacter = /./
-      var assumedEventHandler = action.replace(
+      let symbol = actions[action]
+      let matchFirstCharacter = /./
+      let assumedEventHandler = action.replace(
         matchFirstCharacter,
         (x) => `on${x[0].toUpperCase()}`
       )
-      var handler = null
+      let handler = null
 
       // If you have both action and onAction
       if (this[action] && this[assumedEventHandler]) {
@@ -162,8 +162,8 @@ var StoreMixin = {
   }
 }
 
-var bootstrap = (instance, data) => {
-  var obj = JSON.parse(data)
+let bootstrap = (instance, data) => {
+  let obj = JSON.parse(data)
   Object.keys(obj).forEach((key) => {
     assign(instance.stores[key][STATE_CONTAINER], obj[key])
     if (instance.stores[key][STORE_BOOTSTRAP]) {
@@ -172,7 +172,7 @@ var bootstrap = (instance, data) => {
   })
 }
 
-var snapshot = (instance) => {
+let snapshot = (instance) => {
   return JSON.stringify(
     Object.keys(instance.stores).reduce((obj, key) => {
       if (instance.stores[key][STORE_SNAPSHOT]) {
@@ -184,11 +184,23 @@ var snapshot = (instance) => {
   )
 }
 
-var saveInitialSnapshot = (instance, key) => {
-  var state = instance.stores[key][STATE_CONTAINER]
-  var initial = JSON.parse(instance[INIT_SNAPSHOT])
+let saveInitialSnapshot = (instance, key) => {
+  let state = instance.stores[key][STATE_CONTAINER]
+  let initial = JSON.parse(instance[INIT_SNAPSHOT])
   initial[key] = state
   instance[INIT_SNAPSHOT] = JSON.stringify(initial)
+}
+
+let filterSnapshotOfStores = (snapshot, storeNames) => {
+  let stores = JSON.parse(snapshot)
+  let storesToReset = storeNames.reduce((obj, name) => {
+    if (!stores[name]) {
+      throw new ReferenceError(`${name} is not a valid store`)
+    }
+    obj[name] = stores[name]
+    return obj
+  }, {})
+  return JSON.stringify(storesToReset)
 }
 
 class Alt {
@@ -200,7 +212,7 @@ class Alt {
   }
 
   createStore(StoreModel, iden) {
-    var key = iden || StoreModel.displayName || StoreModel.name
+    let key = iden || StoreModel.displayName || StoreModel.name
     // Creating a class here so we don't overload the provided store's
     // prototype with the mixin behaviour and I'm extending from StoreModel
     // so we can inherit any extensions from the provided store.
@@ -213,7 +225,7 @@ class Alt {
       getInstance: () => this.stores[key]
     })
 
-    var store = new Store()
+    let store = new Store()
 
     if (this.stores[key]) {
       throw new ReferenceError(
@@ -233,8 +245,8 @@ your own custom identifier for each store`
   }
 
   createActions(ActionsClass) {
-    var key = ActionsClass.displayName || ActionsClass.name
-    var actions = assign(
+    let key = ActionsClass.displayName || ActionsClass.name
+    let actions = assign(
       {},
       getInternalMethods(ActionsClass.prototype, builtInProto)
     )
@@ -251,11 +263,11 @@ your own custom identifier for each store`
     })
 
     return Object.keys(actions).reduce((obj, action) => {
-      var constant = formatAsConstant(action)
-      var actionName = Symbol(`action ${key}.prototype.${action}`)
+      let constant = formatAsConstant(action)
+      let actionName = Symbol(`action ${key}.prototype.${action}`)
 
       // Wrap the action so we can provide a dispatch method
-      var newAction = new ActionCreator(
+      let newAction = new ActionCreator(
         this.dispatcher,
         actionName,
         actions[action],
@@ -273,7 +285,7 @@ your own custom identifier for each store`
   }
 
   takeSnapshot() {
-    var state = snapshot(this)
+    let state = snapshot(this)
     this[LAST_SNAPSHOT] = state
     return state
   }
@@ -283,28 +295,15 @@ your own custom identifier for each store`
   }
 
   recycle(...storeNames) {
-    var snapshot = '{}'
-
-    if (storeNames.length) {
-      var stores = JSON.parse(this[INIT_SNAPSHOT])
-      var storesToReset = storeNames.reduce((obj, name) => {
-        if (!stores[name]) {
-          throw new ReferenceError(`${name} is not a valid store`)
-        }
-        obj[name] = stores[name]
-        return obj
-      }, {})
-
-      snapshot = JSON.stringify(storesToReset)
-    } else {
-      snapshot = this[INIT_SNAPSHOT]
-    }
+    let snapshot = storeNames.length
+      ? filterSnapshotOfStores(this[INIT_SNAPSHOT], storeNames)
+      : this[INIT_SNAPSHOT]
 
     bootstrap(this, snapshot)
   }
 
   flush() {
-    var state = snapshot(this)
+    let state = snapshot(this)
     this.recycle()
     return state
   }

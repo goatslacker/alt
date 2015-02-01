@@ -194,6 +194,18 @@ var saveInitialSnapshot = function (instance, key) {
   instance[INIT_SNAPSHOT] = JSON.stringify(initial);
 };
 
+var filterSnapshotOfStores = function (snapshot, storeNames) {
+  var stores = JSON.parse(snapshot);
+  var storesToReset = storeNames.reduce(function (obj, name) {
+    if (!stores[name]) {
+      throw new ReferenceError("" + name + " is not a valid store");
+    }
+    obj[name] = stores[name];
+    return obj;
+  }, {});
+  return JSON.stringify(storesToReset);
+};
+
 var Alt = (function () {
   var Alt = function Alt() {
     this.dispatcher = new Dispatcher();
@@ -288,24 +300,9 @@ var Alt = (function () {
   Alt.prototype.recycle = function () {
     var storeNames = _slice.call(arguments);
 
-    var snapshot = "{}";
+    var _snapshot = storeNames.length ? filterSnapshotOfStores(this[INIT_SNAPSHOT], storeNames) : this[INIT_SNAPSHOT];
 
-    if (storeNames.length) {
-      var stores = JSON.parse(this[INIT_SNAPSHOT]);
-      var storesToReset = storeNames.reduce(function (obj, name) {
-        if (!stores[name]) {
-          throw new ReferenceError("" + name + " is not a valid store");
-        }
-        obj[name] = stores[name];
-        return obj;
-      }, {});
-
-      snapshot = JSON.stringify(storesToReset);
-    } else {
-      snapshot = this[INIT_SNAPSHOT];
-    }
-
-    bootstrap(this, snapshot);
+    bootstrap(this, _snapshot);
   };
 
   Alt.prototype.flush = function () {
