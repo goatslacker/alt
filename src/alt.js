@@ -282,8 +282,25 @@ your own custom identifier for each store`
     bootstrap(this, this[LAST_SNAPSHOT])
   }
 
-  recycle() {
-    bootstrap(this, this[INIT_SNAPSHOT])
+  recycle(...storeNames) {
+    var snapshot = '{}'
+
+    if (storeNames.length) {
+      var stores = JSON.parse(this[INIT_SNAPSHOT])
+      var storesToReset = storeNames.reduce((obj, name) => {
+        if (!stores[name]) {
+          throw new ReferenceError(`${name} is not a valid store`)
+        }
+        obj[name] = stores[name]
+        return obj
+      }, {})
+
+      snapshot = JSON.stringify(storesToReset)
+    } else {
+      snapshot = this[INIT_SNAPSHOT]
+    }
+
+    bootstrap(this, snapshot)
   }
 
   flush() {

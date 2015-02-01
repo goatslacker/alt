@@ -466,4 +466,20 @@ var lifecycleStore = alt.createStore(LifeCycleStore)
   var flushed = JSON.parse(alt.flush())
   assert.equal(myStore.getState().name, 'first', 'flush is a lot like recycle')
   assert.equal(flushed.MyStore.name, 'goat', 'except that flush returns the state before recycling')
+
+  myActions.updateName('butterfly')
+  assert.equal(myStore.getState().name, 'butterfly', 'I can update the state again after a flush')
+  assert.equal(secondStore.getState().name, 'butterfly', 'I can update the state again after a flush')
+
+  alt.recycle('MyStore')
+  assert.equal(myStore.getState().name, 'first', 'I can recycle specific stores')
+  assert.equal(secondStore.getState().name, 'butterfly', 'and other stores will not be recycled')
+
+  try {
+    alt.recycle('StoreThatDoesNotExist')
+    assert.equal(true, false, 'I was able to recycle a store that does not exist')
+  } catch (e) {
+    assert.equal(e instanceof ReferenceError, true, 'store that does not exist throws a RefenceError')
+    assert.equal(e.message, 'StoreThatDoesNotExist is not a valid store')
+  }
 }()

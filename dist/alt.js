@@ -286,7 +286,26 @@ var Alt = (function () {
   };
 
   Alt.prototype.recycle = function () {
-    bootstrap(this, this[INIT_SNAPSHOT]);
+    var storeNames = _slice.call(arguments);
+
+    var snapshot = "{}";
+
+    if (storeNames.length) {
+      var stores = JSON.parse(this[INIT_SNAPSHOT]);
+      var storesToReset = storeNames.reduce(function (obj, name) {
+        if (!stores[name]) {
+          throw new ReferenceError("" + name + " is not a valid store");
+        }
+        obj[name] = stores[name];
+        return obj;
+      }, {});
+
+      snapshot = JSON.stringify(storesToReset);
+    } else {
+      snapshot = this[INIT_SNAPSHOT];
+    }
+
+    bootstrap(this, snapshot);
   };
 
   Alt.prototype.flush = function () {
