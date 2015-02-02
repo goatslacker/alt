@@ -139,16 +139,14 @@ var StoreMixin = {
       });
       var handler = null;
 
-      // If you have both action and onAction
       if (_this2[action] && _this2[assumedEventHandler]) {
-        throw new ReferenceError("You have multiple action handlers bound to an action: " + ("" + action + " and " + assumedEventHandler))
-        // action
-        ;
+        // If you have both action and onAction
+        throw new ReferenceError("You have multiple action handlers bound to an action: " + ("" + action + " and " + assumedEventHandler));
       } else if (_this2[action]) {
-        handler = _this2[action]
-        // onAction
-        ;
+        // action
+        handler = _this2[action];
       } else if (_this2[assumedEventHandler]) {
+        // onAction
         handler = _this2[assumedEventHandler];
       }
 

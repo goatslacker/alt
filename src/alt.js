@@ -133,17 +133,17 @@ let StoreMixin = {
       )
       let handler = null
 
-      // If you have both action and onAction
       if (this[action] && this[assumedEventHandler]) {
+        // If you have both action and onAction
         throw new ReferenceError(
           `You have multiple action handlers bound to an action: ` +
           `${action} and ${assumedEventHandler}`
         )
-      // action
       } else if (this[action]) {
+        // action
         handler = this[action]
-      // onAction
       } else if (this[assumedEventHandler]) {
+        // onAction
         handler = this[assumedEventHandler]
       }
 
