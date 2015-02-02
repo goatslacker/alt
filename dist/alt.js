@@ -244,8 +244,9 @@ var Alt = (function () {
     return this.stores[key];
   };
 
-  Alt.prototype.createActions = function (ActionsClass) {
+  Alt.prototype.createActions = function (ActionsClass, exportObj) {
     var _this4 = this;
+    if (exportObj === undefined) exportObj = {};
     var key = ActionsClass.displayName || ActionsClass.name;
     var actions = assign({}, getInternalMethods(ActionsClass.prototype, builtInProto));
 
@@ -282,7 +283,7 @@ var Alt = (function () {
       obj[constant] = actionName;
 
       return obj;
-    }, {});
+    }, exportObj);
   };
 
   Alt.prototype.takeSnapshot = function () {

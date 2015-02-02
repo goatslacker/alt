@@ -244,7 +244,7 @@ your own custom identifier for each store`
     return this.stores[key]
   }
 
-  createActions(ActionsClass) {
+  createActions(ActionsClass, exportObj = {}) {
     let key = ActionsClass.displayName || ActionsClass.name
     let actions = assign(
       {},
@@ -281,7 +281,7 @@ your own custom identifier for each store`
       obj[constant] = actionName
 
       return obj
-    }, {})
+    }, exportObj)
   }
 
   takeSnapshot() {

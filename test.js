@@ -42,7 +42,8 @@ class MyActions {
   }
 }
 
-var myActions = alt.createActions(MyActions)
+var myActions = {}
+alt.createActions(MyActions, myActions)
 
 class MyStore {
   constructor() {
