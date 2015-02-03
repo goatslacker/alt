@@ -250,20 +250,24 @@ var Alt = (function () {
     var key = ActionsClass.displayName || ActionsClass.name;
     var actions = assign({}, getInternalMethods(ActionsClass.prototype, builtInProto));
 
-    ActionsClass.call({
-      generateActions: function () {
-        var actionNames = _slice.call(arguments);
+    function ActionsGenerator() {
+      ActionsClass.call(this);
+    }
+    ActionsGenerator.prototype = ActionsClass.prototype;
+    ActionsGenerator.prototype.generateActions = function () {
+      var actionNames = _slice.call(arguments);
 
-        actionNames.forEach(function (actionName) {
-          // This is a function so we can later bind this to ActionCreator
-          actions[actionName] = function (x) {
-            var a = _slice.call(arguments, 1);
+      actionNames.forEach(function (actionName) {
+        // This is a function so we can later bind this to ActionCreator
+        actions[actionName] = function (x) {
+          var a = _slice.call(arguments, 1);
 
-            this.dispatch(a.length ? [x].concat(a) : x);
-          };
-        });
-      }
-    });
+          this.dispatch(a.length ? [x].concat(a) : x);
+        };
+      });
+    };
+
+    new ActionsGenerator();
 
     return Object.keys(actions).reduce(function (obj, action) {
       var constant = formatAsConstant(action);

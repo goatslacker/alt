@@ -251,16 +251,18 @@ your own custom identifier for each store`
       getInternalMethods(ActionsClass.prototype, builtInProto)
     )
 
-    ActionsClass.call({
-      generateActions(...actionNames) {
-        actionNames.forEach((actionName) => {
-          // This is a function so we can later bind this to ActionCreator
-          actions[actionName] = function (x, ...a) {
-            this.dispatch(a.length ? [x].concat(a) : x)
-          }
-        })
-      }
-    })
+    function ActionsGenerator() { ActionsClass.call(this) }
+    ActionsGenerator.prototype = ActionsClass.prototype
+    ActionsGenerator.prototype.generateActions = (...actionNames) => {
+      actionNames.forEach((actionName) => {
+        // This is a function so we can later bind this to ActionCreator
+        actions[actionName] = function (x, ...a) {
+          this.dispatch(a.length ? [x].concat(a) : x)
+        }
+      })
+    }
+
+    new ActionsGenerator()
 
     return Object.keys(actions).reduce((obj, action) => {
       let constant = formatAsConstant(action)
