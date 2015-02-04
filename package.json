@@ -4,7 +4,7 @@
   "description": "A flux implementation",
   "main": "dist/alt.js",
   "dependencies": {
-    "es-symbol": "^1.0.0",
+    "es-symbol": "^1.0.1",
     "eventemitter3": "^0.1.6",
     "flux": "^2.0.1",
     "object-assign": "^2.0.0"
