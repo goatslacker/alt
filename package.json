@@ -4,6 +4,7 @@
   "description": "A flux implementation",
   "main": "dist/alt.js",
   "dependencies": {
+    "es-symbol": "^1.0.0",
     "eventemitter3": "^0.1.6",
     "flux": "^2.0.1",
     "object-assign": "^2.0.0"
@@ -11,15 +12,14 @@
   "devDependencies": {
     "6to5": "^1.15.0",
     "coveralls": "^2.11.2",
-    "istanbul": "^0.3.5",
-    "sixpack": "2.0.0"
+    "istanbul": "^0.3.5"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/goatslacker/alt.git"
   },
   "scripts": {
-    "build": "sixpack ./src/alt.js Alt > dist/alt.js",
+    "build": "6to5 ./src/alt.js > dist/alt.js",
     "prepublish": "npm run build",
     "coverage": "6to5 src/alt.js > src/coverage-alt.js; 6to5 test.js > coverage-test.js; istanbul cover coverage-test.js",
     "test": "6to5 src/alt.js > src/coverage-alt.js; 6to5-node test.js;"

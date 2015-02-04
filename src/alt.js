@@ -2,7 +2,7 @@
 
 let Dispatcher = require('flux').Dispatcher
 let EventEmitter = require('eventemitter3')
-let Symbol = require('./polyfills/es6-symbol')
+let Symbol = require('es-symbol')
 let assign = require('object-assign')
 
 let now = Date.now()
