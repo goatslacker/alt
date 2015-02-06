@@ -1,7 +1,8 @@
 "use strict";
 
-var _slice = Array.prototype.slice;
-"use strict";
+var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
 var Dispatcher = require("flux").Dispatcher;
 var EventEmitter = require("eventemitter3");
@@ -17,6 +18,7 @@ var ACTION_DISPATCHER = Symbol("action dispatcher storage");
 var ACTION_HANDLER = Symbol("action creator handler");
 var ACTION_KEY = Symbol("holds the actions uid symbol for listening");
 var ACTION_UID = Symbol("the actions uid name");
+var BOOTSTRAP_FLAG = VariableSymbol("has bootstrap");
 var EE = Symbol("event emitter instance");
 var INIT_SNAPSHOT = Symbol("init snapshot storage");
 var LAST_SNAPSHOT = Symbol("last snapshot storage");
@@ -49,8 +51,10 @@ var getInternalMethods = function (obj, excluded) {
 };
 
 var AltStore = (function () {
-  var AltStore = function AltStore(dispatcher, state) {
+  function AltStore(dispatcher, state) {
     var _this = this;
+    _classCallCheck(this, AltStore);
+
     this[STATE_CONTAINER] = state;
     this[EE] = new EventEmitter();
     if (state.onBootstrap) {
@@ -67,48 +71,72 @@ var AltStore = (function () {
         result !== false && _this.emitChange();
       }
     });
-  };
+  }
 
-  AltStore.prototype.emitChange = function () {
-    this[EE].emit("change", this[STATE_CONTAINER]);
-  };
-
-  AltStore.prototype.listen = function (cb) {
-    this[EE].on("change", cb);
-  };
-
-  AltStore.prototype.unlisten = function (cb) {
-    this[EE].removeListener("change", cb);
-  };
-
-  AltStore.prototype.getState = function () {
-    // Copy over state so it's RO.
-    return assign({}, this[STATE_CONTAINER]);
-  };
+  _prototypeProperties(AltStore, null, {
+    emitChange: {
+      value: function emitChange() {
+        this[EE].emit("change", this[STATE_CONTAINER]);
+      },
+      writable: true,
+      configurable: true
+    },
+    listen: {
+      value: function listen(cb) {
+        this[EE].on("change", cb);
+      },
+      writable: true,
+      configurable: true
+    },
+    unlisten: {
+      value: function unlisten(cb) {
+        this[EE].removeListener("change", cb);
+      },
+      writable: true,
+      configurable: true
+    },
+    getState: {
+      value: function getState() {
+        // Copy over state so it's RO.
+        return assign({}, this[STATE_CONTAINER]);
+      },
+      writable: true,
+      configurable: true
+    }
+  });
 
   return AltStore;
 })();
 
 var ActionCreator = (function () {
-  var ActionCreator = function ActionCreator(dispatcher, name, action, actions) {
+  function ActionCreator(dispatcher, name, action, actions) {
+    _classCallCheck(this, ActionCreator);
+
     this[ACTION_DISPATCHER] = dispatcher;
     this[ACTION_UID] = name;
     this[ACTION_HANDLER] = action.bind(this);
+    this[BOOTSTRAP_FLAG] = false;
     this.actions = actions;
-  };
+  }
 
-  ActionCreator.prototype.dispatch = function (data) {
-    this[ACTION_DISPATCHER].dispatch({
-      action: this[ACTION_UID],
-      data: data
-    });
-  };
+  _prototypeProperties(ActionCreator, null, {
+    dispatch: {
+      value: function dispatch(data) {
+        this[ACTION_DISPATCHER].dispatch({
+          action: this[ACTION_UID],
+          data: data
+        });
+      },
+      writable: true,
+      configurable: true
+    }
+  });
 
   return ActionCreator;
 })();
 
 var StoreMixin = {
-  bindAction: function (symbol, handler) {
+  bindAction: function bindAction(symbol, handler) {
     if (!symbol) {
       throw new ReferenceError("Invalid action reference passed in");
     }
@@ -128,8 +156,8 @@ var StoreMixin = {
     }
   },
 
-  bindActions: function (actions) {
-    var _this2 = this;
+  bindActions: function bindActions(actions) {
+    var _this = this;
     Object.keys(actions).forEach(function (action) {
       var symbol = actions[action];
       var matchFirstCharacter = /./;
@@ -138,24 +166,24 @@ var StoreMixin = {
       });
       var handler = null;
 
-      if (_this2[action] && _this2[assumedEventHandler]) {
+      if (_this[action] && _this[assumedEventHandler]) {
         // If you have both action and onAction
         throw new ReferenceError("You have multiple action handlers bound to an action: " + ("" + action + " and " + assumedEventHandler));
-      } else if (_this2[action]) {
+      } else if (_this[action]) {
         // action
-        handler = _this2[action];
-      } else if (_this2[assumedEventHandler]) {
+        handler = _this[action];
+      } else if (_this[assumedEventHandler]) {
         // onAction
-        handler = _this2[assumedEventHandler];
+        handler = _this[assumedEventHandler];
       }
 
       if (handler) {
-        _this2.bindAction(symbol, handler);
+        _this.bindAction(symbol, handler);
       }
     });
   },
 
-  waitFor: function (tokens) {
+  waitFor: function waitFor(tokens) {
     if (!tokens) {
       throw new ReferenceError("Dispatch tokens not provided");
     }
@@ -164,7 +192,7 @@ var StoreMixin = {
   }
 };
 
-var bootstrap = function (instance, data) {
+var setAppState = function (instance, data) {
   var obj = JSON.parse(data);
   Object.keys(obj).forEach(function (key) {
     assign(instance.stores[key][STATE_CONTAINER], obj[key]);
@@ -204,123 +232,156 @@ var filterSnapshotOfStores = function (snapshot, storeNames) {
 };
 
 var Alt = (function () {
-  var Alt = function Alt() {
+  function Alt() {
+    _classCallCheck(this, Alt);
+
     this.dispatcher = new Dispatcher();
     this.stores = {};
     this[LAST_SNAPSHOT] = null;
     this[INIT_SNAPSHOT] = "{}";
-  };
+  }
 
-  Alt.prototype.createStore = function (StoreModel, iden) {
-    var _this3 = this;
-    var key = iden || StoreModel.displayName || StoreModel.name;
-    // Creating a class here so we don't overload the provided store's
-    // prototype with the mixin behaviour and I'm extending from StoreModel
-    // so we can inherit any extensions from the provided store.
-    function Store() {
-      StoreModel.call(this);
-    }
-    Store.prototype = StoreModel.prototype;
-    Store.prototype[LISTENERS] = {};
-    assign(Store.prototype, StoreMixin, {
-      _storeName: key,
-      dispatcher: this.dispatcher,
-      getInstance: function () {
-        return _this3.stores[key];
-      }
-    });
-
-    var store = new Store();
-
-    if (this.stores[key]) {
-      throw new ReferenceError("A store named " + key + " already exists, double check your store names or pass in\nyour own custom identifier for each store");
-    }
-
-    this.stores[key] = assign(new AltStore(this.dispatcher, store), getInternalMethods(StoreModel, builtIns));
-
-    saveInitialSnapshot(this, key);
-
-    return this.stores[key];
-  };
-
-  Alt.prototype.createActions = function (ActionsClass, exportObj) {
-    var _this4 = this;
-    if (exportObj === undefined) exportObj = {};
-    var key = ActionsClass.displayName || ActionsClass.name;
-    var actions = assign({}, getInternalMethods(ActionsClass.prototype, builtInProto));
-
-    function ActionsGenerator() {
-      ActionsClass.call(this);
-    }
-    ActionsGenerator.prototype = ActionsClass.prototype;
-    ActionsGenerator.prototype.generateActions = function () {
-      var actionNames = _slice.call(arguments);
-
-      actionNames.forEach(function (actionName) {
-        // This is a function so we can later bind this to ActionCreator
-        actions[actionName] = function (x) {
-          var a = _slice.call(arguments, 1);
-
-          this.dispatch(a.length ? [x].concat(a) : x);
-        };
-      });
-    };
-
-    new ActionsGenerator();
-
-    return Object.keys(actions).reduce(function (obj, action) {
-      var constant = formatAsConstant(action);
-      var actionName = Symbol("action " + key + ".prototype." + action);
-
-      // Wrap the action so we can provide a dispatch method
-      var newAction = new ActionCreator(_this4.dispatcher, actionName, actions[action], obj);
-
-      // Set all the properties on action
-      obj[action] = newAction[ACTION_HANDLER];
-      obj[action].defer = function (x) {
-        return setTimeout(function () {
-          return newAction[ACTION_HANDLER](x);
+  _prototypeProperties(Alt, null, {
+    createStore: {
+      value: function createStore(StoreModel, iden) {
+        var _this = this;
+        var key = iden || StoreModel.displayName || StoreModel.name;
+        // Creating a class here so we don't overload the provided store's
+        // prototype with the mixin behaviour and I'm extending from StoreModel
+        // so we can inherit any extensions from the provided store.
+        function Store() {
+          StoreModel.call(this);
+        }
+        Store.prototype = StoreModel.prototype;
+        Store.prototype[LISTENERS] = {};
+        assign(Store.prototype, StoreMixin, {
+          _storeName: key,
+          dispatcher: this.dispatcher,
+          getInstance: function () {
+            return _this.stores[key];
+          }
         });
-      };
-      obj[action][ACTION_KEY] = actionName;
-      obj[constant] = actionName;
 
-      return obj;
-    }, exportObj);
-  };
+        var store = new Store();
 
-  Alt.prototype.takeSnapshot = function () {
-    var state = snapshot(this);
-    this[LAST_SNAPSHOT] = state;
-    return state;
-  };
+        if (this.stores[key]) {
+          throw new ReferenceError("A store named " + key + " already exists, double check your store names or pass in\nyour own custom identifier for each store");
+        }
 
-  Alt.prototype.rollback = function () {
-    bootstrap(this, this[LAST_SNAPSHOT]);
-  };
+        this.stores[key] = assign(new AltStore(this.dispatcher, store), getInternalMethods(StoreModel, builtIns));
 
-  Alt.prototype.recycle = function () {
-    var storeNames = _slice.call(arguments);
+        saveInitialSnapshot(this, key);
 
-    var _snapshot = storeNames.length ? filterSnapshotOfStores(this[INIT_SNAPSHOT], storeNames) : this[INIT_SNAPSHOT];
+        return this.stores[key];
+      },
+      writable: true,
+      configurable: true
+    },
+    createActions: {
+      value: function createActions(ActionsClass) {
+        var _this = this;
+        var exportObj = arguments[1] === undefined ? {} : arguments[1];
+        var key = ActionsClass.displayName || ActionsClass.name;
+        var actions = assign({}, getInternalMethods(ActionsClass.prototype, builtInProto));
 
-    bootstrap(this, _snapshot);
-  };
+        function ActionsGenerator() {
+          ActionsClass.call(this);
+        }
+        ActionsGenerator.prototype = ActionsClass.prototype;
+        ActionsGenerator.prototype.generateActions = function () {
+          for (var _len = arguments.length, actionNames = Array(_len), _key = 0; _key < _len; _key++) {
+            actionNames[_key] = arguments[_key];
+          }
 
-  Alt.prototype.flush = function () {
-    var state = snapshot(this);
-    this.recycle();
-    return state;
-  };
+          actionNames.forEach(function (actionName) {
+            // This is a function so we can later bind this to ActionCreator
+            actions[actionName] = function (x) {
+              for (var _len2 = arguments.length, a = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+                a[_key2 - 1] = arguments[_key2];
+              }
 
-  Alt.prototype.bootstrap = function (data) {
-    bootstrap(this, data);
-    if (typeof window !== "undefined") {
-      this.bootstrap = function () {
-        throw new ReferenceError("Stores have already been bootstrapped");
-      };
+              this.dispatch(a.length ? [x].concat(a) : x);
+            };
+          });
+        };
+
+        new ActionsGenerator();
+
+        return Object.keys(actions).reduce(function (obj, action) {
+          var constant = formatAsConstant(action);
+          var actionName = Symbol("action " + key + ".prototype." + action);
+
+          // Wrap the action so we can provide a dispatch method
+          var newAction = new ActionCreator(_this.dispatcher, actionName, actions[action], obj);
+
+          // Set all the properties on action
+          obj[action] = newAction[ACTION_HANDLER];
+          obj[action].defer = function (x) {
+            return setTimeout(function () {
+              return newAction[ACTION_HANDLER](x);
+            });
+          };
+          obj[action][ACTION_KEY] = actionName;
+          obj[constant] = actionName;
+
+          return obj;
+        }, exportObj);
+      },
+      writable: true,
+      configurable: true
+    },
+    takeSnapshot: {
+      value: function takeSnapshot() {
+        var state = snapshot(this);
+        this[LAST_SNAPSHOT] = state;
+        return state;
+      },
+      writable: true,
+      configurable: true
+    },
+    rollback: {
+      value: function rollback() {
+        setAppState(this, this[LAST_SNAPSHOT]);
+      },
+      writable: true,
+      configurable: true
+    },
+    recycle: {
+      value: function recycle() {
+        for (var _len = arguments.length, storeNames = Array(_len), _key = 0; _key < _len; _key++) {
+          storeNames[_key] = arguments[_key];
+        }
+
+        var snapshot = storeNames.length ? filterSnapshotOfStores(this[INIT_SNAPSHOT], storeNames) : this[INIT_SNAPSHOT];
+
+        setAppState(this, snapshot);
+      },
+      writable: true,
+      configurable: true
+    },
+    flush: {
+      value: function flush() {
+        var state = snapshot(this);
+        this.recycle();
+        return state;
+      },
+      writable: true,
+      configurable: true
+    },
+    bootstrap: {
+      value: function bootstrap(data) {
+        setAppState(this, data);
+        if (typeof window !== "undefined") {
+          if (this[BOOTSTRAP_FLAG]) {
+            throw new ReferenceError("Stores have already been bootstrapped");
+          }
+          this[BOOTSTRAP_FLAG] = true;
+        }
+      },
+      writable: true,
+      configurable: true
     }
-  };
+  });
 
   return Alt;
 })();

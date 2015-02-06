@@ -1,3 +1,5 @@
+require('6to5/runtime')
+
 var Alt = require('./src/coverage-alt')
 var assert = require('assert')
 

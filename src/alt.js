@@ -12,6 +12,7 @@ let ACTION_DISPATCHER = Symbol('action dispatcher storage')
 let ACTION_HANDLER = Symbol('action creator handler')
 let ACTION_KEY = Symbol('holds the actions uid symbol for listening')
 let ACTION_UID = Symbol('the actions uid name')
+let BOOTSTRAP_FLAG = VariableSymbol('has bootstrap')
 let EE = Symbol('event emitter instance')
 let INIT_SNAPSHOT = Symbol('init snapshot storage')
 let LAST_SNAPSHOT = Symbol('last snapshot storage')
@@ -86,6 +87,7 @@ class ActionCreator {
     this[ACTION_DISPATCHER] = dispatcher
     this[ACTION_UID] = name
     this[ACTION_HANDLER] = action.bind(this)
+    this[BOOTSTRAP_FLAG] = false
     this.actions = actions
   }
 
@@ -162,7 +164,7 @@ let StoreMixin = {
   }
 }
 
-let bootstrap = (instance, data) => {
+let setAppState = (instance, data) => {
   let obj = JSON.parse(data)
   Object.keys(obj).forEach((key) => {
     assign(instance.stores[key][STATE_CONTAINER], obj[key])
@@ -293,7 +295,7 @@ your own custom identifier for each store`
   }
 
   rollback() {
-    bootstrap(this, this[LAST_SNAPSHOT])
+    setAppState(this, this[LAST_SNAPSHOT])
   }
 
   recycle(...storeNames) {
@@ -301,7 +303,7 @@ your own custom identifier for each store`
       ? filterSnapshotOfStores(this[INIT_SNAPSHOT], storeNames)
       : this[INIT_SNAPSHOT]
 
-    bootstrap(this, snapshot)
+    setAppState(this, snapshot)
   }
 
   flush() {
@@ -311,11 +313,12 @@ your own custom identifier for each store`
   }
 
   bootstrap(data) {
-    bootstrap(this, data)
+    setAppState(this, data)
     if (typeof window !== 'undefined') {
-      this.bootstrap = () => {
+      if (this[BOOTSTRAP_FLAG]) {
         throw new ReferenceError('Stores have already been bootstrapped')
       }
+      this[BOOTSTRAP_FLAG] = true
     }
   }
 }

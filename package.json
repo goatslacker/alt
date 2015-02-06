@@ -10,7 +10,7 @@
     "object-assign": "^2.0.0"
   },
   "devDependencies": {
-    "6to5": "^1.15.0",
+    "6to5": "^3.3.12",
     "coveralls": "^2.11.2",
     "istanbul": "^0.3.5"
   },
@@ -21,8 +21,8 @@
   "scripts": {
     "build": "6to5 ./src/alt.js > dist/alt.js",
     "prepublish": "npm run build",
-    "coverage": "6to5 src/alt.js > src/coverage-alt.js; 6to5 test.js > coverage-test.js; istanbul cover coverage-test.js",
-    "test": "6to5 src/alt.js > src/coverage-alt.js; 6to5-node test.js;"
+    "coverage": "npm test; 6to5 --runtime test.js > coverage-test.js; istanbul cover coverage-test.js",
+    "test": "6to5 --runtime src/alt.js > src/coverage-alt.js; 6to5-node test.js;"
   },
   "keywords": [
     "flux",
