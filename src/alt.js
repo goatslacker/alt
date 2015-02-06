@@ -83,12 +83,13 @@ class AltStore {
 }
 
 class ActionCreator {
-  constructor(dispatcher, name, action, actions) {
-    this[ACTION_DISPATCHER] = dispatcher
+  constructor(alt, name, action, actions) {
+    this[ACTION_DISPATCHER] = alt.dispatcher
     this[ACTION_UID] = name
     this[ACTION_HANDLER] = action.bind(this)
     this[BOOTSTRAP_FLAG] = false
     this.actions = actions
+    this.alt = alt
   }
 
   dispatch(data) {
@@ -208,6 +209,7 @@ let filterSnapshotOfStores = (snapshot, storeNames) => {
 class Alt {
   constructor() {
     this.dispatcher = new Dispatcher()
+    this.actions = {}
     this.stores = {}
     this[LAST_SNAPSHOT] = null
     this[INIT_SNAPSHOT] = '{}'
@@ -218,11 +220,14 @@ class Alt {
     // Creating a class here so we don't overload the provided store's
     // prototype with the mixin behaviour and I'm extending from StoreModel
     // so we can inherit any extensions from the provided store.
-    function Store() { StoreModel.call(this) }
+    function Store() {
+      this[LISTENERS] = {}
+      StoreModel.call(this)
+    }
     Store.prototype = StoreModel.prototype
-    Store.prototype[LISTENERS] = {}
     assign(Store.prototype, StoreMixin, {
       _storeName: key,
+      alt: this,
       dispatcher: this.dispatcher,
       getInstance: () => this.stores[key]
     })
@@ -268,11 +273,11 @@ your own custom identifier for each store`
 
     return Object.keys(actions).reduce((obj, action) => {
       let constant = formatAsConstant(action)
-      let actionName = Symbol(`action ${key}.prototype.${action}`)
+      let actionName = Symbol.for(`action ${key}.prototype.${action}`)
 
       // Wrap the action so we can provide a dispatch method
       let newAction = new ActionCreator(
-        this.dispatcher,
+        this,
         actionName,
         actions[action],
         obj
@@ -320,6 +325,24 @@ your own custom identifier for each store`
       }
       this[BOOTSTRAP_FLAG] = true
     }
+  }
+
+  // Instance type methods for injecting alt into your application as context
+
+  addActions(name, ActionsClass) {
+    this.actions[name] = this.createActions(ActionsClass)
+  }
+
+  addStore(name, StoreModel) {
+    this.createStore(StoreModel, name)
+  }
+
+  getActions(name) {
+    return this.actions[name]
+  }
+
+  getStore(name) {
+    return this.stores[name]
   }
 }
 

@@ -157,6 +157,47 @@ class LifeCycleStore {
 
 var lifecycleStore = alt.createStore(LifeCycleStore)
 
+// Alt instances...
+
+class AltInstance extends Alt {
+  constructor() {
+    super()
+    this.addActions('myActions', MyActions)
+    this.addStore('myStore', MyStore)
+  }
+}
+
+var altInstance = new AltInstance()
+
+
+// Really confusing set of instances
+var alt1 = new Alt()
+var alt2 = new Alt()
+
+function NameActions() { }
+NameActions.prototype.updateName = function (name) {
+  this.dispatch(name)
+}
+
+var nameActions1 = alt1.createActions(NameActions)
+var nameActions2 = alt2.createActions(NameActions)
+
+function NameStore() {
+  // It's ok to bind whatever actions since Symbol.for maintains
+  // a global registry. As long as the methods called in nameActions2 are defined
+  // in nameActions1 so the constants are created.
+  this.bindActions(nameActions1)
+  this.name = 'foo'
+}
+
+NameStore.prototype.onUpdateName = function (name) {
+  this.name = name
+}
+
+var nameStore1 = alt1.createStore(NameStore)
+var nameStore2 = alt2.createStore(NameStore)
+
+
 /* istanbul ignore next */
 !function () {
   assert.equal(typeof alt.bootstrap, 'function', 'bootstrap function exists')
@@ -485,4 +526,32 @@ var lifecycleStore = alt.createStore(LifeCycleStore)
     assert.equal(e instanceof ReferenceError, true, 'store that does not exist throws a RefenceError')
     assert.equal(e.message, 'StoreThatDoesNotExist is not a valid store')
   }
+
+  // Testing single generated alt instances
+
+  assert.equal(altInstance instanceof Alt, true, 'altInstance is an instance of alt')
+  assert.equal(typeof altInstance.dispatcher, 'object', 'it has a dispatcher')
+  assert.equal(typeof altInstance.bootstrap, 'function', 'bootstrap function exists')
+  assert.equal(typeof altInstance.createActions, 'function', 'createActions function')
+  assert.equal(typeof altInstance.createStore, 'function', 'createStore function')
+
+  var myActionsFromInst = altInstance.getActions('myActions')
+  assert.equal(typeof myActionsFromInst, 'object', 'the actions exist')
+
+  var myActionsFail = altInstance.getActions('ActionsThatDontExist')
+  assert.equal(typeof myActionsFail, 'undefined', 'undefined actions')
+
+  myActionsFromInst.updateName('lion')
+  assert.equal(altInstance.getStore('myStore').getState().name, 'lion', 'state was updated')
+  assert.equal(myStore.getState().name, 'first', 'and other singleton store was not affected')
+
+  // Testing multiple alt instances
+
+  nameActions1.updateName('bar')
+  nameActions2.updateName('baz')
+
+  assert.equal(nameStore1.getState().name, 'bar', 'store 1 state is set')
+  assert.equal(nameStore2.getState().name, 'baz', 'this store has different state')
+  assert.equal(altInstance.getStore('myStore').getState().name, 'lion', 'other stores not affected')
+  assert.equal(myStore.getState().name, 'first', 'other singleton store not affected')
 }()

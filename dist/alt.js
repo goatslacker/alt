@@ -109,14 +109,15 @@ var AltStore = (function () {
 })();
 
 var ActionCreator = (function () {
-  function ActionCreator(dispatcher, name, action, actions) {
+  function ActionCreator(alt, name, action, actions) {
     _classCallCheck(this, ActionCreator);
 
-    this[ACTION_DISPATCHER] = dispatcher;
+    this[ACTION_DISPATCHER] = alt.dispatcher;
     this[ACTION_UID] = name;
     this[ACTION_HANDLER] = action.bind(this);
     this[BOOTSTRAP_FLAG] = false;
     this.actions = actions;
+    this.alt = alt;
   }
 
   _prototypeProperties(ActionCreator, null, {
@@ -236,6 +237,7 @@ var Alt = (function () {
     _classCallCheck(this, Alt);
 
     this.dispatcher = new Dispatcher();
+    this.actions = {};
     this.stores = {};
     this[LAST_SNAPSHOT] = null;
     this[INIT_SNAPSHOT] = "{}";
@@ -250,12 +252,13 @@ var Alt = (function () {
         // prototype with the mixin behaviour and I'm extending from StoreModel
         // so we can inherit any extensions from the provided store.
         function Store() {
+          this[LISTENERS] = {};
           StoreModel.call(this);
         }
         Store.prototype = StoreModel.prototype;
-        Store.prototype[LISTENERS] = {};
         assign(Store.prototype, StoreMixin, {
           _storeName: key,
+          alt: this,
           dispatcher: this.dispatcher,
           getInstance: function () {
             return _this.stores[key];
@@ -309,10 +312,10 @@ var Alt = (function () {
 
         return Object.keys(actions).reduce(function (obj, action) {
           var constant = formatAsConstant(action);
-          var actionName = Symbol("action " + key + ".prototype." + action);
+          var actionName = Symbol["for"]("action " + key + ".prototype." + action);
 
           // Wrap the action so we can provide a dispatch method
-          var newAction = new ActionCreator(_this.dispatcher, actionName, actions[action], obj);
+          var newAction = new ActionCreator(_this, actionName, actions[action], obj);
 
           // Set all the properties on action
           obj[action] = newAction[ACTION_HANDLER];
@@ -377,6 +380,37 @@ var Alt = (function () {
           }
           this[BOOTSTRAP_FLAG] = true;
         }
+      },
+      writable: true,
+      configurable: true
+    },
+    addActions: {
+
+      // Instance type methods for injecting alt into your application as context
+
+      value: function addActions(name, ActionsClass) {
+        this.actions[name] = this.createActions(ActionsClass);
+      },
+      writable: true,
+      configurable: true
+    },
+    addStore: {
+      value: function addStore(name, StoreModel) {
+        this.createStore(StoreModel, name);
+      },
+      writable: true,
+      configurable: true
+    },
+    getActions: {
+      value: function getActions(name) {
+        return this.actions[name];
+      },
+      writable: true,
+      configurable: true
+    },
+    getStore: {
+      value: function getStore(name) {
+        return this.stores[name];
       },
       writable: true,
       configurable: true
