@@ -252,7 +252,6 @@ your own custom identifier for each store`
   }
 
   createActions(ActionsClass, exportObj = {}) {
-    let key = ActionsClass.displayName || ActionsClass.name
     let actions = assign(
       {},
       getInternalMethods(ActionsClass.prototype, builtInProto)
@@ -273,7 +272,7 @@ your own custom identifier for each store`
 
     return Object.keys(actions).reduce((obj, action) => {
       let constant = formatAsConstant(action)
-      let actionName = Symbol.for(`action ${key}.prototype.${action}`)
+      let actionName = Symbol.for(`action ${action}`)
 
       // Wrap the action so we can provide a dispatch method
       let newAction = new ActionCreator(
