@@ -521,13 +521,69 @@ alt.createStore(LocationStore, 'LocationStore')
 If you've screwed up the state, or you just feel like rolling back you can call `alt.rollback()`. Rollback is pretty dumb in the sense
 that it's not automatic in case of errors, and it only rolls back to the last saved snapshot, meaning you have to save a snapshot first in order to roll back.
 
+### Flushing
+
+`flush :: String`
+
+Flush takes a snapshot of the current state and then resets all the stores back to their original initial state. This is useful if you're using alt stores as singletons and doing server side rendering because of concurrency. In this particular scenario you would load the data in via `bootstrap` and then use `flush` to take a snapshot, render the data, and reset your stores so they are ready for the next request.
+
+### Recycling
+
+`recycle :: ?...String -> undefined`
+
+If you wish to reset a particular, or all, store's state back to their original initial state you would call `recycle`. Recycle takes an optional number of arguments as strings which correspond to the store's names you would like reset. If no argument is provided then all stores are reset.
+
 ### Life Cycle Methods
 
-When bootstrapping or snapshotting there are special methods you can assign to your store to ensure any bookeeping that needs to be done.
+When bootstrapping, snapshotting, or recycling there are special methods you can assign to your store to ensure any bookeeping that needs to be done. You would place these in your store's constructor.
 
-`onBootstrap()` is a method which is called after the store has been bootstrapped. Here you can add some logic to take your bootstrapped data and manipulate it.
+`bootstrap` is called after the store has been bootstrapped. Here you can add some logic to take your bootstrapped data and manipulate it.
 
-`onTakeSnapshot()` is a method which is called before the store's state is serialized. Here you can perform any final tasks you need to before the state is saved.
+```js
+class Store {
+  constructor() {
+    this.on('bootstrap', () => {
+      // do something here
+    })
+  }
+}
+```
+
+`snapshot` is called before the store's state is serialized. Here you can perform any final tasks you need to before the state is saved.
+
+```js
+class Store {
+  constructor() {
+    this.on('snapshot', () => {
+      // do something here
+    })
+  }
+}
+```
+
+`init` is called when the store is initialized as well as whenever a store is recycled.
+
+```js
+class Store {
+  constructor() {
+    this.on('init', () => {
+      // do something here
+    })
+  }
+}
+```
+
+`rollback` is called whenever all the stores are rolled back.
+
+```js
+class Store {
+  constructor() {
+    this.on('rollback', () => {
+      // do something here
+    })
+  }
+}
+```
 
 ### Single Dispatcher
 
