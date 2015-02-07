@@ -13,7 +13,7 @@
 
 If you're in a hurry [show me the code](#examples) or [tl;dr](#tldr).
 
-Alt is a [flux](http://facebook.github.io/flux/docs/overview.html) implementation that is [small](https://github.com/goatslacker/alt/blob/master/src/alt.js) (~3.9kb & 300 LOC), [well tested](https://github.com/goatslacker/alt/blob/master/test.js), [terse](https://github.com/goatslacker/alt#differences), and meant to be used with ES6.
+Alt is a [flux](http://facebook.github.io/flux/docs/overview.html) implementation that is [small](https://github.com/goatslacker/alt/blob/master/src/alt.js) (~4.3kb & 400 LOC), [well tested](https://github.com/goatslacker/alt/blob/master/test.js), [terse](https://github.com/goatslacker/alt#differences), [insanely flexible](#flexibility), and [forward thinking](#es6).
 
 Some boilerplate has been removed from flux such as the [JS "constants"](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/constants/ChatConstants.js),
 the [static string tossing](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/dispatcher/ChatAppDispatcher.js#L39),
@@ -105,16 +105,18 @@ var Alt = require('alt')
 var alt = new Alt()
 ```
 
-### ES Versions Disclaimer
+### ES6
 
-Alt depends on ES5 features, the good news is so does React. You can use [es5-shim](https://github.com/es-shims/es5-shim)
-to support those pesky old browsers.
+Alt is written in, and encourages ES6. It is completely optional but it is pleasant to write.
 
-Alt encourages ES6 features, the good news is it's pleasant to write. You can use the es6 transpiler that comes
-with react courtesy of [jstransform](https://github.com/facebook/jstransform) or you can use your own favorite ES6 transpiler:
-[6to5](https://6to5.org/), [es-next](https://esnext.github.io/esnext/), or [any es6 transpiler](https://www.npmjs.com/search?q=es6) you fancy.
+You can use the es6 transpiler that comes with react courtesy of
+[jstransform](https://github.com/facebook/jstransform) or you can use one of the other popular ES6 transpilers:
+[6to5](https://6to5.org/) or [traceur](https://github.com/google/traceur-compiler).
 
 You won't need an [es6-shim](https://github.com/paulmillr/es6-shim) but you can use one for further goodies in your javascripts.
+
+Alt does depend on ES5 features, the good news is so does React. You can use [es5-shim](https://github.com/es-shims/es5-shim)
+to support those pesky old browsers.
 
 ### Creating Actions
 
@@ -263,7 +265,7 @@ locationStore.getState().city === 'Denver'
 
 A token that can be used with waitFor.
 
-#### Disclaimer
+#### Important Note
 
 All defined methods in your Store class **will not** be available on the store instance. They are accessible within the class but not on the returned
 Object via `alt.createStore`. This ensures that stores have no direct setters and the state remains mutable only through actions keeping the flow unidirectional.
@@ -603,6 +605,61 @@ alt.createStore(class MyStore {
   }
 })
 ```
+
+### Flexibility
+
+You can choose to use alt in many ways just like you'd use flux. This means your asynchronous data fetching can live in the actions, or they can live in the stores.
+Stores may also be traditional singletons as in flux, or you can create an instance and have multilple store copies. This leads us into server side rendering.
+
+### Server Side Rendering
+
+Alt was built with isomorphism in mind. This means that you can run full flux server-side and pick back up on the client-side.
+
+There are two options for using flux on the server:
+
+* Keep stores as singletons, keep data loading synchronous, bootstrap, and flush.
+* Create multiple instances of flux and inject the context into your app.
+
+#### Stores as Singletons
+
+With this approach your stores are singletons.
+Any actions that load data must be synchronous, meaning you can fetch your data outside of actions and stores, and once done you fire off a synchronous action which loads
+the store. Alternatively, you can gather all of your data, and once complete, you call `bootstrap()` which seeds all the stores with some initial data.
+
+Once you've completed loading the stores with data you call `flush()` which takes a snapshot to send to the client and then resets all the stores' state back to their initial state. This allows the stores to be ready for the next server request.
+
+#### Flux Instances
+
+If you're afraid of singletons, or if you want to skip synchronous actions or data loading you may want to create separate instances of flux for every server request. Taking this approach means you're making the trade-off of injecting the flux instance into your application in order to retrieve the stores and use the actions. This approach is similar to how [fluxible](https://github.com/yahoo/fluxible) solves isomorphic applications. Creating a new alt instances is fairly simple.
+
+```js
+class Flux extends Alt {
+  constructor() {
+    super()
+
+    this.addActions('myActions', ActionCreators)
+    this.addStore('storeName', Store)
+  }
+}
+
+var flux = new Flux()
+
+// sample using react...
+React.render(
+  <App flux={flux} />,
+  document.body
+)
+
+// retrieving stores
+flux.getStore('storeName').getState()
+
+// actions
+flux.getActions('myActions')
+```
+
+#### Picking back up on the client
+
+To help facilitate with isomorphism alt recommends you use [iso](https://github.com/goatslacker/iso), a helper function which serializes the data on the server into markup and then parses that data back into usable JavaScript on the client. Iso is a great complement to alt for a full-stack flux approach.
 
 ## Examples
 
