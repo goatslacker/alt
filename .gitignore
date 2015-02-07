@@ -1,6 +1,5 @@
 node_modules
 npm-debug.log
 coverage
-coverage-test.js
-src/coverage-alt.js
+test/compiled.js
 TODO

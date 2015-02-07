@@ -12,17 +12,22 @@
   "devDependencies": {
     "6to5": "^3.3.12",
     "coveralls": "^2.11.2",
-    "istanbul": "^0.3.5"
+    "istanbul": "^0.3.5",
+    "mocha": "^2.1.0"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/goatslacker/alt.git"
   },
   "scripts": {
-    "build": "6to5 ./src/alt.js > dist/alt.js",
-    "prepublish": "npm run build",
-    "coverage": "npm test; 6to5 --runtime test.js > coverage-test.js; istanbul cover coverage-test.js",
-    "test": "6to5 --runtime src/alt.js > src/coverage-alt.js; 6to5-node test.js;"
+    "build": "npm run build-alt; npm run build-alt-runtime",
+    "build-alt": "6to5 ./src/alt.js > dist/alt.js",
+    "build-alt-runtime": "6to5 --runtime src/alt.js > dist/alt-with-runtime.js",
+    "build-test": "6to5 --runtime test/index.js > test/compiled.js",
+    "coverage": "istanbul cover _mocha -- -u exports -R list test/compiled.js",
+    "prepublish": "npm test",
+    "test": "npm run build; npm run build-test; npm run tests",
+    "tests": "mocha -u exports -R list test/compiled.js"
   },
   "keywords": [
     "flux",
