@@ -715,17 +715,9 @@ class Action {
 var action = alt.createActions(Action)
 ```
 
-## Other Flux Implementations
-
-[Reflux](https://github.com/spoike/refluxjs) is a fun to work with and terse "flux implementation".
-It's not actually flux, but it's still a pleasure to use. Alt brings the terseness of reflux to actual flux.
-
-[Fluxxor](http://fluxxor.com/) is a neat implementation of flux with good documentation and examples.
-
-[...others](https://www.npmjs.com/search?q=flux) there are actually plenty of flux implementations.
-
 ## TL;DR
 
+* Isomorphic
 * Pure Flux
 * No constants
 * No static string checking
@@ -733,13 +725,13 @@ It's not actually flux, but it's still a pleasure to use. Alt brings the tersene
 * Save state snapshots
 * Rollbacks
 * Bootstrap components on app load
-* Isomorphic
 * Light-weight and terse
 * ES6 Syntax, code your actions and stores with classes
+* Flexible
 * Immutable stores
 * Single dispatcher
 * Global listening for debugging
-* Small library ~3.9kb gzipped and less than 300 LOC
+* Small library
 
 ## License
 
