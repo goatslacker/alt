@@ -24,8 +24,10 @@ var INIT_SNAPSHOT = Symbol("init snapshot storage");
 var LAST_SNAPSHOT = Symbol("last snapshot storage");
 var LISTENERS = Symbol("stores action listeners storage");
 var STATE_CONTAINER = VariableSymbol("the state container");
-var STORE_BOOTSTRAP = Symbol("event handler onBootstrap");
-var STORE_SNAPSHOT = Symbol("event handler onTakeSnapshot");
+var STORE_BOOTSTRAP = Symbol("onBootstrapped");
+var STORE_INIT = Symbol("onInitialized");
+var STORE_SNAPSHOT = Symbol("onTakeSnapshot");
+var STORE_ROLLBACK = Symbol("onRolledback");
 
 var formatAsConstant = function (name) {
   return name.replace(/[a-z]([A-Z])/g, function (i) {
@@ -57,8 +59,15 @@ var AltStore = (function () {
 
     this[STATE_CONTAINER] = state;
     this[EE] = new EventEmitter();
-    if (state.onBootstrap) {
-      this[STORE_BOOTSTRAP] = state.onBootstrap.bind(state);
+
+    if (state.onBootstrapped) {
+      this[STORE_BOOTSTRAP] = state.onBootstrapped.bind(state);
+    }
+    if (state.onInitialized) {
+      this[STORE_INIT] = state.onInitialized.bind(state);
+    }
+    if (state.onRolledback) {
+      this[STORE_ROLLBACK] = state.onRolledback.bind(state);
     }
     if (state.onTakeSnapshot) {
       this[STORE_SNAPSHOT] = state.onTakeSnapshot.bind(state);
@@ -71,6 +80,10 @@ var AltStore = (function () {
         result !== false && _this.emitChange();
       }
     });
+
+    if (this[STORE_INIT]) {
+      this[STORE_INIT]();
+    }
   }
 
   _prototypeProperties(AltStore, null, {
@@ -193,13 +206,11 @@ var StoreMixin = {
   }
 };
 
-var setAppState = function (instance, data) {
+var setAppState = function (instance, data, onStore) {
   var obj = JSON.parse(data);
   Object.keys(obj).forEach(function (key) {
     assign(instance.stores[key][STATE_CONTAINER], obj[key]);
-    if (instance.stores[key][STORE_BOOTSTRAP]) {
-      instance.stores[key][STORE_BOOTSTRAP]();
-    }
+    onStore(instance.stores[key]);
   });
 };
 
@@ -343,7 +354,11 @@ var Alt = (function () {
     },
     rollback: {
       value: function rollback() {
-        setAppState(this, this[LAST_SNAPSHOT]);
+        setAppState(this, this[LAST_SNAPSHOT], function (store) {
+          if (store[STORE_ROLLBACK]) {
+            store[STORE_ROLLBACK]();
+          }
+        });
       },
       writable: true,
       configurable: true
@@ -356,7 +371,11 @@ var Alt = (function () {
 
         var snapshot = storeNames.length ? filterSnapshotOfStores(this[INIT_SNAPSHOT], storeNames) : this[INIT_SNAPSHOT];
 
-        setAppState(this, snapshot);
+        setAppState(this, snapshot, function (store) {
+          if (store[STORE_INIT]) {
+            store[STORE_INIT]();
+          }
+        });
       },
       writable: true,
       configurable: true
@@ -372,7 +391,12 @@ var Alt = (function () {
     },
     bootstrap: {
       value: function bootstrap(data) {
-        setAppState(this, data);
+        setAppState(this, data, function (store) {
+          if (store[STORE_BOOTSTRAP]) {
+            store[STORE_BOOTSTRAP]();
+          }
+        });
+
         if (typeof window !== "undefined") {
           if (this[BOOTSTRAP_FLAG]) {
             throw new ReferenceError("Stores have already been bootstrapped");

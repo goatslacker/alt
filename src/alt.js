@@ -18,8 +18,10 @@ let INIT_SNAPSHOT = Symbol('init snapshot storage')
 let LAST_SNAPSHOT = Symbol('last snapshot storage')
 let LISTENERS = Symbol('stores action listeners storage')
 let STATE_CONTAINER = VariableSymbol('the state container')
-let STORE_BOOTSTRAP = Symbol('event handler onBootstrap')
-let STORE_SNAPSHOT = Symbol('event handler onTakeSnapshot')
+let STORE_BOOTSTRAP = Symbol('onBootstrapped')
+let STORE_INIT = Symbol('onInitialized')
+let STORE_SNAPSHOT = Symbol('onTakeSnapshot')
+let STORE_ROLLBACK = Symbol('onRolledback')
 
 let formatAsConstant = (name) => {
   return name.replace(/[a-z]([A-Z])/g, (i) => {
@@ -48,8 +50,15 @@ class AltStore {
   constructor(dispatcher, state) {
     this[STATE_CONTAINER] = state
     this[EE] = new EventEmitter()
-    if (state.onBootstrap) {
-      this[STORE_BOOTSTRAP] = state.onBootstrap.bind(state)
+
+    if (state.onBootstrapped) {
+      this[STORE_BOOTSTRAP] = state.onBootstrapped.bind(state)
+    }
+    if (state.onInitialized) {
+      this[STORE_INIT] = state.onInitialized.bind(state)
+    }
+    if (state.onRolledback) {
+      this[STORE_ROLLBACK] = state.onRolledback.bind(state)
     }
     if (state.onTakeSnapshot) {
       this[STORE_SNAPSHOT] = state.onTakeSnapshot.bind(state)
@@ -62,6 +71,10 @@ class AltStore {
         result !== false && this.emitChange()
       }
     })
+
+    if (this[STORE_INIT]) {
+      this[STORE_INIT]()
+    }
   }
 
   emitChange() {
@@ -165,13 +178,11 @@ let StoreMixin = {
   }
 }
 
-let setAppState = (instance, data) => {
+let setAppState = (instance, data, onStore) => {
   let obj = JSON.parse(data)
   Object.keys(obj).forEach((key) => {
     assign(instance.stores[key][STATE_CONTAINER], obj[key])
-    if (instance.stores[key][STORE_BOOTSTRAP]) {
-      instance.stores[key][STORE_BOOTSTRAP]()
-    }
+    onStore(instance.stores[key])
   })
 }
 
@@ -299,7 +310,11 @@ your own custom identifier for each store`
   }
 
   rollback() {
-    setAppState(this, this[LAST_SNAPSHOT])
+    setAppState(this, this[LAST_SNAPSHOT], (store) => {
+      if (store[STORE_ROLLBACK]) {
+        store[STORE_ROLLBACK]()
+      }
+    })
   }
 
   recycle(...storeNames) {
@@ -307,7 +322,11 @@ your own custom identifier for each store`
       ? filterSnapshotOfStores(this[INIT_SNAPSHOT], storeNames)
       : this[INIT_SNAPSHOT]
 
-    setAppState(this, snapshot)
+    setAppState(this, snapshot, (store) => {
+      if (store[STORE_INIT]) {
+        store[STORE_INIT]()
+      }
+    })
   }
 
   flush() {
@@ -317,7 +336,12 @@ your own custom identifier for each store`
   }
 
   bootstrap(data) {
-    setAppState(this, data)
+    setAppState(this, data, (store) => {
+      if (store[STORE_BOOTSTRAP]) {
+        store[STORE_BOOTSTRAP]()
+      }
+    })
+
     if (typeof window !== 'undefined') {
       if (this[BOOTSTRAP_FLAG]) {
         throw new ReferenceError('Stores have already been bootstrapped')

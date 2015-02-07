@@ -13,7 +13,8 @@ class MyActions {
       'getInstanceInside',
       'dontEmit',
       'moreActions2',
-      'moreActions3'
+      'moreActions3',
+      'resetRecycled'
     )
     this.generateActions('anotherAction')
   }
@@ -91,7 +92,17 @@ class SecondStore {
 
     this.deferrals = 0
 
+    this.recycled = false
+
     this.bindActions(myActions)
+  }
+
+  onInitialized() {
+    this.recycled = true
+  }
+
+  onResetRecycled() {
+    this.recycled = false
   }
 
   onUpdateTwo(x) {
@@ -143,15 +154,25 @@ var secondStore = alt.createStore(SecondStore, 'AltSecondStore')
 class LifeCycleStore {
   constructor() {
     this.bootstrapped = false
+    this.init = false
+    this.rollback = false
     this.snapshotted = false
   }
 
-  onBootstrap() {
+  onInitialized() {
+    this.init = true
+  }
+
+  onBootstrapped() {
     this.bootstrapped = true
   }
 
   onTakeSnapshot() {
     this.snapshotted = true
+  }
+
+  onRolledback() {
+    this.rollback = true
   }
 }
 
@@ -238,8 +259,10 @@ module.exports = {
   'getting state'() {
     assert.equal(typeof myStore.getState()._dispatcher, 'object', 'the dispatcher is exposed internally')
 
-    assert.equal(lifecycleStore.getState().bootstrapped, true, 'bootstrap has not been called yet, but recycle calls onBootstrap')
+    assert.equal(lifecycleStore.getState().bootstrapped, false, 'bootstrap has not been called yet')
     assert.equal(lifecycleStore.getState().snapshotted, false, 'takeSnapshot has not been called yet')
+    assert.equal(lifecycleStore.getState().rollback, false, 'rollback has not been called')
+    assert.equal(lifecycleStore.getState().init, true, 'init gets called when store initializes')
   },
 
   'snapshots and bootstrapping'() {
@@ -323,6 +346,7 @@ module.exports = {
     assert.equal(rollbackValue, undefined, 'rollback returns nothing')
 
     assert.equal(myStore.getState().name, 'bear', 'state has been rolledback to last snapshot')
+    assert.equal(lifecycleStore.getState().rollback, true, 'rollback lifecycle method was called')
   },
 
   'store listening'() {
@@ -570,6 +594,11 @@ module.exports = {
   'recycling'() {
     alt.recycle()
     assert.equal(myStore.getState().name, 'first', 'recycle sets the state back to its origin')
+
+    myActions.resetRecycled()
+    assert.equal(secondStore.getState().recycled, false, 'recycle var was reset due to action')
+    alt.recycle()
+    assert.equal(secondStore.getState().recycled, true, 'onInitialized was called by recycling')
   },
 
   'flushing'() {
