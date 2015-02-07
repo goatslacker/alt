@@ -18,12 +18,9 @@ var BOOTSTRAP_FLAG = VariableSymbol("has bootstrap");
 var EE = Symbol("event emitter instance");
 var INIT_SNAPSHOT = Symbol("init snapshot storage");
 var LAST_SNAPSHOT = Symbol("last snapshot storage");
+var LIFECYCLE = Symbol("store lifecycle listeners");
 var LISTENERS = Symbol("stores action listeners storage");
 var STATE_CONTAINER = VariableSymbol("the state container");
-var STORE_BOOTSTRAP = Symbol("onBootstrapped");
-var STORE_INIT = Symbol("onInitialized");
-var STORE_SNAPSHOT = Symbol("onTakeSnapshot");
-var STORE_ROLLBACK = Symbol("onRolledback");
 
 var formatAsConstant = function (name) {
   return name.replace(/[a-z]([A-Z])/g, function (i) {
@@ -53,21 +50,11 @@ var AltStore = (function () {
     var _this = this;
     to5Runtime.classCallCheck(this, AltStore);
 
-    this[STATE_CONTAINER] = state;
     this[EE] = new EventEmitter();
+    this[LIFECYCLE] = {};
+    this[STATE_CONTAINER] = state;
 
-    if (state.onBootstrapped) {
-      this[STORE_BOOTSTRAP] = state.onBootstrapped.bind(state);
-    }
-    if (state.onInitialized) {
-      this[STORE_INIT] = state.onInitialized.bind(state);
-    }
-    if (state.onRolledback) {
-      this[STORE_ROLLBACK] = state.onRolledback.bind(state);
-    }
-    if (state.onTakeSnapshot) {
-      this[STORE_SNAPSHOT] = state.onTakeSnapshot.bind(state);
-    }
+    assign(this[LIFECYCLE], state[LIFECYCLE]);
 
     // Register dispatcher
     this.dispatchToken = dispatcher.register(function (payload) {
@@ -77,8 +64,8 @@ var AltStore = (function () {
       }
     });
 
-    if (this[STORE_INIT]) {
-      this[STORE_INIT]();
+    if (this[LIFECYCLE].init) {
+      this[LIFECYCLE].init();
     }
   }
 
@@ -146,6 +133,10 @@ var ActionCreator = (function () {
 })();
 
 var StoreMixin = {
+  on: function on(lifecycleEvent, handler) {
+    this[LIFECYCLE][lifecycleEvent] = handler.bind(this);
+  },
+
   bindAction: function bindAction(symbol, handler) {
     if (!symbol) {
       throw new ReferenceError("Invalid action reference passed in");
@@ -212,8 +203,8 @@ var setAppState = function (instance, data, onStore) {
 
 var snapshot = function (instance) {
   return JSON.stringify(Object.keys(instance.stores).reduce(function (obj, key) {
-    if (instance.stores[key][STORE_SNAPSHOT]) {
-      instance.stores[key][STORE_SNAPSHOT]();
+    if (instance.stores[key][LIFECYCLE].snapshot) {
+      instance.stores[key][LIFECYCLE].snapshot();
     }
     obj[key] = instance.stores[key].getState();
     return obj;
@@ -259,6 +250,7 @@ var Alt = (function () {
         // prototype with the mixin behaviour and I'm extending from StoreModel
         // so we can inherit any extensions from the provided store.
         function Store() {
+          this[LIFECYCLE] = {};
           this[LISTENERS] = {};
           StoreModel.call(this);
         }
@@ -351,8 +343,8 @@ var Alt = (function () {
     rollback: {
       value: function rollback() {
         setAppState(this, this[LAST_SNAPSHOT], function (store) {
-          if (store[STORE_ROLLBACK]) {
-            store[STORE_ROLLBACK]();
+          if (store[LIFECYCLE].rollback) {
+            store[LIFECYCLE].rollback();
           }
         });
       },
@@ -368,8 +360,8 @@ var Alt = (function () {
         var snapshot = storeNames.length ? filterSnapshotOfStores(this[INIT_SNAPSHOT], storeNames) : this[INIT_SNAPSHOT];
 
         setAppState(this, snapshot, function (store) {
-          if (store[STORE_INIT]) {
-            store[STORE_INIT]();
+          if (store[LIFECYCLE].init) {
+            store[LIFECYCLE].init();
           }
         });
       },
@@ -388,8 +380,8 @@ var Alt = (function () {
     bootstrap: {
       value: function bootstrap(data) {
         setAppState(this, data, function (store) {
-          if (store[STORE_BOOTSTRAP]) {
-            store[STORE_BOOTSTRAP]();
+          if (store[LIFECYCLE].bootstrap) {
+            store[LIFECYCLE].bootstrap();
           }
         });
 

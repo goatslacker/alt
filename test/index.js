@@ -95,10 +95,10 @@ class SecondStore {
     this.recycled = false
 
     this.bindActions(myActions)
-  }
 
-  onInitialized() {
-    this.recycled = true
+    this.on('init', () => {
+      this.recycled = true
+    })
   }
 
   onResetRecycled() {
@@ -157,22 +157,19 @@ class LifeCycleStore {
     this.init = false
     this.rollback = false
     this.snapshotted = false
-  }
 
-  onInitialized() {
-    this.init = true
-  }
-
-  onBootstrapped() {
-    this.bootstrapped = true
-  }
-
-  onTakeSnapshot() {
-    this.snapshotted = true
-  }
-
-  onRolledback() {
-    this.rollback = true
+    this.on('init', () => {
+      this.init = true
+    })
+    this.on('bootstrap', () => {
+      this.bootstrapped = true
+    })
+    this.on('snapshot', () => {
+      this.snapshotted = true
+    })
+    this.on('rollback', () => {
+      this.rollback = true
+    })
   }
 }
 
@@ -598,7 +595,7 @@ module.exports = {
     myActions.resetRecycled()
     assert.equal(secondStore.getState().recycled, false, 'recycle var was reset due to action')
     alt.recycle()
-    assert.equal(secondStore.getState().recycled, true, 'onInitialized was called by recycling')
+    assert.equal(secondStore.getState().recycled, true, 'init lifecycle method was called by recycling')
   },
 
   'flushing'() {
