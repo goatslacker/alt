@@ -1,6 +1,6 @@
 {
   "name": "alt",
-  "version": "0.12.1",
+  "version": "0.12.2",
   "description": "A flux implementation",
   "main": "dist/alt.js",
   "dependencies": {
