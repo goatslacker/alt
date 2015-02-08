@@ -10,7 +10,7 @@
     "object-assign": "^2.0.0"
   },
   "devDependencies": {
-    "6to5": "3.3.x",
+    "6to5": "^3.5.3",
     "coveralls": "^2.11.2",
     "istanbul": "^0.3.5",
     "mocha": "^2.1.0"
