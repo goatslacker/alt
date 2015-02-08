@@ -26,8 +26,8 @@
     "build-test": "6to5 --runtime test/index.js > test/compiled.js",
     "coverage": "istanbul cover _mocha -- -u exports -R list test/compiled.js",
     "prepublish": "npm test",
-    "test": "npm run build; npm run build-test; npm run tests",
-    "tests": "mocha -u exports -R list test/compiled.js"
+    "test": "npm run build; npm run build-test; npm run tests-all",
+    "tests-all": "mocha -u exports -R list test/compiled.js"
   },
   "keywords": [
     "flux",
