@@ -2,4 +2,5 @@ language: node_js
 script: npm test && npm run coverage && cat ./coverage/lcov.info | coveralls
 node_js:
   - "0.10"
+  - "0.12"
   - iojs
