@@ -14,7 +14,6 @@ var ACTION_DISPATCHER = Symbol("action dispatcher storage");
 var ACTION_HANDLER = Symbol("action creator handler");
 var ACTION_KEY = Symbol("holds the actions uid symbol for listening");
 var ACTION_UID = Symbol("the actions uid name");
-var BOOTSTRAP_FLAG = VariableSymbol("has bootstrap");
 var EE = Symbol("event emitter instance");
 var INIT_SNAPSHOT = Symbol("init snapshot storage");
 var LAST_SNAPSHOT = Symbol("last snapshot storage");
@@ -111,7 +110,6 @@ var ActionCreator = (function () {
     this[ACTION_DISPATCHER] = alt.dispatcher;
     this[ACTION_UID] = name;
     this[ACTION_HANDLER] = action.bind(this);
-    this[BOOTSTRAP_FLAG] = false;
     this.actions = actions;
     this.alt = alt;
   }
@@ -384,13 +382,6 @@ var Alt = (function () {
             store[LIFECYCLE].bootstrap();
           }
         });
-
-        if (typeof window !== "undefined") {
-          if (this[BOOTSTRAP_FLAG]) {
-            throw new ReferenceError("Stores have already been bootstrapped");
-          }
-          this[BOOTSTRAP_FLAG] = true;
-        }
       },
       writable: true,
       configurable: true

@@ -364,21 +364,12 @@ module.exports = {
 
   'bootstrapping'() {
     alt.bootstrap('{"MyStore":{"name":"bee"}}')
-    assert.equal(myStore.getState().name, 'bee', 'on server I can bootstrap many times')
+    assert.equal(myStore.getState().name, 'bee', 'I can bootstrap many times')
 
-    try {
-      // simulate the browser
-      global.window = {};
+    alt.bootstrap('{}')
 
-      alt.bootstrap('{}')
-      // Attempting to bootstrap more than once
-      alt.bootstrap('{"MyStore":{"name":"bee"}}')
-
-      assert.equal(true, false, 'I was able bootstrap more than once which is bad')
-    } catch (e) {
-      assert.equal(e instanceof ReferenceError, true, 'can only bootstrap once')
-      assert.equal(e.message, 'Stores have already been bootstrapped', 'can only bootstrap once')
-    }
+    alt.bootstrap('{"MyStore":{"name":"monkey"}}')
+    assert.equal(myStore.getState().name, 'monkey', 'I can bootstrap many times')
   },
 
   'variadic actions'() {

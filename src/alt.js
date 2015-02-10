@@ -12,7 +12,6 @@ let ACTION_DISPATCHER = Symbol('action dispatcher storage')
 let ACTION_HANDLER = Symbol('action creator handler')
 let ACTION_KEY = Symbol('holds the actions uid symbol for listening')
 let ACTION_UID = Symbol('the actions uid name')
-let BOOTSTRAP_FLAG = VariableSymbol('has bootstrap')
 let EE = Symbol('event emitter instance')
 let INIT_SNAPSHOT = Symbol('init snapshot storage')
 let LAST_SNAPSHOT = Symbol('last snapshot storage')
@@ -87,7 +86,6 @@ class ActionCreator {
     this[ACTION_DISPATCHER] = alt.dispatcher
     this[ACTION_UID] = name
     this[ACTION_HANDLER] = action.bind(this)
-    this[BOOTSTRAP_FLAG] = false
     this.actions = actions
     this.alt = alt
   }
@@ -333,13 +331,6 @@ your own custom identifier for each store`
         store[LIFECYCLE].bootstrap()
       }
     })
-
-    if (typeof window !== 'undefined') {
-      if (this[BOOTSTRAP_FLAG]) {
-        throw new ReferenceError('Stores have already been bootstrapped')
-      }
-      this[BOOTSTRAP_FLAG] = true
-    }
   }
 
   // Instance type methods for injecting alt into your application as context
