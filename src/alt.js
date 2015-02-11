@@ -273,7 +273,7 @@ your own custom identifier for each store`
 
     return Object.keys(actions).reduce((obj, action) => {
       let constant = formatAsConstant(action)
-      let actionName = Symbol.for(`action ${action}`)
+      let actionName = Symbol(`action ${action}`)
 
       // Wrap the action so we can provide a dispatch method
       let newAction = new ActionCreator(

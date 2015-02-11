@@ -50,6 +50,11 @@ alt.createActions(MyActions, myActions)
 
 class MyStore {
   constructor() {
+    let myActionsInst = this.alt.getActions('myActions')
+    if (myActionsInst) {
+      this.bindAction(myActionsInst.updateName, this.onUpdateName)
+    }
+
     this.bindAction(myActions.updateName, this.onUpdateName)
     this.bindAction(myActions.CALL_INTERNAL_METHOD, this.doCallInternal)
     this.bindAction(myActions.dontEmit, this.dontEmitEvent)
@@ -201,10 +206,8 @@ var nameActions1 = alt1.createActions(NameActions)
 var nameActions2 = alt2.createActions(NameActions)
 
 function NameStore() {
-  // It's ok to bind whatever actions since Symbol.for maintains
-  // a global registry. As long as the methods called in nameActions2 are defined
-  // in nameActions1 so the constants are created.
   this.bindActions(nameActions1)
+  this.bindActions(nameActions2)
   this.name = 'foo'
 }
 
