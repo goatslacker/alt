@@ -428,6 +428,9 @@ module.exports = {
       })
       assert.equal(true, false, 'a store was able to register with multiple action handlers on the same action')
     } catch (e) {
+      if (e.name === 'AssertionError') {
+        throw e
+      }
       assert.equal(e.message, 'You have multiple action handlers bound to an action: updateName and onUpdateName', 'error message is correct')
     }
 
@@ -445,6 +448,9 @@ module.exports = {
       })
       assert.equal(true, false, 'an evil store was able to overload the innocent store\'s action handler')
     } catch (e) {
+      if (e.name === 'AssertionError') {
+        throw e
+      }
       assert.equal(e.message, 'You have multiple action handlers bound to an action: updateName and onUpdateName', 'error message is correct')
     }
   },
@@ -463,6 +469,9 @@ module.exports = {
 
       assert.equal(true, false, 'i was able to bind an undefined action handler')
     } catch (e) {
+      if (e.name === 'AssertionError') {
+        throw e
+      }
       assert.equal(e.message, 'Invalid action reference passed in', 'proper error message for undefined action')
     }
 
@@ -477,6 +486,9 @@ module.exports = {
 
       assert.equal(true, false, 'i was able to bind an action handler to undefined')
     } catch (e) {
+      if (e.name === 'AssertionError') {
+        throw e
+      }
       assert.equal(e.message, 'bindAction expects a function', 'proper error message for undefined action')
     }
   },
@@ -505,6 +517,9 @@ module.exports = {
 
       assert.equal(true, false, 'i was able to waitFor nothing')
     } catch (e) {
+      if (e.name === 'AssertionError') {
+        throw e
+      }
       assert.equal(e.message, 'Dispatch tokens not provided', 'must provide dispatch tokens')
     }
   },
@@ -522,6 +537,9 @@ module.exports = {
       alt.createStore(MethodsAreUnary1)
       assert.equal(true, false, 'i bound a method with two args successfully using bindActions')
     } catch (e) {
+      if (e.name === 'AssertionError') {
+        throw e
+      }
       assert.equal(e instanceof TypeError, true, 'A TypeError was thrown, you cant bind two args with bindActions')
     }
 
@@ -537,6 +555,9 @@ module.exports = {
       alt.createStore(MethodsAreUnary2)
       assert.equal(true, false, 'i bound a method with two args successfully using bindAction')
     } catch (e) {
+      if (e.name === 'AssertionError') {
+        throw e
+      }
       assert.equal(e instanceof TypeError, true, 'A TypeError was thrown, you cant bind two args with bindAction')
     }
   },
@@ -559,6 +580,9 @@ module.exports = {
       alt.createStore(MyStore)
       assert.equal(true, false, 'I was able to create a store with the same name')
     } catch (e) {
+      if (e.name === 'AssertionError') {
+        throw e
+      }
       assert.equal(e instanceof ReferenceError, true, 'error was thrown for store with same name')
     }
 
@@ -569,6 +593,9 @@ module.exports = {
       alt.createStore(mystore, 'MyStore')
       assert.equal(true, false, 'I was able to create a store with the same name by passing in an identifier')
     } catch (e) {
+      if (e.name === 'AssertionError') {
+        throw e
+      }
       assert.equal(e instanceof ReferenceError, true, 'error was thrown for store with same name')
     }
   },
@@ -615,6 +642,9 @@ module.exports = {
       alt.recycle('StoreThatDoesNotExist')
       assert.equal(true, false, 'I was able to recycle a store that does not exist')
     } catch (e) {
+      if (e.name === 'AssertionError') {
+        throw e
+      }
       assert.equal(e instanceof ReferenceError, true, 'store that does not exist throws a RefenceError')
       assert.equal(e.message, 'StoreThatDoesNotExist is not a valid store')
     }
@@ -646,5 +676,87 @@ module.exports = {
     assert.equal(nameStore2.getState().name, 'baz', 'this store has different state')
     assert.equal(altInstance.getStore('myStore').getState().name, 'first', 'other stores not affected')
     assert.equal(myStore.getState().name, 'first', 'other singleton store not affected')
+  },
+
+  'actions with the same name'() {
+    var alt = new Alt()
+
+    function UserActions() {
+      this.generateActions('update')
+    }
+    var ua = alt.createActions(UserActions)
+
+    function LinkActions() {
+      this.generateActions('update')
+    }
+    var la = alt.createActions(LinkActions)
+
+    function Store() {
+      this.bindAction(ua.UPDATE, this.ua)
+      this.bindAction(la.UPDATE, this.la)
+
+      this.a = 0
+      this.b = 0
+    }
+
+    Store.prototype.ua = function () {
+      this.a = 1
+    }
+
+    Store.prototype.la = function () {
+      this.b = 1
+    }
+
+    var store = alt.createStore(Store)
+
+    ua.update()
+    la.update()
+
+    var state = store.getState()
+
+    assert.equal(state.a, 1, 'both actions were called')
+    assert.equal(state.b, 1, 'both actions were called')
+  },
+
+  'actions with the same name and same class name'() {
+    var alt = new Alt()
+
+    var ua = (function () {
+      function a() { this.generateActions('update') }
+      return alt.createActions(a)
+    }())
+
+    var la = (function () {
+      function a() { this.generateActions('update') }
+      return alt.createActions(a)
+    }())
+
+    class Store {
+      constructor() {
+        this.bindAction(ua.UPDATE, this.ua)
+        this.bindAction(la.UPDATE, this.la)
+
+        this.a = 0
+        this.b = 0
+      }
+
+      ua() {
+        this.a = 1
+      }
+
+      la() {
+        this.b = 1
+      }
+    }
+
+    var store = alt.createStore(Store)
+
+    ua.update()
+    la.update()
+
+    var state = store.getState()
+
+    assert.equal(state.a, 1, 'both actions were called')
+    assert.equal(state.b, 1, 'both actions were called')
   }
 }
