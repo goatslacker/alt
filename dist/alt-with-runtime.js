@@ -282,6 +282,7 @@ var Alt = (function () {
         var _this = this;
         var exportObj = arguments[1] === undefined ? {} : arguments[1];
         var actions = assign({}, getInternalMethods(ActionsClass.prototype, builtInProto));
+        var key = ActionsClass.displayName || ActionsClass.name;
 
         function ActionsGenerator() {
           ActionsClass.call(this);
@@ -308,7 +309,7 @@ var Alt = (function () {
 
         return Object.keys(actions).reduce(function (obj, action) {
           var constant = formatAsConstant(action);
-          var actionName = Symbol("action " + action);
+          var actionName = Symbol("action " + key + "#" + action);
 
           // Wrap the action so we can provide a dispatch method
           var newAction = new ActionCreator(_this, actionName, actions[action], obj);
