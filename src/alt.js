@@ -354,4 +354,4 @@ your own custom identifier for each store`
   }
 }
 
-module.exports = Alt
+export default Alt

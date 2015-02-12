@@ -1,9 +1,9 @@
 require('6to5/runtime')
 
-var Alt = require('../dist/alt-with-runtime')
-var assert = require('assert')
+let Alt = require('../dist/alt-with-runtime')
+let assert = require('assert')
 
-var alt = new Alt()
+let alt = new Alt()
 
 class MyActions {
   constructor() {
@@ -45,7 +45,7 @@ class MyActions {
   }
 }
 
-var myActions = {}
+let myActions = {}
 alt.createActions(MyActions, myActions)
 
 class MyStore {
@@ -87,7 +87,7 @@ class MyStore {
   }
 }
 
-var myStore = alt.createStore(MyStore)
+let myStore = alt.createStore(MyStore)
 
 class SecondStore {
   constructor() {
@@ -154,7 +154,7 @@ class SecondStore {
   }
 }
 
-var secondStore = alt.createStore(SecondStore, 'AltSecondStore')
+let secondStore = alt.createStore(SecondStore, 'AltSecondStore')
 
 class LifeCycleStore {
   constructor() {
@@ -178,7 +178,7 @@ class LifeCycleStore {
   }
 }
 
-var lifecycleStore = alt.createStore(LifeCycleStore)
+let lifecycleStore = alt.createStore(LifeCycleStore)
 
 // Alt instances...
 
@@ -190,20 +190,20 @@ class AltInstance extends Alt {
   }
 }
 
-var altInstance = new AltInstance()
+let altInstance = new AltInstance()
 
 
 // Really confusing set of instances
-var alt1 = new Alt()
-var alt2 = new Alt()
+let alt1 = new Alt()
+let alt2 = new Alt()
 
 function NameActions() { }
 NameActions.prototype.updateName = function (name) {
   this.dispatch(name)
 }
 
-var nameActions1 = alt1.createActions(NameActions)
-var nameActions2 = alt2.createActions(NameActions)
+let nameActions1 = alt1.createActions(NameActions)
+let nameActions2 = alt2.createActions(NameActions)
 
 function NameStore() {
   this.bindActions(nameActions1)
@@ -215,12 +215,12 @@ NameStore.prototype.onUpdateName = function (name) {
   this.name = name
 }
 
-var nameStore1 = alt1.createStore(NameStore)
-var nameStore2 = alt2.createStore(NameStore)
+let nameStore1 = alt1.createStore(NameStore)
+let nameStore2 = alt2.createStore(NameStore)
 
 
 /* istanbul ignore next */
-module.exports = {
+let tests = {
   beforeEach() {
     alt.recycle()
     altInstance.recycle()
@@ -240,8 +240,8 @@ module.exports = {
   },
 
   'store methods'() {
-    var storePrototype = Object.getPrototypeOf(myStore)
-    var assertMethods = ['constructor', 'emitChange', 'listen', 'unlisten', 'getState']
+    let storePrototype = Object.getPrototypeOf(myStore)
+    let assertMethods = ['constructor', 'emitChange', 'listen', 'unlisten', 'getState']
     assert.deepEqual(Object.getOwnPropertyNames(storePrototype), assertMethods, 'methods exist for store')
     assert.equal(typeof myStore.addListener, 'undefined', 'event emitter methods not present')
     assert.equal(typeof myStore.removeListener, 'undefined', 'event emitter methods not present')
@@ -266,10 +266,10 @@ module.exports = {
   },
 
   'snapshots and bootstrapping'() {
-    var initialSnapshot = alt.takeSnapshot()
+    let initialSnapshot = alt.takeSnapshot()
     assert.equal(lifecycleStore.getState().snapshotted, true, 'takeSnapshot was called and the life cycle event was triggered')
 
-    var bootstrapReturnValue = alt.bootstrap(initialSnapshot)
+    let bootstrapReturnValue = alt.bootstrap(initialSnapshot)
     assert.equal(bootstrapReturnValue, undefined, 'bootstrap returns nothing')
     assert.equal(lifecycleStore.getState().bootstrapped, true, 'bootstrap was called and the life cycle event was triggered')
   },
@@ -295,7 +295,7 @@ module.exports = {
   },
 
   'internal actions'() {
-    var internalActions = myActions.justTestingInternalActions()
+    let internalActions = myActions.justTestingInternalActions()
     assert.equal(typeof internalActions.updateThree, 'function', 'actions (below) are available internally through this.actions')
     assert.equal(typeof internalActions.updateName, 'function', 'actions (above) are available internally through this.actions')
     assert.equal(typeof internalActions.updateName.defer, 'function', 'making sure internal actions has a defer as well')
@@ -309,7 +309,7 @@ module.exports = {
   },
 
   'calling actions'() {
-    var actionReturnType = myActions.updateName('bear')
+    let actionReturnType = myActions.updateName('bear')
     assert.equal(actionReturnType, undefined, 'action returns nothing')
 
     assert.equal(myStore.getState().name, 'bear', 'action was called, state was updated properly')
@@ -324,7 +324,7 @@ module.exports = {
 
   'snapshotting'() {
     myActions.updateName('bear')
-    var snapshot = alt.takeSnapshot()
+    let snapshot = alt.takeSnapshot()
     assert.equal(typeof snapshot, 'string', 'a snapshot json is returned')
     assert.equal(JSON.parse(snapshot).MyStore.name, 'bear', 'the state is current')
     assert.equal(typeof JSON.parse(snapshot).AltSecondStore, 'object', 'the custom identifier name works')
@@ -335,14 +335,14 @@ module.exports = {
   },
 
   'mutation'() {
-    var state = myStore.getState()
+    let state = myStore.getState()
     state.name = 'foobar'
     assert.equal(state.name, 'foobar', 'mutated returned state')
     assert.equal(myStore.getState().name, 'first', 'store state was not mutated')
   },
 
   'rolling back'() {
-    var rollbackValue = alt.rollback()
+    let rollbackValue = alt.rollback()
     assert.equal(rollbackValue, undefined, 'rollback returns nothing')
 
     assert.equal(myStore.getState().name, 'bear', 'state has been rolledback to last snapshot')
@@ -350,7 +350,7 @@ module.exports = {
   },
 
   'store listening'() {
-    var mooseChecker = (x) => {
+    let mooseChecker = (x) => {
       assert.equal(x.name, 'moose', 'listener for store works')
       assert.equal(myStore.getState().name, 'moose', 'new store state present')
     }
@@ -375,7 +375,7 @@ module.exports = {
     assert.equal(myStore.getState().name, 'monkey', 'I can bootstrap many times')
   },
 
-  'variadic actions'() {
+  'letiadic actions'() {
     myActions.updateTwo(4, 2)
     assert.equal(secondStore.getState().foo, 6, 'im able to pass two params into an action')
 
@@ -506,7 +506,7 @@ module.exports = {
           this.generateActions('pleaseWait')
         }
       }
-      var waiter = alt.createActions(WaitPlease)
+      let waiter = alt.createActions(WaitPlease)
 
       class WaitsForNobody {
         constructor() {
@@ -580,7 +580,7 @@ module.exports = {
 
   'stores with colliding names'() {
     try {
-      var MyStore = (function () {
+      let MyStore = (function () {
         return function MyStore() { }
       }())
       alt.createStore(MyStore)
@@ -593,7 +593,7 @@ module.exports = {
     }
 
     try {
-      var mystore = (function () {
+      let mystore = (function () {
         return function mystore() { }
       }())
       alt.createStore(mystore, 'MyStore')
@@ -620,14 +620,14 @@ module.exports = {
     assert.equal(myStore.getState().name, 'first', 'recycle sets the state back to its origin')
 
     myActions.resetRecycled()
-    assert.equal(secondStore.getState().recycled, false, 'recycle var was reset due to action')
+    assert.equal(secondStore.getState().recycled, false, 'recycle let was reset due to action')
     alt.recycle()
     assert.equal(secondStore.getState().recycled, true, 'init lifecycle method was called by recycling')
   },
 
   'flushing'() {
     myActions.updateName('goat')
-    var flushed = JSON.parse(alt.flush())
+    let flushed = JSON.parse(alt.flush())
     assert.equal(myStore.getState().name, 'first', 'flush is a lot like recycle')
     assert.equal(flushed.MyStore.name, 'goat', 'except that flush returns the state before recycling')
 
@@ -663,10 +663,10 @@ module.exports = {
     assert.equal(typeof altInstance.createActions, 'function', 'createActions function')
     assert.equal(typeof altInstance.createStore, 'function', 'createStore function')
 
-    var myActionsFromInst = altInstance.getActions('myActions')
+    let myActionsFromInst = altInstance.getActions('myActions')
     assert.equal(typeof myActionsFromInst, 'object', 'the actions exist')
 
-    var myActionsFail = altInstance.getActions('ActionsThatDontExist')
+    let myActionsFail = altInstance.getActions('ActionsThatDontExist')
     assert.equal(typeof myActionsFail, 'undefined', 'undefined actions')
 
     myActionsFromInst.updateName('lion')
@@ -685,17 +685,17 @@ module.exports = {
   },
 
   'actions with the same name'() {
-    var alt = new Alt()
+    let alt = new Alt()
 
     function UserActions() {
       this.generateActions('update')
     }
-    var ua = alt.createActions(UserActions)
+    let ua = alt.createActions(UserActions)
 
     function LinkActions() {
       this.generateActions('update')
     }
-    var la = alt.createActions(LinkActions)
+    let la = alt.createActions(LinkActions)
 
     function Store() {
       this.bindAction(ua.UPDATE, this.ua)
@@ -713,26 +713,26 @@ module.exports = {
       this.b = 1
     }
 
-    var store = alt.createStore(Store)
+    let store = alt.createStore(Store)
 
     ua.update()
     la.update()
 
-    var state = store.getState()
+    let state = store.getState()
 
     assert.equal(state.a, 1, 'both actions were called')
     assert.equal(state.b, 1, 'both actions were called')
   },
 
   'actions with the same name and same class name'() {
-    var alt = new Alt()
+    let alt = new Alt()
 
-    var ua = (function () {
+    let ua = (function () {
       function a() { this.generateActions('update') }
       return alt.createActions(a)
     }())
 
-    var la = (function () {
+    let la = (function () {
       function a() { this.generateActions('update') }
       return alt.createActions(a)
     }())
@@ -755,30 +755,32 @@ module.exports = {
       }
     }
 
-    var store = alt.createStore(Store)
+    let store = alt.createStore(Store)
 
     ua.update()
     la.update()
 
-    var state = store.getState()
+    let state = store.getState()
 
     assert.equal(state.a, 1, 'both actions were called')
     assert.equal(state.b, 1, 'both actions were called')
   },
 
   'dispatching from alt instance'() {
-    var inst = new AltInstance()
-    var called = false
-    var listen = (x) => {
+    let inst = new AltInstance()
+    let called = false
+    let listen = (x) => {
       assert.equal(x.action, inst.getActions('myActions').updateName, 'the action provided is correct')
       assert.equal(x.data, 'yo', 'i can dispatch instances on my own')
       called = true
     }
 
-    var id = inst.dispatcher.register(listen)
+    let id = inst.dispatcher.register(listen)
     inst.dispatch(inst.getActions('myActions').updateName, 'yo')
     inst.dispatcher.unregister(id)
 
     assert.equal(called, true, 'listener was called')
   }
 }
+
+export default tests
