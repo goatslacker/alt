@@ -318,9 +318,13 @@ var Alt = (function () {
 
           // Set all the properties on action
           obj[action] = newAction[ACTION_HANDLER];
-          obj[action].defer = function (x) {
-            return setTimeout(function () {
-              return newAction[ACTION_HANDLER](x);
+          obj[action].defer = function () {
+            for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+              args[_key] = arguments[_key];
+            }
+
+            setTimeout(function () {
+              return newAction[ACTION_HANDLER].apply(null, args);
             });
           };
           obj[action][ACTION_KEY] = actionName;

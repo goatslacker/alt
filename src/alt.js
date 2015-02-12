@@ -285,7 +285,9 @@ your own custom identifier for each store`
 
       // Set all the properties on action
       obj[action] = newAction[ACTION_HANDLER]
-      obj[action].defer = (x) => setTimeout(() => newAction[ACTION_HANDLER](x))
+      obj[action].defer = (...args) => {
+        setTimeout(() => newAction[ACTION_HANDLER].apply(null, args))
+      }
       obj[action][ACTION_KEY] = actionName
       obj[constant] = actionName
 

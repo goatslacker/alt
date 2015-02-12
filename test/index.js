@@ -386,6 +386,12 @@ module.exports = {
     assert.equal(Array.isArray(secondStore.getState().foo), true, 'shorthand for multiple elements pass through goes as array')
     assert.equal(secondStore.getState().foo[0], 1, 'shorthand for multiple elements pass through goes as array')
     assert.equal(secondStore.getState().foo[1], 0, 'shorthand for multiple elements pass through goes as array')
+
+    myActions.shortHandBinary.defer(2, 1)
+    setTimeout(() => {
+      assert.equal(secondStore.getState().foo[0], 2, 'shorthand for defer multiple elements pass through goes as array')
+      assert.equal(secondStore.getState().foo[1], 1, 'shorthand for defer multiple elements pass through goes as array')
+    })
   },
 
   'access of stores'() {
