@@ -8,7 +8,6 @@ let assign = require('object-assign')
 let now = Date.now()
 let VariableSymbol = (desc) => Symbol(`${now}${desc}`)
 
-let ACTION_DISPATCHER = Symbol('action dispatcher storage')
 let ACTION_HANDLER = Symbol('action creator handler')
 let ACTION_KEY = Symbol('holds the actions uid symbol for listening')
 let ACTION_UID = Symbol('the actions uid name')
@@ -83,7 +82,6 @@ class AltStore {
 
 class ActionCreator {
   constructor(alt, name, action, actions) {
-    this[ACTION_DISPATCHER] = alt.dispatcher
     this[ACTION_UID] = name
     this[ACTION_HANDLER] = action.bind(this)
     this.actions = actions
@@ -91,7 +89,7 @@ class ActionCreator {
   }
 
   dispatch(data) {
-    this[ACTION_DISPATCHER].dispatch({
+    this.alt.dispatcher.dispatch({
       action: this[ACTION_UID],
       data: data
     })

@@ -14,7 +14,6 @@ var VariableSymbol = function (desc) {
   return Symbol("" + now + "" + desc);
 };
 
-var ACTION_DISPATCHER = Symbol("action dispatcher storage");
 var ACTION_HANDLER = Symbol("action creator handler");
 var ACTION_KEY = Symbol("holds the actions uid symbol for listening");
 var ACTION_UID = Symbol("the actions uid name");
@@ -111,7 +110,6 @@ var ActionCreator = (function () {
   function ActionCreator(alt, name, action, actions) {
     _classCallCheck(this, ActionCreator);
 
-    this[ACTION_DISPATCHER] = alt.dispatcher;
     this[ACTION_UID] = name;
     this[ACTION_HANDLER] = action.bind(this);
     this.actions = actions;
@@ -121,7 +119,7 @@ var ActionCreator = (function () {
   _prototypeProperties(ActionCreator, null, {
     dispatch: {
       value: function dispatch(data) {
-        this[ACTION_DISPATCHER].dispatch({
+        this.alt.dispatcher.dispatch({
           action: this[ACTION_UID],
           data: data
         });
