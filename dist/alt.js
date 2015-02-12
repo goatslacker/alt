@@ -119,10 +119,7 @@ var ActionCreator = (function () {
   _prototypeProperties(ActionCreator, null, {
     dispatch: {
       value: function dispatch(data) {
-        this.alt.dispatcher.dispatch({
-          action: this[ACTION_UID],
-          data: data
-        });
+        this.alt.dispatch(this[ACTION_UID], data);
       },
       writable: true,
       configurable: true
@@ -242,6 +239,13 @@ var Alt = (function () {
   }
 
   _prototypeProperties(Alt, null, {
+    dispatch: {
+      value: function dispatch(action, data) {
+        this.dispatcher.dispatch({ action: action, data: data });
+      },
+      writable: true,
+      configurable: true
+    },
     createStore: {
       value: function createStore(StoreModel, iden) {
         var _this = this;

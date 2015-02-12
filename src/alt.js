@@ -89,10 +89,7 @@ class ActionCreator {
   }
 
   dispatch(data) {
-    this.alt.dispatcher.dispatch({
-      action: this[ACTION_UID],
-      data: data
-    })
+    this.alt.dispatch(this[ACTION_UID], data)
   }
 }
 
@@ -211,6 +208,10 @@ class Alt {
     this.stores = {}
     this[LAST_SNAPSHOT] = null
     this[INIT_SNAPSHOT] = '{}'
+  }
+
+  dispatch(action, data) {
+    this.dispatcher.dispatch({ action, data })
   }
 
   createStore(StoreModel, iden) {

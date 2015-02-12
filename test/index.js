@@ -758,5 +758,21 @@ module.exports = {
 
     assert.equal(state.a, 1, 'both actions were called')
     assert.equal(state.b, 1, 'both actions were called')
+  },
+
+  'dispatching from alt instance'() {
+    var inst = new AltInstance()
+    var called = false
+    var listen = (x) => {
+      assert.equal(x.action, inst.getActions('myActions').updateName, 'the action provided is correct')
+      assert.equal(x.data, 'yo', 'i can dispatch instances on my own')
+      called = true
+    }
+
+    var id = inst.dispatcher.register(listen)
+    inst.dispatch(inst.getActions('myActions').updateName, 'yo')
+    inst.dispatcher.unregister(id)
+
+    assert.equal(called, true, 'listener was called')
   }
 }
