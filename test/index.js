@@ -375,7 +375,7 @@ let tests = {
     assert.equal(myStore.getState().name, 'monkey', 'I can bootstrap many times')
   },
 
-  'letiadic actions'() {
+  'letiadic actions'(done) {
     myActions.updateTwo(4, 2)
     assert.equal(secondStore.getState().foo, 6, 'im able to pass two params into an action')
 
@@ -387,10 +387,12 @@ let tests = {
     assert.equal(secondStore.getState().foo[0], 1, 'shorthand for multiple elements pass through goes as array')
     assert.equal(secondStore.getState().foo[1], 0, 'shorthand for multiple elements pass through goes as array')
 
+
     myActions.shortHandBinary.defer(2, 1)
     setTimeout(() => {
       assert.equal(secondStore.getState().foo[0], 2, 'shorthand for defer multiple elements pass through goes as array')
       assert.equal(secondStore.getState().foo[1], 1, 'shorthand for defer multiple elements pass through goes as array')
+      done()
     })
   },
 
