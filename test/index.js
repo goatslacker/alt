@@ -14,7 +14,8 @@ class MyActions {
       'dontEmit',
       'moreActions2',
       'moreActions3',
-      'resetRecycled'
+      'resetRecycled',
+      'asyncStoreAction'
     )
     this.generateActions('anotherAction')
   }
@@ -58,11 +59,21 @@ class MyStore {
     this.bindAction(myActions.updateName, this.onUpdateName)
     this.bindAction(myActions.CALL_INTERNAL_METHOD, this.doCallInternal)
     this.bindAction(myActions.dontEmit, this.dontEmitEvent)
+    this.bindAction(myActions.asyncStoreAction, this.doStoreAsync)
     this.name = 'first'
     this.calledInternal = false
     this.dontEmitEventCalled = false
+    this.async = false
 
     this._dispatcher = this.dispatcher
+  }
+
+  doStoreAsync() {
+    setTimeout(() => {
+      this.async = true
+      this.getInstance().emitChange()
+    })
+    return false
   }
 
   onUpdateName(name) {
@@ -782,6 +793,19 @@ let tests = {
     inst.dispatcher.unregister(id)
 
     assert.equal(called, true, 'listener was called')
+  },
+
+  'emit change method works from the store'(done) {
+    assert.equal(myStore.getState().async, false, 'store async is false')
+
+    let listener = () => {
+      assert.equal(myStore.getState().async, true, 'store async is true')
+      myStore.unlisten(listener)
+      done()
+    }
+
+    myStore.listen(listener)
+    myActions.asyncStoreAction()
   }
 }
 

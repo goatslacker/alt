@@ -219,12 +219,14 @@ class Alt {
     // Creating a class here so we don't overload the provided store's
     // prototype with the mixin behaviour and I'm extending from StoreModel
     // so we can inherit any extensions from the provided store.
-    function Store() {
-      this[LIFECYCLE] = {}
-      this[LISTENERS] = {}
-      StoreModel.call(this)
+    class Store extends StoreModel {
+      constructor() {
+        this[LIFECYCLE] = {}
+        this[LISTENERS] = {}
+        super()
+      }
     }
-    Store.prototype = StoreModel.prototype
+
     assign(Store.prototype, StoreMixin, {
       _storeName: key,
       alt: this,
@@ -258,15 +260,19 @@ your own custom identifier for each store`
     )
     let key = ActionsClass.displayName || ActionsClass.name
 
-    function ActionsGenerator() { ActionsClass.call(this) }
-    ActionsGenerator.prototype = ActionsClass.prototype
-    ActionsGenerator.prototype.generateActions = (...actionNames) => {
-      actionNames.forEach((actionName) => {
-        // This is a function so we can later bind this to ActionCreator
-        actions[actionName] = function (x, ...a) {
-          this.dispatch(a.length ? [x].concat(a) : x)
-        }
-      })
+    class ActionsGenerator extends ActionsClass {
+      constructor() {
+        super()
+      }
+
+      generateActions(...actionNames) {
+        actionNames.forEach((actionName) => {
+          // This is a function so we can later bind this to ActionCreator
+          actions[actionName] = function (x, ...a) {
+            this.dispatch(a.length ? [x].concat(a) : x)
+          }
+        })
+      }
     }
 
     new ActionsGenerator()

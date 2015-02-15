@@ -1,5 +1,9 @@
 "use strict";
 
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
 var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
@@ -49,7 +53,7 @@ var getInternalMethods = function (obj, excluded) {
 
 var AltStore = (function () {
   function AltStore(dispatcher, state) {
-    var _this = this;
+    var _this5 = this;
     _classCallCheck(this, AltStore);
 
     this[EE] = new EventEmitter();
@@ -62,7 +66,7 @@ var AltStore = (function () {
     this.dispatchToken = dispatcher.register(function (payload) {
       if (state[LISTENERS][payload.action]) {
         var result = state[LISTENERS][payload.action](payload.data);
-        result !== false && _this.emitChange();
+        result !== false && _this5.emitChange();
       }
     });
 
@@ -155,7 +159,7 @@ var StoreMixin = {
   },
 
   bindActions: function bindActions(actions) {
-    var _this = this;
+    var _this5 = this;
     Object.keys(actions).forEach(function (action) {
       var symbol = actions[action];
       var matchFirstCharacter = /./;
@@ -164,19 +168,19 @@ var StoreMixin = {
       });
       var handler = null;
 
-      if (_this[action] && _this[assumedEventHandler]) {
+      if (_this5[action] && _this5[assumedEventHandler]) {
         // If you have both action and onAction
         throw new ReferenceError("You have multiple action handlers bound to an action: " + ("" + action + " and " + assumedEventHandler));
-      } else if (_this[action]) {
+      } else if (_this5[action]) {
         // action
-        handler = _this[action];
-      } else if (_this[assumedEventHandler]) {
+        handler = _this5[action];
+      } else if (_this5[assumedEventHandler]) {
         // onAction
-        handler = _this[assumedEventHandler];
+        handler = _this5[assumedEventHandler];
       }
 
       if (handler) {
-        _this.bindAction(symbol, handler);
+        _this5.bindAction(symbol, handler);
       }
     });
   },
@@ -248,25 +252,34 @@ var Alt = (function () {
     },
     createStore: {
       value: function createStore(StoreModel, iden) {
-        var _this = this;
+        var _this5 = this;
         var key = iden || StoreModel.displayName || StoreModel.name;
         // Creating a class here so we don't overload the provided store's
         // prototype with the mixin behaviour and I'm extending from StoreModel
         // so we can inherit any extensions from the provided store.
-        function Store() {
-          this[LIFECYCLE] = {};
-          this[LISTENERS] = {};
-          StoreModel.call(this);
-        }
-        Store.prototype = StoreModel.prototype;
+        var Store = (function (StoreModel) {
+          function Store() {
+            _classCallCheck(this, Store);
+
+            this[LIFECYCLE] = {};
+            this[LISTENERS] = {};
+            _get(Object.getPrototypeOf(Store.prototype), "constructor", this).call(this);
+          }
+
+          _inherits(Store, StoreModel);
+
+          return Store;
+        })(StoreModel);
+
         assign(Store.prototype, StoreMixin, {
           _storeName: key,
           alt: this,
           dispatcher: this.dispatcher,
           getInstance: function () {
-            return _this.stores[key];
+            return _this5.stores[key];
           }
         });
+
 
         var store = new Store();
 
@@ -285,31 +298,45 @@ var Alt = (function () {
     },
     createActions: {
       value: function createActions(ActionsClass) {
-        var _this = this;
+        var _this5 = this;
         var exportObj = arguments[1] === undefined ? {} : arguments[1];
         var actions = assign({}, getInternalMethods(ActionsClass.prototype, builtInProto));
         var key = ActionsClass.displayName || ActionsClass.name;
 
-        function ActionsGenerator() {
-          ActionsClass.call(this);
-        }
-        ActionsGenerator.prototype = ActionsClass.prototype;
-        ActionsGenerator.prototype.generateActions = function () {
-          for (var _len = arguments.length, actionNames = Array(_len), _key = 0; _key < _len; _key++) {
-            actionNames[_key] = arguments[_key];
+        var ActionsGenerator = (function (ActionsClass) {
+          function ActionsGenerator() {
+            _classCallCheck(this, ActionsGenerator);
+
+            _get(Object.getPrototypeOf(ActionsGenerator.prototype), "constructor", this).call(this);
           }
 
-          actionNames.forEach(function (actionName) {
-            // This is a function so we can later bind this to ActionCreator
-            actions[actionName] = function (x) {
-              for (var _len2 = arguments.length, a = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-                a[_key2 - 1] = arguments[_key2];
-              }
+          _inherits(ActionsGenerator, ActionsClass);
 
-              this.dispatch(a.length ? [x].concat(a) : x);
-            };
+          _prototypeProperties(ActionsGenerator, null, {
+            generateActions: {
+              value: function generateActions() {
+                for (var _len = arguments.length, actionNames = Array(_len), _key = 0; _key < _len; _key++) {
+                  actionNames[_key] = arguments[_key];
+                }
+
+                actionNames.forEach(function (actionName) {
+                  // This is a function so we can later bind this to ActionCreator
+                  actions[actionName] = function (x) {
+                    for (var _len2 = arguments.length, a = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+                      a[_key2 - 1] = arguments[_key2];
+                    }
+
+                    this.dispatch(a.length ? [x].concat(a) : x);
+                  };
+                });
+              },
+              writable: true,
+              configurable: true
+            }
           });
-        };
+
+          return ActionsGenerator;
+        })(ActionsClass);
 
         new ActionsGenerator();
 
@@ -318,7 +345,7 @@ var Alt = (function () {
           var actionName = Symbol("action " + key + "#" + action);
 
           // Wrap the action so we can provide a dispatch method
-          var newAction = new ActionCreator(_this, actionName, actions[action], obj);
+          var newAction = new ActionCreator(_this5, actionName, actions[action], obj);
 
           // Set all the properties on action
           obj[action] = newAction[ACTION_HANDLER];
