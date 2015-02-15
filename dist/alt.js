@@ -280,7 +280,6 @@ var Alt = (function () {
           }
         });
 
-
         var store = new Store();
 
         if (this.stores[key]) {
