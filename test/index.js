@@ -1,4 +1,4 @@
-require('6to5/runtime')
+require('babel/external-helpers')
 
 let Alt = require('../dist/alt-with-runtime')
 let assert = require('assert')

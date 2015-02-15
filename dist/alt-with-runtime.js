@@ -46,7 +46,7 @@ var getInternalMethods = function (obj, excluded) {
 var AltStore = (function () {
   function AltStore(dispatcher, state) {
     var _this5 = this;
-    to5Runtime.classCallCheck(this, AltStore);
+    babelHelpers.classCallCheck(this, AltStore);
 
     this[EE] = new EventEmitter();
     this[LIFECYCLE] = {};
@@ -67,7 +67,7 @@ var AltStore = (function () {
     }
   }
 
-  to5Runtime.prototypeProperties(AltStore, null, {
+  babelHelpers.prototypeProperties(AltStore, null, {
     emitChange: {
       value: function emitChange() {
         this[EE].emit("change", this[STATE_CONTAINER]);
@@ -104,7 +104,7 @@ var AltStore = (function () {
 
 var ActionCreator = (function () {
   function ActionCreator(alt, name, action, actions) {
-    to5Runtime.classCallCheck(this, ActionCreator);
+    babelHelpers.classCallCheck(this, ActionCreator);
 
     this[ACTION_UID] = name;
     this[ACTION_HANDLER] = action.bind(this);
@@ -112,7 +112,7 @@ var ActionCreator = (function () {
     this.alt = alt;
   }
 
-  to5Runtime.prototypeProperties(ActionCreator, null, {
+  babelHelpers.prototypeProperties(ActionCreator, null, {
     dispatch: {
       value: function dispatch(data) {
         this.alt.dispatch(this[ACTION_UID], data);
@@ -225,7 +225,7 @@ var filterSnapshotOfStores = function (snapshot, storeNames) {
 
 var Alt = (function () {
   function Alt() {
-    to5Runtime.classCallCheck(this, Alt);
+    babelHelpers.classCallCheck(this, Alt);
 
     this.dispatcher = new Dispatcher();
     this.actions = {};
@@ -234,7 +234,7 @@ var Alt = (function () {
     this[INIT_SNAPSHOT] = "{}";
   }
 
-  to5Runtime.prototypeProperties(Alt, null, {
+  babelHelpers.prototypeProperties(Alt, null, {
     dispatch: {
       value: function dispatch(action, data) {
         this.dispatcher.dispatch({ action: action, data: data });
@@ -251,14 +251,14 @@ var Alt = (function () {
         // so we can inherit any extensions from the provided store.
         var Store = (function (StoreModel) {
           function Store() {
-            to5Runtime.classCallCheck(this, Store);
+            babelHelpers.classCallCheck(this, Store);
 
             this[LIFECYCLE] = {};
             this[LISTENERS] = {};
-            to5Runtime.get(Object.getPrototypeOf(Store.prototype), "constructor", this).call(this);
+            babelHelpers.get(Object.getPrototypeOf(Store.prototype), "constructor", this).call(this);
           }
 
-          to5Runtime.inherits(Store, StoreModel);
+          babelHelpers.inherits(Store, StoreModel);
 
           return Store;
         })(StoreModel);
@@ -296,14 +296,14 @@ var Alt = (function () {
 
         var ActionsGenerator = (function (ActionsClass) {
           function ActionsGenerator() {
-            to5Runtime.classCallCheck(this, ActionsGenerator);
+            babelHelpers.classCallCheck(this, ActionsGenerator);
 
-            to5Runtime.get(Object.getPrototypeOf(ActionsGenerator.prototype), "constructor", this).call(this);
+            babelHelpers.get(Object.getPrototypeOf(ActionsGenerator.prototype), "constructor", this).call(this);
           }
 
-          to5Runtime.inherits(ActionsGenerator, ActionsClass);
+          babelHelpers.inherits(ActionsGenerator, ActionsClass);
 
-          to5Runtime.prototypeProperties(ActionsGenerator, null, {
+          babelHelpers.prototypeProperties(ActionsGenerator, null, {
             generateActions: {
               value: function generateActions() {
                 for (var _len = arguments.length, actionNames = Array(_len), _key = 0; _key < _len; _key++) {
