@@ -454,7 +454,7 @@ var LocationComponent = React.createClass({
 Alt provides a free `ListenerMixin` for React so you don't have to remember to unregister your listener. You can use said mixin like this:
 
 ```js
-var ListenerMixin = require('alt/ListenerMixin')
+var ListenerMixin = require('alt/mixins/ListenerMixin')
 
 var LocationComponent = React.createClass({
   mixins: [ListenerMixin],
