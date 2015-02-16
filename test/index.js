@@ -844,6 +844,32 @@ let tests = {
 
     store.listen(listener)
     actions.test()
+  },
+
+  'extending stores'() {
+    let alt = new Alt()
+
+    class Other {
+      constructor() {
+        this.foo = true
+      }
+
+      test() { return true }
+    }
+
+    class Store extends Other {
+      constructor() {
+        super()
+        this.bar = true
+        this.baz = super.test()
+      }
+    }
+
+    let store = alt.createStore(Store)
+
+    assert.equal(store.getState().foo, true, 'store inherits properties')
+    assert.equal(store.getState().bar, true, 'store properties are available')
+    assert.equal(store.getState().baz, true, 'inherited methods can be called')
   }
 }
 
