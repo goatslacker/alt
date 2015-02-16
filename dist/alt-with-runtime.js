@@ -333,7 +333,7 @@ var Alt = (function () {
 
         return Object.keys(actions).reduce(function (obj, action) {
           var constant = formatAsConstant(action);
-          var actionName = Symbol("action " + key + "#" + action);
+          var actionName = Symbol("" + key + "#" + action);
 
           // Wrap the action so we can provide a dispatch method
           var newAction = new ActionCreator(_this5, actionName, actions[action], obj);
