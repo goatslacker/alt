@@ -806,6 +806,44 @@ let tests = {
 
     myStore.listen(listener)
     myActions.asyncStoreAction()
+  },
+
+  'emit change method works with an isolated store'(done) {
+    let alt = new Alt()
+
+    function Actions() {
+      this.generateActions('test')
+    }
+
+    let actions = alt.createActions(Actions)
+
+    class Store {
+      constructor() {
+        this.bindActions(actions)
+        this.test = false
+      }
+
+      onTest() {
+        setTimeout(() => {
+          this.test = true
+          this.getInstance().emitChange()
+        })
+        return false
+      }
+    }
+
+    let store = alt.createStore(Store)
+
+    assert.equal(store.getState().test, false, 'test is false')
+
+    let listener = () => {
+      assert.equal(store.getState().test, true, 'test is true')
+      store.unlisten(listener)
+      done()
+    }
+
+    store.listen(listener)
+    actions.test()
   }
 }
 
