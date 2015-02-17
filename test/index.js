@@ -870,6 +870,28 @@ let tests = {
     assert.equal(store.getState().foo, true, 'store inherits properties')
     assert.equal(store.getState().bar, true, 'store properties are available')
     assert.equal(store.getState().baz, true, 'inherited methods can be called')
+  },
+
+  'listener mixin'() {
+    let ListenerMixin = require('../mixins/ListenerMixin')
+
+    let handler = () => { }
+
+    ListenerMixin.listenTo(myStore, handler)
+
+    assert.equal(ListenerMixin['_alt store listener registry_'].length, 1, 'mixin has one handler')
+
+    ListenerMixin.componentWillUnmount()
+
+    assert.equal(ListenerMixin['_alt store listener registry_'].length, 0, 'mixin was unmounted')
+
+    ListenerMixin.listenTo([myStore, secondStore], handler)
+
+    assert.equal(ListenerMixin['_alt store listener registry_'].length, 2, 'mixin has two handlers')
+
+    ListenerMixin.componentWillUnmount()
+
+    assert.equal(ListenerMixin['_alt store listener registry_'].length, 0, 'mixin was unmounted')
   }
 }
 
