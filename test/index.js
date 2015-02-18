@@ -998,7 +998,7 @@ let tests = {
       ReactComponent.test(FakeComponent)
       assert.equal(true, false, 'an error was not called')
     } catch (e) {
-      assert.equal(e instanceof ReferenceError, 'reference error doFoo is not defined')
+      assert.equal(e instanceof ReferenceError, true, 'reference error doFoo is not defined')
     }
   },
 
@@ -1015,7 +1015,7 @@ let tests = {
       ReactComponent.test(FakeComponent)
       assert.equal(true, false, 'an error was not called')
     } catch (e) {
-      assert.equal(e instanceof ReferenceError, 'reference error onChange is not defined')
+      assert.equal(e instanceof ReferenceError, true, 'reference error onChange is not defined')
     }
   },
 }
