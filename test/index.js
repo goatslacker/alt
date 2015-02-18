@@ -1,9 +1,39 @@
 require('babel/external-helpers')
 
+let ListenerMixin = require('../mixins/ListenerMixin')
+let FluxyMixin = require('../mixins/FluxyMixin')
+
 let Alt = require('../dist/alt-with-runtime')
 let assert = require('assert')
 
 let alt = new Alt()
+
+class ReactComponent {
+  setState(state) {
+    this.state = state
+    this.render()
+  }
+
+  // A not at all react spec compliant way to test fake react components
+  static test(Component, testFn) {
+    var component = new Component()
+    Component.mixins.forEach((mixin) => {
+      Object.keys(Component.statics).forEach((stat) => {
+        Component[stat] = Component.statics[stat]
+      })
+//      component.state = mixin.getInitialState
+//        ? mixin.getInitialState.call(component)
+//        : {}
+      mixin.componentDidMount.call(component)
+    })
+
+    testFn && testFn()
+
+    Component.mixins.forEach((mixin) => {
+      mixin.componentWillUnmount.call(component)
+    })
+  }
+}
 
 class MyActions {
   constructor() {
@@ -873,9 +903,10 @@ let tests = {
   },
 
   'listener mixin'() {
-    let ListenerMixin = require('../mixins/ListenerMixin')
-
     let handler = () => { }
+
+    // set it up
+    ListenerMixin.componentDidMount()
 
     ListenerMixin.listenTo(myStore, handler)
 
@@ -889,10 +920,104 @@ let tests = {
 
     assert.equal(ListenerMixin['_alt store listener registry_'].length, 2, 'mixin has two handlers')
 
+    // tear it down
     ListenerMixin.componentWillUnmount()
 
     assert.equal(ListenerMixin['_alt store listener registry_'].length, 0, 'mixin was unmounted')
-  }
+  },
+
+  'fluxy mixin object pattern'() {
+    var called = false
+
+    class FakeComponent extends ReactComponent {
+      doFoo(storeState) {
+        this.setState({ foo: myStore.getState() })
+      }
+
+      doBar(storeState) { }
+
+      render() {
+        assert.equal(this.state.foo.name, 'Fluxy (object)', 'render was called with right state')
+        called = true
+      }
+    }
+
+    FakeComponent.mixins = [FluxyMixin]
+
+    FakeComponent.statics = {
+      storeListeners: {
+        doFoo: myStore,
+        doBar: secondStore
+      }
+    }
+
+    ReactComponent.test(FakeComponent, () => {
+      myActions.updateName('Fluxy (object)')
+      assert.equal(called, true, 'render was called')
+    })
+  },
+
+  'fluxy mixin array pattern'() {
+    var called = false
+
+    class FakeComponent extends ReactComponent {
+      onChange() {
+        this.setState({ foo: myStore.getState() })
+      }
+
+      render() {
+        assert.equal(this.state.foo.name, 'Fluxy (array)', 'render was called with right state')
+        called = true
+      }
+    }
+
+    FakeComponent.mixins = [FluxyMixin]
+
+    FakeComponent.statics = {
+      storeListeners: [myStore, secondStore]
+    }
+
+    ReactComponent.test(FakeComponent, () => {
+      myActions.updateName('Fluxy (array)')
+      assert.equal(called, true, 'render was called')
+    })
+  },
+
+  'fluxy mixin object errors'() {
+    class FakeComponent extends ReactComponent { }
+
+    FakeComponent.mixins = [FluxyMixin]
+
+    FakeComponent.statics = {
+      storeListeners: {
+        doFoo: myStore
+      }
+    }
+
+    try {
+      ReactComponent.test(FakeComponent)
+      assert.equal(true, false, 'an error was not called')
+    } catch (e) {
+      assert.equal(e instanceof ReferenceError, 'reference error doFoo is not defined')
+    }
+  },
+
+  'fluxy mixin array errors'() {
+    class FakeComponent extends ReactComponent { }
+
+    FakeComponent.mixins = [FluxyMixin]
+
+    FakeComponent.statics = {
+      storeListeners: [myStore]
+    }
+
+    try {
+      ReactComponent.test(FakeComponent)
+      assert.equal(true, false, 'an error was not called')
+    } catch (e) {
+      assert.equal(e instanceof ReferenceError, 'reference error onChange is not defined')
+    }
+  },
 }
 
 export default tests
