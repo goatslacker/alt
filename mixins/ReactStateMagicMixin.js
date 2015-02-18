@@ -5,7 +5,7 @@
 // mixins: [ReactStateMagicMixin],
 //
 // statics: {
-//   storeListeners: {
+//   registerStores: {
 //     foo: FooStore,
 //     bar: BarStore
 //   }
@@ -15,6 +15,17 @@
 //   // state will be in the keys you provided
 //   this.state.foo
 //   this.state.bar
+// }
+//
+// Alternatively:
+//
+// statics: {
+//   registerStore: FooStore
+// },
+//
+// render: function () {
+//   // all of FooStore's state will be dumped into this.state
+//   this.state
 // }
 var Subscribe = require('./Subscribe')
 
