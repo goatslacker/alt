@@ -111,7 +111,7 @@ Alt is written in, and encourages ES6. It is completely optional but it is pleas
 
 You can use the es6 transpiler that comes with react courtesy of
 [jstransform](https://github.com/facebook/jstransform) or you can use one of the other popular ES6 transpilers:
-[6to5](https://6to5.org/) or [traceur](https://github.com/google/traceur-compiler).
+[babel](https://babeljs.io/) or [traceur](https://github.com/google/traceur-compiler).
 
 You won't need an [es6-shim](https://github.com/paulmillr/es6-shim) but you can use one for further goodies in your javascripts.
 
