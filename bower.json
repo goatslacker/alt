@@ -1,0 +1,23 @@
+{
+  "name": "alt",
+  "version": "0.13.4",
+  "homepage": "https://github.com/goatslacker/alt",
+  "authors": [
+    "Josh Perez <josh@goatslacker.com>"
+  ],
+  "description": "Alt is a flux implementation that is small (~4.3kb & 400 LOC), well tested, terse, insanely flexible, and forward thinking.",
+  "main": "dist/alt.js",
+  "keywords": [
+    "alt",
+    "flux",
+    "terse"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
