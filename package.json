@@ -30,9 +30,11 @@
     "tests-all": "mocha -u exports -R list test/compiled.js"
   },
   "keywords": [
+    "alt",
+    "es6",
+    "flow",
     "flux",
     "react",
-    "flow",
     "unidirectional"
   ],
   "author": "Josh Perez <josh@goatslacker.com>",

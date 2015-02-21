@@ -7,10 +7,32 @@
   ],
   "description": "Alt is a flux implementation that is small (~4.3kb & 400 LOC), well tested, terse, insanely flexible, and forward thinking.",
   "main": "dist/alt.js",
+  "ignore": [
+    "examples",
+    "src",
+    "coverage-test.js",
+    "coverage",
+    "TODO"
+  ],
+  "dependencies": {
+    "es-symbol": "^1.0.1",
+    "eventemitter3": "^0.1.6",
+    "flux": "^2.0.1",
+    "object-assign": "^2.0.0"
+  },
+  "devDependencies": {
+    "babel": "^4.0.1",
+    "coveralls": "^2.11.2",
+    "istanbul": "^0.3.5",
+    "mocha": "^2.1.0"
+  },
   "keywords": [
     "alt",
+    "es6",
+    "flow",
     "flux",
-    "terse"
+    "react",
+    "unidirectional"
   ],
   "license": "MIT",
   "ignore": [
