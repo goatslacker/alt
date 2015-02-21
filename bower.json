@@ -7,13 +7,6 @@
   ],
   "description": "Alt is a flux implementation that is small (~4.3kb & 400 LOC), well tested, terse, insanely flexible, and forward thinking.",
   "main": "dist/alt.js",
-  "ignore": [
-    "examples",
-    "src",
-    "coverage-test.js",
-    "coverage",
-    "TODO"
-  ],
   "dependencies": {
     "es-symbol": "^1.0.1",
     "eventemitter3": "^0.1.6",
@@ -40,6 +33,11 @@
     "node_modules",
     "bower_components",
     "test",
-    "tests"
+    "tests",
+    "examples",
+    "src",
+    "coverage-test.js",
+    "coverage",
+    "TODO"
   ]
 }
