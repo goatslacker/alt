@@ -35,20 +35,24 @@ class ReactComponent {
       }
     })
 
-    component.props = component.getDefaultProps
-      ? component.getDefaultProps()
-      : {}
+    try {
+      component.props = component.getDefaultProps
+        ? component.getDefaultProps()
+        : {}
 
-    component.state = component.getInitialState
-      ? component.getInitialState()
-      : {}
+      component.state = component.getInitialState
+        ? component.getInitialState()
+        : {}
 
-    component.componentWillMount && component.componentWillMount()
-    component.componentDidMount && component.componentDidMount()
+      component.componentWillMount && component.componentWillMount();
+      component.componentDidMount && component.componentDidMount();
 
-    testFn && testFn()
-
-    component.componentWillUnmount && component.componentWillUnmount()
+      testFn && testFn();
+    } catch (e) {
+      throw e;
+    } finally {
+      component.componentWillUnmount && component.componentWillUnmount();
+    }
   }
 }
 
@@ -1042,6 +1046,10 @@ let tests = {
     class FakeComponent extends ReactComponent {
       doFoo(storeState) {
         return { foo: myStore.getState() }
+      }
+
+      doBar() {
+        return null
       }
 
       render() {
