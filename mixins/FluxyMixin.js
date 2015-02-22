@@ -21,6 +21,25 @@
 //   // state will be in the keys you provided
 //   this.state.foo
 // }
+//
+// ----
+//
+// You can also pass in an Array of stores to storeListeners:
+//
+// statics: {
+//   storeListeners: [FooStore, BarStore]
+// }
+//
+// Changes will then be passed to a function `onChange` which you will have
+// to define:
+//
+// onChange() {
+//   this.setState({
+//     foo: FooStore.getState(),
+//     bar: BarStore.getState()
+//   })
+// }
+//
 var Subscribe = require('./Subscribe')
 
 var FluxyMixin = {
