@@ -5,7 +5,6 @@
   "repository": "https://github.com/goatslacker/alt",
   "main": "js/app.js",
   "dependencies": {
-    "flux": "^2.0.0",
     "react": "^0.12.2"
   },
   "devDependencies": {
