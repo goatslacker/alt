@@ -594,7 +594,7 @@ A single dispatcher instance is made available for listening to all events passi
 and listening to all events is as easy as
 
 ```js
-alt.dispatcher.register(console.log)
+alt.dispatcher.register(console.log.bind(console))
 ```
 
 Each store has a reference to the dispatcher as well
@@ -602,7 +602,7 @@ Each store has a reference to the dispatcher as well
 ```js
 alt.createStore(class MyStore {
   constructor() {
-    this.dispatcher.register(console.log)
+    this.dispatcher.register(console.log.bind(console))
   }
 })
 ```
