@@ -5,6 +5,7 @@
   "repository": "https://github.com/goatslacker/alt",
   "main": "js/app.js",
   "dependencies": {
+    "alt": "^0.13.5",
     "react": "^0.12.2"
   },
   "devDependencies": {
