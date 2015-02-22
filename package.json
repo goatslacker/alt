@@ -23,11 +23,10 @@
     "build": "npm run build-alt; npm run build-alt-runtime",
     "build-alt": "babel ./src/alt.js > dist/alt.js",
     "build-alt-runtime": "babel --external-helpers src/alt.js > dist/alt-with-runtime.js",
-    "build-test": "babel --external-helpers test/index.js > test/compiled.js",
-    "coverage": "istanbul cover _mocha -- -u exports -R list test/compiled.js",
+    "coverage": "istanbul cover _mocha -- -u exports -R list --compilers js:babel/register test/index.js",
     "prepublish": "npm test",
-    "test": "npm run build; npm run build-test; npm run tests-all",
-    "tests-all": "mocha -u exports -R list test/compiled.js"
+    "test": "npm run build; npm run tests-all",
+    "tests-all": "mocha -u exports -R list --compilers js:babel/register test/index.js"
   },
   "keywords": [
     "alt",
