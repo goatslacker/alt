@@ -1062,7 +1062,8 @@ let tests = {
 
     FakeComponent.statics = {
       storeListeners: {
-        doFoo: myStore
+        doFoo: myStore,
+        doBar: secondStore
       }
     }
 

@@ -37,7 +37,9 @@ var ReactStoreMixin = {
 
       Subscribe.add(this, store, function () {
         var state = this[formatter](store.getState())
-        this.setState(state)
+        if (state) {
+          this.setState(state)
+        }
       })
     }, this)
   },
