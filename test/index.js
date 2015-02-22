@@ -1,16 +1,16 @@
-require('babel/external-helpers')
+import 'babel/external-helpers'
 
-let ListenerMixin = require('../mixins/ListenerMixin')
-let FluxyMixin = require('../mixins/FluxyMixin')
-let ReactStateMagicMixin = require('../mixins/ReactStateMagicMixin')
-let IsomorphicMixin = require('../mixins/IsomorphicMixin')
+import Alt from '../dist/alt-with-runtime'
+import assert from 'assert'
 
-let Alt = require('../dist/alt-with-runtime')
-let assert = require('assert')
-
-let alt = new Alt()
+import ListenerMixin from '../mixins/ListenerMixin'
+import FluxyMixin from '../mixins/FluxyMixin'
+import ReactStateMagicMixin from '../mixins/ReactStateMagicMixin'
+import IsomorphicMixin from '../mixins/IsomorphicMixin'
 
 import ReactComponent from './helpers/ReactComponent'
+
+let alt = new Alt()
 
 class MyActions {
   constructor() {

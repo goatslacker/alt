@@ -1,9 +1,9 @@
 'use strict'
 
-let Dispatcher = require('flux').Dispatcher
-let EventEmitter = require('eventemitter3')
-let Symbol = require('es-symbol')
-let assign = require('object-assign')
+import { Dispatcher } from 'flux'
+import EventEmitter from 'eventemitter3'
+import Symbol from 'es-symbol'
+import assign from 'object-assign'
 
 let now = Date.now()
 let VariableSymbol = (desc) => Symbol(`${now}${desc}`)

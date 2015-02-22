@@ -1,9 +1,11 @@
 "use strict";
 
 var Dispatcher = require("flux").Dispatcher;
-var EventEmitter = require("eventemitter3");
-var Symbol = require("es-symbol");
-var assign = require("object-assign");
+var EventEmitter = babelHelpers.interopRequire(require("eventemitter3"));
+
+var Symbol = babelHelpers.interopRequire(require("es-symbol"));
+
+var assign = babelHelpers.interopRequire(require("object-assign"));
 
 var now = Date.now();
 var VariableSymbol = function (desc) {
