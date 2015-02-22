@@ -2,7 +2,6 @@ require('babel/external-helpers')
 
 let ListenerMixin = require('../mixins/ListenerMixin')
 let FluxyMixin = require('../mixins/FluxyMixin')
-let ReactStoreMixin = require('../mixins/ReactStoreMixin')
 let ReactStateMagicMixin = require('../mixins/ReactStateMagicMixin')
 let IsomorphicMixin = require('../mixins/IsomorphicMixin')
 
@@ -1038,39 +1037,6 @@ let tests = {
     } catch (e) {
       assert.equal(e instanceof ReferenceError, true, 'reference error onChange is not defined')
     }
-  },
-
-  'react store mixin'() {
-    let called = false
-
-    class FakeComponent extends ReactComponent {
-      doFoo(storeState) {
-        return { foo: myStore.getState() }
-      }
-
-      doBar() {
-        return null
-      }
-
-      render() {
-        assert.equal(this.state.foo.name, 'ReactStore', 'render was called with right state')
-        called = true
-      }
-    }
-
-    FakeComponent.mixins = [ReactStoreMixin]
-
-    FakeComponent.statics = {
-      storeListeners: {
-        doFoo: myStore,
-        doBar: secondStore
-      }
-    }
-
-    ReactComponent.test(FakeComponent, () => {
-      myActions.updateName('ReactStore')
-      assert.equal(called, true, 'render was called')
-    })
   },
 
   'isomorphic mixin error'() {
