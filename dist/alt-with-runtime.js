@@ -1,10 +1,9 @@
 "use strict";
 
 var Dispatcher = require("flux").Dispatcher;
+
 var EventEmitter = babelHelpers.interopRequire(require("eventemitter3"));
-
 var Symbol = babelHelpers.interopRequire(require("es-symbol"));
-
 var assign = babelHelpers.interopRequire(require("object-assign"));
 
 var now = Date.now();
@@ -48,6 +47,7 @@ var getInternalMethods = function (obj, excluded) {
 var AltStore = (function () {
   function AltStore(dispatcher, state) {
     var _this5 = this;
+
     babelHelpers.classCallCheck(this, AltStore);
 
     this[EE] = new EventEmitter();
@@ -100,7 +100,6 @@ var AltStore = (function () {
       configurable: true
     }
   });
-
   return AltStore;
 })();
 
@@ -123,7 +122,6 @@ var ActionCreator = (function () {
       configurable: true
     }
   });
-
   return ActionCreator;
 })();
 
@@ -154,6 +152,7 @@ var StoreMixin = {
 
   bindActions: function bindActions(actions) {
     var _this5 = this;
+
     Object.keys(actions).forEach(function (action) {
       var symbol = actions[action];
       var matchFirstCharacter = /./;
@@ -247,10 +246,12 @@ var Alt = (function () {
     createStore: {
       value: function createStore(StoreModel, iden) {
         var _this5 = this;
+
         var key = iden || StoreModel.displayName || StoreModel.name;
         // Creating a class here so we don't overload the provided store's
         // prototype with the mixin behaviour and I'm extending from StoreModel
         // so we can inherit any extensions from the provided store.
+
         var Store = (function (StoreModel) {
           function Store() {
             babelHelpers.classCallCheck(this, Store);
@@ -261,7 +262,6 @@ var Alt = (function () {
           }
 
           babelHelpers.inherits(Store, StoreModel);
-
           return Store;
         })(StoreModel);
 
@@ -289,10 +289,31 @@ var Alt = (function () {
       writable: true,
       configurable: true
     },
+    generateActions: {
+      value: function generateActions() {
+        for (var _len = arguments.length, actionNames = Array(_len), _key = 0; _key < _len; _key++) {
+          actionNames[_key] = arguments[_key];
+        }
+
+        var ActionsClass = function ActionsClass() {
+          var _ref;
+
+          babelHelpers.classCallCheck(this, ActionsClass);
+
+          (_ref = this).generateActions.apply(_ref, actionNames);
+        };
+
+        return this.createActions(ActionsClass);
+      },
+      writable: true,
+      configurable: true
+    },
     createActions: {
       value: function createActions(ActionsClass) {
         var _this5 = this;
+
         var exportObj = arguments[1] === undefined ? {} : arguments[1];
+
         var actions = assign({}, getInternalMethods(ActionsClass.prototype, builtInProto));
         var key = ActionsClass.displayName || ActionsClass.name;
 
@@ -304,7 +325,6 @@ var Alt = (function () {
           }
 
           babelHelpers.inherits(ActionsGenerator, ActionsClass);
-
           babelHelpers.prototypeProperties(ActionsGenerator, null, {
             generateActions: {
               value: function generateActions() {
@@ -327,7 +347,6 @@ var Alt = (function () {
               configurable: true
             }
           });
-
           return ActionsGenerator;
         })(ActionsClass);
 
@@ -449,7 +468,6 @@ var Alt = (function () {
       configurable: true
     }
   });
-
   return Alt;
 })();
 
