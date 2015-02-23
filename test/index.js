@@ -56,6 +56,8 @@ class MyActions {
 let myActions = {}
 alt.createActions(MyActions, myActions)
 
+let myShorthandActions = alt.createActions(["actionOne", "actionTwo"])
+
 class MyStore {
   constructor() {
     let myActionsInst = this.alt.getActions('myActions')
@@ -300,6 +302,8 @@ let tests = {
     assert.equal(typeof myActions.updateTwo, 'function', 'prototype defined actions exist')
     assert.equal(typeof myActions.updateThree, 'function', 'prototype defined actions exist')
     assert.equal(myActions.updateTwo.length, 2, 'actions can have > 1 arity')
+    assert.equal(typeof myShorthandActions.actionOne, 'function', 'action created with shorthand createActions exists')
+    assert.equal(typeof myShorthandActions.actionTwo, 'function', 'other action created with shorthand createActions exists')
   },
 
   'existence of constants'() {

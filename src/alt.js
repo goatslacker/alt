@@ -254,6 +254,15 @@ your own custom identifier for each store`
   }
 
   createActions(ActionsClass, exportObj = {}) {
+    if (ActionsClass instanceof Array) {
+      let actions = ActionsClass
+      ActionsClass = class DefaultActionsClass {
+        constructor() {
+          this.generateActions(...actions)
+        }
+      }
+    }
+
     let actions = assign(
       {},
       getInternalMethods(ActionsClass.prototype, builtInProto)
