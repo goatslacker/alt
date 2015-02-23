@@ -56,7 +56,7 @@ class MyActions {
 let myActions = {}
 alt.createActions(MyActions, myActions)
 
-let myShorthandActions = alt.createActions(["actionOne", "actionTwo"])
+let myShorthandActions = alt.generateActions("actionOne", "actionTwo")
 
 class MyStore {
   constructor() {
