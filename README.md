@@ -210,6 +210,12 @@ var locationActions = alt.createActions(LocationActions)
 locationActions.updateLocation('South Lake Tahoe', 'California')
 ```
 
+There's even a shorthand for the shorthand if all you're doing is generating a list of actions
+
+```js
+var locationActions = alt.generateActions('updateLocation', 'updateCity', 'updateState', 'updateCountry')
+```
+
 ### Stores
 
 Stores are where you keep a part of your application's state. It's a singleton, holds your data, and is immutable.
