@@ -1,7 +1,7 @@
 var Subscribe = require('./Subscribe')
 
 var ListenerMixin = {
-  componentDidMount: function () {
+  componentWillMount: function () {
     Subscribe.create(this)
   },
 
