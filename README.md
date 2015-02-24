@@ -13,7 +13,7 @@
 
 If you're in a hurry [show me the code](#examples) or [tl;dr](#tldr).
 
-Alt is a [flux](http://facebook.github.io/flux/docs/overview.html) implementation that is [small](https://github.com/goatslacker/alt/blob/master/src/alt.js) (~4.3kb & 400 LOC), [well tested](https://github.com/goatslacker/alt/tree/master/test), [terse](https://github.com/goatslacker/alt#differences), [insanely flexible](#flexibility), and [forward thinking](#es6).
+Alt is a [flux](http://facebook.github.io/flux/docs/overview.html) implementation that is [small](https://github.com/goatslacker/alt/blob/master/src/alt.js) (< 500 LOC), [well tested](https://github.com/goatslacker/alt/tree/master/test), [terse](https://github.com/goatslacker/alt#differences), [insanely flexible](#flexibility), and [forward thinking](#es6).
 
 Some boilerplate has been removed from flux such as the [JS "constants"](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/constants/ChatConstants.js),
 the [static string tossing](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/dispatcher/ChatAppDispatcher.js#L39),
