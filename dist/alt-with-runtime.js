@@ -47,7 +47,7 @@ var getInternalMethods = function (obj, excluded) {
 
 var AltStore = (function () {
   function AltStore(dispatcher, state) {
-    var _this5 = this;
+    var _this6 = this;
     babelHelpers.classCallCheck(this, AltStore);
 
     this[EE] = new EventEmitter();
@@ -60,7 +60,7 @@ var AltStore = (function () {
     this.dispatchToken = dispatcher.register(function (payload) {
       if (state[LISTENERS][payload.action]) {
         var result = state[LISTENERS][payload.action](payload.data);
-        result !== false && _this5.emitChange();
+        result !== false && _this6.emitChange();
       }
     });
 
@@ -153,7 +153,7 @@ var StoreMixin = {
   },
 
   bindActions: function bindActions(actions) {
-    var _this5 = this;
+    var _this6 = this;
     Object.keys(actions).forEach(function (action) {
       var symbol = actions[action];
       var matchFirstCharacter = /./;
@@ -162,19 +162,39 @@ var StoreMixin = {
       });
       var handler = null;
 
-      if (_this5[action] && _this5[assumedEventHandler]) {
+      if (_this6[action] && _this6[assumedEventHandler]) {
         // If you have both action and onAction
         throw new ReferenceError("You have multiple action handlers bound to an action: " + ("" + action + " and " + assumedEventHandler));
-      } else if (_this5[action]) {
+      } else if (_this6[action]) {
         // action
-        handler = _this5[action];
-      } else if (_this5[assumedEventHandler]) {
+        handler = _this6[action];
+      } else if (_this6[assumedEventHandler]) {
         // onAction
-        handler = _this5[assumedEventHandler];
+        handler = _this6[assumedEventHandler];
       }
 
       if (handler) {
-        _this5.bindAction(symbol, handler);
+        _this6.bindAction(symbol, handler);
+      }
+    });
+  },
+
+  bindListeners: function bindListeners(obj) {
+    var _this6 = this;
+    Object.keys(obj).forEach(function (methodName) {
+      var symbol = obj[methodName];
+      var listener = _this6[methodName];
+
+      if (!listener) {
+        throw new ReferenceError("" + methodName + " defined but does not exist in " + _this6._storeName);
+      }
+
+      if (Array.isArray(symbol)) {
+        symbol.forEach(function (action) {
+          return _this6.bindAction(action, listener);
+        });
+      } else {
+        _this6.bindAction(symbol, listener);
       }
     });
   },
@@ -246,7 +266,7 @@ var Alt = (function () {
     },
     createStore: {
       value: function createStore(StoreModel, iden) {
-        var _this5 = this;
+        var _this6 = this;
         var key = iden || StoreModel.displayName || StoreModel.name;
         // Creating a class here so we don't overload the provided store's
         // prototype with the mixin behaviour and I'm extending from StoreModel
@@ -270,7 +290,7 @@ var Alt = (function () {
           alt: this,
           dispatcher: this.dispatcher,
           getInstance: function () {
-            return _this5.stores[key];
+            return _this6.stores[key];
           }
         });
 
@@ -291,7 +311,7 @@ var Alt = (function () {
     },
     createActions: {
       value: function createActions(ActionsClass) {
-        var _this5 = this;
+        var _this6 = this;
         var exportObj = arguments[1] === undefined ? {} : arguments[1];
         var actions = assign({}, getInternalMethods(ActionsClass.prototype, builtInProto));
         var key = ActionsClass.displayName || ActionsClass.name;
@@ -338,7 +358,7 @@ var Alt = (function () {
           var actionName = Symbol("" + key + "#" + action);
 
           // Wrap the action so we can provide a dispatch method
-          var newAction = new ActionCreator(_this5, actionName, actions[action], obj);
+          var newAction = new ActionCreator(_this6, actionName, actions[action], obj);
 
           // Set all the properties on action
           obj[action] = newAction[ACTION_HANDLER];

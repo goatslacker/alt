@@ -153,6 +153,25 @@ let StoreMixin = {
     })
   },
 
+  bindListeners(obj) {
+    Object.keys(obj).forEach((methodName) => {
+      let symbol = obj[methodName]
+      let listener = this[methodName]
+
+      if (!listener) {
+        throw new ReferenceError(
+          `${methodName} defined but does not exist in ${this._storeName}`
+        )
+      }
+
+      if (Array.isArray(symbol)) {
+        symbol.forEach((action) => this.bindAction(action, listener))
+      } else {
+        this.bindAction(symbol, listener)
+      }
+    })
+  },
+
   waitFor(tokens) {
     if (!tokens) {
       throw new ReferenceError('Dispatch tokens not provided')

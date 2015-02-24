@@ -376,6 +376,7 @@ Thus brings us to our final store point. Stores have the following available met
 * `on :: lifecycleMethod, handler -> undefined`
 * `bindAction :: ActionsMethod, StoreMethod -> undefined`
 * `bindActions :: Actions -> undefined`
+* `bindListeners :: Object -> undefined`
 * `waitFor :: DispatcherToken | [DispatcherTokens] -> undefined`
 
 `waitFor` is mostly an alias to Flux's Dispatcher waitFor. Here's an excerpt from the flux docs on what waitFor is designed for:

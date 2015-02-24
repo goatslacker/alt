@@ -181,6 +181,12 @@ class LifeCycleStore {
     this.rollback = false
     this.snapshotted = false
 
+    this.bindListeners({
+      test: myActions.updateName,
+      test2: [myActions.updateName, myActions.updateTwo],
+      test3: myActions.updateName
+    })
+
     this.on('init', () => {
       this.init = true
     })
@@ -194,6 +200,10 @@ class LifeCycleStore {
       this.rollback = true
     })
   }
+
+  test() { }
+  test2() { }
+  test3() { }
 }
 
 let lifecycleStore = alt.createStore(LifeCycleStore)
@@ -1090,6 +1100,42 @@ let tests = {
       assert.equal(true, false, 'I was able to use registerStore and registerStores')
     } catch (e) {
       assert.equal(e instanceof ReferenceError, true, 'must pick one')
+    }
+  },
+
+  'binding a listener that does not exist'() {
+    class BadListenerStore {
+      constructor() {
+        this.bindListeners({
+          methodThatDoesNotExist: myActions.updateName
+        })
+      }
+    }
+
+    try {
+      alt.createStore(BadListenerStore)
+      assert.equal(true, false, 'I was able to bind an unknown method')
+    } catch (e) {
+      assert.equal(e instanceof ReferenceError, true, 'cannot bind methods that dont exist')
+    }
+  },
+
+  'binding listeners to action that does not exist'() {
+    class BadListenerStore {
+      constructor() {
+        this.bindListeners({
+          foo: myActions.trolololololol
+        })
+      }
+
+      foo() { }
+    }
+
+    try {
+      alt.createStore(BadListenerStore)
+      assert.equal(true, false, 'I was able to bind an unknown method')
+    } catch (e) {
+      assert.equal(e instanceof ReferenceError, true, 'invalid action reference passed in')
     }
   },
 }
