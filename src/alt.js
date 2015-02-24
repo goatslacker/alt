@@ -109,9 +109,9 @@ let StoreMixin = {
     if (handler.length > 1) {
       throw new TypeError(
         `Action handler in store ${this._storeName} for ` +
-        `${(symbol[ACTION_KEY] || symbol)} was defined with 2 parameters. ` +
-        `Only a single parameter is passed through the dispatcher, did you ` +
-        `mean to pass in an Object instead?`
+        `${(symbol[ACTION_KEY] || symbol).toString()} was defined with 2 ` +
+        `parameters. Only a single parameter is passed through the ` +
+        `dispatcher, did you mean to pass in an Object instead?`
       )
     }
 
