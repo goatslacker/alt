@@ -2,10 +2,14 @@ var MIXIN_REGISTRY = '_alt store listener registry_'
 
 var Subscribe = {
   create: function (context) {
-    context[MIXIN_REGISTRY] = []
+    context[MIXIN_REGISTRY] = context[MIXIN_REGISTRY] || []
   },
 
   add: function (context, store, fn) {
+    if (!context[MIXIN_REGISTRY]) {
+      Subscribe.create(context)
+    }
+
     var handler = fn.bind(context)
     context[MIXIN_REGISTRY].push({ store: store, handler: handler })
     store.listen(handler)
