@@ -897,7 +897,7 @@ let tests = {
     let handler = () => { }
 
     // set it up
-    ListenerMixin.componentDidMount()
+    ListenerMixin.componentWillMount()
 
     ListenerMixin.listenTo(myStore, handler)
 
