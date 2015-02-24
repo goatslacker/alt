@@ -272,6 +272,16 @@ your own custom identifier for each store`
     return this.stores[key]
   }
 
+  generateActions(...actionNames) {
+    class ActionsClass {
+      constructor() {
+        this.generateActions(...actionNames)
+      }
+    }
+
+    return this.createActions(ActionsClass)
+  }
+
   createActions(ActionsClass, exportObj = {}) {
     let actions = assign(
       {},

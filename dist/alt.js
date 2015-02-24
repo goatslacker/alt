@@ -319,6 +319,24 @@ var Alt = (function () {
       writable: true,
       configurable: true
     },
+    generateActions: {
+      value: function generateActions() {
+        for (var _len = arguments.length, actionNames = Array(_len), _key = 0; _key < _len; _key++) {
+          actionNames[_key] = arguments[_key];
+        }
+
+        var ActionsClass = function ActionsClass() {
+          var _ref;
+          _classCallCheck(this, ActionsClass);
+
+          (_ref = this).generateActions.apply(_ref, actionNames);
+        };
+
+        return this.createActions(ActionsClass);
+      },
+      writable: true,
+      configurable: true
+    },
     createActions: {
       value: function createActions(ActionsClass) {
         var _this6 = this;

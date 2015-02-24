@@ -75,7 +75,7 @@ Best of all, if you really screw the state up beyond repair you can easily rollb
 There's also a method available that lets you bootstrap all the application's stores once, at startup, with a saved snapshot.
 This is particularly useful if you're writing isomorphic applications where you can send down a snapshot of the state the server was in, then bootstrap it back on the client and continue working where the program left off.
 
-Stores are immutable. Meaning you can't just update the store through your store instance, the objects returned by `getState` are immutable (well you can mutate them all you want but it won't affect the state inside the store), and other stores can't mutate other stores. This makes it easy to reason about how your application exactly changes and where.
+Store data is copied on retrieval. Meaning you can't just update the store through your store instance, the objects returned by `getState` are shallow copied so you won't accidentally mutate data and other stores can't mutate other stores. This makes it easy to reason about how your application exactly changes and where.
 
 Last but not least, alt is meant to work with ES6. That is we're betting you'll be writing your stores and actions
 as classes. This part isn't necessary but you really should write some ES6 anyways because it's nice.
@@ -210,9 +210,15 @@ var locationActions = alt.createActions(LocationActions)
 locationActions.updateLocation('South Lake Tahoe', 'California')
 ```
 
+There's even a shorthand for the shorthand if all you're doing is generating a list of actions
+
+```js
+var locationActions = alt.generateActions('updateLocation', 'updateCity', 'updateState', 'updateCountry')
+```
+
 ### Stores
 
-Stores are where you keep a part of your application's state. It's a singleton, holds your data, and is immutable.
+Stores are where you keep a part of your application's state.
 
 `alt.createStore :: Class, String -> Store`
 
@@ -730,7 +736,7 @@ var action = alt.createActions(Action)
 * Light-weight and terse
 * ES6 Syntax, code your actions and stores with classes
 * Flexible
-* Immutable stores
+* No direct setters on stores
 * Single dispatcher
 * Global listening for debugging
 * Small library
@@ -738,3 +744,4 @@ var action = alt.createActions(Action)
 ## License
 
 [![MIT](https://img.shields.io/npm/l/alt.svg?style=flat)](http://josh.mit-license.org)
+
