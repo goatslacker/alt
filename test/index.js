@@ -1,5 +1,3 @@
-import 'babel/external-helpers'
-
 import Alt from '../dist/alt-with-runtime'
 import assert from 'assert'
 
