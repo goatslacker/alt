@@ -17,6 +17,7 @@ var MessageStore = require('../stores/MessageStore');
 var ThreadListItem = require('../components/ThreadListItem.react');
 var ThreadStore = require('../stores/ThreadStore');
 var UnreadThreadStore = require('../stores/UnreadThreadStore');
+var ListenerMixin = require('../../../../mixins/ListenerMixin');
 
 function getStateFromStores() {
   return {
@@ -27,19 +28,15 @@ function getStateFromStores() {
 }
 
 var ThreadSection = React.createClass({
+  mixins: [ListenerMixin],
 
   getInitialState: function() {
     return getStateFromStores();
   },
 
   componentDidMount: function() {
-    ThreadStore.listen(this._onChange);
-    UnreadThreadStore.listen(this._onChange);
-  },
-
-  componentWillUnmount: function() {
-    ThreadStore.unlisten(this._onChange);
-    UnreadThreadStore.unlisten(this._onChange);
+    this.listenTo(ThreadStore, this._onChange);
+    this.listenTo(UnreadThreadStore, this._onChange);
   },
 
   render: function() {
