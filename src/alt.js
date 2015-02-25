@@ -278,13 +278,9 @@ your own custom identifier for each store`
   }
 
   generateActions(...actionNames) {
-    class ActionsClass {
-      constructor() {
-        this.generateActions(...actionNames)
-      }
-    }
-
-    return this.createActions(ActionsClass)
+    return this.createActions(function () {
+      this.generateActions(...actionNames)
+    })
   }
 
   createActions(ActionsClass, exportObj = {}) {

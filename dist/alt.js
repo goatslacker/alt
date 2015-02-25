@@ -330,14 +330,10 @@ var Alt = (function () {
           actionNames[_key] = arguments[_key];
         }
 
-        var ActionsClass = function ActionsClass() {
+        return this.createActions(function () {
           var _ref;
-          _classCallCheck(this, ActionsClass);
-
           (_ref = this).generateActions.apply(_ref, actionNames);
-        };
-
-        return this.createActions(ActionsClass);
+        });
       },
       writable: true,
       configurable: true
