@@ -270,7 +270,7 @@ var Alt = (function () {
         var storeInstance = undefined;
         var key = iden || StoreModel.displayName || StoreModel.name;
 
-        if (this.stores[key]) {
+        if (saveStore && this.stores[key]) {
           throw new ReferenceError("A store named " + key + " already exists, double check your store names or pass in\nyour own custom identifier for each store");
         }
 
