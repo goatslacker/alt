@@ -266,8 +266,14 @@ var Alt = (function () {
     },
     createStore: {
       value: function createStore(StoreModel, iden) {
-        var _this6 = this;
+        var saveStore = arguments[2] === undefined ? true : arguments[2];
+        var storeInstance = undefined;
         var key = iden || StoreModel.displayName || StoreModel.name;
+
+        if (this.stores[key]) {
+          throw new ReferenceError("A store named " + key + " already exists, double check your store names or pass in\nyour own custom identifier for each store");
+        }
+
         // Creating a class here so we don't overload the provided store's
         // prototype with the mixin behaviour and I'm extending from StoreModel
         // so we can inherit any extensions from the provided store.
@@ -290,21 +296,20 @@ var Alt = (function () {
           alt: this,
           dispatcher: this.dispatcher,
           getInstance: function () {
-            return _this6.stores[key];
+            return storeInstance;
           }
         });
 
         var store = new Store();
 
-        if (this.stores[key]) {
-          throw new ReferenceError("A store named " + key + " already exists, double check your store names or pass in\nyour own custom identifier for each store");
+        storeInstance = assign(new AltStore(this.dispatcher, store), getInternalMethods(StoreModel, builtIns));
+
+        if (saveStore) {
+          this.stores[key] = storeInstance;
+          saveInitialSnapshot(this, key);
         }
 
-        this.stores[key] = assign(new AltStore(this.dispatcher, store), getInternalMethods(StoreModel, builtIns));
-
-        saveInitialSnapshot(this, key);
-
-        return this.stores[key];
+        return storeInstance;
       },
       writable: true,
       configurable: true

@@ -233,8 +233,17 @@ class Alt {
     this.dispatcher.dispatch({ action, data })
   }
 
-  createStore(StoreModel, iden) {
+  createStore(StoreModel, iden, saveStore = true) {
+    let storeInstance
     let key = iden || StoreModel.displayName || StoreModel.name
+
+    if (this.stores[key]) {
+      throw new ReferenceError(
+`A store named ${key} already exists, double check your store names or pass in
+your own custom identifier for each store`
+      )
+    }
+
     // Creating a class here so we don't overload the provided store's
     // prototype with the mixin behaviour and I'm extending from StoreModel
     // so we can inherit any extensions from the provided store.
@@ -250,26 +259,22 @@ class Alt {
       _storeName: key,
       alt: this,
       dispatcher: this.dispatcher,
-      getInstance: () => this.stores[key]
+      getInstance: () => storeInstance
     })
 
     let store = new Store()
 
-    if (this.stores[key]) {
-      throw new ReferenceError(
-`A store named ${key} already exists, double check your store names or pass in
-your own custom identifier for each store`
-      )
-    }
-
-    this.stores[key] = assign(
+    storeInstance = assign(
       new AltStore(this.dispatcher, store),
       getInternalMethods(StoreModel, builtIns)
     )
 
-    saveInitialSnapshot(this, key)
+    if (saveStore) {
+      this.stores[key] = storeInstance
+      saveInitialSnapshot(this, key)
+    }
 
-    return this.stores[key]
+    return storeInstance
   }
 
   generateActions(...actionNames) {
