@@ -1,2 +1,2 @@
-var Alt = require('alt')
+var Alt = require('../../../')
 module.exports = new Alt()

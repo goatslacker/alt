@@ -9,14 +9,13 @@
     "react": "^0.12.2"
   },
   "devDependencies": {
+    "babelify": "^5.0.3",
     "browserify": "~4.2.2",
     "envify": "^3.2.0",
-    "esnext": "^0.13.2",
-    "reactify": "~0.14.0",
     "uglify-js": "~2.4.15"
   },
   "scripts": {
-    "build": "NODE_ENV=production ./node_modules/browserify/bin/cmd.js -t esnext . | uglifyjs -cm > js/bundle.min.js",
+    "build": "NODE_ENV=production browserify . | uglifyjs -cm > js/bundle.min.js",
     "test": "jest"
   },
   "authors": [
@@ -25,7 +24,7 @@
   ],
   "browserify": {
     "transform": [
-      "reactify",
+      "babelify",
       "envify"
     ]
   },

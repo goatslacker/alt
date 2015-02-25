@@ -23,7 +23,7 @@ ChatExampleData.init(); // load example data into localstorage
 
 ChatWebAPIUtils.getAllMessages();
 
-React.renderComponent(
+React.render(
     <ChatApp />,
     document.getElementById('react')
 );
