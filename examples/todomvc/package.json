@@ -9,18 +9,17 @@
     "react": "^0.12.2"
   },
   "devDependencies": {
-    "browserify": "~4.2.2",
-    "reactify": "^0.17.1",
-    "sixpack": "^1.0.0"
+    "babelify": "^5.0.3",
+    "browserify": "~4.2.2"
   },
   "scripts": {
-    "build": "./node_modules/sixpack/bin/sixpack ./js/app.js App > js/bundle.js",
+    "build": "browserify . > js/bundle.js",
     "test": "jest"
   },
   "author": "Josh Perez <josh@goatslacker.com>",
   "browserify": {
     "transform": [
-      "reactify"
+      "babelify"
     ]
   },
   "jest": {
