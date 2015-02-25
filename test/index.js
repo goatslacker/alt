@@ -896,9 +896,6 @@ let tests = {
   'listener mixin'() {
     let handler = () => { }
 
-    // set it up
-    ListenerMixin.componentWillMount()
-
     ListenerMixin.listenTo(myStore, handler)
 
     assert.equal(ListenerMixin['_alt store listener registry_'].length, 1, 'mixin has one handler')
@@ -907,7 +904,7 @@ let tests = {
 
     assert.equal(ListenerMixin['_alt store listener registry_'].length, 0, 'mixin was unmounted')
 
-    ListenerMixin.listenTo([myStore, secondStore], handler)
+    ListenerMixin.listenToMany([myStore, secondStore], handler)
 
     assert.equal(ListenerMixin['_alt store listener registry_'].length, 2, 'mixin has two handlers')
 

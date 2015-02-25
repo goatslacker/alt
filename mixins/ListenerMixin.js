@@ -1,22 +1,23 @@
-var Subscribe = require('./Subscribe')
+var MIXIN_REGISTRY = '_alt store listener registry_'
 
 var ListenerMixin = {
-  componentWillMount: function () {
-    Subscribe.create(this)
-  },
-
   componentWillUnmount: function () {
-    Subscribe.destroy(this)
+    this[MIXIN_REGISTRY] && this[MIXIN_REGISTRY].forEach(function (x) {
+      x.store.unlisten(x.handler)
+    })
+    this[MIXIN_REGISTRY] = []
   },
 
   listenTo: function (store, handler) {
-    if (Array.isArray(store)) {
-      store.forEach(function (s) {
-        Subscribe.add(this, s, handler)
-      }, this)
-    } else {
-      Subscribe.add(this, store, handler)
-    }
+    this[MIXIN_REGISTRY] = this[MIXIN_REGISTRY] || []
+    this[MIXIN_REGISTRY].push({ store: store, handler: handler })
+    store.listen(handler)
+  },
+
+  listenToMany: function (stores, handler) {
+    stores.forEach(function (store) {
+      this.listenTo(store, handler);
+    }, this);
   }
 }
 

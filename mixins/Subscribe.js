@@ -6,10 +6,6 @@ var Subscribe = {
   },
 
   add: function (context, store, fn) {
-    if (!context[MIXIN_REGISTRY]) {
-      Subscribe.create(context)
-    }
-
     var handler = fn.bind(context)
     context[MIXIN_REGISTRY].push({ store: store, handler: handler })
     store.listen(handler)
