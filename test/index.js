@@ -896,22 +896,25 @@ let tests = {
   'listener mixin'() {
     let handler = () => { }
 
+    // set up
+    ListenerMixin.componentWillMount()
+
     ListenerMixin.listenTo(myStore, handler)
 
-    assert.equal(ListenerMixin['_alt store listener registry_'].length, 1, 'mixin has one handler')
+    assert.equal(ListenerMixin.getListeners().length, 1, 'mixin has one handler')
 
     ListenerMixin.componentWillUnmount()
 
-    assert.equal(ListenerMixin['_alt store listener registry_'].length, 0, 'mixin was unmounted')
+    assert.equal(ListenerMixin.getListeners().length, 0, 'mixin was unmounted')
 
     ListenerMixin.listenToMany([myStore, secondStore], handler)
 
-    assert.equal(ListenerMixin['_alt store listener registry_'].length, 2, 'mixin has two handlers')
+    assert.equal(ListenerMixin.getListeners().length, 2, 'mixin has two handlers')
 
     // tear it down
     ListenerMixin.componentWillUnmount()
 
-    assert.equal(ListenerMixin['_alt store listener registry_'].length, 0, 'mixin was unmounted')
+    assert.equal(ListenerMixin.getListeners().length, 0, 'mixin was unmounted')
   },
 
   'fluxy mixin object pattern'() {

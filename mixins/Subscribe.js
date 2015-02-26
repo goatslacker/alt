@@ -1,12 +1,12 @@
-var MIXIN_REGISTRY = '_alt store listener registry_'
+var Symbol = require('es-symbol')
+var MIXIN_REGISTRY = Symbol('alt store listeners')
 
 var Subscribe = {
   create: function (context) {
     context[MIXIN_REGISTRY] = context[MIXIN_REGISTRY] || []
   },
 
-  add: function (context, store, fn) {
-    var handler = fn.bind(context)
+  add: function (context, store, handler) {
     context[MIXIN_REGISTRY].push({ store: store, handler: handler })
     store.listen(handler)
   },
@@ -16,6 +16,10 @@ var Subscribe = {
       x.store.unlisten(x.handler)
     })
     context[MIXIN_REGISTRY] = []
+  },
+
+  listeners: function (context) {
+    return context[MIXIN_REGISTRY]
   }
 }
 

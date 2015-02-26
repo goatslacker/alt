@@ -6,7 +6,22 @@ class ReactComponent {
 
   // A not at all react spec compliant way to test fake react components
   static test(Component, testFn, props) {
-    let component = new Component()
+    let builtInProto = Object.getOwnPropertyNames(Component.prototype)
+
+    // A trolol way of doing the react <0.13 auto-binding.
+    function AutoBoundComponent() {
+      Component.call(this)
+
+      builtInProto.forEach((method) => {
+        if (method !== 'constructor') {
+          this[method] = this[method].bind(this)
+        }
+      })
+    }
+    AutoBoundComponent.prototype = Component.prototype
+
+    // initialize the component
+    let component = new AutoBoundComponent()
 
     Component.mixins.forEach((mixin) => {
       // transfer over the mixins.
@@ -22,6 +37,7 @@ class ReactComponent {
       }
     })
 
+    // call the lifecycle methods and the test function
     try {
       component.props = component.getDefaultProps
         ? component.getDefaultProps()
@@ -38,6 +54,7 @@ class ReactComponent {
     } catch (e) {
       throw e;
     } finally {
+      // end with last lifecycle method
       component.componentWillUnmount && component.componentWillUnmount();
     }
   }
