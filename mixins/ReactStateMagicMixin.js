@@ -1,32 +1,34 @@
-// This mixin automatically sets the state for you based on the key you provide
-//
-// Usage:
-//
-// mixins: [ReactStateMagicMixin],
-//
-// statics: {
-//   registerStores: {
-//     foo: FooStore,
-//     bar: BarStore
-//   }
-// },
-//
-// render: function () {
-//   // state will be in the keys you provided
-//   this.state.foo
-//   this.state.bar
-// }
-//
-// Alternatively:
-//
-// statics: {
-//   registerStore: FooStore
-// },
-//
-// render: function () {
-//   // all of FooStore's state will be dumped into this.state
-//   this.state
-// }
+/**
+ * This mixin automatically sets the state for you based on the key you provide
+ *
+ * Usage:
+ *
+ * mixins: [ReactStateMagicMixin],
+ *
+ * statics: {
+ *   registerStores: {
+ *     foo: FooStore,
+ *     bar: BarStore
+ *   }
+ * },
+ *
+ * render: function () {
+ *   // state will be in the keys you provided
+ *   this.state.foo
+ *   this.state.bar
+ * }
+ *
+ * Alternatively:
+ *
+ * statics: {
+ *   registerStore: FooStore
+ * },
+ *
+ * render: function () {
+ *   // all of FooStore's state will be dumped into this.state
+ *   this.state
+ * }
+ */
 var Subscribe = require('./Subscribe')
 
 var ReactStateMagicMixin = {
