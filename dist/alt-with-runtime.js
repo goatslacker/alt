@@ -70,6 +70,13 @@ var AltStore = (function () {
   }
 
   babelHelpers.prototypeProperties(AltStore, null, {
+    getEventEmitter: {
+      value: function getEventEmitter() {
+        return this[EE];
+      },
+      writable: true,
+      configurable: true
+    },
     emitChange: {
       value: function emitChange() {
         this[EE].emit("change", this[STATE_CONTAINER]);

@@ -62,6 +62,10 @@ class AltStore {
     }
   }
 
+  getEventEmitter() {
+    return this[EE]
+  }
+
   emitChange() {
     this[EE].emit('change', this[STATE_CONTAINER])
   }

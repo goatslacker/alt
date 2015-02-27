@@ -271,7 +271,7 @@ let tests = {
 
   'store methods'() {
     let storePrototype = Object.getPrototypeOf(myStore)
-    let assertMethods = ['constructor', 'emitChange', 'listen', 'unlisten', 'getState']
+    let assertMethods = ['constructor', 'getEventEmitter', 'emitChange', 'listen', 'unlisten', 'getState']
     assert.deepEqual(Object.getOwnPropertyNames(storePrototype), assertMethods, 'methods exist for store')
     assert.equal(typeof myStore.addListener, 'undefined', 'event emitter methods not present')
     assert.equal(typeof myStore.removeListener, 'undefined', 'event emitter methods not present')
