@@ -5,20 +5,20 @@ import EventEmitter from 'eventemitter3'
 import Symbol from 'es-symbol'
 import assign from 'object-assign'
 
-let now = Date.now()
-let VariableSymbol = (desc) => Symbol(`${now}${desc}`)
+const now = Date.now()
+const VariableSymbol = (desc) => Symbol(`${now}${desc}`)
 
-let ACTION_HANDLER = Symbol('action creator handler')
-let ACTION_KEY = Symbol('holds the actions uid symbol for listening')
-let ACTION_UID = Symbol('the actions uid name')
-let EE = Symbol('event emitter instance')
-let INIT_SNAPSHOT = Symbol('init snapshot storage')
-let LAST_SNAPSHOT = Symbol('last snapshot storage')
-let LIFECYCLE = Symbol('store lifecycle listeners')
-let LISTENERS = Symbol('stores action listeners storage')
-let STATE_CONTAINER = VariableSymbol('the state container')
+const ACTION_HANDLER = Symbol('action creator handler')
+const ACTION_KEY = Symbol('holds the actions uid symbol for listening')
+const ACTION_UID = Symbol('the actions uid name')
+const EE = Symbol('event emitter instance')
+const INIT_SNAPSHOT = Symbol('init snapshot storage')
+const LAST_SNAPSHOT = Symbol('last snapshot storage')
+const LIFECYCLE = Symbol('store lifecycle listeners')
+const LISTENERS = Symbol('stores action listeners storage')
+const STATE_CONTAINER = VariableSymbol('the state container')
 
-let formatAsConstant = (name) => {
+const formatAsConstant = (name) => {
   return name.replace(/[a-z]([A-Z])/g, (i) => {
     return `${i[0]}_${i[1].toLowerCase()}`
   }).toUpperCase()
@@ -27,10 +27,10 @@ let formatAsConstant = (name) => {
 /* istanbul ignore next */
 function NoopClass() { }
 
-let builtIns = Object.getOwnPropertyNames(NoopClass)
-let builtInProto = Object.getOwnPropertyNames(NoopClass.prototype)
+const builtIns = Object.getOwnPropertyNames(NoopClass)
+const builtInProto = Object.getOwnPropertyNames(NoopClass.prototype)
 
-let getInternalMethods = (obj, excluded) => {
+const getInternalMethods = (obj, excluded) => {
   return Object.getOwnPropertyNames(obj).reduce((value, m) => {
     if (excluded.indexOf(m) !== -1) {
       return value
@@ -93,7 +93,7 @@ class ActionCreator {
   }
 }
 
-let StoreMixin = {
+const StoreMixin = {
   on(lifecycleEvent, handler) {
     this[LIFECYCLE][lifecycleEvent] = handler.bind(this)
   },
@@ -181,7 +181,7 @@ let StoreMixin = {
   }
 }
 
-let setAppState = (instance, data, onStore) => {
+const setAppState = (instance, data, onStore) => {
   let obj = JSON.parse(data)
   Object.keys(obj).forEach((key) => {
     assign(instance.stores[key][STATE_CONTAINER], obj[key])
@@ -189,7 +189,7 @@ let setAppState = (instance, data, onStore) => {
   })
 }
 
-let snapshot = (instance) => {
+const snapshot = (instance) => {
   return JSON.stringify(
     Object.keys(instance.stores).reduce((obj, key) => {
       if (instance.stores[key][LIFECYCLE].snapshot) {
@@ -201,14 +201,14 @@ let snapshot = (instance) => {
   )
 }
 
-let saveInitialSnapshot = (instance, key) => {
+const saveInitialSnapshot = (instance, key) => {
   let state = instance.stores[key][STATE_CONTAINER]
   let initial = JSON.parse(instance[INIT_SNAPSHOT])
   initial[key] = state
   instance[INIT_SNAPSHOT] = JSON.stringify(initial)
 }
 
-let filterSnapshotOfStores = (snapshot, storeNames) => {
+const filterSnapshotOfStores = (snapshot, storeNames) => {
   let stores = JSON.parse(snapshot)
   let storesToReset = storeNames.reduce((obj, name) => {
     if (!stores[name]) {
