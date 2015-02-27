@@ -377,8 +377,8 @@ your own custom identifier for each store`
     this.actions[name] = this.createActions(ActionsClass)
   }
 
-  addStore(name, StoreModel) {
-    this.createStore(StoreModel, name)
+  addStore(name, StoreModel, saveStore) {
+    this.createStore(StoreModel, name, saveStore)
   }
 
   getActions(name) {

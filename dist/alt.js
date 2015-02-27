@@ -477,8 +477,8 @@ var Alt = (function () {
       configurable: true
     },
     addStore: {
-      value: function addStore(name, StoreModel) {
-        this.createStore(StoreModel, name);
+      value: function addStore(name, StoreModel, saveStore) {
+        this.createStore(StoreModel, name, saveStore);
       },
       writable: true,
       configurable: true
