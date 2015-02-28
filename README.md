@@ -10,16 +10,18 @@
 [![Dependency Status](https://david-dm.org/goatslacker/alt.svg)](https://david-dm.org/goatslacker/alt)
 [![Download Count](https://img.shields.io/npm/dm/alt.svg?style=flat)](https://www.npmjs.com/package/alt)
 
-
 If you're in a hurry [show me the code](#examples) or [tl;dr](#tldr).
 
-Alt is a [flux](http://facebook.github.io/flux/docs/overview.html) implementation that is [small](https://github.com/goatslacker/alt/blob/master/src/alt.js) (< 500 LOC), [well tested](https://github.com/goatslacker/alt/tree/master/test), [terse](https://github.com/goatslacker/alt#differences), [insanely flexible](#flexibility), and [forward thinking](#es6).
+Why you should be using Alt
 
-Some boilerplate has been removed from flux such as the [JS "constants"](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/constants/ChatConstants.js),
-the [static string tossing](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/dispatcher/ChatAppDispatcher.js#L39),
-and the [massive switch statements](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/stores/MessageStore.js#L111) you're required to code.
+* It is pure [flux](http://facebook.github.io/flux/docs/overview.html).
+* It's [small](https://github.com/goatslacker/alt/blob/master/src/alt.js) and readable.
+* It is [terse](https://github.com/goatslacker/alt#no-boilerplate). No boilerplate.
+* Extremely [flexible](#flexibility) and unopionated in how you use flux.
+* Alt is [forward thinking](#es6).
+* It's being used and actively maintained.
 
-Alt is pure flux though. Data flows one way. Here's an ascii chart to prove it.
+Alt is pure flux and data flows one way. Here's an ascii chart to prove it.
 
 ```txt
       ╔═══════════════╗             ╔══════════════╗             ╔════════════╗
@@ -51,9 +53,11 @@ one can set up the view to listen to changes on the store.
 
 * Single dispatcher which allows one to listen to all events for debugging or fun.
 
-## Differences
+## No Boilerplate
 
-Some boilerplate has been removed from flux.
+Some boilerplate has been removed from flux such as the [JS "constants"](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/constants/ChatConstants.js),
+the [static string tossing](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/dispatcher/ChatAppDispatcher.js#L39),
+and the [massive switch statements](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/stores/MessageStore.js#L111) you're required to code.
 
 There is no giant switch statement you have to write in your store and this is because alt removes the burden of constants from the developer.
 This has the wonderful side effect of making the custom dispatcher logic unnecessary, thus removing one of the boxes from the flow
