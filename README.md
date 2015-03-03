@@ -435,7 +435,7 @@ var LocationComponent = React.createClass({
     return locationStore.getState()
   },
 
-  componentWillMount() {
+  componentDidMount() {
     locationStore.listen(this.onChange)
   },
 
@@ -474,7 +474,7 @@ var LocationComponent = React.createClass({
     return locationStore.getState()
   },
 
-  componentWillMount() {
+  componentDidMount() {
     this.listenTo(locationStore, this.onChange)
   },
 
