@@ -115,7 +115,7 @@ class MyStore {
 
 > (): (AltStore)[stores.md]
 
-This method retrieves the store instance.
+This method retrieves the store instance which contains other methods like `getEventEmitter()`, `getState()`, and `emitChange()`.
 
 ```js
 class MyStore {
@@ -124,6 +124,49 @@ class MyStore {
     setTimeout(() => {
       // emit change later via the store instance.
       this.getInstance().emitChange();
+    }, 100);
+
+    // supress emitting a change.
+    return false;
+  }
+}
+```
+
+## StoreModel#emitChange
+
+> (): undefined
+
+Shorthand for emitting a change from within a store.
+
+```js
+class MyStore {
+  handleFoo() {
+    setTimeout(() => {
+      this.emitChange();
+    }, 100);
+
+    // supress emitting a change.
+    return false;
+  }
+}
+```
+
+## StoreModel#setState
+
+> (state = {}: object): false
+
+`setState` is syntactic sugar for setting state. This method automatically emits a change event. This can be particularly useful when performing async in your stores when you wish to update the state and emit a change event all in one.
+
+```js
+class MyStore {
+  handleFoo() {
+    this.foo = 0;
+
+    setTimeout(() => {
+      // set foo to 1 and emit a change.
+      this.setState({
+        foo: 1
+      });
     }, 100);
 
     // supress emitting a change.
