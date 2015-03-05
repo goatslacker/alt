@@ -52,7 +52,7 @@ class AltStore {
     // Register dispatcher
     this.dispatchToken = dispatcher.register((payload) => {
       if (state[LISTENERS][payload.action]) {
-        let result = state[LISTENERS][payload.action](payload.data)
+        const result = state[LISTENERS][payload.action](payload.data)
         result !== false && this.emitChange()
       }
     })
@@ -129,9 +129,9 @@ const StoreMixin = {
 
   bindActions(actions) {
     Object.keys(actions).forEach((action) => {
-      let symbol = actions[action]
-      let matchFirstCharacter = /./
-      let assumedEventHandler = action.replace(
+      const symbol = actions[action]
+      const matchFirstCharacter = /./
+      const assumedEventHandler = action.replace(
         matchFirstCharacter,
         (x) => `on${x[0].toUpperCase()}`
       )
@@ -159,8 +159,8 @@ const StoreMixin = {
 
   bindListeners(obj) {
     Object.keys(obj).forEach((methodName) => {
-      let symbol = obj[methodName]
-      let listener = this[methodName]
+      const symbol = obj[methodName]
+      const listener = this[methodName]
 
       if (!listener) {
         throw new ReferenceError(
@@ -186,7 +186,7 @@ const StoreMixin = {
 }
 
 const setAppState = (instance, data, onStore) => {
-  let obj = JSON.parse(data)
+  const obj = JSON.parse(data)
   Object.keys(obj).forEach((key) => {
     assign(instance.stores[key][STATE_CONTAINER], obj[key])
     onStore(instance.stores[key])
@@ -206,15 +206,15 @@ const snapshot = (instance) => {
 }
 
 const saveInitialSnapshot = (instance, key) => {
-  let state = instance.stores[key][STATE_CONTAINER]
-  let initial = JSON.parse(instance[INIT_SNAPSHOT])
+  const state = instance.stores[key][STATE_CONTAINER]
+  const initial = JSON.parse(instance[INIT_SNAPSHOT])
   initial[key] = state
   instance[INIT_SNAPSHOT] = JSON.stringify(initial)
 }
 
 const filterSnapshotOfStores = (snapshot, storeNames) => {
-  let stores = JSON.parse(snapshot)
-  let storesToReset = storeNames.reduce((obj, name) => {
+  const stores = JSON.parse(snapshot)
+  const storesToReset = storeNames.reduce((obj, name) => {
     if (!stores[name]) {
       throw new ReferenceError(`${name} is not a valid store`)
     }
@@ -239,7 +239,7 @@ class Alt {
 
   createStore(StoreModel, iden, saveStore = true) {
     let storeInstance
-    let key = iden || StoreModel.displayName || StoreModel.name
+    const key = iden || StoreModel.displayName || StoreModel.name
 
     if (saveStore && this.stores[key]) {
       throw new ReferenceError(
@@ -266,7 +266,7 @@ your own custom identifier for each store`
       getInstance: () => storeInstance
     })
 
-    let store = new Store()
+    const store = new Store()
 
     storeInstance = assign(
       new AltStore(this.dispatcher, store),
@@ -288,11 +288,11 @@ your own custom identifier for each store`
   }
 
   createActions(ActionsClass, exportObj = {}) {
-    let actions = assign(
+    const actions = assign(
       {},
       getInternalMethods(ActionsClass.prototype, builtInProto)
     )
-    let key = ActionsClass.displayName || ActionsClass.name
+    const key = ActionsClass.displayName || ActionsClass.name
 
     class ActionsGenerator extends ActionsClass {
       constructor() {
@@ -312,11 +312,11 @@ your own custom identifier for each store`
     new ActionsGenerator()
 
     return Object.keys(actions).reduce((obj, action) => {
-      let constant = formatAsConstant(action)
-      let actionName = Symbol(`${key}#${action}`)
+      const constant = formatAsConstant(action)
+      const actionName = Symbol(`${key}#${action}`)
 
       // Wrap the action so we can provide a dispatch method
-      let newAction = new ActionCreator(
+      const newAction = new ActionCreator(
         this,
         actionName,
         actions[action],
@@ -336,7 +336,7 @@ your own custom identifier for each store`
   }
 
   takeSnapshot() {
-    let state = snapshot(this)
+    const state = snapshot(this)
     this[LAST_SNAPSHOT] = state
     return state
   }
@@ -350,7 +350,7 @@ your own custom identifier for each store`
   }
 
   recycle(...storeNames) {
-    let snapshot = storeNames.length
+    const snapshot = storeNames.length
       ? filterSnapshotOfStores(this[INIT_SNAPSHOT], storeNames)
       : this[INIT_SNAPSHOT]
 
@@ -362,7 +362,7 @@ your own custom identifier for each store`
   }
 
   flush() {
-    let state = snapshot(this)
+    const state = snapshot(this)
     this.recycle()
     return state
   }
