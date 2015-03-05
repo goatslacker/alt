@@ -263,7 +263,17 @@ your own custom identifier for each store`
       _storeName: key,
       alt: this,
       dispatcher: this.dispatcher,
-      getInstance: () => storeInstance
+      getInstance() {
+        return storeInstance
+      },
+      emitChange() {
+        this.getInstance().emitChange()
+      },
+      setState(values = {}) {
+        assign(this, values)
+        this.emitChange()
+        return false
+      }
     })
 
     const store = new Store(this)
