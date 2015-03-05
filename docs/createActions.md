@@ -31,6 +31,12 @@ MyActions.baz();
 
 # ActionsClass
 
+## ActionsClass#constructor
+
+> (alt: Alt): ActionsClass
+
+The constructor of your actions receieves the alt instance as its first and only argument.
+
 ## ActionsClass#generateActions
 
 > (...actions: string): undefined

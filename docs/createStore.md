@@ -13,6 +13,12 @@ This is a function that takes in a class of your store and returns back the sing
 
 # StoreModel
 
+## StoreModel#constructor
+
+> (alt: Alt): StoreModel
+
+The constructor of your store definition receieves the alt instance as its first and only argument.
+
 ## StoreModel#on
 
 > (lifecycleMethod: string, handler: function): undefined
