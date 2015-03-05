@@ -49,6 +49,7 @@ class MyActions {
   updateThree(a, b, c) {
     this.dispatch({ a, b, c })
   }
+
 }
 
 let myActions = {}
@@ -208,6 +209,19 @@ class LifeCycleStore {
 
 let lifecycleStore = alt.createStore(LifeCycleStore)
 
+class ThirdStore {
+  constructor() {
+    this.bindAction(myActions.updateName, this.onUpdateName)
+  }
+
+  onUpdateName() {
+    this.waitFor( myStore, secondStore) // Not referencing dispatchToken!
+    this.name= secondStore.getState().name +'3'
+  }
+}
+
+let thirdStore= alt.createStore(ThirdStore)
+
 // Alt instances...
 
 class AltInstance extends Alt {
@@ -345,6 +359,7 @@ let tests = {
     assert.equal(myStore.getState().name, 'bear', 'action was called, state was updated properly')
     assert.equal(myStore.getState().calledInternal, false, 'internal method has not been called')
     assert.equal(secondStore.getState().name, 'bear', 'second store gets its value from myStore')
+    assert.equal(thirdStore.getState().name, 'bear3', 'third store gets its value from secondStore, adds 3')
   },
 
   'calling internal methods'() {

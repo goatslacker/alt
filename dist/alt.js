@@ -220,11 +220,21 @@ var StoreMixin = {
     });
   },
 
-  waitFor: function waitFor(tokens) {
-    if (!tokens) {
+  waitFor: function waitFor(sources) {
+    if (!sources) {
       throw new ReferenceError("Dispatch tokens not provided");
     }
-    tokens = Array.isArray(tokens) ? tokens : [tokens];
+
+    if (arguments.length === 1) {
+      sources = Array.isArray(sources) ? sources : [sources];
+    } else {
+      sources = Array.prototype.slice.call(arguments);
+    }
+
+    var tokens = sources.map(function (source) {
+      return source.dispatchToken || source;
+    });
+
     this.dispatcher.waitFor(tokens);
   }
 };
