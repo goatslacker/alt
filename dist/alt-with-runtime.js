@@ -287,12 +287,12 @@ var Alt = (function () {
         // so we can inherit any extensions from the provided store.
 
         var Store = (function (StoreModel) {
-          function Store() {
+          function Store(alt) {
             babelHelpers.classCallCheck(this, Store);
 
             this[LIFECYCLE] = {};
             this[LISTENERS] = {};
-            babelHelpers.get(Object.getPrototypeOf(Store.prototype), "constructor", this).call(this);
+            babelHelpers.get(Object.getPrototypeOf(Store.prototype), "constructor", this).call(this, alt);
           }
 
           babelHelpers.inherits(Store, StoreModel);
@@ -308,7 +308,7 @@ var Alt = (function () {
           }
         });
 
-        var store = new Store();
+        var store = new Store(this);
 
         storeInstance = assign(new AltStore(this.dispatcher, store), getInternalMethods(StoreModel, builtIns));
 
@@ -347,10 +347,10 @@ var Alt = (function () {
         var key = ActionsClass.displayName || ActionsClass.name;
 
         var ActionsGenerator = (function (ActionsClass) {
-          function ActionsGenerator() {
+          function ActionsGenerator(alt) {
             babelHelpers.classCallCheck(this, ActionsGenerator);
 
-            babelHelpers.get(Object.getPrototypeOf(ActionsGenerator.prototype), "constructor", this).call(this);
+            babelHelpers.get(Object.getPrototypeOf(ActionsGenerator.prototype), "constructor", this).call(this, alt);
           }
 
           babelHelpers.inherits(ActionsGenerator, ActionsClass);
@@ -379,7 +379,7 @@ var Alt = (function () {
           return ActionsGenerator;
         })(ActionsClass);
 
-        new ActionsGenerator();
+        new ActionsGenerator(this);
 
         return Object.keys(actions).reduce(function (obj, action) {
           var constant = formatAsConstant(action);

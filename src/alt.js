@@ -252,10 +252,10 @@ your own custom identifier for each store`
     // prototype with the mixin behaviour and I'm extending from StoreModel
     // so we can inherit any extensions from the provided store.
     class Store extends StoreModel {
-      constructor() {
+      constructor(alt) {
         this[LIFECYCLE] = {}
         this[LISTENERS] = {}
-        super()
+        super(alt)
       }
     }
 
@@ -266,7 +266,7 @@ your own custom identifier for each store`
       getInstance: () => storeInstance
     })
 
-    const store = new Store()
+    const store = new Store(this)
 
     storeInstance = assign(
       new AltStore(this.dispatcher, store),
@@ -295,8 +295,8 @@ your own custom identifier for each store`
     const key = ActionsClass.displayName || ActionsClass.name
 
     class ActionsGenerator extends ActionsClass {
-      constructor() {
-        super()
+      constructor(alt) {
+        super(alt)
       }
 
       generateActions(...actionNames) {
@@ -309,7 +309,7 @@ your own custom identifier for each store`
       }
     }
 
-    new ActionsGenerator()
+    new ActionsGenerator(this)
 
     return Object.keys(actions).reduce((obj, action) => {
       const constant = formatAsConstant(action)

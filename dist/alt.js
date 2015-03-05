@@ -301,12 +301,12 @@ var Alt = (function () {
         // so we can inherit any extensions from the provided store.
 
         var Store = (function (StoreModel) {
-          function Store() {
+          function Store(alt) {
             _classCallCheck(this, Store);
 
             this[LIFECYCLE] = {};
             this[LISTENERS] = {};
-            _get(Object.getPrototypeOf(Store.prototype), "constructor", this).call(this);
+            _get(Object.getPrototypeOf(Store.prototype), "constructor", this).call(this, alt);
           }
 
           _inherits(Store, StoreModel);
@@ -323,7 +323,7 @@ var Alt = (function () {
           }
         });
 
-        var store = new Store();
+        var store = new Store(this);
 
         storeInstance = assign(new AltStore(this.dispatcher, store), getInternalMethods(StoreModel, builtIns));
 
@@ -362,10 +362,10 @@ var Alt = (function () {
         var key = ActionsClass.displayName || ActionsClass.name;
 
         var ActionsGenerator = (function (ActionsClass) {
-          function ActionsGenerator() {
+          function ActionsGenerator(alt) {
             _classCallCheck(this, ActionsGenerator);
 
-            _get(Object.getPrototypeOf(ActionsGenerator.prototype), "constructor", this).call(this);
+            _get(Object.getPrototypeOf(ActionsGenerator.prototype), "constructor", this).call(this, alt);
           }
 
           _inherits(ActionsGenerator, ActionsClass);
@@ -396,7 +396,7 @@ var Alt = (function () {
           return ActionsGenerator;
         })(ActionsClass);
 
-        new ActionsGenerator();
+        new ActionsGenerator(this);
 
         return Object.keys(actions).reduce(function (obj, action) {
           var constant = formatAsConstant(action);
