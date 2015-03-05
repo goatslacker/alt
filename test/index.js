@@ -845,7 +845,7 @@ let tests = {
       onTest() {
         setTimeout(() => {
           this.test = true
-          this.getInstance().emitChange()
+          this.emitChange()
         })
         return false
       }

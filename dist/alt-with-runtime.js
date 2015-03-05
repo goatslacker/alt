@@ -303,8 +303,18 @@ var Alt = (function () {
           _storeName: key,
           alt: this,
           dispatcher: this.dispatcher,
-          getInstance: function () {
+          getInstance: function getInstance() {
             return storeInstance;
+          },
+          emitChange: function emitChange() {
+            this.getInstance().emitChange();
+          },
+          setState: function setState() {
+            var values = arguments[0] === undefined ? {} : arguments[0];
+
+            assign(this, values);
+            this.emitChange();
+            return false;
           }
         });
 
