@@ -13,16 +13,20 @@
     "babel": "^4.6.6",
     "coveralls": "^2.11.2",
     "istanbul": "^0.3.5",
-    "mocha": "^2.1.0"
+    "mocha": "^2.1.0",
+    "browserify": "^9.0.3",
+    "babelify": "^5.0.4"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/goatslacker/alt.git"
   },
   "scripts": {
-    "build": "npm run build-alt; npm run build-alt-runtime",
+    "build": "npm run build-alt; npm run build-alt-runtime; npm run build-alt-browser; npm run build-alt-browser-with-addons",
     "build-alt": "babel ./src/alt.js > dist/alt.js",
     "build-alt-runtime": "babel --external-helpers src/alt.js > dist/alt-with-runtime.js",
+    "build-alt-browser": "NODE_ENV=production browserify src/alt.js -t babelify --outfile dist/alt-browser.js --standalone Alt",
+    "build-alt-browser-with-addons": "NODE_ENV=production browserify src/alt-with-addons.js -t babelify --outfile dist/alt-browser-with-addons.js --standalone Alt",
     "coverage": "istanbul cover _mocha -- -u exports -R list --compilers js:babel/register --require babel/external-helpers test",
     "prepublish": "npm test",
     "test": "npm run build; npm run tests-all",
