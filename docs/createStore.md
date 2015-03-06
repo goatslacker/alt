@@ -97,14 +97,23 @@ class MyStore {
 
 ## StoreModel#waitFor
 
-> (dispatcherToken: mixed): undefined
+> (dispatcherSource: mixed): undefined
 
-`dispatcherToken` can be either a single token or an array of tokens. `waitFor` is an alias for the flux dispatcher's waitFor method. This method is used to enable dependencies between stores and signal to the dispatcher that this store needs to wait for another store to update first before it can be updated itself.
+`dispatcherSource` can be either a single token/source or an array of tokens/sources. `waitFor` is mostly an alias for the flux dispatcher's waitFor method. This method is used to enable dependencies between stores and signal to the dispatcher that this store needs to wait for another store to update first before it can be updated itself.
 
 ```js
 class MyStore {
   onFoo(data) {
+
+    // All of these do the same thing:
     this.waitFor(OtherStore);
+    this.waitFor(OtherStore.dispatchToken);
+
+    // You can also pass in multiple stores, these are all the same:
+    this.waitFor([Store1, Store2]);
+    this.waitFor([Store1.dispatchToken, Store2.dispatchToken]);
+    this.waitFor(Store1, Store2);
+    this.waitFor(Store1.dispatchToken, Store2.dispatchToken);
 
     // handle data once OtherStore is updated
   }
