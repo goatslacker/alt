@@ -953,11 +953,11 @@ var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["defau
 
 var Alt = _interopRequire(require("./alt"));
 
-var ReactStateMagicMixin = _interopRequire(require("../mixins/ReactStateMagicMixin"));
+var FluxyMixin = _interopRequire(require("../mixins/FluxyMixin"));
 
 var ListenerMixin = _interopRequire(require("../mixins/ListenerMixin"));
 
-var FluxyMixin = _interopRequire(require("../mixins/FluxyMixin"));
+var ReactStateMagicMixin = _interopRequire(require("../mixins/ReactStateMagicMixin"));
 
 var Subscribe = _interopRequire(require("../mixins/Subscribe"));
 
@@ -968,13 +968,13 @@ var DispatcherRecorder = _interopRequire(require("../utils/DispatcherRecorder"))
 var makeFinalStore = _interopRequire(require("../utils/makeFinalStore"));
 
 Alt.addons = {
-  ReactStateMagicMixin: ReactStateMagicMixin,
-  ListenerMixin: ListenerMixin,
-  FluxyMixin: FluxyMixin,
-  Subscribe: Subscribe,
   ActionListeners: ActionListeners,
   DispatcherRecorder: DispatcherRecorder,
-  makeFinalStore: makeFinalStore
+  FluxyMixin: FluxyMixin,
+  ListenerMixin: ListenerMixin,
+  makeFinalStore: makeFinalStore,
+  ReactStateMagicMixin: ReactStateMagicMixin,
+  Subscribe: Subscribe
 };
 
 module.exports = Alt;
