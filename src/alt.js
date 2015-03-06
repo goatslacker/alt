@@ -24,6 +24,21 @@ const formatAsConstant = (name) => {
   }).toUpperCase()
 }
 
+const getFunctionName = (aFunction) => {
+  // Function.prototype.name is available
+  if (aFunction.name) {
+    return aFunction.name
+  }
+
+  // Extract the function name from its source
+  const match = aFunction.toString().match(/^function\s*([^\s(]+)/)
+  if (match) {
+    return match[1];
+  }
+
+  return undefined;
+}
+
 /* istanbul ignore next */
 function NoopClass() { }
 
@@ -249,7 +264,7 @@ class Alt {
 
   createStore(StoreModel, iden, saveStore = true) {
     let storeInstance
-    let key = iden || StoreModel.name || StoreModel.displayName || ''
+    let key = iden || StoreModel.displayName || getFunctionName(StoreModel) || ''
 
     if (saveStore && (this.stores[key] || !key)) {
       /* istanbul ignore else */

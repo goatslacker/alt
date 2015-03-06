@@ -39,6 +39,21 @@ var formatAsConstant = function (name) {
   }).toUpperCase();
 };
 
+var getFunctionName = function (aFunction) {
+  // Function.prototype.name is available
+  if (aFunction.name) {
+    return aFunction.name;
+  }
+
+  // Extract the function name from its source
+  var match = aFunction.toString().match(/^function\s*([^\s(]+)/);
+  if (match) {
+    return match[1];
+  }
+
+  return undefined;
+};
+
 /* istanbul ignore next */
 function NoopClass() {}
 
@@ -300,7 +315,7 @@ var Alt = (function () {
         var saveStore = arguments[2] === undefined ? true : arguments[2];
 
         var storeInstance = undefined;
-        var key = iden || StoreModel.name || StoreModel.displayName || "";
+        var key = iden || StoreModel.displayName || getFunctionName(StoreModel) || "";
 
         if (saveStore && (this.stores[key] || !key)) {
           /* istanbul ignore else */
