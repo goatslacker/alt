@@ -300,10 +300,23 @@ var Alt = (function () {
         var saveStore = arguments[2] === undefined ? true : arguments[2];
 
         var storeInstance = undefined;
-        var key = iden || StoreModel.displayName || StoreModel.name;
+        var key = iden || StoreModel.name || StoreModel.displayName || "";
 
-        if (saveStore && this.stores[key]) {
-          throw new ReferenceError("A store named " + key + " already exists, double check your store names or pass in\nyour own custom identifier for each store");
+        if (saveStore && (this.stores[key] || !key)) {
+          /* istanbul ignore else */
+          if (typeof console !== "undefined") {
+            if (this.stores[key]) {
+              console.warn(new ReferenceError("A store named " + key + " already exists, double check your store " + "names or pass in your own custom identifier for each store"));
+            } else {
+              console.warn(new ReferenceError("Store name was not specified"));
+            }
+          }
+
+          // guarantee the store has a unique key name
+          var count = 0;
+          while (this.stores[key]) {
+            key = key + String(++count);
+          }
         }
 
         // Creating a class here so we don't overload the provided store's
@@ -379,7 +392,7 @@ var Alt = (function () {
         var exportObj = arguments[1] === undefined ? {} : arguments[1];
 
         var actions = assign({}, getInternalMethods(ActionsClass.prototype, builtInProto));
-        var key = ActionsClass.displayName || ActionsClass.name;
+        var key = ActionsClass.name || ActionsClass.displayName || "";
 
         var ActionsGenerator = (function (ActionsClass) {
           function ActionsGenerator(alt) {

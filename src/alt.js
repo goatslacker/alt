@@ -249,13 +249,26 @@ class Alt {
 
   createStore(StoreModel, iden, saveStore = true) {
     let storeInstance
-    const key = iden || StoreModel.displayName || StoreModel.name
+    let key = iden || StoreModel.name || StoreModel.displayName || ''
 
-    if (saveStore && this.stores[key]) {
-      throw new ReferenceError(
-`A store named ${key} already exists, double check your store names or pass in
-your own custom identifier for each store`
-      )
+    if (saveStore && (this.stores[key] || !key)) {
+      /* istanbul ignore else */
+      if (typeof console !== 'undefined') {
+        if (this.stores[key]) {
+          console.warn(new ReferenceError(
+            `A store named ${key} already exists, double check your store ` +
+            `names or pass in your own custom identifier for each store`
+          ))
+        } else {
+          console.warn(new ReferenceError('Store name was not specified'))
+        }
+      }
+
+      // guarantee the store has a unique key name
+      let count = 0
+      while (this.stores[key]) {
+        key = key + String(++count)
+      }
     }
 
     // Creating a class here so we don't overload the provided store's
@@ -312,7 +325,7 @@ your own custom identifier for each store`
       {},
       getInternalMethods(ActionsClass.prototype, builtInProto)
     )
-    const key = ActionsClass.displayName || ActionsClass.name
+    const key = ActionsClass.name || ActionsClass.displayName || ''
 
     class ActionsGenerator extends ActionsClass {
       constructor(alt) {

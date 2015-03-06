@@ -260,6 +260,7 @@ NameStore.prototype.onUpdateName = function (name) {
 let nameStore1 = alt1.createStore(NameStore)
 let nameStore2 = alt2.createStore(NameStore)
 
+const consoleWarn = console.warn.bind(console)
 
 /* istanbul ignore next */
 let tests = {
@@ -268,6 +269,7 @@ let tests = {
     altInstance.recycle()
     alt1.recycle()
     alt2.recycle()
+    console.warn = consoleWarn
   },
 
   'alt instance'() {
@@ -626,31 +628,49 @@ let tests = {
   },
 
   'stores with colliding names'() {
-    try {
-      let MyStore = (function () {
-        return function MyStore() { }
-      }())
-      alt.createStore(MyStore)
-      assert.equal(true, false, 'I was able to create a store with the same name')
-    } catch (e) {
-      if (e.name === 'AssertionError') {
-        throw e
-      }
-      assert.equal(e instanceof ReferenceError, true, 'error was thrown for store with same name')
+    let called = false
+    console.warn = function (x) {
+      called = true
+      assert.equal(x instanceof ReferenceError, true)
     }
 
-    try {
-      let mystore = (function () {
-        return function mystore() { }
-      }())
-      alt.createStore(mystore, 'MyStore')
-      assert.equal(true, false, 'I was able to create a store with the same name by passing in an identifier')
-    } catch (e) {
-      if (e.name === 'AssertionError') {
-        throw e
-      }
-      assert.equal(e instanceof ReferenceError, true, 'error was thrown for store with same name')
+    let MyStore = (function () {
+      return function MyStore() { }
+    }())
+    alt.createStore(MyStore)
+
+    assert.equal(called, true, 'a warning was called')
+
+    assert.equal(typeof alt.stores.MyStore1, 'object', 'a store was still created')
+  },
+
+  'colliding names via identifier'() {
+    let called = false
+    console.warn = function (x) {
+      called = true
+      assert.equal(x instanceof ReferenceError, true)
     }
+
+    class auniquestore { }
+    alt.createStore(auniquestore, 'MyStore')
+
+    assert.equal(called, true, 'a warning was called')
+
+    assert.equal(typeof alt.stores.MyStore1, 'object', 'a store was still created')
+  },
+
+  'not providing a store name via anonymous function'() {
+    let called = false
+    console.warn = function (x) {
+      called = true
+      assert.equal(x instanceof ReferenceError, true)
+    }
+
+    alt.createStore(function () { })
+
+    assert.equal(called, true, 'a warning was called')
+
+    assert.equal(typeof alt.stores[''], 'object', 'a store with no name was still created')
   },
 
   'multiple deferrals'(done) {
@@ -1165,6 +1185,14 @@ let tests = {
 
     assert.equal(typeof snapshot.NoBootstrap, 'undefined', 'Store does not exist in snapshots')
     assert.equal(typeof snapshot.AltSecondStore, 'object', 'AltSecondStore exists')
+  },
+
+  'actions with no name are still ok'() {
+    var actions = alt.createActions(function () {
+      this.generateActions('foo')
+    })
+
+    assert.equal(typeof actions.foo, 'function', 'action still exists')
   },
 }
 
