@@ -1,11 +1,27 @@
 # Changelog
 
+## 0.13.11
+
+New:
+
+* Added access to the internal EventEmitter used by the store. This can be access on the store instance by using `getEventEmitter()` and can be used for custom events.
+* Added a setState method for syntactic sugar which sets the state in the instance variables inside your store and then emits a change event.
+* Added emitChange method. No more `this.getInstance().emitChange`, now you can just `this.emitChange()` from inside a store.
+* Added syntactic sugar for waitFor. `waitFor` now takes in a splat or array of stores or dispatch tokens.
+* The `alt` instance now gets passed to the store constructor as well as the actions constructor.
+* ActionListener is a util that allows you to listen in on specific actions. Now it's even more lightweight if you want to listen in on a specific action but don't want the weight of a store. This comes as a util meaning it doesn't increase the size of core alt. Use it if you need it.
+
+Fixed:
+
+* addStore now has the `saveStore` parameter as well.
+
 ## 0.13.10
 
 New:
 
 * DispatcherRecorder is a util that allows you to record and replay a series of actions. [commit](https://github.com/goatslacker/alt/commit/834ccf1718ccd6067dadbb286ca0fbbfd5510ecb)
 * FinalStore is a util Store that emits a change once all other stores have emitted. [commit](https://github.com/goatslacker/alt/commit/c104fb73eedd61f4c1dbd4ac074ce8a2f4b818bf)
+* Added a `saveStore` parameter to `alt.createStore`. This parameter controls whether we should save the store internally (for snapshots, bootstraps) or not. Default is true.
 
 Fixed:
 
