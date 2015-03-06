@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.14.0
+
+Changed:
+
+* createStore no longer throws when it encounters a store with the same name. Instead if generates a new name for you and warns you in the console. If a store name is not specified due to using anonymous functions then a warning is also logged.
+
+Other:
+
+* Includes many README tweaks.
+
+Dependency Update:
+
+* es-symbol has been updated to 1.1.0 for better IE8 compatibility.
+
 ## 0.13.11
 
 New:
