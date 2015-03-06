@@ -184,10 +184,10 @@ const StoreMixin = {
     if (arguments.length === 1) {
       sources = Array.isArray(sources) ? sources : [sources]
     } else {
-      sources = Array.prototype.slice.call( arguments)
+      sources = Array.prototype.slice.call(arguments)
     }
 
-    let tokens = sources.map(( source)=>{
+    let tokens = sources.map((source) => {
       return source.dispatchToken || source
     })
 

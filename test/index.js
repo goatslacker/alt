@@ -215,12 +215,12 @@ class ThirdStore {
   }
 
   onUpdateName() {
-    this.waitFor( myStore, secondStore) // Not referencing dispatchToken!
-    this.name= secondStore.getState().name +'3'
+    this.waitFor(myStore, secondStore) // Not referencing dispatchToken!
+    this.name = secondStore.getState().name + '3'
   }
 }
 
-let thirdStore= alt.createStore(ThirdStore)
+let thirdStore = alt.createStore(ThirdStore)
 
 // Alt instances...
 
