@@ -177,7 +177,7 @@ const StoreMixin = {
   },
 
   waitFor(sources) {
-    if (! sources) {
+    if (!sources) {
       throw new ReferenceError('Dispatch tokens not provided')
     }
 
