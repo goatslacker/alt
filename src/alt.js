@@ -176,11 +176,21 @@ const StoreMixin = {
     })
   },
 
-  waitFor(tokens) {
-    if (!tokens) {
+  waitFor(sources) {
+    if (!sources) {
       throw new ReferenceError('Dispatch tokens not provided')
     }
-    tokens = Array.isArray(tokens) ? tokens : [tokens]
+
+    if (arguments.length === 1) {
+      sources = Array.isArray(sources) ? sources : [sources]
+    } else {
+      sources = Array.prototype.slice.call(arguments)
+    }
+
+    let tokens = sources.map((source) => {
+      return source.dispatchToken || source
+    })
+
     this.dispatcher.waitFor(tokens)
   }
 }
