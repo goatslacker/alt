@@ -171,7 +171,7 @@ class LocationActions {
     this.generateActions('updateLocation')
 
     // as well as for many actions
-    this.generateActions('updateCity', 'updateState', 'updateCountry')
+    this.generateActions('updateCity', 'updateCountry')
   }
 }
 
@@ -182,7 +182,6 @@ var locationActions = alt.createActions(LocationActions)
 locationActions.updateLocation('Las Vegas')
 
 locationActions.updateCity('Las Vegas')
-locationActions.updateState('Nevada')
 locationActions.updateCountry('US')
 ```
 
@@ -217,7 +216,7 @@ locationActions.updateLocation('South Lake Tahoe', 'California')
 There's even a shorthand for the shorthand if all you're doing is generating a list of actions
 
 ```js
-var locationActions = alt.generateActions('updateLocation', 'updateCity', 'updateState', 'updateCountry')
+var locationActions = alt.generateActions('updateLocation', 'updateCity', 'updateCountry')
 ```
 
 ### Stores
@@ -327,10 +326,10 @@ Feel free to use them to bind your actions or use the method itself, whatever re
 ```js
 class LocationStore {
   constructor() {
-    this.bindAction(locationActions.UPDATE_STATE, this.onUpdateState)
+    this.bindAction(locationActions.UPDATE_CITY, this.onUpdateCity)
 
     this.city = ''
-    this.state = ''
+    this.country = ''
   }
 }
 
@@ -347,7 +346,7 @@ handler is not anyone's idea of fun.
 ```js
 class LocationActions {
   constructor() {
-    this.generateActions('updateCity', 'updateState')
+    this.generateActions('updateCity', 'updateCountry')
   }
 }
 
@@ -362,15 +361,15 @@ class LocationStore {
     this.bindActions(locationActions)
 
     this.city = 'Austin'
-    this.state = 'Texas'
+    this.country = 'US'
   }
 
   onUpdateCity(city) {
     this.city = city
   }
 
-  onUpdateState(state) {
-    this.state = state
+  onUpdateCountry(country) {
+    this.country = country
   }
 }
 
