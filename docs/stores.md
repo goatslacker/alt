@@ -13,7 +13,7 @@ These are the stores returned by [`alt.createStore`](createStore.md), they will 
 
 > (): object
 
-The bread and butter method of your store. This method is used to get your state out of the store. Once it is called it performs a shallow copy of your store's state, this is so you don't accidentally overwrite/mutate any of your store's state.
+The bread and butter method of your store. This method is used to get your state out of the store. Once it is called it performs a shallow copy of your store's state, this is so you don't accidentally overwrite/mutate any of your store's state. The state is pulled from the [StoreModel](createStore.md)'s instance variables.
 
 ```js
 MyStore.getState();

@@ -17,7 +17,7 @@ This is a function that takes in a class of your store and returns back the sing
 
 > (alt: Alt): StoreModel
 
-The constructor of your store definition receieves the alt instance as its first and only argument.
+The constructor of your store definition receieves the alt instance as its first and only argument. All instance variables, values assigned to `this`, in any part of the StoreModel will become part of state.
 
 ## StoreModel#on
 

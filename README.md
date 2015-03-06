@@ -246,6 +246,8 @@ var locationStore = alt.createStore(LocationStore)
 
 Stores require a constructor, that's where you'll set your initial state and bind any actions to the methods that update the state, the `action handlers` if you will. All store instances returned by `alt.createStore` will have the following methods:
 
+All values assigned to `this` inside the store will accessible via `LocationStore.getState()`.
+
 #### createStore API
 
 ##### listen :: Function -> undefined
