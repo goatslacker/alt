@@ -231,13 +231,13 @@ class LocationStore {
     this.bindAction(locationActions.updateLocation, this.onUpdateLocation)
 
     this.city = 'Denver'
-    this.state = 'Colorado'
+    this.country = 'US'
   }
 
   onUpdateLocation(obj) {
-    var { city, state } = obj
+    var { city, country } = obj
     this.city = city
-    this.state = state
+    this.country = country
   }
 }
 
@@ -304,7 +304,7 @@ class LocationStore {
     this.bindAction(locationActions.updateCity, this.onUpdateCity)
 
     this.city = 'Portland'
-    this.state = 'Oregon'
+    this.country = 'US'
   }
 
   onUpdateCity(city) {
@@ -453,7 +453,7 @@ var LocationComponent = React.createClass({
           City {this.state.city}
         </p>
         <p>
-          State {this.state.state}
+          Country {this.state.country}
         </p>
       </div>
     )
@@ -488,7 +488,7 @@ var LocationComponent = React.createClass({
           City {this.state.city}
         </p>
         <p>
-          State {this.state.state}
+          Country {this.state.country}
         </p>
       </div>
     )
