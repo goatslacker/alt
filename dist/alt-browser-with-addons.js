@@ -977,19 +977,6 @@ Alt.addons = {
   makeFinalStore: makeFinalStore
 };
 
-Alt.mixins = {
-  ReactStateMagicMixin: ReactStateMagicMixin,
-  ListenerMixin: ListenerMixin,
-  FluxyMixin: FluxyMixin
-};
-
-Alt.utils = {
-  Subscribe: Subscribe,
-  ActionListeners: ActionListeners,
-  DispatcherRecorder: DispatcherRecorder,
-  makeFinalStore: makeFinalStore
-};
-
 module.exports = Alt;
 
 },{"../mixins/FluxyMixin":1,"../mixins/ListenerMixin":2,"../mixins/ReactStateMagicMixin":3,"../mixins/Subscribe":4,"../utils/ActionListeners":13,"../utils/DispatcherRecorder":14,"../utils/makeFinalStore":15,"./alt":12}],12:[function(require,module,exports){
