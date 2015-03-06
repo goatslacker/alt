@@ -46,14 +46,6 @@ New:
 * Create shorthand form of `createActions`, `generateActions`. [commit](https://github.com/goatslacker/alt/commit/84e6bc40f1d7d03dc51f4f68d76bcca5b2fae748)
 * Add/update several helpful mixins: `FluxyMixin`, `ReactStateMagicMixin`, and `Subscribe`. [commit](https://github.com/goatslacker/alt/commit/c6acbf5deeee4aa60bd1e6bfcf590d4673926016)
 
-Removed:
-
-* Remove `ReactStoreMixin`. [commit](https://github.com/goatslacker/alt/commit/fb1823c900a61fa5a99dffc4ce1a2be17f8d1717)
-
-Refactored:
-
-* Utilize ES6 import. [commit](https://github.com/goatslacker/alt/commit/ffc66dd99447b42b7ac08f7282f41d7d495ed547)
-
 ## 0.13.4
 
 New:
@@ -70,7 +62,7 @@ New:
 
 ## 0.13.3
 
-Dependency Updates:
+Dev Dependency Updates:
 
 * Upgrade to Babel 4.0 (formerly 6to5). [commit](https://github.com/goatslacker/alt/commit/b7dd7795fb8e5b727f07ca578ca1fc930ed6c18b)
 
@@ -109,10 +101,13 @@ New:
 
 ## 0.11.0
 
-Dependency Updates:
+Dependency update:
+
+* Update es-symbol [commit](https://github.com/goatslacker/alt/commit/d2a1377357eff68c8512be2971228ab863751cba)
+
+Dev Dependency Updates:
 
 * Update 6to5. [commit](https://github.com/goatslacker/alt/commit/5facbbbc8d5fb8573e7edcf5b0dd76b20b37de32)
-* Update es-symbol [commit](https://github.com/goatslacker/alt/commit/d2a1377357eff68c8512be2971228ab863751cba)
 
 ## 0.10.2
 
@@ -131,10 +126,6 @@ New:
 New:
 
 * Allow recycling of specific stores. [commit](https://github.com/goatslacker/alt/commit/614843bd2cc84a651229f89a0f0bc749a0249537)
-
-Refactored:
-
-* Utilize ES6 `let`. [commit](https://github.com/goatslacker/alt/commit/6062ad9261be79ed471abfccfe237bda4fb58c7f)
 
 ## 0.9.0
 
