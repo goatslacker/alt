@@ -292,6 +292,25 @@ let tests = {
     assert.equal(typeof myStore.emit, 'undefined', 'event emitter methods not present')
   },
 
+  'store name extraction'() {
+    let hiddenName = "hiddenName"
+    // IIFE is needed since babel will take the variable name as a function name
+    let storeModelWithoutName = (function() { return function () {} })()
+
+    // When no name can be found, the store will have the name ''
+    let storeWithoutName = alt.createStore(storeModelWithoutName)
+    assert.notEqual(alt.stores[''], undefined)
+
+    // override toString so that a name can be extracted by using the source
+    // of the function
+    storeModelWithoutName.toString = function() {
+      return "function " + hiddenName + "() {}"
+    }
+
+    let storeWithHiddenName = alt.createStore(storeModelWithoutName)
+    assert.notEqual(alt.stores[hiddenName], undefined)
+  },
+
   'store external methods'() {
     assert.equal(typeof myStore.externalMethod, 'function', 'static methods are made available')
     assert.equal(myStore.externalMethod(), true, 'static methods return proper result')
