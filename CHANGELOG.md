@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.14.2
+
+Added:
+
+* Browser builds for bower.
+
+Changed:
+
+* The store name generator is now more robust.
+
 ## 0.14.1
 
 Dependency Update:
