@@ -18,10 +18,19 @@ const LIFECYCLE = Symbol('store lifecycle listeners')
 const LISTENERS = Symbol('stores action listeners storage')
 const STATE_CONTAINER = VariableSymbol('the state container')
 
-const formatAsConstant = (name) => {
+function formatAsConstant(name) {
   return name.replace(/[a-z]([A-Z])/g, (i) => {
     return `${i[0]}_${i[1].toLowerCase()}`
   }).toUpperCase()
+}
+
+function uid(container, name) {
+  let count = 0
+  let key = name
+  while (Object.hasOwnProperty.call(container, key)) {
+    key = name + String(++count)
+  }
+  return key
 }
 
 /* istanbul ignore next */
@@ -264,11 +273,7 @@ class Alt {
         }
       }
 
-      // guarantee the store has a unique key name
-      let count = 0
-      while (this.stores[key]) {
-        key = key + String(++count)
-      }
+      key = uid(this.stores, key)
     }
 
     // Creating a class here so we don't overload the provided store's

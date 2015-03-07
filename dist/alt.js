@@ -33,11 +33,20 @@ var LIFECYCLE = Symbol("store lifecycle listeners");
 var LISTENERS = Symbol("stores action listeners storage");
 var STATE_CONTAINER = VariableSymbol("the state container");
 
-var formatAsConstant = function (name) {
+function formatAsConstant(name) {
   return name.replace(/[a-z]([A-Z])/g, function (i) {
     return "" + i[0] + "_" + i[1].toLowerCase();
   }).toUpperCase();
-};
+}
+
+function uid(container, name) {
+  var count = 0;
+  var key = name;
+  while (Object.hasOwnProperty.call(container, key)) {
+    key = name + String(++count);
+  }
+  return key;
+}
 
 /* istanbul ignore next */
 function NoopClass() {}
@@ -312,11 +321,7 @@ var Alt = (function () {
             }
           }
 
-          // guarantee the store has a unique key name
-          var count = 0;
-          while (this.stores[key]) {
-            key = key + String(++count);
-          }
+          key = uid(this.stores, key);
         }
 
         // Creating a class here so we don't overload the provided store's
