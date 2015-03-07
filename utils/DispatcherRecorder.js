@@ -66,10 +66,34 @@ DispatcherRecorder.prototype.clear = function () {
 }
 
 /**
- * Synchronously replay all events that were recorded.
+ * (As|S)ynchronously replay all events that were recorded.
+ * replay(replayTime: ?number, done: ?function): undefined
  */
-DispatcherRecorder.prototype.replay = function () {
-  this.events.forEach(function (payload) {
-    this.alt.dispatch(payload.action, payload.data)
-  }.bind(this))
+DispatcherRecorder.prototype.replay = function (replayTime, done) {
+  var alt = this.alt
+
+  if (replayTime === void 0) {
+    this.events.forEach(function (payload) {
+      alt.dispatch(payload.action, payload.data)
+    })
+  }
+
+  var onNext = function (payload, next) {
+    return function () {
+      setTimeout(function () {
+        alt.dispatch(payload.action, payload.data)
+        next()
+      }, replayTime)
+    }
+  }
+
+  var next = done || function () { }
+  var i = this.events.length - 1
+  while (i >= 0) {
+    var event = this.events[i]
+    next = onNext(event, next)
+    i -= 1
+  }
+
+  next()
 }
