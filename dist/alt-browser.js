@@ -1,8 +1,6 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.Alt = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
 
-var _defineProperty = function (obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); };
-
 var globalSymbolRegistryList = {};
 
 // Aliases & Helpers
@@ -22,6 +20,16 @@ var isSymbol = function (symbol) {
   return symbol && symbol[xSymbol.toStringTag] === "Symbol";
 };
 
+var supportsAccessors = undefined;
+try {
+  var x = defProp({}, "y", { get: function () {
+      return 1;
+    } });
+  supportsAccessors = x.y === 1;
+} catch (e) {
+  supportsAccessors = false;
+}
+
 var id = {};
 var uid = function (desc) {
   desc = String(desc);
@@ -34,15 +42,18 @@ var uid = function (desc) {
 
   var tag = "Symbol(" + desc + "" + x + ")";
 
-  // Make the symbols hidden to pre-es6 code
-  defProp(Object.prototype, tag, {
-    get: undefined,
-    set: function (value) {
-      defProp(this, tag, defValue(value, { c: true, w: true }));
-    },
-    configurable: true,
-    enumerable: false
-  });
+  /* istanbul ignore else */
+  if (supportsAccessors) {
+    // Make the symbols hidden to pre-es6 code
+    defProp(Object.prototype, tag, {
+      get: undefined,
+      set: function (value) {
+        defProp(this, tag, defValue(value, { c: true, w: true }));
+      },
+      configurable: true,
+      enumerable: false
+    });
+  }
 
   return tag;
 };
@@ -59,6 +70,11 @@ function xSymbol(descString) {
   descString = descString === undefined ? "" : String(descString);
 
   var tag = uid(descString);
+
+  /* istanbul ignore next */
+  if (!supportsAccessors) {
+    return tag;
+  }
 
   return make(SymbolProto, {
     __description__: defValue(descString),
@@ -125,23 +141,13 @@ defProps(SymbolProto, {
   })
 });
 
-defProps(SymbolProto, (function () {
-  var _defProps = {};
-
-  _defineProperty(_defProps, xSymbol.toPrimitive, defValue(function (hint) {
-    return this;
-  }, { c: true }));
-
-  _defineProperty(_defProps, xSymbol.toStringTag, defValue("Symbol", { c: true }));
-
-  return _defProps;
-})());
+// 19.4.3.5
+/* istanbul ignore else */
+if (supportsAccessors) {
+  defProp(SymbolProto, xSymbol.toStringTag, defValue("Symbol", { c: true }));
+}
 
 module.exports = typeof Symbol === "function" ? Symbol : xSymbol;
-// 19.4.3.4 XXX Does not follow spec.
-
-
-// 19.4.3.5
 
 
 },{}],2:[function(require,module,exports){

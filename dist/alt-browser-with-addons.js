@@ -225,8 +225,6 @@ module.exports = Subscribe;
 },{"es-symbol":5}],5:[function(require,module,exports){
 "use strict";
 
-var _defineProperty = function (obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); };
-
 var globalSymbolRegistryList = {};
 
 // Aliases & Helpers
@@ -246,6 +244,16 @@ var isSymbol = function (symbol) {
   return symbol && symbol[xSymbol.toStringTag] === "Symbol";
 };
 
+var supportsAccessors = undefined;
+try {
+  var x = defProp({}, "y", { get: function () {
+      return 1;
+    } });
+  supportsAccessors = x.y === 1;
+} catch (e) {
+  supportsAccessors = false;
+}
+
 var id = {};
 var uid = function (desc) {
   desc = String(desc);
@@ -258,15 +266,18 @@ var uid = function (desc) {
 
   var tag = "Symbol(" + desc + "" + x + ")";
 
-  // Make the symbols hidden to pre-es6 code
-  defProp(Object.prototype, tag, {
-    get: undefined,
-    set: function (value) {
-      defProp(this, tag, defValue(value, { c: true, w: true }));
-    },
-    configurable: true,
-    enumerable: false
-  });
+  /* istanbul ignore else */
+  if (supportsAccessors) {
+    // Make the symbols hidden to pre-es6 code
+    defProp(Object.prototype, tag, {
+      get: undefined,
+      set: function (value) {
+        defProp(this, tag, defValue(value, { c: true, w: true }));
+      },
+      configurable: true,
+      enumerable: false
+    });
+  }
 
   return tag;
 };
@@ -283,6 +294,11 @@ function xSymbol(descString) {
   descString = descString === undefined ? "" : String(descString);
 
   var tag = uid(descString);
+
+  /* istanbul ignore next */
+  if (!supportsAccessors) {
+    return tag;
+  }
 
   return make(SymbolProto, {
     __description__: defValue(descString),
@@ -349,23 +365,13 @@ defProps(SymbolProto, {
   })
 });
 
-defProps(SymbolProto, (function () {
-  var _defProps = {};
-
-  _defineProperty(_defProps, xSymbol.toPrimitive, defValue(function (hint) {
-    return this;
-  }, { c: true }));
-
-  _defineProperty(_defProps, xSymbol.toStringTag, defValue("Symbol", { c: true }));
-
-  return _defProps;
-})());
+// 19.4.3.5
+/* istanbul ignore else */
+if (supportsAccessors) {
+  defProp(SymbolProto, xSymbol.toStringTag, defValue("Symbol", { c: true }));
+}
 
 module.exports = typeof Symbol === "function" ? Symbol : xSymbol;
-// 19.4.3.4 XXX Does not follow spec.
-
-
-// 19.4.3.5
 
 
 },{}],6:[function(require,module,exports){
