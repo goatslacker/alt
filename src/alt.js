@@ -5,9 +5,6 @@ import EventEmitter from 'eventemitter3'
 import Symbol from 'es-symbol'
 import assign from 'object-assign'
 
-const now = Date.now()
-const VariableSymbol = (desc) => Symbol(`${now}${desc}`)
-
 const ACTION_HANDLER = Symbol('action creator handler')
 const ACTION_KEY = Symbol('holds the actions uid symbol for listening')
 const ACTION_UID = Symbol('the actions uid name')
@@ -16,7 +13,7 @@ const INIT_SNAPSHOT = Symbol('init snapshot storage')
 const LAST_SNAPSHOT = Symbol('last snapshot storage')
 const LIFECYCLE = Symbol('store lifecycle listeners')
 const LISTENERS = Symbol('stores action listeners storage')
-const STATE_CONTAINER = VariableSymbol('the state container')
+const STATE_CONTAINER = Symbol('the state container')
 
 function formatAsConstant(name) {
   return name.replace(/[a-z]([A-Z])/g, (i) => {

@@ -6,11 +6,6 @@ var EventEmitter = babelHelpers.interopRequire(require("eventemitter3"));
 var Symbol = babelHelpers.interopRequire(require("es-symbol"));
 var assign = babelHelpers.interopRequire(require("object-assign"));
 
-var now = Date.now();
-var VariableSymbol = function (desc) {
-  return Symbol("" + now + "" + desc);
-};
-
 var ACTION_HANDLER = Symbol("action creator handler");
 var ACTION_KEY = Symbol("holds the actions uid symbol for listening");
 var ACTION_UID = Symbol("the actions uid name");
@@ -19,7 +14,7 @@ var INIT_SNAPSHOT = Symbol("init snapshot storage");
 var LAST_SNAPSHOT = Symbol("last snapshot storage");
 var LIFECYCLE = Symbol("store lifecycle listeners");
 var LISTENERS = Symbol("stores action listeners storage");
-var STATE_CONTAINER = VariableSymbol("the state container");
+var STATE_CONTAINER = Symbol("the state container");
 
 function formatAsConstant(name) {
   return name.replace(/[a-z]([A-Z])/g, function (i) {
