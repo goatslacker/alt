@@ -6,13 +6,7 @@
     "Josh Perez <josh@goatslacker.com>"
   ],
   "description": "Alt is a flux implementation that is small (~4.3kb & 400 LOC), well tested, terse, insanely flexible, and forward thinking.",
-  "main": "dist/alt.js",
-  "dependencies": {
-    "es-symbol": "^1.0.1",
-    "eventemitter3": "^0.1.6",
-    "flux": "^2.0.1",
-    "object-assign": "^2.0.0"
-  },
+  "main": "dist/alt-browser.js",
   "devDependencies": {
     "babel": "^4.0.1",
     "coveralls": "^2.11.2",
