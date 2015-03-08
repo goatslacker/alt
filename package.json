@@ -11,11 +11,13 @@
   },
   "devDependencies": {
     "babel": "^4.6.6",
-    "coveralls": "^2.11.2",
-    "istanbul": "^0.3.5",
-    "mocha": "^2.1.0",
+    "babel-eslint": "^1.0.14",
+    "babelify": "^5.0.4",
     "browserify": "^9.0.3",
-    "babelify": "^5.0.4"
+    "coveralls": "^2.11.2",
+    "eslint": "^0.16.1",
+    "istanbul": "^0.3.5",
+    "mocha": "^2.1.0"
   },
   "repository": {
     "type": "git",
@@ -28,6 +30,7 @@
     "build-alt-browser": "NODE_ENV=production browserify src/alt.js -t babelify --outfile dist/alt-browser.js --standalone Alt",
     "build-alt-browser-with-addons": "NODE_ENV=production browserify src/alt-with-addons.js -t babelify --outfile dist/alt-browser-with-addons.js --standalone Alt",
     "coverage": "istanbul cover _mocha -- -u exports -R list --compilers js:babel/register --require babel/external-helpers test",
+    "lint": "eslint src mixins utils",
     "prepublish": "npm test",
     "test": "npm run build; npm run tests-all",
     "tests-all": "mocha -u exports -R list --compilers js:babel/register --require babel/external-helpers test"
@@ -40,6 +43,69 @@
     "react",
     "unidirectional"
   ],
+  "eslintConfig": {
+    "parser": "babel-eslint",
+    "env": {
+      "node": true
+    },
+    "rules": {
+      "brace-style": [2, "1tbs", { "allowSingleLine": false }],
+      "camelcase": [2, "always"],
+      "comma-spacing": [2, { "before": false, "after": true }],
+      "comma-style": [2, "last"],
+      "consistent-this": [2, "this"],
+      "eol-last": [2, "always"],
+      "func-names": [0],
+      "func-style": [1, "expression"],
+      "generator-star": [2, "end"],
+      "key-spacing": [2, {
+        "beforeColon": false,
+        "afterColon": true
+      }],
+      "indent": [2, 2],
+      "max-nested-callbacks": [2, 3],
+      "new-cap": [2, { "newIsCap": true, "capIsNew": true }],
+      "new-parens": [2],
+      "no-array-constructor": [2],
+      "no-inline-comments": [2],
+      "no-lonely-if": [2],
+      "no-mixed-spaces-and-tabs": [2, "always"],
+      "no-multiple-empty-lines": [1, { "max": 2 }],
+      "no-nested-ternary": [2],
+      "no-new-object": [2],
+      "no-spaced-func": [2],
+      "no-ternary": [0],
+      "no-trailing-spaces": [2],
+      "no-underscore-dangle": [2],
+      "no-wrap-func": [2],
+      "no-var": [2],
+      "one-var": [0],
+      "operator-assignment": [0],
+      "padded-blocks": [0],
+      "quote-props": [2, "as-needed"],
+      "quotes": [2, "single"],
+      "semi": [2, "never"],
+      "semi-spacing": { "before": false, "after": true },
+      "sort-vars": [2, { "ignoreCase": true }],
+      "space-after-keywords": [2, "always"],
+      "space-before-blocks": [2, "always"],
+      "space-before-function-parentheses": {"anonymous": "always", "named": "never"},
+      "space-in-brackets": [0, "never", {
+        "arraysInArrays": false,
+        "arraysInObjects": false,
+        "singleValue": false,
+        "objectsInArrays": false,
+        "objectsInObjects": false,
+        "propertyName": false
+      }],
+      "space-in-parens": [2, "never"],
+      "space-infix-ops": [2, "always"],
+      "space-return-throw-case": [2, "always"],
+      "space-unary-ops": [2, { "words": true, "nonwords": false }],
+      "spaced-line-comment": [2, "always"],
+      "wrap-regex": [2, "never"]
+    }
+  },
   "author": "Josh Perez <josh@goatslacker.com>",
   "license": "MIT"
 }
