@@ -1,3 +1,4 @@
+'use strict'
 /**
  * This mixin lets you setup your listeners. It is similar to Fluxible's mixin.
  *

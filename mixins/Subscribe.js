@@ -1,3 +1,4 @@
+'use strict'
 var Symbol = require('es-symbol')
 var MIXIN_REGISTRY = Symbol('alt store listeners')
 

@@ -1,3 +1,4 @@
+'use strict'
 /**
  * DispatcherRecorder(alt: AltInstance): DispatcherInstance
  *

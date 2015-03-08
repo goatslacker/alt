@@ -1,3 +1,4 @@
+'use strict'
 module.exports = { create: createIsomorphicMixin }
 
 function createIsomorphicMixin(alt) {

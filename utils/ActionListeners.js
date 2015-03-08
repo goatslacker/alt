@@ -1,3 +1,4 @@
+'use strict'
 /**
  * ActionListeners(alt: AltInstance): ActionListenersInstance
  *

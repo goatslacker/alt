@@ -1,3 +1,4 @@
+'use strict'
 /**
  * This mixin automatically sets the state for you based on the key you provide
  *
