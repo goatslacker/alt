@@ -79,11 +79,11 @@ DispatcherRecorder.prototype.replay = function (replayTime, done) {
     })
   }
 
-  var onNext = function (payload, next) {
+  var onNext = function (payload, nextAction) {
     return function () {
       setTimeout(function () {
         alt.dispatch(payload.action, payload.data)
-        next()
+        nextAction()
       }, replayTime)
     }
   }

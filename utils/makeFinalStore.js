@@ -25,7 +25,7 @@
 module.exports = makeFinalStore
 
 function FinalStore() {
-  this.dispatcher.register(function (payload) {
+  this.dispatcher.register(function () {
     var stores = Object.keys(this.alt.stores).reduce(function (arr, store) {
       return arr.push(this.alt.stores[store].dispatchToken), arr
     }.bind(this), [])

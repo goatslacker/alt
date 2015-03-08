@@ -51,15 +51,14 @@ var FluxyMixin = {
     var stores = this.constructor.storeListeners
 
     if (Array.isArray(stores)) {
-      var handler = this.onChange
-      if (!handler) {
+      if (!this.onChange) {
         throw new ReferenceError(
-          handler + ' should exist in your React component but is not defined'
+          'onChange should exist in your React component but is not defined'
         )
       }
 
       stores.forEach(function (store) {
-        Subscribe.add(this, store, handler)
+        Subscribe.add(this, store, this.onChange)
       }, this)
     } else {
       Object.keys(stores).forEach(function (handler) {

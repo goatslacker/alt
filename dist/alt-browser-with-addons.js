@@ -53,13 +53,12 @@ var FluxyMixin = {
     var stores = this.constructor.storeListeners;
 
     if (Array.isArray(stores)) {
-      var handler = this.onChange;
-      if (!handler) {
-        throw new ReferenceError(handler + " should exist in your React component but is not defined");
+      if (!this.onChange) {
+        throw new ReferenceError("onChange should exist in your React component but is not defined");
       }
 
       stores.forEach(function (store) {
-        Subscribe.add(this, store, handler);
+        Subscribe.add(this, store, this.onChange);
       }, this);
     } else {
       Object.keys(stores).forEach(function (handler) {
@@ -1539,7 +1538,9 @@ function ActionListeners(alt) {
  */
 ActionListeners.prototype.addActionListener = function (symAction, handler) {
   var id = this.dispatcher.register(function (payload) {
-    symAction === payload.action && handler(payload.data);
+    if (symAction === payload.action) {
+      handler(payload.data);
+    }
   });
   this[ALT_LISTENERS][id] = true;
   return id;
@@ -1645,11 +1646,11 @@ DispatcherRecorder.prototype.replay = function (replayTime, done) {
     });
   }
 
-  var onNext = function onNext(payload, next) {
+  var onNext = function onNext(payload, nextAction) {
     return function () {
       setTimeout(function () {
         alt.dispatch(payload.action, payload.data);
-        next();
+        nextAction();
       }, replayTime);
     };
   };
@@ -1694,7 +1695,7 @@ DispatcherRecorder.prototype.replay = function (replayTime, done) {
 module.exports = makeFinalStore;
 
 function FinalStore() {
-  this.dispatcher.register((function (payload) {
+  this.dispatcher.register((function () {
     var stores = Object.keys(this.alt.stores).reduce((function (arr, store) {
       return (arr.push(this.alt.stores[store].dispatchToken), arr);
     }).bind(this), []);
