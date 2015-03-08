@@ -49,18 +49,18 @@ const getInternalMethods = (obj, excluded) => {
 }
 
 class AltStore {
-  constructor(dispatcher, state) {
+  constructor(dispatcher, model, state) {
     this[EE] = new EventEmitter()
     this[LIFECYCLE] = {}
-    this[STATE_CONTAINER] = state
+    this[STATE_CONTAINER] = state || model
 
-    assign(this[LIFECYCLE], state[LIFECYCLE])
-    assign(this, state[PUBLIC_METHODS])
+    assign(this[LIFECYCLE], model[LIFECYCLE])
+    assign(this, model[PUBLIC_METHODS])
 
     // Register dispatcher
     this.dispatchToken = dispatcher.register((payload) => {
-      if (state[LISTENERS][payload.action]) {
-        const result = state[LISTENERS][payload.action](payload.data)
+      if (model[LISTENERS][payload.action]) {
+        const result = model[LISTENERS][payload.action](payload.data)
         if (result !== false) {
           this.emitChange()
         }
@@ -107,7 +107,7 @@ class ActionCreator {
   }
 }
 
-const StoreMixin = {
+const StoreMixinListeners = {
   on(lifecycleEvent, handler) {
     this[LIFECYCLE][lifecycleEvent] = handler.bind(this)
   },
@@ -187,6 +187,9 @@ const StoreMixin = {
     })
   },
 
+}
+
+const StoreMixinEssentials = {
   waitFor(sources) {
     if (!sources) {
       throw new ReferenceError('Dispatch tokens not provided')
@@ -213,6 +216,10 @@ const StoreMixin = {
 
       this[PUBLIC_METHODS][methodName] = methods[methodName]
     })
+  },
+
+  emitChange() {
+    this.getInstance().emitChange()
   }
 }
 
@@ -255,6 +262,56 @@ const filterSnapshotOfStores = (serializedSnapshot, storeNames) => {
   return JSON.stringify(storesToReset)
 }
 
+const createStoreFromObject = (alt, StoreModel, key, saveStore) => {
+  let storeInstance
+
+  const StoreProto = {}
+  StoreProto[LIFECYCLE] = {}
+  StoreProto[LISTENERS] = {}
+
+  assign(StoreProto, {
+    _storeName: key,
+    alt,
+    dispatcher: alt.dispatcher,
+    getInstance() {
+      return storeInstance
+    },
+    setState(values = {}) {
+      assign(this.state, values)
+      this.emitChange()
+      return false
+    }
+  }, StoreMixinListeners, StoreMixinEssentials, StoreModel)
+
+  // bind the store listeners
+  /* istanbul ignore else */
+  if (StoreProto.bindListeners) {
+    StoreMixinListeners.bindListeners.call(StoreProto, StoreProto.bindListeners)
+  }
+
+  // bind the lifecycle events
+  /* istanbul ignore else */
+  if (StoreProto.lifecycle) {
+    Object.keys(StoreProto.lifecycle).forEach((event) => {
+      StoreMixinListeners.on.call(StoreProto, event, StoreProto.lifecycle[event])
+    })
+  }
+
+  // create the instance and assign the public methods to the instance
+  storeInstance = assign(
+    new AltStore(alt.dispatcher, StoreProto, StoreProto.state),
+    StoreProto.publicMethods
+  )
+
+  /* istanbul ignore else */
+  if (saveStore) {
+    alt.stores[key] = storeInstance
+    saveInitialSnapshot(alt, key)
+  }
+
+  return storeInstance
+}
+
 class Alt {
   constructor() {
     this.dispatcher = new Dispatcher()
@@ -288,6 +345,10 @@ class Alt {
       key = uid(this.stores, key)
     }
 
+    if (typeof StoreModel === 'object') {
+      return createStoreFromObject(this, StoreModel, key, saveStore)
+    }
+
     // Creating a class here so we don't overload the provided store's
     // prototype with the mixin behaviour and I'm extending from StoreModel
     // so we can inherit any extensions from the provided store.
@@ -297,15 +358,12 @@ class Alt {
       }
     }
 
-    assign(Store.prototype, StoreMixin, {
+    assign(Store.prototype, StoreMixinListeners, StoreMixinEssentials, {
       _storeName: key,
       alt: this,
       dispatcher: this.dispatcher,
       getInstance() {
         return storeInstance
-      },
-      emitChange() {
-        this.getInstance().emitChange()
       },
       setState(values = {}) {
         assign(this, values)
