@@ -41,6 +41,21 @@ const getInternalMethods = (obj, excluded) => {
   }, {})
 }
 
+const getInheritedMethods = (obj, methods = {}) => {
+  if (Object.getPrototypeOf(obj) !== Object.getPrototypeOf(NoopClass)) {
+    let ancestorObj = Object.getPrototypeOf(obj)
+    let ancestorMethods = getInternalMethods(ancestorObj, builtIns)
+
+    for (let m in ancestorMethods) {
+      methods[m] = methods[m] || ancestorMethods[m]
+    }
+
+    return getInheritedMethods(ancestorObj, methods)
+  } else {
+    return methods
+  }
+}
+
 class AltStore {
   constructor(dispatcher, state) {
     this[EE] = new EventEmitter()
@@ -270,6 +285,7 @@ your own custom identifier for each store`
 
     storeInstance = assign(
       new AltStore(this.dispatcher, store),
+      getInheritedMethods(StoreModel),
       getInternalMethods(StoreModel, builtIns)
     )
 
