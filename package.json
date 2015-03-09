@@ -31,7 +31,7 @@
     "build-alt-browser-with-addons": "NODE_ENV=production browserify src/alt-with-addons.js -t babelify --outfile dist/alt-browser-with-addons.js --standalone Alt",
     "coverage": "istanbul cover _mocha -- -u exports -R list --compilers js:babel/register --require babel/external-helpers test",
     "lint": "eslint src mixins utils",
-    "prepublish": "npm test-build",
+    "prepublish": "npm run test-build",
     "test": "npm run build-alt-runtime; npm run tests-all",
     "test-build": "npm run build; npm run tests-all",
     "tests-all": "mocha -u exports -R list --compilers js:babel/register --require babel/external-helpers test"
