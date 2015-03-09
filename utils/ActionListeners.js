@@ -33,6 +33,7 @@ function ActionListeners(alt) {
  */
 ActionListeners.prototype.addActionListener = function (symAction, handler) {
   var id = this.dispatcher.register(function (payload) {
+    /* istanbul ignore else */
     if (symAction === payload.action) {
       handler(payload.data)
     }
