@@ -32,7 +32,7 @@
     "coverage": "istanbul cover _mocha -- -u exports -R list --compilers js:babel/register --require babel/external-helpers test",
     "lint": "eslint src mixins utils",
     "prepublish": "npm test-build",
-    "test": "npm run build-alt; npm run tests-all",
+    "test": "npm run build-alt-runtime; npm run tests-all",
     "test-build": "npm run build; npm run tests-all",
     "tests-all": "mocha -u exports -R list --compilers js:babel/register --require babel/external-helpers test"
   },
