@@ -380,6 +380,8 @@ var locationStore = alt.createStore(LocationStore)
 
 Actions who have a `onCamelCasedAction` method or an `actionName` method available in the store will be bound. In this example `locationActions.updateCity` will be handled by `onUpdateCity`. There is no difference between calling the action handler `updateCity` or `onUpdateCity` it's just a matter of aesthetic preference.
 
+#### bindListeners
+
 A better approach is to specify which action handlers belong to which actions this way you have ultimate control over what gets called and handled. The function `bindListeners` is the inverse of `bindActions`. `bindListeners` takes an object of action handlers as keys and actions as a value.
 
 ```js
