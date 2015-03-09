@@ -57,7 +57,7 @@ export class UnwrappedPetStore {
   }
 
   static getInventory() {
-    return this.pets;
+    return this.getState().pets;
   }
 }
 
