@@ -1,5 +1,5 @@
 import Alt from '../dist/alt-with-runtime'
-import assert from 'assert'
+import {assert} from 'chai'
 
 import ListenerMixin from '../mixins/ListenerMixin'
 import FluxyMixin from '../mixins/FluxyMixin'

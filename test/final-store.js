@@ -1,6 +1,6 @@
 import Alt from '../dist/alt-with-runtime'
 import makeFinalStore from '../utils/makeFinalStore'
-import assert from 'assert'
+import {assert} from 'chai'
 
 const alt = new Alt()
 

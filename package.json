@@ -14,6 +14,7 @@
     "babel-eslint": "^1.0.14",
     "babelify": "^5.0.4",
     "browserify": "^9.0.3",
+    "chai": "^2.1.0",
     "coveralls": "^2.11.2",
     "eslint": "^0.16.1",
     "istanbul": "^0.3.5",
