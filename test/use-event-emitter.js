@@ -1,4 +1,4 @@
-import assert from 'assert'
+import {assert} from 'chai'
 import Alt from '../dist/alt-with-runtime'
 
 let alt = new Alt()

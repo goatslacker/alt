@@ -1,5 +1,5 @@
 import Alt from '../dist/alt-with-runtime'
-import assert from 'assert'
+import {assert} from 'chai'
 
 import ListenerMixin from '../mixins/ListenerMixin'
 import FluxyMixin from '../mixins/FluxyMixin'
@@ -471,150 +471,94 @@ let tests = {
   },
 
   'conflicting listeners on a store'() {
-    try {
-      alt.createStore(class StoreWithManyListeners {
-        constructor() {
-          this.bindActions(myActions)
-        }
-
-        // listeners with same action
-        updateName() { }
-        onUpdateName() { }
-      })
-      assert.equal(true, false, 'a store was able to register with multiple action handlers on the same action')
-    } catch (e) {
-      if (e.name === 'AssertionError') {
-        throw e
+    class StoreWithManyListeners {
+      constructor() {
+        this.bindActions(myActions)
       }
-      assert.equal(e.message, 'You have multiple action handlers bound to an action: updateName and onUpdateName', 'error message is correct')
+
+      // listeners with same action
+      updateName() { }
+      onUpdateName() { }
     }
 
-    try {
-      class EvilStore {
-        updateName() { }
-      }
+    assert.throw(() => alt.createStore(StoreWithManyListeners), ReferenceError, 'You have multiple action handlers bound to an action: updateName and onUpdateName')
 
-      alt.createStore(class InnocentStore extends EvilStore {
-        constructor() {
-          this.bindActions(myActions)
-        }
-
-        onUpdateName() { }
-      })
-      assert.equal(true, false, 'an evil store was able to overload the innocent store\'s action handler')
-    } catch (e) {
-      if (e.name === 'AssertionError') {
-        throw e
-      }
-      assert.equal(e.message, 'You have multiple action handlers bound to an action: updateName and onUpdateName', 'error message is correct')
+    class EvilStore {
+      updateName() { }
     }
+
+    class InnocentStore extends EvilStore {
+      constructor() {
+        this.bindActions(myActions)
+      }
+
+      onUpdateName() { }
+    }
+
+    assert.throw(() => alt.createStore(InnocentStore), ReferenceError, 'You have multiple action handlers bound to an action: updateName and onUpdateName')
   },
 
   'registering invalid action handlers'() {
-    try {
-      class StoreWithInvalidActionHandlers {
-        constructor() {
-          this.bindAction(myActions.THIS_DOES_NOT_EXIST, this.trololol)
-        }
-
-        trololol() { }
+    class StoreWithInvalidActionHandlers {
+      constructor() {
+        this.bindAction(myActions.THIS_DOES_NOT_EXIST, this.trololol)
       }
 
-      alt.createStore(StoreWithInvalidActionHandlers)
-
-      assert.equal(true, false, 'i was able to bind an undefined action handler')
-    } catch (e) {
-      if (e.name === 'AssertionError') {
-        throw e
-      }
-      assert.equal(e.message, 'Invalid action reference passed in', 'proper error message for undefined action')
+      trololol() { }
     }
 
-    try {
-      class StoreWithInvalidActionHandlers2 {
-        constructor() {
-          this.bindAction(myActions.UPDATE_NAME, this.invisibleFunction)
-        }
-      }
+    assert.throw(() => alt.createStore(StoreWithInvalidActionHandlers), ReferenceError, 'Invalid action reference passed in')
 
-      alt.createStore(StoreWithInvalidActionHandlers2)
-
-      assert.equal(true, false, 'i was able to bind an action handler to undefined')
-    } catch (e) {
-      if (e.name === 'AssertionError') {
-        throw e
+    class StoreWithInvalidActionHandlers2 {
+      constructor() {
+        this.bindAction(myActions.UPDATE_NAME, this.invisibleFunction)
       }
-      assert.equal(e.message, 'bindAction expects a function', 'proper error message for undefined action')
     }
+
+    assert.throw(() => alt.createStore(StoreWithInvalidActionHandlers2), TypeError, 'bindAction expects a function')
   },
 
   'waiting for nothing'() {
-    try {
-      class WaitPlease {
-        constructor() {
-          this.generateActions('pleaseWait')
-        }
+    class WaitPlease {
+      constructor() {
+        this.generateActions('pleaseWait')
       }
-      let waiter = alt.createActions(WaitPlease)
-
-      class WaitsForNobody {
-        constructor() {
-          this.bindActions(waiter)
-        }
-
-        pleaseWait() {
-          this.waitFor()
-        }
-      }
-      alt.createStore(WaitsForNobody)
-
-      waiter.pleaseWait()
-
-      assert.equal(true, false, 'i was able to waitFor nothing')
-    } catch (e) {
-      if (e.name === 'AssertionError') {
-        throw e
-      }
-      assert.equal(e.message, 'Dispatch tokens not provided', 'must provide dispatch tokens')
     }
+    const waiter = alt.createActions(WaitPlease)
+
+    alt.createStore(class WaitsForNobody {
+      constructor() {
+        this.bindActions(waiter)
+      }
+
+      pleaseWait() {
+        this.waitFor()
+      }
+    })
+
+    assert.throw(() => waiter.pleaseWait(), ReferenceError, 'Dispatch tokens not provided')
   },
 
   'unary action warnings'() {
-    try {
-      class MethodsAreUnary1 {
-        constructor() {
-          this.bindActions(myActions)
-        }
-
-        onUpdateName(name1, name2) { }
+    class MethodsAreUnary1 {
+      constructor() {
+        this.bindActions(myActions)
       }
 
-      alt.createStore(MethodsAreUnary1)
-      assert.equal(true, false, 'i bound a method with two args successfully using bindActions')
-    } catch (e) {
-      if (e.name === 'AssertionError') {
-        throw e
-      }
-      assert.equal(e instanceof TypeError, true, 'A TypeError was thrown, you cant bind two args with bindActions')
+      onUpdateName(name1, name2) { }
     }
 
-    try {
-      class MethodsAreUnary2 {
-        constructor() {
-          this.bindAction(myActions.UPDATE_TWO, this.onUpdateName)
-        }
+    assert.throw(() => alt.createStore(MethodsAreUnary1), TypeError, /Action handler in store .* was defined with 2 parameters/)
 
-        onUpdateName(name1, name2) { }
+    class MethodsAreUnary2 {
+      constructor() {
+        this.bindAction(myActions.UPDATE_TWO, this.onUpdateName)
       }
 
-      alt.createStore(MethodsAreUnary2)
-      assert.equal(true, false, 'i bound a method with two args successfully using bindAction')
-    } catch (e) {
-      if (e.name === 'AssertionError') {
-        throw e
-      }
-      assert.equal(e instanceof TypeError, true, 'A TypeError was thrown, you cant bind two args with bindAction')
+      onUpdateName(name1, name2) { }
     }
+
+    assert.throw(() => alt.createStore(MethodsAreUnary2), TypeError, /Action handler in store .* was defined with 2 parameters/)
   },
 
   'cancelling emit'() {
@@ -711,16 +655,7 @@ let tests = {
   },
 
   'recycling invalid stores'() {
-    try {
-      alt.recycle('StoreThatDoesNotExist')
-      assert.equal(true, false, 'I was able to recycle a store that does not exist')
-    } catch (e) {
-      if (e.name === 'AssertionError') {
-        throw e
-      }
-      assert.equal(e instanceof ReferenceError, true, 'store that does not exist throws a RefenceError')
-      assert.equal(e.message, 'StoreThatDoesNotExist is not a valid store')
-    }
+    assert.throw(() => alt.recycle('StoreThatDoesNotExist'), ReferenceError, 'StoreThatDoesNotExist is not a valid store')
   },
 
   'alt single instances'() {
@@ -1018,12 +953,7 @@ let tests = {
       }
     }
 
-    try {
-      ReactComponent.test(FakeComponent)
-      assert.equal(true, false, 'an error was not called')
-    } catch (e) {
-      assert.equal(e instanceof ReferenceError, true, 'reference error doFoo is not defined')
-    }
+    assert.throw(() => ReactComponent.test(FakeComponent), ReferenceError, 'doFoo does not exist in your React component')
   },
 
   'fluxy mixin array errors'() {
@@ -1035,24 +965,14 @@ let tests = {
       storeListeners: [myStore]
     }
 
-    try {
-      ReactComponent.test(FakeComponent)
-      assert.equal(true, false, 'an error was not called')
-    } catch (e) {
-      assert.equal(e instanceof ReferenceError, true, 'reference error onChange is not defined')
-    }
+    assert.throw(() => ReactComponent.test(FakeComponent), ReferenceError, 'onChange should exist in your React component but is not defined')
   },
 
   'isomorphic mixin error'() {
     class FakeComponent extends ReactComponent { }
     FakeComponent.mixins = [IsomorphicMixin.create(new Alt())]
 
-    try {
-      ReactComponent.test(FakeComponent)
-      assert.equal(true, false, 'I did not pass the correct props')
-    } catch (e) {
-      assert.equal(e instanceof ReferenceError, true, 'altStores was not provided')
-    }
+    assert.throw(() => ReactComponent.test(FakeComponent), ReferenceError, 'altStores was not provided')
   },
 
   'isomorphic mixin'() {
@@ -1132,12 +1052,7 @@ let tests = {
       registerStore: myStore
     }
 
-    try {
-      ReactComponent.test(FakeComponent)
-      assert.equal(true, false, 'I was able to use registerStore and registerStores')
-    } catch (e) {
-      assert.equal(e instanceof ReferenceError, true, 'must pick one')
-    }
+    assert.throw(() => ReactComponent.test(FakeComponent), ReferenceError, 'You are attempting to use `registerStore` and `registerStores` pick one')
   },
 
   'binding a listener that does not exist'() {
@@ -1149,12 +1064,7 @@ let tests = {
       }
     }
 
-    try {
-      alt.createStore(BadListenerStore)
-      assert.equal(true, false, 'I was able to bind an unknown method')
-    } catch (e) {
-      assert.equal(e instanceof ReferenceError, true, 'cannot bind methods that dont exist')
-    }
+    assert.throw(() => alt.createStore(BadListenerStore), ReferenceError, 'methodThatDoesNotExist defined but does not exist in BadListenerStore')
   },
 
   'binding listeners to action that does not exist'() {
@@ -1168,12 +1078,7 @@ let tests = {
       foo() { }
     }
 
-    try {
-      alt.createStore(BadListenerStore)
-      assert.equal(true, false, 'I was able to bind an unknown method')
-    } catch (e) {
-      assert.equal(e instanceof ReferenceError, true, 'invalid action reference passed in')
-    }
+    assert.throw(() => alt.createStore(BadListenerStore), ReferenceError, 'Invalid action reference passed in')
   },
 
   'do not include store in snapshots'() {
