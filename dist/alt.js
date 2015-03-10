@@ -60,6 +60,23 @@ var getInternalMethods = function (obj, excluded) {
   }, {});
 };
 
+var getInheritedMethods = function (obj) {
+  var methods = arguments[1] === undefined ? {} : arguments[1];
+
+  if (Object.getPrototypeOf(obj) !== Object.getPrototypeOf(NoopClass)) {
+    var ancestorObj = Object.getPrototypeOf(obj);
+    var ancestorMethods = getInternalMethods(ancestorObj, builtIns);
+
+    for (var m in ancestorMethods) {
+      methods[m] = methods[m] || ancestorMethods[m];
+    }
+
+    return getInheritedMethods(ancestorObj, methods);
+  } else {
+    return methods;
+  }
+};
+
 var AltStore = (function () {
   function AltStore(dispatcher, state) {
     var _this6 = this;
@@ -358,7 +375,7 @@ var Alt = (function () {
 
         var store = new Store(this);
 
-        storeInstance = assign(new AltStore(this.dispatcher, store), getInternalMethods(StoreModel, builtIns));
+        storeInstance = assign(new AltStore(this.dispatcher, store), getInheritedMethods(StoreModel), getInternalMethods(StoreModel, builtIns));
 
         if (saveStore) {
           this.stores[key] = storeInstance;
