@@ -11,7 +11,9 @@ var todoStore = alt.createStore(class TodoStore {
   }
 
   update(id, updates) {
-    this.todos[id] = merge(this.todos[id], updates)
+    if(this.todos[id] && updates){
+      this.todos[id] = merge(this.todos[id], updates)
+    }
   }
 
   updateAll(updates) {
@@ -36,7 +38,7 @@ var todoStore = alt.createStore(class TodoStore {
 
   onUpdateText(x) {
     var { id, text } = x
-    text = text.trim()
+    text = text ? text.trim() : ''
     if (text === '') {
       return false
     }
