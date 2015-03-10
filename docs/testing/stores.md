@@ -114,8 +114,8 @@ describe('PetStore', () => {
   // non static methods if we desire/need to
   it('rounds money to 2 decimal places', function() {
     var unwrappedStore = new UnwrappedPetStore();
-    assert.equal(unwrappedStore.roundMoney(21.221234, 21.22));
-    assert.equal(unwrappedStore.roundMoney(11.2561341, 11.26));
+    assert.equal(unwrappedStore.roundMoney(21.221234), 21.22);
+    assert.equal(unwrappedStore.roundMoney(11.2561341), 11.26);
   });
 });
 ```
