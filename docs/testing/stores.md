@@ -33,7 +33,7 @@ export class UnwrappedPetStore {
   constructor() {
     this.bindActions(petActions); // buyPet, sellPet
 
-    this.pets = {}; //eg. {hamsters: 2, dogs: 0, cats: 3}
+    this.pets = {hamsters: 2, dogs: 0, cats: 3};
     this.storeName = "Pete's Pets";
     this.revenue = 0;
   }
@@ -63,6 +63,21 @@ export class UnwrappedPetStore {
 export default alt.createStore(UnwrappedPetStore, 'PetStore');
 ```
 
+### Related Actions
+
+```javascript
+// actions/PetActions.js
+import alt from 'MyAlt';
+
+class PetActions {
+  constructor() {
+    this.generateActions('buyPet', 'sellPet');
+  }
+}
+
+export default alt.createActions(PetActions);
+```
+
 ### Store test
 
 ```javascript
@@ -78,14 +93,15 @@ describe('PetStore', () => {
   it('listens for buy a pet action', () => {
     // get initial state of store
     var oldRevenue = wrappedPetStore.getState().revenue,
-        oldDogs = wrappredPetStore.getInventory().dogs;
+        oldDogs = wrappedPetStore.getInventory().dogs;
 
     // create action to be dispatched
-    var payload = {cost: 10.223, pet: 'dog'},
+    var data = {cost: 10.223, pet: 'dogs'},
         action = petActions.BUY_PET;
 
     // dispatch action (store is listening for action)
-    alt.dispatcher.dispatch({action, payload});
+    // NOTE: FB's dispatcher expects keys "action" and "data"
+    alt.dispatcher.dispatch({action, data});
 
     // assertions
     assert.equal(wrappedPetStore.getState().revenue, oldRevenue - 10.22);
@@ -95,14 +111,15 @@ describe('PetStore', () => {
   it('listens for sell a pet action', () => {
     // get initial state of store
     var oldRevenue = wrappedPetStore.getState().revenue,
-        oldDogs = wrappredPetStore.getInventory().dogs;
+        oldDogs = wrappedPetStore.getInventory().dogs;
 
     // create action to be dispatched
-    var payload = {price: 40.125, pet: 'dog'},
+    var data = {price: 40.125, pet: 'dogs'},
         action = petActions.SELL_PET;
 
     // dispatch action (store is listening for action)
-    alt.dispatcher.dispatch({action, payload});
+    // NOTE: FB's dispatcher expects keys "action" and "data"
+    alt.dispatcher.dispatch({action, data});
 
     // assertions
     assert.equal(wrappedPetStore.getState().revenue, oldRevenue + 40.13);
@@ -113,7 +130,14 @@ describe('PetStore', () => {
   // lets use this inaccessible method to show how we can test
   // non static methods if we desire/need to
   it('rounds money to 2 decimal places', function() {
-    var unwrappedStore = new UnwrappedPetStore();
+    class TestPetStore extends UnwrappedPetStore {
+      constructor() {
+        // we extend and override the constructor because
+        // this.bindActions will fail in the unwrapped PetStore as
+        // it is an all specific method that the wrapped PetStore has
+      }
+    }
+    var unwrappedStore = new TestPetStore();
     assert.equal(unwrappedStore.roundMoney(21.221234), 21.22);
     assert.equal(unwrappedStore.roundMoney(11.2561341), 11.26);
   });
