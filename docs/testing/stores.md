@@ -129,13 +129,15 @@ describe('PetStore', () => {
   // though we can see that this method is working from our tests above,
   // lets use this inaccessible method to show how we can test
   // non static methods if we desire/need to
-  it('rounds money to 2 decimal places', function() {
+  it('rounds money to 2 decimal places', () => {
+    // we extend UnwrappedPetStore so we can easily stub out
+    // functions that alt adds to the wrapped store like `bindActions`
     class TestPetStore extends UnwrappedPetStore {
       constructor() {
-        // we extend and override the constructor because
-        // this.bindActions will fail in the unwrapped PetStore as
-        // it is an all specific method that the wrapped PetStore has
+        super();
       }
+      // stub bindActions
+      bindActions(){}
     }
     var unwrappedStore = new TestPetStore();
     assert.equal(unwrappedStore.roundMoney(21.221234), 21.22);
