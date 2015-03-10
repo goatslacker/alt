@@ -17,9 +17,7 @@ This form of "blackbox testing" should cover most of your store testing needs, b
 
 One thing we can do is to test our class before it is wrapped by alt, the unwrapped class. We should trust the alt library to test its own internals, so we can just test the inaccessible methods in our plain class by exporting it separately from our alt wrapped store (via `alt.createStore`). To do this, we can export it as a separate file, or use a named export for our unwrapped class and the default export for our alt wrapped class (in the example below, I will use the latter for simplicity).
 
-Another method to get at the unwrapped class is to do something like `AltWrappedStore[Object.getOwnPropertySymbols(AltWrappedStore)[2]]` as detailed [here](https://gist.github.com/troutowicz/d9dcb7e7e9e77032f602).
-
-So the best way to demonstrate testing stores is with an example.
+The best way to demonstrate testing stores is with an example.
 
 ## Example
 
@@ -111,10 +109,9 @@ describe('PetStore', () => {
     assert.equal(wrappedPetStore.getInventory().dogs, oldDogs - 1);
   });
 
-  // though we can see that this method is working via blackbox testing
-  // and seeing that our store revenue is rounded to 2 decimal places after
-  // buying or selling pets, lets use this inaccessible method to show how
-  // we can test non static methods if we desire/need to
+  // though we can see that this method is working from our tests above,
+  // lets use this inaccessible method to show how we can test
+  // non static methods if we desire/need to
   it('rounds money to 2 decimal places', function() {
     var unwrappedStore = new UnwrappedPetStore();
     assert.equal(unwrappedStore.roundMoney(21.221234, 21.22));
