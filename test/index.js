@@ -73,6 +73,8 @@ class MyStore {
     this.dontEmitEventCalled = false
     this.async = false
 
+    this.exportPublicMethods('externalMethodNoStatic')
+
     this._dispatcher = this.dispatcher
   }
 
@@ -104,6 +106,10 @@ class MyStore {
   static externalMethod() {
     return true
   }
+
+  externalMethodNoStatic() {
+   return true 
+  }
 }
 
 let myStore = alt.createStore(MyStore)
@@ -119,6 +125,8 @@ class SecondStore {
     this.recycled = false
 
     this.bindActions(myActions)
+
+    this.exportPublicMethods('externalMethodNoStatic', 'concatFooWithNoStatic')
 
     this.on('init', () => {
       this.recycled = true
@@ -168,7 +176,15 @@ class SecondStore {
     return this.getState().foo
   }
 
+  externalMethodNoStatic() {
+    return this.getState().foo
+  }
+
   static concatFooWith(x) {
+    return this.getState().foo + x
+  }
+
+  concatFooWithNoStatic(x) {
     return this.getState().foo + x
   }
 }
@@ -294,10 +310,15 @@ let tests = {
 
   'store external methods'() {
     assert.equal(typeof myStore.externalMethod, 'function', 'static methods are made available')
+    assert.equal(typeof myStore.externalMethodNoStatic, 'function', 'methods via mixin are made available')
     assert.equal(myStore.externalMethod(), true, 'static methods return proper result')
+    assert.equal(myStore.externalMethodNoStatic(), true, 'methods via mixin return proper result')
     assert.equal(typeof secondStore.externalMethod, 'function', 'static methods are made available')
+    assert.equal(typeof secondStore.externalMethodNoStatic, 'function', 'static methods are made available')
     assert.equal(secondStore.externalMethod(), 'bar', 'static methods have `this` bound to the instance')
+    assert.equal(secondStore.externalMethodNoStatic(), 'bar', 'static methods have `this` bound to the instance')
     assert.equal(secondStore.concatFooWith('baz'), 'barbaz', 'static methods may be called with params too')
+    assert.equal(secondStore.concatFooWithNoStatic('baz'), 'barbaz', 'static methods may be called with params too')
   },
 
   'getting state'() {
@@ -516,6 +537,25 @@ let tests = {
     }
 
     assert.throw(() => alt.createStore(StoreWithInvalidActionHandlers2), TypeError, 'bindAction expects a function')
+  },
+
+  'exporting invalid store methods'() {
+    class StoreWithMissingMethod {
+      constructor() {
+        this.exportPublicMethods('missingMethod')
+      }
+    }
+
+    assert.throw(() => alt.createStore(StoreWithMissingMethod), ReferenceError, 'missingMethod defined but does not exist in StoreWithMissingMethod')
+
+    class StoreWithInvalidExportType {
+      constructor() {
+        this.foo = 'bar'
+        this.exportPublicMethods('foo')
+      }
+    }
+
+    assert.throw(() => alt.createStore(StoreWithInvalidExportType), TypeError, 'exportPublicMethods expects a function')
   },
 
   'waiting for nothing'() {
@@ -859,6 +899,24 @@ let tests = {
     assert.equal(store.getState().foo, true, 'store inherits properties')
     assert.equal(store.getState().bar, true, 'store properties are available')
     assert.equal(store.getState().baz, true, 'inherited methods can be called')
+  },
+
+  'exporting public method of ancestor'() {
+    class StoreBase {
+      baseMethod() {
+        return true
+      }
+    }
+
+    class Store extends StoreBase {
+      constructor() {
+        this.exportPublicMethods('baseMethod')
+      }
+    }
+
+    let store = alt.createStore(Store)
+
+    assert.equal(typeof store.baseMethod, 'function', 'ancestor methods via export mixin are made available')
   },
 
   'listener mixin'() {
