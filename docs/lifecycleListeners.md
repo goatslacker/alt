@@ -7,7 +7,7 @@ permalink: /docs/lifecycleListeners/
 
 # Lifecycle Listener Methods
 
-When bootstrapping, snapshotting, or recycling there are special methods you can assign to your store to ensure any bookeeping that needs to be done. You would place these in your store's constructor.
+When bootstrapping, snapshotting, or recycling there are special methods you can assign to your store to ensure any bookkeeping that needs to be done. You would place these in your store's constructor.
 
 ## Bootstrap
 
@@ -32,6 +32,40 @@ class Store {
   constructor() {
     this.on('snapshot', () => {
       // do something here
+    });
+  }
+}
+```
+
+## Serialize
+
+`serialize` is called when the store's state is being serialized. Here you can alter or limit the store data that you want to be included in the snapshot. The return value of this function is what gets used by alt in the snapshot. See the [serialization](serialization.md) for an example.
+
+**Serialize expects a return value or an error will be thrown if one is not present.**
+
+```js
+class Store {
+  constructor() {
+    this.on('serialize', () => {
+      // do something here
+      return obj
+    });
+  }
+}
+```
+
+## Deserialize
+
+`deserialize` is called before the store's state is deserialized. This occurs whenever the store's state is being set to an existing snapshot/bootstrap data. Here you can perform any final tasks you need to before the snapshot/bootstrap data is set on the store such as mapping the data to model objects, or converting data an external source like a JSON API into a format the store expects. Deserialize takes in a parameter that is an object of snapshot/bootstrap data and must return the data to be set to the store's state. See the [serialization](serialization.md) for an example.
+
+**Deserialize expects a return value or an error will be thrown if one is not present.**
+
+```js
+class Store {
+  constructor() {
+    this.on('deserialize', (data) => {
+      // do something here
+      return modifiedData
     });
   }
 }

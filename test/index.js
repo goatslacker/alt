@@ -20,7 +20,8 @@ class MyActions {
       'moreActions2',
       'moreActions3',
       'resetRecycled',
-      'asyncStoreAction'
+      'asyncStoreAction',
+      'updateAnotherVal'
     )
     this.generateActions('anotherAction')
   }
@@ -202,6 +203,8 @@ class LifeCycleStore {
     this.init = false
     this.rollback = false
     this.snapshotted = false
+    this.serialized = false
+    this.deserialized = false
 
     this.bindListeners({
       test: myActions.updateName,
@@ -220,6 +223,14 @@ class LifeCycleStore {
     })
     this.on('rollback', () => {
       this.rollback = true
+    })
+    this.on('serialize', () => {
+      this.serialized = true
+      return this
+    })
+    this.on('deserialize', (data) => {
+      data.deserialized = true
+      return data
     })
   }
 
@@ -242,6 +253,65 @@ class ThirdStore {
 }
 
 const thirdStore = alt.createStore(ThirdStore)
+
+class Model {
+  constructor({x, y}) {
+    this.x = x
+    this.y = y
+  }
+
+  get sum() {
+    return this.x + this.y
+  }
+
+  get product() {
+    return this.x * this.y
+  }
+
+  get data() {
+    return {
+      x: this.x,
+      y: this.y,
+      sum: this.sum,
+      product: this.product
+    }
+  }
+}
+
+class InterceptSnapshotStore {
+  constructor() {
+    this.bindAction(myActions.updateAnotherVal, this.onUpdateAnotherVal)
+
+    this.modelData = new Model({x: 2, y: 3})
+    this.anotherVal = 5
+    this.privateVal = 10
+
+    this.on('serialize', () => {
+      return {
+        modelData: this.modelData.data,
+        anotherVal: this.anotherVal
+      }
+    })
+
+    this.on('deserialize', (data) => {
+      const obj = {
+        modelData: new Model({x: data.modelData.x, y: data.modelData.y}),
+        anotherVal: data.anotherVal
+      }
+      return obj
+    })
+  }
+
+  onUpdateAnotherVal(newVal) {
+    this.anotherVal = newVal
+  }
+
+  static getModelData() {
+    return this.getState().modelData.data
+  }
+}
+
+let interceptSnapshotStore = alt.createStore(InterceptSnapshotStore)
 
 // Alt instances...
 
@@ -332,6 +402,8 @@ const tests = {
     assert(lifecycleStore.getState().snapshotted === false, 'takeSnapshot has not been called yet')
     assert(lifecycleStore.getState().rollback === false, 'rollback has not been called')
     assert(lifecycleStore.getState().init === true, 'init gets called when store initializes')
+    assert.equal(lifecycleStore.getState().deserialized, true, 'deserialize has not been called yet')
+    assert.equal(lifecycleStore.getState().serialized, false, 'serialize has not been called yet')
   },
 
   'snapshots and bootstrapping'() {
@@ -341,6 +413,9 @@ const tests = {
     const bootstrapReturnValue = alt.bootstrap(initialSnapshot)
     assert(bootstrapReturnValue === undefined, 'bootstrap returns nothing')
     assert(lifecycleStore.getState().bootstrapped === true, 'bootstrap was called and the life cycle event was triggered')
+    assert.equal(lifecycleStore.getState().serialized, true, 'serialize was called and the life cycle event was triggered')
+    assert.equal(lifecycleStore.getState().snapshotted, true, 'snapshot was called and the life cycle event was triggered')
+    assert.equal(lifecycleStore.getState().deserialized, true, 'deserialize was called and the life cycle event was triggered')
   },
 
   'existence of actions'() {
@@ -406,6 +481,25 @@ const tests = {
     assert(JSON.parse(snapshot).MyStore.name === 'bear', 'the snapshot is not affected by action')
   },
 
+  'serializing/deserializing'(){
+    myActions.updateAnotherVal(11)
+    let snapshot = alt.takeSnapshot()
+    const expectedSerializedData = {
+      modelData: {
+        x: 2,
+        y: 3,
+        sum: 5,
+        product: 6
+      },
+      anotherVal: 11
+    }
+    // serializes data correctly
+    assert.deepEqual(JSON.parse(snapshot).InterceptSnapshotStore, expectedSerializedData, 'interceptSnapshotStore was serialized correctly')
+    alt.rollback()
+    // deserializes data correctly
+    assert.deepEqual(interceptSnapshotStore.getModelData(), expectedSerializedData.modelData)
+  },
+
   'mutation'() {
     const state = myStore.getState()
     state.name = 'foobar'
@@ -417,8 +511,8 @@ const tests = {
     const rollbackValue = alt.rollback()
     assert(rollbackValue === undefined, 'rollback returns nothing')
 
-    assert(myStore.getState().name === 'bear', 'state has been rolledback to last snapshot')
-    assert(lifecycleStore.getState().rollback === true, 'rollback lifecycle method was called')
+    assert.equal(myStore.getState().name, 'first', 'state has been rolledback to last snapshot')
+    assert.equal(lifecycleStore.getState().rollback, true, 'rollback lifecycle method was called')
   },
 
   'store listening'() {
