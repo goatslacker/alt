@@ -17,7 +17,7 @@ Why you should be using Alt
 * It is pure [flux](http://facebook.github.io/flux/docs/overview.html).
 * It's [small](https://github.com/goatslacker/alt/blob/master/src/alt.js) and readable.
 * It is [terse](https://github.com/goatslacker/alt#no-boilerplate). No boilerplate.
-* Extremely [flexible](#flexibility) and unopionated in how you use flux.
+* Extremely [flexible](#flexibility) and unopinionated in how you use flux.
 * Alt is [forward thinking](#es6).
 * It's being used and actively maintained.
 
@@ -532,7 +532,7 @@ Restart the loop by making your views kick off new actions.
 `takeSnapshot :: String`
 
 Snapshots are a core component of alt. The idea is that at any given point in time you can `takeSnapshot` and have your entire application's state
-serialized for persistence, transfering, logging, or debugging.
+serialized for persistence, transferring, logging, or debugging.
 
 Taking a snapshot is as easy as calling `alt.takeSnapshot()`.
 
@@ -645,7 +645,7 @@ alt.createStore(class MyStore {
 ### Flexibility
 
 You can choose to use alt in many ways just like you'd use flux. This means your asynchronous data fetching can live in the actions, or they can live in the stores.
-Stores may also be traditional singletons as in flux, or you can create an instance and have multilple store copies. This leads us into server side rendering.
+Stores may also be traditional singletons as in flux, or you can create an instance and have multiple store copies. This leads us into server side rendering.
 
 ### Server Side Rendering
 
