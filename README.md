@@ -76,7 +76,7 @@ What's new.
 One really cool aspect of alt is that you can save snapshots of the entire application's state at any given point in time.
 Best of all, if you really screw the state up beyond repair you can easily rollback to the last saved snapshot.
 
-There's also a method available that lets you bootstrap all the application's stores once, at startup, with a saved snapshot.
+There's also a method available that lets you bootstrap all the application's stores with a saved snapshot (a JSON string).
 This is particularly useful if you're writing isomorphic applications where you can send down a snapshot of the state the server was in, then bootstrap it back on the client and continue working where the program left off.
 
 Store data is copied on retrieval. Meaning you can't just update the store through your store instance, the objects returned by `getState` are shallow copied so you won't accidentally mutate data and other stores can't mutate other stores. This makes it easy to reason about how your application exactly changes and where.
@@ -540,9 +540,9 @@ Taking a snapshot is as easy as calling `alt.takeSnapshot()`.
 
 `bootstrap :: String -> undefined`
 
-Bootstrapping can only be done once, and usually is best to do when initializing your application. The `alt.bootstrap()` function takes in a snapshot
+Bootstrapping can be done as many times as you wish, but it is common to use when initializing your application. The `alt.bootstrap()` function takes in a snapshot (JSON string)
 you've saved and reloads all the state with that snapshot, no events will be emitted to your components during this process, so again, it's best to do this
-on init before the view has even rendered.
+on init before the view has even rendered. If you need to emit a change event, you can use `this.emitChange` inside of your `bootstrap` life cycle method.
 
 Bootstrap is great if you're running an isomorphic app, or if you're persisting state to localstorage and then retrieving it on init later on. You can save a snapshot on the server side, send it down, and then bootstrap it back on the client.
 
