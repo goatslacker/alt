@@ -73,7 +73,9 @@ class MyStore {
     this.dontEmitEventCalled = false
     this.async = false
 
-    this.exportPublicMethods('externalMethodNoStatic')
+    this.exportPublicMethods({
+      externalMethodNoStatic: this.externalMethodNoStatic
+    })
 
     this._dispatcher = this.dispatcher
   }
@@ -126,7 +128,10 @@ class SecondStore {
 
     this.bindActions(myActions)
 
-    this.exportPublicMethods('externalMethodNoStatic', 'concatFooWithNoStatic')
+    this.exportPublicMethods({
+      externalMethodNoStatic: this.externalMethodNoStatic,
+      concatFooWithNoStatic: this.concatFooWithNoStatic
+    })
 
     this.on('init', () => {
       this.recycled = true
@@ -540,14 +545,6 @@ let tests = {
   },
 
   'exporting invalid store methods'() {
-    class StoreWithMissingMethod {
-      constructor() {
-        this.exportPublicMethods('missingMethod')
-      }
-    }
-
-    assert.throw(() => alt.createStore(StoreWithMissingMethod), ReferenceError, 'missingMethod defined but does not exist in StoreWithMissingMethod')
-
     class StoreWithInvalidExportType {
       constructor() {
         this.foo = 'bar'
@@ -910,7 +907,9 @@ let tests = {
 
     class Store extends StoreBase {
       constructor() {
-        this.exportPublicMethods('baseMethod')
+        this.exportPublicMethods({
+          baseMethod: this.baseMethod
+        })
       }
     }
 

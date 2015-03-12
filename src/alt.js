@@ -202,18 +202,13 @@ const StoreMixin = {
     this.dispatcher.waitFor(tokens)
   },
 
-  exportPublicMethods(...methodNames) {
-    methodNames.forEach((methodName) => {
-      if (!this[methodName]) {
-        throw new ReferenceError(
-          `${methodName} defined but does not exist in ${this._storeName}`
-        )
-      }
-      if (typeof this[methodName] !== 'function') {
+  exportPublicMethods(methods) {
+    Object.keys(methods).forEach((methodName) => {
+      if (typeof methods[methodName] !== 'function') {
         throw new TypeError('exportPublicMethods expects a function')
       }
 
-      this[PUBLIC_METHODS][methodName] = this[methodName]
+      this[PUBLIC_METHODS][methodName] = methods[methodName]
     })
   }
 }

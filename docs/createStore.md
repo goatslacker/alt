@@ -122,24 +122,32 @@ class MyStore {
 
 ## StoreModel#exportPublicMethods
 
-> (...methodNames: string): undefined
+> (methods: object): undefined
 
-`exportPublicMethods` is an explicit, less magical alternative to declaring public methods as type `static`. The method accepts any number of comma separated method names, including that of ancestors.
+`exportPublicMethods` is an explicit, less magical alternative to declaring public methods as type `static`. The method accepts an object where the keys correspond to a method that exists inside or outside the StoreModel object.
 
 ```js
+const externalFunc = () => {
+  // do something
+};
+
 class StoreBase {
   baseMethod() {
-    return true;
+    // do something
   }
 }
 
 class Store extends StoreBase {
   constructor() {
-    this.exportPublicMethods('baseMethod', 'ownMethod');
+    this.exportPublicMethods({
+      baseMethod: this.baseMethod,
+      ownMethod: this.ownMethod,
+      externalFunc: externalFunc
+    });
   }
 
   ownMethod() {
-    return true;
+    // do something
   }
 }
 ```
