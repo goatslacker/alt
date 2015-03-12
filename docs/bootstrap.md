@@ -11,7 +11,7 @@ permalink: /docs/bootstrap/
 
 The `alt.bootstrap()` function takes in a snapshot you've saved and reloads all the state with that snapshot, no events will be emitted to your components during this process, so it is advised to do this on init before the view has even rendered.
 
-If you need to emit a change event, you can use `this.emitChange` inside of your `bootstrap` life cycle method.
+If you want to emit a change event after bootstrapping you can use [`this.emitChange`](stores.md#storeemitchange) inside of the [bootstrap lifecycle method](lifecycleListeners.md#bootstrap).
 
 ```js
 class MyStore {
