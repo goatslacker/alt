@@ -13,6 +13,7 @@ const INIT_SNAPSHOT = Symbol('init snapshot storage')
 const LAST_SNAPSHOT = Symbol('last snapshot storage')
 const LIFECYCLE = Symbol('store lifecycle listeners')
 const LISTENERS = Symbol('stores action listeners storage')
+const PUBLIC_METHODS = Symbol('store public method storage')
 const STATE_CONTAINER = Symbol('the state container')
 
 function formatAsConstant(name) {
@@ -54,6 +55,7 @@ class AltStore {
     this[STATE_CONTAINER] = state
 
     assign(this[LIFECYCLE], state[LIFECYCLE])
+    assign(this, state[PUBLIC_METHODS])
 
     // Register dispatcher
     this.dispatchToken = dispatcher.register((payload) => {
@@ -198,6 +200,16 @@ const StoreMixin = {
     })
 
     this.dispatcher.waitFor(tokens)
+  },
+
+  exportPublicMethods(methods) {
+    Object.keys(methods).forEach((methodName) => {
+      if (typeof methods[methodName] !== 'function') {
+        throw new TypeError('exportPublicMethods expects a function')
+      }
+
+      this[PUBLIC_METHODS][methodName] = methods[methodName]
+    })
   }
 }
 
@@ -280,6 +292,7 @@ class Alt {
       constructor(alt) {
         this[LIFECYCLE] = {}
         this[LISTENERS] = {}
+        this[PUBLIC_METHODS] = {}
         super(alt)
       }
     }
