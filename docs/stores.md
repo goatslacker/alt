@@ -9,7 +9,7 @@ permalink: /docs/stores/
 
 These are the stores returned by [`alt.createStore`](createStore.md), they will not have the methods defined in your StoreModel because flux stores do not have direct setters. However, any `static` methods defined in your StoreModel will be transferred to this object.
 
-**Please Note:** The behavior of `static` methods in alt stores is NOT how `static` methods behave in ES6. Normally `static` methods can be called directly off of the class without creating a new instance of said class, `MyClass.staticMethod()`. In alt, there is magic under the hood that takes the `static` methods you define on a store, and makes them accessible from the store object created by `alt.createStore`. This provides an easy way to add methods that you need to be accessible in your views. If you do not like the magic, or are a fan of being more explicit, you can use [`StoreModel#exportPublicMethods`](createStore.md#storemodelexportpublicmethods) to accomplish the same thing.
+**Please note:** Static methods defined on a store model are nothing more than syntactic sugar for exporting the method as a public method of your alt instance. This means that this will be bound to the store instance. It is recommended to explicitly export the methods in the constructor using [`StoreModel#exportPublicMethods`](createStore.md#storemodelexportpublicmethods).
 
 ## Store#getState
 
