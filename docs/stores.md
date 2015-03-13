@@ -7,7 +7,9 @@ permalink: /docs/stores/
 
 # Alt Stores
 
-These are the stores returned by [`alt.createStore`](createStore.md), they will not have the methods defined in your StoreModel because flux stores do not have direct setters. However, any static methods defined in your StoreModel will be transferred to this object.
+These are the stores returned by [`alt.createStore`](createStore.md), they will not have the methods defined in your StoreModel because flux stores do not have direct setters. However, any `static` methods defined in your StoreModel will be transferred to this object.
+
+**Please note:** Static methods defined on a store model are nothing more than syntactic sugar for exporting the method as a public method of your alt instance. This means that `this` will be bound to the store instance. It is recommended to explicitly export the methods in the constructor using [`StoreModel#exportPublicMethods`](createStore.md#storemodelexportpublicmethods).
 
 ## Store#getState
 
