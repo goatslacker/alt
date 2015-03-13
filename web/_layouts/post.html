@@ -1,0 +1,14 @@
+---
+layout: default
+---
+
+<div class="sp-vert-sm"></div>
+
+<div class="txt-center sp-horiz-lg">
+  <h1 class="txt-light">{{ page.title }}</h1>
+  <p class="txt-light">{{ page.date | date: "%b %-d, %Y" }}{% if page.author %} • {{ page.author }}{% endif %}{% if page.meta %} • {{ page.meta }}{% endif %}</p>
+</div>
+
+<article class="sp-lg">
+  {{ content }}
+</article>

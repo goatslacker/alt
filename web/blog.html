@@ -1,0 +1,29 @@
+---
+layout: default
+title: Blog
+description: Web log for the alt project
+permalink: /blog/
+---
+
+<div class="main sp-vert-md sp-horiz-lg">
+
+  <div class="txt-center">
+    <h1 class="txt-light">Posts</h1>
+    <p class="txt-light">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
+  </div>
+
+  <ul>
+    {% for post in site.posts %}
+      <li class="col c4">
+        <div class="post">
+          <span>{{ post.date | date: "%b %-d, %Y" }}</span>
+          <h2>
+            <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+          </h2>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+
+
+</div>

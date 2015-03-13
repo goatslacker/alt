@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+  {% include head.html %}
+
+  <body>
+
+    {% include header.html %}
+
+    <div class="main sp-vert-md sp-horiz-lg">
+      <div class="row">
+        <div class="col c2">
+          {% include guidenav.html %}
+        </div>
+        <div class="col c10">
+          <div class="sp-horiz-md">
+            {{ content }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% include footer.html %}
+
+  </body>
+
+</html>

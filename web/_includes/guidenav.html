@@ -1,0 +1,7 @@
+<ul class="sidenav">
+  {% for item in site.guidenav %}
+  <li>
+    <a href="{{ item.url }}">{{ item.title }}</a>
+  </li>
+  {% endfor %}
+</ul>

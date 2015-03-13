@@ -1,0 +1,54 @@
+# Site settings
+title: Alt
+description: > # this means to ignore newlines until "baseurl:"
+  A library for managing data within JavaScript applications. Alt is a pure
+  flux implementation that is small, terse, well tested, extremely flexible,
+  and forward thinking.
+baseurl: "" # the subpath of your site, e.g. /blog/
+url: "https://goatslacker.github.io/alt" # the base hostname & protocol for your site
+twitter_username: goatslacker
+github_username:  goatslacker/alt
+
+sidenav:
+- title: Creating Actions
+  url: /docs/createActions
+- title: Actions
+  url: /docs/actions
+- title: Creating Stores
+  url: /docs/createStore
+- title: Stores
+  url: /docs/stores
+- title: Lifecycle Listeners
+  url: /docs/lifecycleListeners
+- title: Bootstrap
+  url: /docs/bootstrap
+- title: Take Snapshot
+  url: /docs/takeSnapshot
+- title: Flush
+  url: /docs/flush
+- title: Recycle
+  url: /docs/recycle
+- title: Rollback
+  url: /docs/rollback
+- title: Alt Instances
+  url: /docs/altInstances
+
+guidenav:
+- title: Getting Started
+  url: /guide/
+- title: Creating Actions
+  url: /guide/actions/
+- title: Creating a Store
+  url: /guide/store/
+- title: Using your View
+  url: /guide/view/
+- title: Fetching Data
+  url: /guide/async/
+- title: Data Dependencies
+  url: /guide/wait-for/
+
+# Build settings
+markdown: kramdown
+
+kramdown:
+  input: GFM
