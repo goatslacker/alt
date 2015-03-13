@@ -815,6 +815,9 @@ const tests = {
       return alt.createActions(a)
     }())
 
+    let uaOnce = 0
+    let laOnce = 0
+
     class Store {
       constructor() {
         this.bindAction(ua.UPDATE, this.ua)
@@ -826,10 +829,12 @@ const tests = {
 
       ua() {
         this.a = 1
+        uaOnce += 1
       }
 
       la() {
         this.b = 1
+        laOnce += 1
       }
     }
 
@@ -842,6 +847,8 @@ const tests = {
 
     assert(state.a === 1, 'both actions were called')
     assert(state.b === 1, 'both actions were called')
+    assert.equal(uaOnce, 1, 'actions only called once')
+    assert.equal(laOnce, 1, 'actions only called once')
   },
 
   'dispatching from alt instance'() {
