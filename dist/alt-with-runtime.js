@@ -491,7 +491,6 @@ var Alt = (function () {
           if (store[LIFECYCLE].init) {
             store[LIFECYCLE].init();
           }
-          store.emitChange();
         });
       },
       writable: true,

@@ -412,7 +412,6 @@ class Alt {
       if (store[LIFECYCLE].init) {
         store[LIFECYCLE].init()
       }
-      store.emitChange()
     })
   }
 
