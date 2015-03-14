@@ -471,6 +471,7 @@ var Alt = (function () {
           if (store[LIFECYCLE].rollback) {
             store[LIFECYCLE].rollback();
           }
+          store.emitChange();
         });
       },
       writable: true,
@@ -509,6 +510,7 @@ var Alt = (function () {
           if (store[LIFECYCLE].bootstrap) {
             store[LIFECYCLE].bootstrap();
           }
+          store.emitChange();
         });
       },
       writable: true,

@@ -394,6 +394,7 @@ class Alt {
       if (store[LIFECYCLE].rollback) {
         store[LIFECYCLE].rollback()
       }
+      store.emitChange()
     })
   }
 
@@ -421,6 +422,7 @@ class Alt {
       if (store[LIFECYCLE].bootstrap) {
         store[LIFECYCLE].bootstrap()
       }
+      store.emitChange()
     })
   }
 

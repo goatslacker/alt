@@ -110,7 +110,7 @@ class MyStore {
   }
 
   externalMethodNoStatic() {
-   return true 
+   return true
   }
 }
 
