@@ -7,13 +7,13 @@ permalink: /docs/serialization/
 
 # Serialization
 
-The [serialize](lifecycleListeners.md#serialize) and [deserialize](lifecycleListeners.md#deserialize) lifecycle listener methods can be utilized separately or together to transform the store data being saved in a snapshot or the snapshot/bootstrap data being set to a store. Though they do not have to be used together, you can picture the parity between the two methods. You can transform the shape of your store data created in the snapshot with `serialize`, which might be to get your data in a format ready to be consumed by other services and use `deserialize` to transform this data back into the format that your store recognizes.
+The [snapshot](lifecycleListeners.md#snapshot) and [deserialize](lifecycleListeners.md#deserialize) lifecycle listener methods can be utilized separately or together to transform the store data being saved in a snapshot or the snapshot/bootstrap data being set to a store. Though they do not have to be used together, you can picture the parity between the two methods. You can transform the shape of your store data created in the snapshot with `snapshot`, which might be to get your data in a format ready to be consumed by other services and use `deserialize` to transform this data back into the format that your store recognizes.
 
 In the example below, we will show how this technique can be used to `serialize` complex model data being used by the store into a simpler structure for the store's snapshot, and repopulate our store models with the simple structure from the bootstrap/snapshot data with `deserialize`.
 
-## Serialize
+## Snapshot
 
-`serialize` provides a hook to transform the store data to be saved to an alt snapshot, application data persisted by alt. The return value of this function becomes the value of the store in the snapshot. For example, if the store name was `MyStore` and `serialize` returned `{firstName: 'Cereal', lastName: 'Eyes'}`, the snapshot would contain the data `{...'MyStore': {'firstName': 'Cereal', 'lastName': 'Eyes'}...}`
+`snapshot` provides a hook to transform the store data (via an optional return value) to be saved to an alt snapshot. If a return value is provided than it becomes the value of the store in the snapshot. For example, if the store name was `MyStore` and `serialize` returned `{firstName: 'Cereal', lastName: 'Eyes'}`, the snapshot would contain the data `{...'MyStore': {'firstName': 'Cereal', 'lastName': 'Eyes'}...}`. If there is no return value, the default, [`MyStore#getState()`](stores.md#storegetstate) is used for the snapshot data.
 
 ## Deserialize
 
@@ -58,7 +58,7 @@ class MyStore {
     // we don't want to save this data in the snapshot
     this.semiPrivateVal = 10
 
-    this.on('serialize', () => {
+    this.on('snapshot', () => {
       return {
         // provides product and sum data from the model getters in addition to x and y
         // this data would not be included by the default serialization (getState)

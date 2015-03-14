@@ -25,30 +25,15 @@ class Store {
 
 ## Snapshot
 
-`snapshot` is called before the store's state is serialized. Here you can perform any final tasks you need to before the state is saved.
+`snapshot` is called before the store's state is serialized. Here you can perform any final tasks you need to before the state is saved. You may optionally return an object, which will be used directly as the snapshot data for the store. If you do not return anything, the default, [`MyStore#getState()`](stores.md#storegetstate) is used for the snapshot data.
 
 ```js
 class Store {
   constructor() {
     this.on('snapshot', () => {
       // do something here
-    });
-  }
-}
-```
-
-## Serialize
-
-`serialize` is called when the store's state is being serialized. Here you can alter or limit the store data that you want to be included in the snapshot. The return value of this function is what gets used by alt in the snapshot. See the [serialization](serialization.md) for an example.
-
-**Serialize expects a return value or an error will be thrown if one is not present.**
-
-```js
-class Store {
-  constructor() {
-    this.on('serialize', () => {
-      // do something here
-      return obj
+      // optional return of data to be used in snapshot
+      // return mySnapshotData
     });
   }
 }
