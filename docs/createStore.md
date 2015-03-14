@@ -120,6 +120,38 @@ class MyStore {
 }
 ```
 
+## StoreModel#exportPublicMethods
+
+> (methods: object): undefined
+
+`exportPublicMethods` is an explicit, less magical alternative to declaring public methods as type `static`. The method accepts an object where the keys correspond to a method that exists inside or outside the StoreModel object.
+
+```js
+const externalFunc = () => {
+  // do something
+};
+
+class StoreBase {
+  baseMethod() {
+    // do something
+  }
+}
+
+class Store extends StoreBase {
+  constructor() {
+    this.exportPublicMethods({
+      baseMethod: this.baseMethod,
+      ownMethod: this.ownMethod,
+      externalFunc: externalFunc
+    });
+  }
+
+  ownMethod() {
+    // do something
+  }
+}
+```
+
 ## StoreModel#getInstance
 
 > (): (AltStore)[stores.md]

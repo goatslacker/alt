@@ -1,5 +1,5 @@
 import Alt from '../dist/alt-with-runtime'
-import assert from 'assert'
+import {assert} from 'chai'
 
 import DispatcherRecorder from '../utils/DispatcherRecorder'
 
