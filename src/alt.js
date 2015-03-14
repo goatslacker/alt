@@ -61,7 +61,9 @@ class AltStore {
     this.dispatchToken = dispatcher.register((payload) => {
       if (state[LISTENERS][payload.action]) {
         const result = state[LISTENERS][payload.action](payload.data)
-        result !== false && this.emitChange()
+        if (result !== false) {
+          this.emitChange()
+        }
       }
     })
 
@@ -139,10 +141,9 @@ const StoreMixin = {
     Object.keys(actions).forEach((action) => {
       const symbol = actions[action]
       const matchFirstCharacter = /./
-      const assumedEventHandler = action.replace(
-        matchFirstCharacter,
-        (x) => `on${x[0].toUpperCase()}`
-      )
+      const assumedEventHandler = action.replace(matchFirstCharacter, (x) => {
+        return `on${x[0].toUpperCase()}`
+      })
       let handler = null
 
       if (this[action] && this[assumedEventHandler]) {
@@ -177,7 +178,9 @@ const StoreMixin = {
       }
 
       if (Array.isArray(symbol)) {
-        symbol.forEach((action) => this.bindAction(action, listener))
+        symbol.forEach((action) => {
+          this.bindAction(action, listener)
+        })
       } else {
         this.bindAction(symbol, listener)
       }
@@ -240,8 +243,8 @@ const saveInitialSnapshot = (instance, key) => {
   instance[INIT_SNAPSHOT] = JSON.stringify(initial)
 }
 
-const filterSnapshotOfStores = (snapshot, storeNames) => {
-  const stores = JSON.parse(snapshot)
+const filterSnapshotOfStores = (serializedSnapshot, storeNames) => {
+  const stores = JSON.parse(serializedSnapshot)
   const storesToReset = storeNames.reduce((obj, name) => {
     if (!stores[name]) {
       throw new ReferenceError(`${name} is not a valid store`)
@@ -375,7 +378,9 @@ class Alt {
       // Set all the properties on action
       obj[action] = newAction[ACTION_HANDLER]
       obj[action].defer = (...args) => {
-        setTimeout(() => newAction[ACTION_HANDLER].apply(null, args))
+        setTimeout(() => {
+          newAction[ACTION_HANDLER].apply(null, args)
+        })
       }
       obj[action][ACTION_KEY] = actionName
       obj[constant] = actionName
@@ -399,11 +404,11 @@ class Alt {
   }
 
   recycle(...storeNames) {
-    const snapshot = storeNames.length
+    const initialSnapshot = storeNames.length
       ? filterSnapshotOfStores(this[INIT_SNAPSHOT], storeNames)
       : this[INIT_SNAPSHOT]
 
-    setAppState(this, snapshot, (store) => {
+    setAppState(this, initialSnapshot, (store) => {
       if (store[LIFECYCLE].init) {
         store[LIFECYCLE].init()
       }

@@ -78,7 +78,9 @@ var AltStore = (function () {
     this.dispatchToken = dispatcher.register(function (payload) {
       if (state[LISTENERS][payload.action]) {
         var result = state[LISTENERS][payload.action](payload.data);
-        result !== false && _this7.emitChange();
+        if (result !== false) {
+          _this7.emitChange();
+        }
       }
     });
 
@@ -218,7 +220,7 @@ var StoreMixin = {
 
       if (Array.isArray(symbol)) {
         symbol.forEach(function (action) {
-          return _this7.bindAction(action, listener);
+          _this7.bindAction(action, listener);
         });
       } else {
         _this7.bindAction(symbol, listener);
@@ -282,8 +284,8 @@ var saveInitialSnapshot = function (instance, key) {
   instance[INIT_SNAPSHOT] = JSON.stringify(initial);
 };
 
-var filterSnapshotOfStores = function (snapshot, storeNames) {
-  var stores = JSON.parse(snapshot);
+var filterSnapshotOfStores = function (serializedSnapshot, storeNames) {
+  var stores = JSON.parse(serializedSnapshot);
   var storesToReset = storeNames.reduce(function (obj, name) {
     if (!stores[name]) {
       throw new ReferenceError("" + name + " is not a valid store");
@@ -462,7 +464,7 @@ var Alt = (function () {
             }
 
             setTimeout(function () {
-              return newAction[ACTION_HANDLER].apply(null, args);
+              newAction[ACTION_HANDLER].apply(null, args);
             });
           };
           obj[action][ACTION_KEY] = actionName;
@@ -500,9 +502,9 @@ var Alt = (function () {
           storeNames[_key] = arguments[_key];
         }
 
-        var snapshot = storeNames.length ? filterSnapshotOfStores(this[INIT_SNAPSHOT], storeNames) : this[INIT_SNAPSHOT];
+        var initialSnapshot = storeNames.length ? filterSnapshotOfStores(this[INIT_SNAPSHOT], storeNames) : this[INIT_SNAPSHOT];
 
-        setAppState(this, snapshot, function (store) {
+        setAppState(this, initialSnapshot, function (store) {
           if (store[LIFECYCLE].init) {
             store[LIFECYCLE].init();
           }
