@@ -14,6 +14,7 @@ var INIT_SNAPSHOT = Symbol("init snapshot storage");
 var LAST_SNAPSHOT = Symbol("last snapshot storage");
 var LIFECYCLE = Symbol("store lifecycle listeners");
 var LISTENERS = Symbol("stores action listeners storage");
+var PUBLIC_METHODS = Symbol("store public method storage");
 var STATE_CONTAINER = Symbol("the state container");
 
 function formatAsConstant(name) {
@@ -50,7 +51,7 @@ var getInternalMethods = function (obj, excluded) {
 
 var AltStore = (function () {
   function AltStore(dispatcher, state) {
-    var _this6 = this;
+    var _this7 = this;
 
     babelHelpers.classCallCheck(this, AltStore);
 
@@ -59,12 +60,13 @@ var AltStore = (function () {
     this[STATE_CONTAINER] = state;
 
     assign(this[LIFECYCLE], state[LIFECYCLE]);
+    assign(this, state[PUBLIC_METHODS]);
 
     // Register dispatcher
     this.dispatchToken = dispatcher.register(function (payload) {
       if (state[LISTENERS][payload.action]) {
         var result = state[LISTENERS][payload.action](payload.data);
-        result !== false && _this6.emitChange();
+        result !== false && _this7.emitChange();
       }
     });
 
@@ -162,7 +164,7 @@ var StoreMixin = {
   },
 
   bindActions: function bindActions(actions) {
-    var _this6 = this;
+    var _this7 = this;
 
     Object.keys(actions).forEach(function (action) {
       var symbol = actions[action];
@@ -172,40 +174,40 @@ var StoreMixin = {
       });
       var handler = null;
 
-      if (_this6[action] && _this6[assumedEventHandler]) {
+      if (_this7[action] && _this7[assumedEventHandler]) {
         // If you have both action and onAction
         throw new ReferenceError("You have multiple action handlers bound to an action: " + ("" + action + " and " + assumedEventHandler));
-      } else if (_this6[action]) {
+      } else if (_this7[action]) {
         // action
-        handler = _this6[action];
-      } else if (_this6[assumedEventHandler]) {
+        handler = _this7[action];
+      } else if (_this7[assumedEventHandler]) {
         // onAction
-        handler = _this6[assumedEventHandler];
+        handler = _this7[assumedEventHandler];
       }
 
       if (handler) {
-        _this6.bindAction(symbol, handler);
+        _this7.bindAction(symbol, handler);
       }
     });
   },
 
   bindListeners: function bindListeners(obj) {
-    var _this6 = this;
+    var _this7 = this;
 
     Object.keys(obj).forEach(function (methodName) {
       var symbol = obj[methodName];
-      var listener = _this6[methodName];
+      var listener = _this7[methodName];
 
       if (!listener) {
-        throw new ReferenceError("" + methodName + " defined but does not exist in " + _this6._storeName);
+        throw new ReferenceError("" + methodName + " defined but does not exist in " + _this7._storeName);
       }
 
       if (Array.isArray(symbol)) {
         symbol.forEach(function (action) {
-          return _this6.bindAction(action, listener);
+          return _this7.bindAction(action, listener);
         });
       } else {
-        _this6.bindAction(symbol, listener);
+        _this7.bindAction(symbol, listener);
       }
     });
   },
@@ -226,6 +228,18 @@ var StoreMixin = {
     });
 
     this.dispatcher.waitFor(tokens);
+  },
+
+  exportPublicMethods: function exportPublicMethods(methods) {
+    var _this7 = this;
+
+    Object.keys(methods).forEach(function (methodName) {
+      if (typeof methods[methodName] !== "function") {
+        throw new TypeError("exportPublicMethods expects a function");
+      }
+
+      _this7[PUBLIC_METHODS][methodName] = methods[methodName];
+    });
   }
 };
 
@@ -315,6 +329,7 @@ var Alt = (function () {
 
             this[LIFECYCLE] = {};
             this[LISTENERS] = {};
+            this[PUBLIC_METHODS] = {};
             babelHelpers.get(Object.getPrototypeOf(Store.prototype), "constructor", this).call(this, alt);
           }
 
@@ -372,7 +387,7 @@ var Alt = (function () {
     },
     createActions: {
       value: function createActions(ActionsClass) {
-        var _this6 = this;
+        var _this7 = this;
 
         var exportObj = arguments[1] === undefined ? {} : arguments[1];
 
@@ -419,7 +434,7 @@ var Alt = (function () {
           var actionName = Symbol("" + key + "#" + action);
 
           // Wrap the action so we can provide a dispatch method
-          var newAction = new ActionCreator(_this6, actionName, actions[action], obj);
+          var newAction = new ActionCreator(_this7, actionName, actions[action], obj);
 
           // Set all the properties on action
           obj[action] = newAction[ACTION_HANDLER];
