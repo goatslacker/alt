@@ -219,7 +219,7 @@ const StoreMixin = {
 const setAppState = (instance, data, onStore) => {
   const obj = JSON.parse(data)
   Object.keys(obj).forEach((key) => {
-    const store = instance.stores[key];
+    const store = instance.stores[key]
     if (store[LIFECYCLE].deserialize) {
       obj[key] = store[LIFECYCLE].deserialize(obj[key])
       /* istanbul ignore next */
@@ -237,23 +237,12 @@ const setAppState = (instance, data, onStore) => {
 const snapshot = (instance) => {
   return JSON.stringify(
     Object.keys(instance.stores).reduce((obj, key) => {
-      const store = instance.stores[key];
+      const store = instance.stores[key]
+      let customSnapshot
       if (store[LIFECYCLE].snapshot) {
-        store[LIFECYCLE].snapshot()
+        customSnapshot = store[LIFECYCLE].snapshot()
       }
-
-      if (store[LIFECYCLE].serialize) {
-        obj[key] = store[LIFECYCLE].serialize()
-        /* istanbul ignore next */
-        if(!obj[key]) {
-          throw new Error(
-            `The "serialize" lifecycle method in the store, ${key}, must return data.`
-          )
-        }
-      }
-      else {
-        obj[key] = store.getState()
-      }
+      obj[key] = customSnapshot ? customSnapshot : store.getState()
       return obj
     }, {})
   )

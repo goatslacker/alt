@@ -997,19 +997,11 @@ var setAppState = function (instance, data, onStore) {
 var snapshot = function (instance) {
   return JSON.stringify(Object.keys(instance.stores).reduce(function (obj, key) {
     var store = instance.stores[key];
+    var customSnapshot = undefined;
     if (store[LIFECYCLE].snapshot) {
-      store[LIFECYCLE].snapshot();
+      customSnapshot = store[LIFECYCLE].snapshot();
     }
-
-    if (store[LIFECYCLE].serialize) {
-      obj[key] = store[LIFECYCLE].serialize();
-      /* istanbul ignore next */
-      if (!obj[key]) {
-        throw new Error("The \"serialize\" lifecycle method in the store, " + key + ", must return data.");
-      }
-    } else {
-      obj[key] = store.getState();
-    }
+    obj[key] = customSnapshot ? customSnapshot : store.getState();
     return obj;
   }, {}));
 };
