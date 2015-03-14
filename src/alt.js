@@ -290,9 +290,6 @@ class Alt {
     // so we can inherit any extensions from the provided store.
     class Store extends StoreModel {
       constructor(alt) {
-        this[LIFECYCLE] = {}
-        this[LISTENERS] = {}
-        this[PUBLIC_METHODS] = {}
         super(alt)
       }
     }
@@ -313,6 +310,10 @@ class Alt {
         return false
       }
     })
+
+    Store.prototype[LIFECYCLE] = {}
+    Store.prototype[LISTENERS] = {}
+    Store.prototype[PUBLIC_METHODS] = {}
 
     const store = new Store(this)
 

@@ -341,9 +341,6 @@ var Alt = (function () {
           function Store(alt) {
             _classCallCheck(this, Store);
 
-            this[LIFECYCLE] = {};
-            this[LISTENERS] = {};
-            this[PUBLIC_METHODS] = {};
             _get(Object.getPrototypeOf(Store.prototype), "constructor", this).call(this, alt);
           }
 
@@ -370,6 +367,10 @@ var Alt = (function () {
             return false;
           }
         });
+
+        Store.prototype[LIFECYCLE] = {};
+        Store.prototype[LISTENERS] = {};
+        Store.prototype[PUBLIC_METHODS] = {};
 
         var store = new Store(this);
 
