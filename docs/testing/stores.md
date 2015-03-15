@@ -89,6 +89,9 @@ import petActions from 'actions/PetActions';
  // you can use any assertion library you want
 import {assert} from 'chai';
 
+// These testing utils will auto stub the stuff that alt.createStore does
+import AltTestingUtils from 'alt/utils/AltTestingUtils';
+
 describe('PetStore', () => {
   it('listens for buy a pet action', () => {
     // get initial state of store
@@ -130,18 +133,9 @@ describe('PetStore', () => {
   // lets use this inaccessible method to show how we can test
   // non static methods if we desire/need to
   it('rounds money to 2 decimal places', () => {
-    // we extend UnwrappedPetStore so we can easily stub out
-    // functions that alt adds to the wrapped store like `bindActions`
-    class TestPetStore extends UnwrappedPetStore {
-      constructor() {
-        super();
-      }
-      // stub bindActions
-      bindActions(){}
-    }
-    var unwrappedStore = new TestPetStore();
+    var unwrappedStore = AltTestingUtils.makeStoreTestable(alt, UnwrappedPetStore);
     assert.equal(unwrappedStore.roundMoney(21.221234), 21.22);
-    assert.equal(unwrappedStore.roundMoney(11.2561341), 11.26);
+    assert.equal(unwrappedStore.roundMoney(11.2561341), 11.26)
   });
 });
 ```
