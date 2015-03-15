@@ -1,8 +1,4 @@
-var Alt = require('../../../')
+var Alt = require('alt')
 var alt = new Alt()
 
-var DispatcherRecorder = require('../../../utils/DispatcherRecorder')
-
-window.alt = alt
-window.DispatcherRecorder = DispatcherRecorder
 module.exports = alt

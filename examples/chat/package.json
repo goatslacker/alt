@@ -9,9 +9,11 @@
     "react": "^0.12.2"
   },
   "devDependencies": {
+    "babel-jest": "^4.0.0",
     "babelify": "^5.0.3",
     "browserify": "~4.2.2",
     "envify": "^3.2.0",
+    "jest-cli": "^0.4.0",
     "uglify-js": "~2.4.15"
   },
   "scripts": {
@@ -29,6 +31,11 @@
     ]
   },
   "jest": {
+    "scriptPreprocessor": "../node_modules/babel-jest",
+    "unmockedModulePathPatterns": [
+      "../node_modules/alt",
+      "alt.js"
+    ],
     "rootDir": "./js"
   }
 }

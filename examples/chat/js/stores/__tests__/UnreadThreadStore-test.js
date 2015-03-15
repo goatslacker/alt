@@ -1,32 +1,20 @@
-/**
- * This file is provided by Facebook for testing and evaluation purposes
- * only. Facebook reserves all rights not expressly granted.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- * FACEBOOK BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
- * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
-
 jest.dontMock('../UnreadThreadStore');
-jest.dontMock('react/lib/merge');
 
 describe('UnreadThreadStore', function() {
 
-  var ChatAppDispatcher;
-  var UnreadThreadStore;
+  var alt;
   var callback;
+  var UnreadThreadStore;
 
   beforeEach(function() {
-    ChatAppDispatcher = require('../../dispatcher/ChatAppDispatcher');
+    alt = require('../../alt');
+    alt.dispatcher = { register: jest.genMockFunction() };
     UnreadThreadStore = require('../UnreadThreadStore');
-    callback = ChatAppDispatcher.register.mock.calls[0][0];
+    callback = alt.dispatcher.register.mock.calls[0][0];
   });
 
   it('registers a callback with the dispatcher', function() {
-    expect(ChatAppDispatcher.register.mock.calls.length).toBe(1);
+    expect(alt.dispatcher.register.mock.calls.length).toBe(1);
   });
 
   it('provides the unread thread count', function() {
