@@ -10,7 +10,9 @@ const tests = assign(
   require('../stores-get-alt'),
   require('../stores-with-colliding-names'),
   require('../testing-utils'),
-  require('../use-event-emitter')
+  require('../use-event-emitter'),
+  require('../store-as-a-module'),
+  require('../es3-module-pattern')
 )
 
 // This code is directly from mocha/lib/interfaces/exports.js

@@ -7,15 +7,17 @@ import * as StoreModel from './helpers/SaaM'
 const store = alt.createStore(StoreModel)
 
 export default {
-  beforeEach() {
-    alt.recycle()
-  },
+  'Stores as a Module': {
+    beforeEach() {
+      alt.recycle()
+    },
 
-  'store state is there'() {
-    assert.equal(store.getState().data, 1, 'store data is initialized to 1')
+    'store state is there'() {
+      assert.equal(store.getState().data, 1, 'store data is initialized to 1')
 
-    actions.fire(2)
+      actions.fire(2)
 
-    assert.equal(store.getState().data, 2, 'store data was updated')
+      assert.equal(store.getState().data, 2, 'store data was updated')
+    }
   }
 }

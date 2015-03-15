@@ -1,5 +1,6 @@
 import Alt from '../dist/alt-with-runtime'
 import assert from 'assert'
+import sinon from 'sinon'
 
 const alt = new Alt()
 
@@ -36,9 +37,10 @@ function MyStore() {
 const myStore = alt.createStore(MyStore())
 
 export default {
-  'using the es3 module pattern': {
+  'Creating store using ES3 module pattern': {
     beforeEach() {
       alt.recycle()
+      console.warn = function () { }
     },
 
     'store method exists'() {
@@ -67,15 +69,11 @@ export default {
     },
 
     'adding lifecycle events'() {
-      let called = false
+      let spy = sinon.spy()
 
       class TestStore {
         constructor() {
-          this.lifecycle = {
-            init() {
-              called = true
-            }
-          }
+          this.lifecycle = { init: spy }
 
           this.state = {
             foo: 'bar'
@@ -85,7 +83,7 @@ export default {
 
       const store = alt.createStore(new TestStore())
 
-      assert.equal(called, true, 'lifecycle event was called')
+      assert.ok(spy.calledOnce, 'lifecycle event was called')
       assert.equal(store.getState().foo, 'bar', 'state is set')
     },
 
