@@ -1,6 +1,6 @@
 import Alt from '../dist/alt-with-runtime'
 import AltTestingUtils from '../utils/AltTestingUtils'
-import {assert} from 'chai'
+import { assert } from 'chai'
 
 const alt = new Alt()
 
@@ -39,7 +39,7 @@ class UnwrappedPetStore {
 export default {
   'make a store testable by auto mocking alt.createStore'() {
     var unwrappedStore = AltTestingUtils.makeStoreTestable(alt, UnwrappedPetStore)
-    assert.equal(unwrappedStore.roundMoney(21.221234), 21.22)
-    assert.equal(unwrappedStore.roundMoney(11.2561341), 11.26)
+    assert(unwrappedStore.roundMoney(21.221234) === 21.22)
+    assert(unwrappedStore.roundMoney(11.2561341) === 11.26)
   }
 }

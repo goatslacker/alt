@@ -1,9 +1,9 @@
-import assert from 'assert'
+import { assert } from 'chai'
 import Alt from '../dist/alt-with-runtime'
 
-let alt = new Alt()
+const alt = new Alt()
 
-let actions = alt.generateActions('fire', 'nothing')
+const actions = alt.generateActions('fire', 'nothing')
 
 class MyStore {
   constructor() {
@@ -21,22 +21,22 @@ class MyStore {
   }
 }
 
-let myStore = alt.createStore(MyStore)
+const myStore = alt.createStore(MyStore)
 
 export default {
   'using setState to set the state'() {
     actions.fire()
 
     let changes = 0
-    let fart = () => {
+    const fart = () => {
       changes += 1
-      assert.equal(changes, 1, 'listen was fired once')
+      assert(changes === 1, 'listen was fired once')
     }
 
     myStore.listen(fart)
 
-    assert.equal(myStore.getState().foo, 2, 'foo was incremented')
-    assert.equal(myStore.getState().retVal, false, 'return value of setState is false')
+    assert(myStore.getState().foo === 2, 'foo was incremented')
+    assert(myStore.getState().retVal === false, 'return value of setState is false')
 
     myStore.unlisten(fart)
 

@@ -1,5 +1,5 @@
 import Alt from '../dist/alt-with-runtime'
-import {assert} from 'chai'
+import { assert } from 'chai'
 
 import ListenerMixin from '../mixins/ListenerMixin'
 import FluxyMixin from '../mixins/FluxyMixin'
@@ -8,7 +8,7 @@ import IsomorphicMixin from '../mixins/IsomorphicMixin'
 
 import ReactComponent from './helpers/ReactComponent'
 
-let alt = new Alt()
+const alt = new Alt()
 
 class MyActions {
   constructor() {
@@ -52,14 +52,14 @@ class MyActions {
 
 }
 
-let myActions = {}
+const myActions = {}
 alt.createActions(MyActions, myActions)
 
-let myShorthandActions = alt.generateActions("actionOne", "actionTwo")
+const myShorthandActions = alt.generateActions("actionOne", "actionTwo")
 
 class MyStore {
   constructor() {
-    let myActionsInst = this.alt.getActions('myActions')
+    const myActionsInst = this.alt.getActions('myActions')
     if (myActionsInst) {
       this.bindAction(myActionsInst.updateName, this.onUpdateName)
     }
@@ -110,11 +110,11 @@ class MyStore {
   }
 
   externalMethodNoStatic() {
-   return true 
+   return true
   }
 }
 
-let myStore = alt.createStore(MyStore)
+const myStore = alt.createStore(MyStore)
 
 class SecondStore {
   constructor() {
@@ -194,7 +194,7 @@ class SecondStore {
   }
 }
 
-let secondStore = alt.createStore(SecondStore, 'AltSecondStore')
+const secondStore = alt.createStore(SecondStore, 'AltSecondStore')
 
 class LifeCycleStore {
   constructor() {
@@ -228,7 +228,7 @@ class LifeCycleStore {
   test3() { }
 }
 
-let lifecycleStore = alt.createStore(LifeCycleStore)
+const lifecycleStore = alt.createStore(LifeCycleStore)
 
 class ThirdStore {
   constructor() {
@@ -241,7 +241,7 @@ class ThirdStore {
   }
 }
 
-let thirdStore = alt.createStore(ThirdStore)
+const thirdStore = alt.createStore(ThirdStore)
 
 // Alt instances...
 
@@ -253,20 +253,20 @@ class AltInstance extends Alt {
   }
 }
 
-let altInstance = new AltInstance()
+const altInstance = new AltInstance()
 
 
 // Really confusing set of instances
-let alt1 = new Alt()
-let alt2 = new Alt()
+const alt1 = new Alt()
+const alt2 = new Alt()
 
 function NameActions() { }
 NameActions.prototype.updateName = function (name) {
   this.dispatch(name)
 }
 
-let nameActions1 = alt1.createActions(NameActions)
-let nameActions2 = alt2.createActions(NameActions)
+const nameActions1 = alt1.createActions(NameActions)
+const nameActions2 = alt2.createActions(NameActions)
 
 function NameStore() {
   this.bindActions(nameActions1)
@@ -278,13 +278,13 @@ NameStore.prototype.onUpdateName = function (name) {
   this.name = name
 }
 
-let nameStore1 = alt1.createStore(NameStore)
-let nameStore2 = alt2.createStore(NameStore)
+const nameStore1 = alt1.createStore(NameStore)
+const nameStore2 = alt2.createStore(NameStore)
 
 const consoleWarn = console.warn.bind(console)
 
 /* istanbul ignore next */
-let tests = {
+const tests = {
   beforeEach() {
     alt.recycle()
     altInstance.recycle()
@@ -294,205 +294,204 @@ let tests = {
   },
 
   'alt instance'() {
-    assert.equal(typeof alt.bootstrap, 'function', 'bootstrap function exists')
-    assert.equal(typeof alt.dispatcher, 'object', 'dispatcher exists')
-    assert.equal(typeof alt.dispatcher.register, 'function', 'dispatcher function exists for listening to all events')
-    assert.equal(typeof alt.takeSnapshot, 'function', 'snapshot function exists for saving app state')
-    assert.equal(typeof alt.createActions, 'function', 'createActions function')
-    assert.equal(typeof alt.createStore, 'function', 'createStore function')
-
-    assert.equal(typeof alt.stores.AltSecondStore, 'object', 'store exists in alt.stores')
+    assert.isFunction(alt.bootstrap, 'bootstrap function exists')
+    assert.isObject(alt.dispatcher, 'dispatcher exists')
+    assert.isFunction(alt.dispatcher.register, 'dispatcher function exists for listening to all events')
+    assert.isFunction(alt.takeSnapshot, 'snapshot function exists for saving app state')
+    assert.isFunction(alt.createActions, 'createActions function')
+    assert.isFunction(alt.createStore, 'createStore function')
+    assert.isObject(alt.stores.AltSecondStore, 'store exists in alt.stores')
   },
 
   'store methods'() {
-    let storePrototype = Object.getPrototypeOf(myStore)
-    let assertMethods = ['constructor', 'getEventEmitter', 'emitChange', 'listen', 'unlisten', 'getState']
+    const storePrototype = Object.getPrototypeOf(myStore)
+    const assertMethods = ['constructor', 'getEventEmitter', 'emitChange', 'listen', 'unlisten', 'getState']
     assert.deepEqual(Object.getOwnPropertyNames(storePrototype), assertMethods, 'methods exist for store')
-    assert.equal(typeof myStore.addListener, 'undefined', 'event emitter methods not present')
-    assert.equal(typeof myStore.removeListener, 'undefined', 'event emitter methods not present')
-    assert.equal(typeof myStore.emit, 'undefined', 'event emitter methods not present')
+    assert.isUndefined(myStore.addListener, 'event emitter methods not present')
+    assert.isUndefined(myStore.removeListener, 'event emitter methods not present')
+    assert.isUndefined(myStore.emit, 'event emitter methods not present')
   },
 
   'store external methods'() {
-    assert.equal(typeof myStore.externalMethod, 'function', 'static methods are made available')
-    assert.equal(typeof myStore.externalMethodNoStatic, 'function', 'methods via mixin are made available')
-    assert.equal(myStore.externalMethod(), true, 'static methods return proper result')
-    assert.equal(myStore.externalMethodNoStatic(), true, 'methods via mixin return proper result')
-    assert.equal(typeof secondStore.externalMethod, 'function', 'static methods are made available')
-    assert.equal(typeof secondStore.externalMethodNoStatic, 'function', 'static methods are made available')
-    assert.equal(secondStore.externalMethod(), 'bar', 'static methods have `this` bound to the instance')
-    assert.equal(secondStore.externalMethodNoStatic(), 'bar', 'static methods have `this` bound to the instance')
-    assert.equal(secondStore.concatFooWith('baz'), 'barbaz', 'static methods may be called with params too')
-    assert.equal(secondStore.concatFooWithNoStatic('baz'), 'barbaz', 'static methods may be called with params too')
+    assert.isFunction(myStore.externalMethod, 'static methods are made available')
+    assert.isFunction(myStore.externalMethodNoStatic, 'methods via mixin are made available')
+    assert(myStore.externalMethod() === true, 'static methods return proper result')
+    assert(myStore.externalMethodNoStatic() === true, 'methods via mixin return proper result')
+    assert.isFunction(secondStore.externalMethod, 'static methods are made available')
+    assert.isFunction(secondStore.externalMethodNoStatic, 'static methods are made available')
+    assert(secondStore.externalMethod() === 'bar', 'static methods have `this` bound to the instance')
+    assert(secondStore.externalMethodNoStatic() === 'bar', 'static methods have `this` bound to the instance')
+    assert(secondStore.concatFooWith('baz') === 'barbaz', 'static methods may be called with params too')
+    assert(secondStore.concatFooWithNoStatic('baz') === 'barbaz', 'static methods may be called with params too')
   },
 
   'getting state'() {
-    assert.equal(typeof myStore.getState()._dispatcher, 'object', 'the dispatcher is exposed internally')
+    assert.isObject(myStore.getState()._dispatcher, 'the dispatcher is exposed internally')
 
-    assert.equal(lifecycleStore.getState().bootstrapped, false, 'bootstrap has not been called yet')
-    assert.equal(lifecycleStore.getState().snapshotted, false, 'takeSnapshot has not been called yet')
-    assert.equal(lifecycleStore.getState().rollback, false, 'rollback has not been called')
-    assert.equal(lifecycleStore.getState().init, true, 'init gets called when store initializes')
+    assert(lifecycleStore.getState().bootstrapped === false, 'bootstrap has not been called yet')
+    assert(lifecycleStore.getState().snapshotted === false, 'takeSnapshot has not been called yet')
+    assert(lifecycleStore.getState().rollback === false, 'rollback has not been called')
+    assert(lifecycleStore.getState().init === true, 'init gets called when store initializes')
   },
 
   'snapshots and bootstrapping'() {
-    let initialSnapshot = alt.takeSnapshot()
-    assert.equal(lifecycleStore.getState().snapshotted, true, 'takeSnapshot was called and the life cycle event was triggered')
+    const initialSnapshot = alt.takeSnapshot()
+    assert(lifecycleStore.getState().snapshotted === true, 'takeSnapshot was called and the life cycle event was triggered')
 
-    let bootstrapReturnValue = alt.bootstrap(initialSnapshot)
-    assert.equal(bootstrapReturnValue, undefined, 'bootstrap returns nothing')
-    assert.equal(lifecycleStore.getState().bootstrapped, true, 'bootstrap was called and the life cycle event was triggered')
+    const bootstrapReturnValue = alt.bootstrap(initialSnapshot)
+    assert(bootstrapReturnValue === undefined, 'bootstrap returns nothing')
+    assert(lifecycleStore.getState().bootstrapped === true, 'bootstrap was called and the life cycle event was triggered')
   },
 
   'existence of actions'() {
-    assert.equal(typeof myActions.anotherAction, 'function', 'shorthand function created with createAction exists')
-    assert.equal(typeof myActions.callInternalMethod, 'function', 'shorthand function created with createActions exists')
-    assert.equal(myActions.callInternalMethod.length, 1, 'shorthand function is an id function')
-    assert.equal(typeof myActions.updateName, 'function', 'prototype defined actions exist')
-    assert.equal(typeof myActions.updateTwo, 'function', 'prototype defined actions exist')
-    assert.equal(typeof myActions.updateThree, 'function', 'prototype defined actions exist')
-    assert.equal(myActions.updateTwo.length, 2, 'actions can have > 1 arity')
-    assert.equal(typeof myShorthandActions.actionOne, 'function', 'action created with shorthand createActions exists')
-    assert.equal(typeof myShorthandActions.actionTwo, 'function', 'other action created with shorthand createActions exists')
+    assert.isFunction(myActions.anotherAction, 'shorthand function created with createAction exists')
+    assert.isFunction(myActions.callInternalMethod, 'shorthand function created with createActions exists')
+    assert(myActions.callInternalMethod.length === 1, 'shorthand function is an id function')
+    assert.isFunction(myActions.updateName, 'prototype defined actions exist')
+    assert.isFunction(myActions.updateTwo, 'prototype defined actions exist')
+    assert.isFunction(myActions.updateThree, 'prototype defined actions exist')
+    assert(myActions.updateTwo.length === 2, 'actions can have > 1 arity')
+    assert.isFunction(myShorthandActions.actionOne, 'action created with shorthand createActions exists')
+    assert.isFunction(myShorthandActions.actionTwo, 'other action created with shorthand createActions exists')
   },
 
   'existence of constants'() {
-    assert.notEqual(typeof myActions.UPDATE_NAME, 'undefined', 'a constant is created for each action')
-    assert.notEqual(typeof myActions.UPDATE_TWO, 'undefined', 'a constant is created for each action')
-    assert.notEqual(typeof myActions.CALL_INTERNAL_METHOD, 'undefined', 'a constant is created for each action')
+    assert.isDefined(myActions.UPDATE_NAME, 'a constant is created for each action')
+    assert.isDefined(myActions.UPDATE_TWO, 'a constant is created for each action')
+    assert.isDefined(myActions.CALL_INTERNAL_METHOD, 'a constant is created for each action')
   },
 
   'helper functions'() {
-    assert.equal(typeof myActions.updateName.defer, 'function', 'actions have a defer method for async flow')
+    assert.isFunction(myActions.updateName.defer, 'actions have a defer method for async flow')
   },
 
   'internal actions'() {
-    let internalActions = myActions.justTestingInternalActions()
-    assert.equal(typeof internalActions.updateThree, 'function', 'actions (below) are available internally through this.actions')
-    assert.equal(typeof internalActions.updateName, 'function', 'actions (above) are available internally through this.actions')
-    assert.equal(typeof internalActions.updateName.defer, 'function', 'making sure internal actions has a defer as well')
-    assert.equal(typeof internalActions.updateThree.defer, 'function', 'making sure internal actions has a defer as well')
+    const internalActions = myActions.justTestingInternalActions()
+    assert.isFunction(internalActions.updateThree, 'actions (below) are available internally through this.actions')
+    assert.isFunction(internalActions.updateName, 'actions (above) are available internally through this.actions')
+    assert.isFunction(internalActions.updateName.defer, 'making sure internal actions has a defer as well')
+    assert.isFunction(internalActions.updateThree.defer, 'making sure internal actions has a defer as well')
 
-    assert.equal(typeof myStore.getState, 'function', 'the store has a getState method exposed')
-    assert.equal(typeof myStore.internalOnly, 'undefined', 'internal only method isnt available')
+    assert.isFunction(myStore.getState, 'the store has a getState method exposed')
+    assert.isUndefined(myStore.internalOnly, 'internal only method isnt available')
 
-    assert.equal(myStore.getState().name, 'first', 'store has been initialized properly')
-    assert.equal(myStore.getState().calledInternal, false, 'store has been initialized properly')
+    assert(myStore.getState().name === 'first', 'store has been initialized properly')
+    assert(myStore.getState().calledInternal === false, 'store has been initialized properly')
   },
 
   'calling actions'() {
-    let actionReturnType = myActions.updateName('bear')
-    assert.equal(actionReturnType, undefined, 'action returns nothing')
+    const actionReturnType = myActions.updateName('bear')
+    assert(actionReturnType === undefined, 'action returns nothing')
 
-    assert.equal(myStore.getState().name, 'bear', 'action was called, state was updated properly')
-    assert.equal(myStore.getState().calledInternal, false, 'internal method has not been called')
-    assert.equal(secondStore.getState().name, 'bear', 'second store gets its value from myStore')
-    assert.equal(thirdStore.getState().name, 'bear3', 'third store gets its value from secondStore, adds 3')
+    assert(myStore.getState().name === 'bear', 'action was called, state was updated properly')
+    assert(myStore.getState().calledInternal === false, 'internal method has not been called')
+    assert(secondStore.getState().name === 'bear', 'second store gets its value from myStore')
+    assert(thirdStore.getState().name === 'bear3', 'third store gets its value from secondStore, adds 3')
   },
 
   'calling internal methods'() {
     myActions.callInternalMethod()
-    assert.equal(myStore.getState().calledInternal, true, 'internal method has been called successfully by an action')
+    assert(myStore.getState().calledInternal === true, 'internal method has been called successfully by an action')
   },
 
   'snapshotting'() {
     myActions.updateName('bear')
-    let snapshot = alt.takeSnapshot()
-    assert.equal(typeof snapshot, 'string', 'a snapshot json is returned')
-    assert.equal(JSON.parse(snapshot).MyStore.name, 'bear', 'the state is current')
-    assert.equal(typeof JSON.parse(snapshot).AltSecondStore, 'object', 'the custom identifier name works')
+    const snapshot = alt.takeSnapshot()
+    assert.isString(snapshot, 'a snapshot json is returned')
+    assert(JSON.parse(snapshot).MyStore.name === 'bear', 'the state is current')
+    assert.isObject(JSON.parse(snapshot).AltSecondStore, 'the custom identifier name works')
 
     myActions.updateName('blossom')
-    assert.equal(myStore.getState().name, 'blossom', 'action was called, state was updated properly')
-    assert.equal(JSON.parse(snapshot).MyStore.name, 'bear', 'the snapshot is not affected by action')
+    assert(myStore.getState().name === 'blossom', 'action was called, state was updated properly')
+    assert(JSON.parse(snapshot).MyStore.name === 'bear', 'the snapshot is not affected by action')
   },
 
   'mutation'() {
-    let state = myStore.getState()
+    const state = myStore.getState()
     state.name = 'foobar'
-    assert.equal(state.name, 'foobar', 'mutated returned state')
-    assert.equal(myStore.getState().name, 'first', 'store state was not mutated')
+    assert(state.name === 'foobar', 'mutated returned state')
+    assert(myStore.getState().name === 'first', 'store state was not mutated')
   },
 
   'rolling back'() {
-    let rollbackValue = alt.rollback()
-    assert.equal(rollbackValue, undefined, 'rollback returns nothing')
+    const rollbackValue = alt.rollback()
+    assert(rollbackValue === undefined, 'rollback returns nothing')
 
-    assert.equal(myStore.getState().name, 'bear', 'state has been rolledback to last snapshot')
-    assert.equal(lifecycleStore.getState().rollback, true, 'rollback lifecycle method was called')
+    assert(myStore.getState().name === 'bear', 'state has been rolledback to last snapshot')
+    assert(lifecycleStore.getState().rollback === true, 'rollback lifecycle method was called')
   },
 
   'store listening'() {
-    let mooseChecker = (x) => {
-      assert.equal(x.name, 'moose', 'listener for store works')
-      assert.equal(myStore.getState().name, 'moose', 'new store state present')
+    const mooseChecker = (x) => {
+      assert(x.name === 'moose', 'listener for store works')
+      assert(myStore.getState().name === 'moose', 'new store state present')
     }
     myStore.listen(mooseChecker)
     myActions.updateName('moose')
 
-    assert.equal(myStore.getState().name, 'moose', 'new store state present')
+    assert(myStore.getState().name === 'moose', 'new store state present')
 
     myStore.unlisten(mooseChecker)
     myActions.updateName('badger')
 
-    assert.equal(myStore.getState().name, 'badger', 'new store state present')
+    assert(myStore.getState().name === 'badger', 'new store state present')
   },
 
   'bootstrapping'() {
     alt.bootstrap('{"MyStore":{"name":"bee"}}')
-    assert.equal(myStore.getState().name, 'bee', 'I can bootstrap many times')
+    assert(myStore.getState().name === 'bee', 'I can bootstrap many times')
 
     alt.bootstrap('{}')
 
     alt.bootstrap('{"MyStore":{"name":"monkey"}}')
-    assert.equal(myStore.getState().name, 'monkey', 'I can bootstrap many times')
+    assert(myStore.getState().name === 'monkey', 'I can bootstrap many times')
   },
 
   'letiadic actions'(done) {
     myActions.updateTwo(4, 2)
-    assert.equal(secondStore.getState().foo, 6, 'im able to pass two params into an action')
+    assert(secondStore.getState().foo === 6, 'im able to pass two params into an action')
 
     myActions.updateThree(4, 2, 1)
-    assert.equal(secondStore.getState().foo, 7, 'the store method updateThree works')
+    assert(secondStore.getState().foo === 7, 'the store method updateThree works')
 
     myActions.shortHandBinary(1, 0)
-    assert.equal(Array.isArray(secondStore.getState().foo), true, 'shorthand for multiple elements pass through goes as array')
-    assert.equal(secondStore.getState().foo[0], 1, 'shorthand for multiple elements pass through goes as array')
-    assert.equal(secondStore.getState().foo[1], 0, 'shorthand for multiple elements pass through goes as array')
+    assert(Array.isArray(secondStore.getState().foo) === true, 'shorthand for multiple elements pass through goes as array')
+    assert(secondStore.getState().foo[0] === 1, 'shorthand for multiple elements pass through goes as array')
+    assert(secondStore.getState().foo[1] === 0, 'shorthand for multiple elements pass through goes as array')
 
 
     myActions.shortHandBinary.defer(2, 1)
     setTimeout(() => {
-      assert.equal(secondStore.getState().foo[0], 2, 'shorthand for defer multiple elements pass through goes as array')
-      assert.equal(secondStore.getState().foo[1], 1, 'shorthand for defer multiple elements pass through goes as array')
+      assert(secondStore.getState().foo[0] === 2, 'shorthand for defer multiple elements pass through goes as array')
+      assert(secondStore.getState().foo[1] === 1, 'shorthand for defer multiple elements pass through goes as array')
       done()
     })
   },
 
   'access of stores'() {
-    assert.equal(secondStore.foo, undefined, 'cant access state properties that live inside store')
-    assert.equal(secondStore.bindAction, undefined, 'cant access action listeners from outside store')
-    assert.equal(secondStore.bindActions, undefined, 'cant access action listeners from outside store')
+    assert(secondStore.foo === undefined, 'cant access state properties that live inside store')
+    assert(secondStore.bindAction === undefined, 'cant access action listeners from outside store')
+    assert(secondStore.bindActions === undefined, 'cant access action listeners from outside store')
   },
 
   'deferral of actions'(done) {
     myActions.updateName('gerenuk')
-    assert.equal(myStore.getState().name, 'gerenuk', 'store state was updated properly')
+    assert(myStore.getState().name === 'gerenuk', 'store state was updated properly')
     myActions.updateName.defer('marmot')
-    assert.equal(myStore.getState().name, 'gerenuk', 'store state has same name (for now)')
+    assert(myStore.getState().name === 'gerenuk', 'store state has same name (for now)')
     setTimeout(() => {
-      assert.equal(myStore.getState().name, 'marmot', 'store state was updated with defer')
+      assert(myStore.getState().name === 'marmot', 'store state was updated with defer')
       done()
     })
   },
 
   'getting instance'() {
-    assert.equal(typeof myActions.getInstanceInside, 'function', 'action for getting the instance inside')
-    assert.equal(secondStore.getState().instance, null, 'instance is null because it has not been set')
+    assert.isFunction(myActions.getInstanceInside, 'action for getting the instance inside')
+    assert(secondStore.getState().instance === null, 'instance is null because it has not been set')
     myActions.getInstanceInside()
-    assert.equal(typeof secondStore.getState().instance, 'object', 'instance has been now set')
-    assert.equal(typeof secondStore.getState().instance.getState, 'function', 'instance is a pointer to secondStore')
-    assert.equal(typeof secondStore.getState().instance.externalMethod, 'function', 'instance has the static methods available')
+    assert.isObject(secondStore.getState().instance, 'instance has been now set')
+    assert.isFunction(secondStore.getState().instance.getState, 'instance is a pointer to secondStore')
+    assert.isFunction(secondStore.getState().instance.externalMethod, 'instance has the static methods available')
     assert.deepEqual(secondStore.getState().instance.externalMethod(), 'bar', 'calling a static method from instance and able to use this inside')
   },
 
@@ -600,95 +599,95 @@ let tests = {
 
   'cancelling emit'() {
     function eventEmittedFail() {
-      assert.equal(true, false, 'event was emitted but I did not want it to be')
+      assert(true === false, 'event was emitted but I did not want it to be')
     }
     myStore.listen(eventEmittedFail)
     myActions.dontEmit()
     myStore.unlisten(eventEmittedFail)
-    assert.equal(myStore.getState().dontEmitEventCalled, true, 'dont emit event was called successfully and event was not emitted')
+    assert(myStore.getState().dontEmitEventCalled === true, 'dont emit event was called successfully and event was not emitted')
   },
 
   'stores with colliding names'() {
     let called = false
     console.warn = function (x) {
       called = true
-      assert.equal(x instanceof ReferenceError, true)
+      assert.instanceOf(x, ReferenceError)
     }
 
-    let MyStore = (function () {
+    const MyStore = (function () {
       return function MyStore() { }
     }())
     alt.createStore(MyStore)
 
-    assert.equal(called, true, 'a warning was called')
+    assert(called === true, 'a warning was called')
 
-    assert.equal(typeof alt.stores.MyStore1, 'object', 'a store was still created')
+    assert.isObject(alt.stores.MyStore1, 'a store was still created')
   },
 
   'colliding names via identifier'() {
     let called = false
     console.warn = function (x) {
       called = true
-      assert.equal(x instanceof ReferenceError, true)
+      assert.instanceOf(x, ReferenceError)
     }
 
     class auniquestore { }
     alt.createStore(auniquestore, 'MyStore')
 
-    assert.equal(called, true, 'a warning was called')
+    assert(called === true, 'a warning was called')
 
-    assert.equal(typeof alt.stores.MyStore1, 'object', 'a store was still created')
+    assert.isObject(alt.stores.MyStore1, 'a store was still created')
   },
 
   'not providing a store name via anonymous function'() {
     let called = false
     console.warn = function (x) {
       called = true
-      assert.equal(x instanceof ReferenceError, true)
+      assert.instanceOf(x, ReferenceError)
     }
 
     alt.createStore(function () { })
 
-    assert.equal(called, true, 'a warning was called')
+    assert(called === true, 'a warning was called')
 
-    assert.equal(typeof alt.stores[''], 'object', 'a store with no name was still created')
+    assert.isObject(alt.stores[''], 'a store with no name was still created')
   },
 
   'multiple deferrals'(done) {
     myActions.moreActions()
-    assert.equal(secondStore.getState().deferrals, 1, 'deferrals is initially set to 1')
+    assert(secondStore.getState().deferrals === 1, 'deferrals is initially set to 1')
     setTimeout(() => {
-      assert.equal(secondStore.getState().deferrals, 3, 'but deferrals ends up being set to 3 after all actions complete')
+      assert(secondStore.getState().deferrals === 3, 'but deferrals ends up being set to 3 after all actions complete')
       done()
     })
   },
 
   'recycling'() {
     alt.recycle()
-    assert.equal(myStore.getState().name, 'first', 'recycle sets the state back to its origin')
+    assert(myStore.getState().name === 'first', 'recycle sets the state back to its origin')
 
     myActions.resetRecycled()
-    assert.equal(secondStore.getState().recycled, false, 'recycle let was reset due to action')
+    assert(secondStore.getState().recycled === false, 'recycle const was reset due to action')
     alt.recycle()
-    assert.equal(secondStore.getState().recycled, true, 'init lifecycle method was called by recycling')
+    assert(secondStore.getState().recycled === true, 'init lifecycle method was called by recycling')
   },
 
   'flushing'() {
     myActions.updateName('goat')
-    let flushed = JSON.parse(alt.flush())
-    assert.equal(myStore.getState().name, 'first', 'flush is a lot like recycle')
-    assert.equal(flushed.MyStore.name, 'goat', 'except that flush returns the state before recycling')
+    const flushed = JSON.parse(alt.flush())
+    assert(myStore.getState().name === 'first', 'flush is a lot like recycle')
+    assert(flushed.MyStore.name === 'goat', 'except that flush returns the state before recycling')
 
     myActions.updateName('butterfly')
-    assert.equal(myStore.getState().name, 'butterfly', 'I can update the state again after a flush')
-    assert.equal(secondStore.getState().name, 'butterfly', 'I can update the state again after a flush')
+    assert(myStore.getState().name === 'butterfly', 'I can update the state again after a flush')
+    assert(secondStore.getState().name === 'butterfly', 'I can update the state again after a flush')
   },
 
   'recycling single store'() {
     myActions.updateName('butterfly')
     alt.recycle('MyStore')
-    assert.equal(myStore.getState().name, 'first', 'I can recycle specific stores')
-    assert.equal(secondStore.getState().name, 'butterfly', 'and other stores will not be recycled')
+    assert(myStore.getState().name === 'first', 'I can recycle specific stores')
+    assert(secondStore.getState().name === 'butterfly', 'and other stores will not be recycled')
   },
 
   'recycling invalid stores'() {
@@ -696,45 +695,45 @@ let tests = {
   },
 
   'alt single instances'() {
-    assert.equal(altInstance instanceof Alt, true, 'altInstance is an instance of alt')
-    assert.equal(typeof altInstance.dispatcher, 'object', 'it has a dispatcher')
-    assert.equal(typeof altInstance.bootstrap, 'function', 'bootstrap function exists')
-    assert.equal(typeof altInstance.createActions, 'function', 'createActions function')
-    assert.equal(typeof altInstance.createStore, 'function', 'createStore function')
+    assert.instanceOf(altInstance, Alt, 'altInstance is an instance of alt')
+    assert.isObject(altInstance.dispatcher, 'it has a dispatcher')
+    assert.isFunction(altInstance.bootstrap, 'bootstrap function exists')
+    assert.isFunction(altInstance.createActions, 'createActions function')
+    assert.isFunction(altInstance.createStore, 'createStore function')
 
-    let myActionsFromInst = altInstance.getActions('myActions')
-    assert.equal(typeof myActionsFromInst, 'object', 'the actions exist')
+    const myActionsFromInst = altInstance.getActions('myActions')
+    assert.isObject(myActionsFromInst, 'the actions exist')
 
-    let myActionsFail = altInstance.getActions('ActionsThatDontExist')
-    assert.equal(typeof myActionsFail, 'undefined', 'undefined actions')
+    const myActionsFail = altInstance.getActions('ActionsThatDontExist')
+    assert.isUndefined(myActionsFail, 'undefined actions')
 
     myActionsFromInst.updateName('lion')
-    assert.equal(altInstance.getStore('myStore').getState().name, 'lion', 'state was updated')
-    assert.equal(myStore.getState().name, 'first', 'and other singleton store was not affected')
+    assert(altInstance.getStore('myStore').getState().name === 'lion', 'state was updated')
+    assert(myStore.getState().name === 'first', 'and other singleton store was not affected')
   },
 
   'multiple alt instances'() {
     nameActions1.updateName('bar')
     nameActions2.updateName('baz')
 
-    assert.equal(nameStore1.getState().name, 'bar', 'store 1 state is set')
-    assert.equal(nameStore2.getState().name, 'baz', 'this store has different state')
-    assert.equal(altInstance.getStore('myStore').getState().name, 'first', 'other stores not affected')
-    assert.equal(myStore.getState().name, 'first', 'other singleton store not affected')
+    assert(nameStore1.getState().name === 'bar', 'store 1 state is set')
+    assert(nameStore2.getState().name === 'baz', 'this store has different state')
+    assert(altInstance.getStore('myStore').getState().name === 'first', 'other stores not affected')
+    assert(myStore.getState().name === 'first', 'other singleton store not affected')
   },
 
   'actions with the same name'() {
-    let alt = new Alt()
+    const alt = new Alt()
 
     function UserActions() {
       this.generateActions('update')
     }
-    let ua = alt.createActions(UserActions)
+    const ua = alt.createActions(UserActions)
 
     function LinkActions() {
       this.generateActions('update')
     }
-    let la = alt.createActions(LinkActions)
+    const la = alt.createActions(LinkActions)
 
     function Store() {
       this.bindAction(ua.UPDATE, this.ua)
@@ -752,26 +751,26 @@ let tests = {
       this.b = 1
     }
 
-    let store = alt.createStore(Store)
+    const store = alt.createStore(Store)
 
     ua.update()
     la.update()
 
-    let state = store.getState()
+    const state = store.getState()
 
-    assert.equal(state.a, 1, 'both actions were called')
-    assert.equal(state.b, 1, 'both actions were called')
+    assert(state.a === 1, 'both actions were called')
+    assert(state.b === 1, 'both actions were called')
   },
 
   'actions with the same name and same class name'() {
-    let alt = new Alt()
+    const alt = new Alt()
 
-    let ua = (function () {
+    const ua = (function () {
       function a() { this.generateActions('update') }
       return alt.createActions(a)
     }())
 
-    let la = (function () {
+    const la = (function () {
       function a() { this.generateActions('update') }
       return alt.createActions(a)
     }())
@@ -794,38 +793,38 @@ let tests = {
       }
     }
 
-    let store = alt.createStore(Store)
+    const store = alt.createStore(Store)
 
     ua.update()
     la.update()
 
-    let state = store.getState()
+    const state = store.getState()
 
-    assert.equal(state.a, 1, 'both actions were called')
-    assert.equal(state.b, 1, 'both actions were called')
+    assert(state.a === 1, 'both actions were called')
+    assert(state.b === 1, 'both actions were called')
   },
 
   'dispatching from alt instance'() {
-    let inst = new AltInstance()
+    const inst = new AltInstance()
     let called = false
-    let listen = (x) => {
-      assert.equal(x.action, inst.getActions('myActions').updateName, 'the action provided is correct')
-      assert.equal(x.data, 'yo', 'i can dispatch instances on my own')
+    const listen = (x) => {
+      assert(x.action === inst.getActions('myActions').updateName, 'the action provided is correct')
+      assert(x.data === 'yo', 'i can dispatch instances on my own')
       called = true
     }
 
-    let id = inst.dispatcher.register(listen)
+    const id = inst.dispatcher.register(listen)
     inst.dispatch(inst.getActions('myActions').updateName, 'yo')
     inst.dispatcher.unregister(id)
 
-    assert.equal(called, true, 'listener was called')
+    assert(called === true, 'listener was called')
   },
 
   'emit change method works from the store'(done) {
-    assert.equal(myStore.getState().async, false, 'store async is false')
+    assert(myStore.getState().async === false, 'store async is false')
 
-    let listener = () => {
-      assert.equal(myStore.getState().async, true, 'store async is true')
+    const listener = () => {
+      assert(myStore.getState().async === true, 'store async is true')
       myStore.unlisten(listener)
       done()
     }
@@ -835,13 +834,13 @@ let tests = {
   },
 
   'emit change method works with an isolated store'(done) {
-    let alt = new Alt()
+    const alt = new Alt()
 
     function Actions() {
       this.generateActions('test')
     }
 
-    let actions = alt.createActions(Actions)
+    const actions = alt.createActions(Actions)
 
     class Store {
       constructor() {
@@ -858,12 +857,12 @@ let tests = {
       }
     }
 
-    let store = alt.createStore(Store)
+    const store = alt.createStore(Store)
 
-    assert.equal(store.getState().test, false, 'test is false')
+    assert(store.getState().test === false, 'test is false')
 
-    let listener = () => {
-      assert.equal(store.getState().test, true, 'test is true')
+    const listener = () => {
+      assert(store.getState().test === true, 'test is true')
       store.unlisten(listener)
       done()
     }
@@ -873,7 +872,7 @@ let tests = {
   },
 
   'extending stores'() {
-    let alt = new Alt()
+    const alt = new Alt()
 
     class Other {
       constructor() {
@@ -891,11 +890,11 @@ let tests = {
       }
     }
 
-    let store = alt.createStore(Store)
+    const store = alt.createStore(Store)
 
-    assert.equal(store.getState().foo, true, 'store inherits properties')
-    assert.equal(store.getState().bar, true, 'store properties are available')
-    assert.equal(store.getState().baz, true, 'inherited methods can be called')
+    assert(store.getState().foo === true, 'store inherits properties')
+    assert(store.getState().bar === true, 'store properties are available')
+    assert(store.getState().baz === true, 'inherited methods can be called')
   },
 
   'exporting public method of ancestor'() {
@@ -913,33 +912,33 @@ let tests = {
       }
     }
 
-    let store = alt.createStore(Store)
+    const store = alt.createStore(Store)
 
-    assert.equal(typeof store.baseMethod, 'function', 'ancestor methods via export mixin are made available')
+    assert.isFunction(store.baseMethod, 'ancestor methods via export mixin are made available')
   },
 
   'listener mixin'() {
-    let handler = () => { }
+    const handler = () => { }
 
     // set up
     ListenerMixin.componentWillMount()
 
     ListenerMixin.listenTo(myStore, handler)
 
-    assert.equal(ListenerMixin.getListeners().length, 1, 'mixin has one handler')
+    assert(ListenerMixin.getListeners().length === 1, 'mixin has one handler')
 
     ListenerMixin.componentWillUnmount()
 
-    assert.equal(ListenerMixin.getListeners().length, 0, 'mixin was unmounted')
+    assert(ListenerMixin.getListeners().length === 0, 'mixin was unmounted')
 
     ListenerMixin.listenToMany([myStore, secondStore], handler)
 
-    assert.equal(ListenerMixin.getListeners().length, 2, 'mixin has two handlers')
+    assert(ListenerMixin.getListeners().length === 2, 'mixin has two handlers')
 
     // tear it down
     ListenerMixin.componentWillUnmount()
 
-    assert.equal(ListenerMixin.getListeners().length, 0, 'mixin was unmounted')
+    assert(ListenerMixin.getListeners().length === 0, 'mixin was unmounted')
   },
 
   'fluxy mixin object pattern'() {
@@ -953,7 +952,7 @@ let tests = {
       doBar(storeState) { }
 
       render() {
-        assert.equal(this.state.foo.name, 'Fluxy (object)', 'render was called with right state')
+        assert(this.state.foo.name === 'Fluxy (object)', 'render was called with right state')
         called = true
       }
     }
@@ -969,7 +968,7 @@ let tests = {
 
     ReactComponent.test(FakeComponent, () => {
       myActions.updateName('Fluxy (object)')
-      assert.equal(called, true, 'render was called')
+      assert(called === true, 'render was called')
     })
   },
 
@@ -982,7 +981,7 @@ let tests = {
       }
 
       render() {
-        assert.equal(this.state.foo.name, 'Fluxy (array)', 'render was called with right state')
+        assert(this.state.foo.name === 'Fluxy (array)', 'render was called with right state')
         called = true
       }
     }
@@ -995,7 +994,7 @@ let tests = {
 
     ReactComponent.test(FakeComponent, () => {
       myActions.updateName('Fluxy (array)')
-      assert.equal(called, true, 'render was called')
+      assert(called === true, 'render was called')
     })
   },
 
@@ -1053,11 +1052,11 @@ let tests = {
     class FakeComponent extends ReactComponent {
       render() {
         if (renderCalls === 1) {
-          assert.equal(this.state.my.name, 'Magic', 'myStore state was updated properly')
+          assert(this.state.my.name === 'Magic', 'myStore state was updated properly')
         }
 
         if (renderCalls === 2) {
-          assert.equal(this.state.sc.name, 'Magic', 'secondStore state was updated properly')
+          assert(this.state.sc.name === 'Magic', 'secondStore state was updated properly')
         }
 
         called = true
@@ -1075,8 +1074,8 @@ let tests = {
 
     ReactComponent.test(FakeComponent, () => {
       myActions.updateName('Magic')
-      assert.equal(called, true, 'render was called')
-      assert.equal(renderCalls - 1, 2, 'render was called twice')
+      assert(called === true, 'render was called')
+      assert(renderCalls - 1 === 2, 'render was called twice')
     })
   },
 
@@ -1085,7 +1084,7 @@ let tests = {
 
     class FakeComponent extends ReactComponent {
       render() {
-        assert.equal(this.state.name, 'Single magic', 'myStore state was updated properly')
+        assert(this.state.name === 'Single magic', 'myStore state was updated properly')
         called = true
       }
     }
@@ -1097,7 +1096,7 @@ let tests = {
 
     ReactComponent.test(FakeComponent, () => {
       myActions.updateName('Single magic')
-      assert.equal(called, true, 'render was called')
+      assert(called === true, 'render was called')
     })
   },
 
@@ -1143,10 +1142,10 @@ let tests = {
 
     alt.createStore(NoBootstrap, 'NoBootstrap', false)
 
-    let snapshot = JSON.parse(alt.takeSnapshot())
+    const snapshot = JSON.parse(alt.takeSnapshot())
 
-    assert.equal(typeof snapshot.NoBootstrap, 'undefined', 'Store does not exist in snapshots')
-    assert.equal(typeof snapshot.AltSecondStore, 'object', 'AltSecondStore exists')
+    assert.isUndefined(snapshot.NoBootstrap, 'Store does not exist in snapshots')
+    assert.isObject(snapshot.AltSecondStore, 'AltSecondStore exists')
   },
 
   'actions with no name are still ok'() {
@@ -1154,7 +1153,7 @@ let tests = {
       this.generateActions('foo')
     })
 
-    assert.equal(typeof actions.foo, 'function', 'action still exists')
+    assert.isFunction(actions.foo, 'action still exists')
   },
 }
 

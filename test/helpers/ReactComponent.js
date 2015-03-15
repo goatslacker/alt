@@ -6,7 +6,7 @@ class ReactComponent {
 
   // A not at all react spec compliant way to test fake react components
   static test(Component, testFn, props) {
-    let builtInProto = Object.getOwnPropertyNames(Component.prototype)
+    const builtInProto = Object.getOwnPropertyNames(Component.prototype)
 
     // A trolol way of doing the react <0.13 auto-binding.
     function AutoBoundComponent() {
@@ -21,7 +21,7 @@ class ReactComponent {
     AutoBoundComponent.prototype = Component.prototype
 
     // initialize the component
-    let component = new AutoBoundComponent()
+    const component = new AutoBoundComponent()
 
     Component.mixins.forEach((mixin) => {
       // transfer over the mixins.

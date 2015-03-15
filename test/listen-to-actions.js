@@ -1,9 +1,9 @@
-import {assert} from 'chai'
+import { assert } from 'chai'
 import Alt from '../dist/alt-with-runtime'
 
 import ActionListeners from '../utils/ActionListeners'
 
-let alt = new Alt()
+const alt = new Alt()
 
 class MyActions {
   constructor() {
@@ -11,27 +11,26 @@ class MyActions {
   }
 }
 
-let myActions = alt.createActions(MyActions)
+const myActions = alt.createActions(MyActions)
 
-let listener = new ActionListeners(alt)
+const listener = new ActionListeners(alt)
 
 export default {
   'listen to actions globally'() {
-    let id = listener.addActionListener(myActions.UPDATE_NAME, (name) => {
-      assert.equal(name, 'yes', 'proper data was passed in')
+    const id = listener.addActionListener(myActions.UPDATE_NAME, (name) => {
+      assert(name === 'yes', 'proper data was passed in')
     })
 
-    assert.equal(typeof id, 'string', 'the dispatcher id is returned for the listener')
+    assert.isString(id, 'the dispatcher id is returned for the listener')
 
     myActions.updateName('yes')
 
     listener.removeActionListener(id)
 
-    myActions.updateName('no')
-    assert.equal(true, true, 'no error was thrown by above action since listener was removed')
+    assert.doesNotThrow(() => myActions.updateName('no'), 'no error was thrown by action since listener was removed')
 
     listener.addActionListener(myActions.UPDATE_NAME, (name) => {
-      assert.equal(name, 'mud', 'proper data was passed in again')
+      assert(name === 'mud', 'proper data was passed in again')
     })
 
     myActions.updateName('mud')
@@ -39,7 +38,6 @@ export default {
     listener.removeAllActionListeners()
 
     myActions.updateName('bill')
-
-    assert.equal(true, true, 'all listeners were removed')
+    assert.doesNotThrow(() => myActions.updateName('bill'), 'all listeners were removed')
   }
 }
