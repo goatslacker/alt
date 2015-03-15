@@ -139,3 +139,29 @@ describe('PetStore', () => {
   });
 });
 ```
+
+If you're using jest to test it is advised you unmock your alt instance as well as alt itself.
+
+You can set this up in your `package.json` like so:
+
+```js
+"jest": {
+  "unmockedModulePathPatterns": [
+    "../node_modules/alt",
+    "alt.js"
+  ]
+}
+```
+
+You can also test the dispatcher by overwriting `alt.dispatcher`. Here is an example:
+
+```js
+beforeEach(function() {
+  alt = require('../../alt');
+  alt.dispatcher = { register: jest.genMockFunction() };
+  UnreadThreadStore = require('../UnreadThreadStore');
+  callback = alt.dispatcher.register.mock.calls[0][0];
+});
+```
+
+You can see a working jest test [here](https://github.com/goatslacker/alt/blob/master/examples/chat/js/stores/__tests__/UnreadThreadStore-test.js) which tests the [UnreadThreadStore](https://github.com/goatslacker/alt/blob/master/examples/chat/js/stores/UnreadThreadStore.js) from the [flux chat example](https://github.com/goatslacker/alt/tree/master/examples/chat) application.
