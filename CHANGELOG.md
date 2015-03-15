@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.14.3
+
+Added:
+
+* `exportPublicMethods` can be used within a store to export public getter methods from the store.
+
+Other:
+
+* Future spec compliant change of making the derived store class call super before setting `this`.
+
 ## 0.14.2
 
 Added:
