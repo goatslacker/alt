@@ -18,7 +18,8 @@
     "coveralls": "^2.11.2",
     "eslint": "^0.16.1",
     "istanbul": "^0.3.5",
-    "mocha": "^2.1.0"
+    "mocha": "^2.1.0",
+    "sinon": "^1.14.0"
   },
   "repository": {
     "type": "git",
@@ -30,12 +31,12 @@
     "build-alt-runtime": "babel --external-helpers src/alt.js > dist/alt-with-runtime.js",
     "build-alt-browser": "NODE_ENV=production browserify src/alt.js -t babelify --outfile dist/alt-browser.js --standalone Alt",
     "build-alt-browser-with-addons": "NODE_ENV=production browserify src/alt-with-addons.js -t babelify --outfile dist/alt-browser-with-addons.js --standalone Alt",
-    "coverage": "istanbul cover _mocha -- -u exports -R list --compilers js:babel/register --require babel/external-helpers test",
+    "coverage": "istanbul cover _mocha -- -u exports -R spec --compilers js:babel/register --require babel/external-helpers test",
     "lint": "eslint src mixins utils",
     "prepublish": "npm run test-build",
     "test": "npm run build-alt-runtime; npm run tests-all",
     "test-build": "npm run build; npm run tests-all",
-    "tests-all": "mocha -u exports -R list --compilers js:babel/register --require babel/external-helpers test"
+    "tests-all": "mocha -u exports -R spec --compilers js:babel/register --require babel/external-helpers test"
   },
   "keywords": [
     "alt",

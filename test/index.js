@@ -607,52 +607,6 @@ const tests = {
     assert(myStore.getState().dontEmitEventCalled === true, 'dont emit event was called successfully and event was not emitted')
   },
 
-  'stores with colliding names'() {
-    let called = false
-    console.warn = function (x) {
-      called = true
-      assert.instanceOf(x, ReferenceError)
-    }
-
-    const MyStore = (function () {
-      return function MyStore() { }
-    }())
-    alt.createStore(MyStore)
-
-    assert(called === true, 'a warning was called')
-
-    assert.isObject(alt.stores.MyStore1, 'a store was still created')
-  },
-
-  'colliding names via identifier'() {
-    let called = false
-    console.warn = function (x) {
-      called = true
-      assert.instanceOf(x, ReferenceError)
-    }
-
-    class auniquestore { }
-    alt.createStore(auniquestore, 'MyStore')
-
-    assert(called === true, 'a warning was called')
-
-    assert.isObject(alt.stores.MyStore1, 'a store was still created')
-  },
-
-  'not providing a store name via anonymous function'() {
-    let called = false
-    console.warn = function (x) {
-      called = true
-      assert.instanceOf(x, ReferenceError)
-    }
-
-    alt.createStore(function () { })
-
-    assert(called === true, 'a warning was called')
-
-    assert.isObject(alt.stores[''], 'a store with no name was still created')
-  },
-
   'multiple deferrals'(done) {
     myActions.moreActions()
     assert(secondStore.getState().deferrals === 1, 'deferrals is initially set to 1')

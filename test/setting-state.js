@@ -1,5 +1,6 @@
 import { assert } from 'chai'
 import Alt from '../dist/alt-with-runtime'
+import sinon from 'sinon'
 
 const alt = new Alt()
 
@@ -24,23 +25,22 @@ class MyStore {
 const myStore = alt.createStore(MyStore)
 
 export default {
-  'using setState to set the state'() {
-    actions.fire()
+  'setState': {
+    'using setState to set the state'() {
+      const spy = sinon.spy()
+      myStore.listen(spy)
 
-    let changes = 0
-    const fart = () => {
-      changes += 1
-      assert(changes === 1, 'listen was fired once')
+      actions.fire()
+
+      assert(myStore.getState().foo === 2, 'foo was incremented')
+      assert(myStore.getState().retVal === false, 'return value of setState is false')
+
+      myStore.unlisten(spy)
+
+      // calling set state without anything doesn't make things crash and burn
+      actions.nothing()
+
+      assert.ok(spy.calledOnce, 'spy was only called once')
     }
-
-    myStore.listen(fart)
-
-    assert(myStore.getState().foo === 2, 'foo was incremented')
-    assert(myStore.getState().retVal === false, 'return value of setState is false')
-
-    myStore.unlisten(fart)
-
-    // calling set state without anything doesn't make things crash and burn
-    actions.nothing()
   }
 }
