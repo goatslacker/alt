@@ -447,7 +447,7 @@ const tests = {
     assert(myStore.getState().name === 'monkey', 'I can bootstrap many times')
   },
 
-  'letiadic actions'(done) {
+  'variadic actions'(done) {
     myActions.updateTwo(4, 2)
     assert(secondStore.getState().foo === 6, 'im able to pass two params into an action')
 

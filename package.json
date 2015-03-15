@@ -36,6 +36,7 @@
     "prepublish": "npm run test-build",
     "test": "npm run build-alt-runtime; npm run tests-all",
     "test-build": "npm run build; npm run tests-all",
+    "test-browser": "browserify test/browser/index.js -t babelify --outfile test/browser/tests.js",
     "tests-all": "mocha -u exports -R spec --compilers js:babel/register --require babel/external-helpers test"
   },
   "keywords": [

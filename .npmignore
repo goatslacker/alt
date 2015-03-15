@@ -3,3 +3,4 @@ src
 coverage-test.js
 coverage
 TODO
+test/browser/tests.js
