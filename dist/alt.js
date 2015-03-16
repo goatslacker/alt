@@ -258,11 +258,13 @@ var setAppState = function (instance, data, onStore) {
   var obj = JSON.parse(data);
   Object.keys(obj).forEach(function (key) {
     var store = instance.stores[key];
-    if (store[LIFECYCLE].deserialize) {
-      obj[key] = store[LIFECYCLE].deserialize(obj[key]) || obj[key];
+    if (store) {
+      if (store[LIFECYCLE].deserialize) {
+        obj[key] = store[LIFECYCLE].deserialize(obj[key]) || obj[key];
+      }
+      assign(store[STATE_CONTAINER], obj[key]);
+      onStore(store);
     }
-    assign(store[STATE_CONTAINER], obj[key]);
-    onStore(store);
   });
 };
 

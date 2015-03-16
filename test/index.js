@@ -1195,6 +1195,12 @@ const tests = {
 
     assert.isFunction(actions.foo, 'action still exists')
   },
+
+  'recycle store that does not exist'() {
+    assert.doesNotThrow(() => {
+      alt.bootstrap('{"AStoreThatIJustMadeUpButDoesNotReallyExist": {}}')
+    })
+  },
 }
 
 export default tests
