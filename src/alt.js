@@ -226,8 +226,10 @@ const StoreMixinEssentials = {
 const setAppState = (instance, data, onStore) => {
   const obj = JSON.parse(data)
   Object.keys(obj).forEach((key) => {
-    assign(instance.stores[key][STATE_CONTAINER], obj[key])
-    onStore(instance.stores[key])
+    if(instance.stores[key]){
+      assign(instance.stores[key][STATE_CONTAINER], obj[key])
+      onStore(instance.stores[key])
+    }
   })
 }
 
