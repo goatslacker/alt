@@ -225,7 +225,6 @@ class LifeCycleStore {
     })
     this.on('deserialize', (data) => {
       data.deserialized = true
-      return data
     })
   }
 

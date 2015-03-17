@@ -983,11 +983,7 @@ var setAppState = function (instance, data, onStore) {
   Object.keys(obj).forEach(function (key) {
     var store = instance.stores[key];
     if (store[LIFECYCLE].deserialize) {
-      obj[key] = store[LIFECYCLE].deserialize(obj[key]);
-      /* istanbul ignore next */
-      if (!obj[key]) {
-        throw new Error("The \"deserialize\" lifecycle method in the store, " + key + ", must return data.");
-      }
+      obj[key] = store[LIFECYCLE].deserialize(obj[key]) || obj[key];
     }
     assign(store[STATE_CONTAINER], obj[key]);
     onStore(store);

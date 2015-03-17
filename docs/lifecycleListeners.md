@@ -41,9 +41,7 @@ class Store {
 
 ## Deserialize
 
-`deserialize` is called before the store's state is deserialized. This occurs whenever the store's state is being set to an existing snapshot/bootstrap data. Here you can perform any final tasks you need to before the snapshot/bootstrap data is set on the store such as mapping the data to model objects, or converting data an external source like a JSON API into a format the store expects. Deserialize takes in a parameter that is an object of snapshot/bootstrap data and must return the data to be set to the store's state. See the [serialization](serialization.md) for an example.
-
-**Deserialize expects a return value or an error will be thrown if one is not present.**
+`deserialize` is called before the store's state is deserialized. This occurs whenever the store's state is being set to an existing snapshot/bootstrap data. Here you can perform any final tasks you need to before the snapshot/bootstrap data is set on the store such as mapping the data to model objects, or converting data an external source like a JSON API into a format the store expects. Deserialize takes in a parameter that is an object of snapshot/bootstrap data and must return the data to be set to the store's state. If nothing is returned, then the data from the snapshot is set to the store's state. See the [serialization](serialization.md) for an example.
 
 ```js
 class Store {
