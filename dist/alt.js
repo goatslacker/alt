@@ -6,7 +6,7 @@ var _get = function get(object, property, receiver) { var desc = Object.getOwnPr
 
 var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
 
-var _prototypeProperties = function (child, staticProps, instanceProps) { if (staticProps) Object.defineProperties(child, staticProps); if (instanceProps) Object.defineProperties(child.prototype, instanceProps); };
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
@@ -89,42 +89,32 @@ var AltStore = (function () {
     }
   }
 
-  _prototypeProperties(AltStore, null, {
+  _createClass(AltStore, {
     getEventEmitter: {
       value: function getEventEmitter() {
         return this[EE];
-      },
-      writable: true,
-      configurable: true
+      }
     },
     emitChange: {
       value: function emitChange() {
         this[EE].emit("change", this[STATE_CONTAINER]);
-      },
-      writable: true,
-      configurable: true
+      }
     },
     listen: {
       value: function listen(cb) {
         this[EE].on("change", cb);
-      },
-      writable: true,
-      configurable: true
+      }
     },
     unlisten: {
       value: function unlisten(cb) {
         this[EE].removeListener("change", cb);
-      },
-      writable: true,
-      configurable: true
+      }
     },
     getState: {
       value: function getState() {
         // Copy over state so it's RO.
         return assign({}, this[STATE_CONTAINER]);
-      },
-      writable: true,
-      configurable: true
+      }
     }
   });
 
@@ -141,13 +131,11 @@ var ActionCreator = (function () {
     this.alt = alt;
   }
 
-  _prototypeProperties(ActionCreator, null, {
+  _createClass(ActionCreator, {
     dispatch: {
       value: function dispatch(data) {
         this.alt.dispatch(this[ACTION_UID], data);
-      },
-      writable: true,
-      configurable: true
+      }
     }
   });
 
@@ -364,13 +352,11 @@ var Alt = (function () {
     this[INIT_SNAPSHOT] = "{}";
   }
 
-  _prototypeProperties(Alt, null, {
+  _createClass(Alt, {
     dispatch: {
       value: function dispatch(action, data) {
         this.dispatcher.dispatch({ action: action, data: data });
-      },
-      writable: true,
-      configurable: true
+      }
     },
     createStore: {
       value: function createStore(StoreModel, iden) {
@@ -400,14 +386,14 @@ var Alt = (function () {
         // prototype with the mixin behaviour and I'm extending from StoreModel
         // so we can inherit any extensions from the provided store.
 
-        var Store = (function (StoreModel) {
+        var Store = (function (_StoreModel) {
           function Store(alt) {
             _classCallCheck(this, Store);
 
             _get(Object.getPrototypeOf(Store.prototype), "constructor", this).call(this, alt);
           }
 
-          _inherits(Store, StoreModel);
+          _inherits(Store, _StoreModel);
 
           return Store;
         })(StoreModel);
@@ -442,9 +428,7 @@ var Alt = (function () {
         }
 
         return storeInstance;
-      },
-      writable: true,
-      configurable: true
+      }
     },
     generateActions: {
       value: function generateActions() {
@@ -453,13 +437,9 @@ var Alt = (function () {
         }
 
         return this.createActions(function () {
-          var _ref;
-
-          (_ref = this).generateActions.apply(_ref, actionNames);
+          this.generateActions.apply(this, actionNames);
         });
-      },
-      writable: true,
-      configurable: true
+      }
     },
     createActions: {
       value: function createActions(ActionsClass) {
@@ -470,16 +450,16 @@ var Alt = (function () {
         var actions = assign({}, getInternalMethods(ActionsClass.prototype, builtInProto));
         var key = ActionsClass.name || ActionsClass.displayName || "";
 
-        var ActionsGenerator = (function (ActionsClass) {
+        var ActionsGenerator = (function (_ActionsClass) {
           function ActionsGenerator(alt) {
             _classCallCheck(this, ActionsGenerator);
 
             _get(Object.getPrototypeOf(ActionsGenerator.prototype), "constructor", this).call(this, alt);
           }
 
-          _inherits(ActionsGenerator, ActionsClass);
+          _inherits(ActionsGenerator, _ActionsClass);
 
-          _prototypeProperties(ActionsGenerator, null, {
+          _createClass(ActionsGenerator, {
             generateActions: {
               value: function generateActions() {
                 for (var _len = arguments.length, actionNames = Array(_len), _key = 0; _key < _len; _key++) {
@@ -496,9 +476,7 @@ var Alt = (function () {
                     this.dispatch(a.length ? [x].concat(a) : x);
                   };
                 });
-              },
-              writable: true,
-              configurable: true
+              }
             }
           });
 
@@ -530,18 +508,14 @@ var Alt = (function () {
 
           return obj;
         }, exportObj);
-      },
-      writable: true,
-      configurable: true
+      }
     },
     takeSnapshot: {
       value: function takeSnapshot() {
         var state = snapshot(this);
         this[LAST_SNAPSHOT] = state;
         return state;
-      },
-      writable: true,
-      configurable: true
+      }
     },
     rollback: {
       value: function rollback() {
@@ -550,9 +524,7 @@ var Alt = (function () {
             store[LIFECYCLE].rollback();
           }
         });
-      },
-      writable: true,
-      configurable: true
+      }
     },
     recycle: {
       value: function recycle() {
@@ -567,18 +539,14 @@ var Alt = (function () {
             store[LIFECYCLE].init();
           }
         });
-      },
-      writable: true,
-      configurable: true
+      }
     },
     flush: {
       value: function flush() {
         var state = snapshot(this);
         this.recycle();
         return state;
-      },
-      writable: true,
-      configurable: true
+      }
     },
     bootstrap: {
       value: function bootstrap(data) {
@@ -587,9 +555,7 @@ var Alt = (function () {
             store[LIFECYCLE].bootstrap();
           }
         });
-      },
-      writable: true,
-      configurable: true
+      }
     },
     addActions: {
 
@@ -597,30 +563,22 @@ var Alt = (function () {
 
       value: function addActions(name, ActionsClass) {
         this.actions[name] = this.createActions(ActionsClass);
-      },
-      writable: true,
-      configurable: true
+      }
     },
     addStore: {
       value: function addStore(name, StoreModel, saveStore) {
         this.createStore(StoreModel, name, saveStore);
-      },
-      writable: true,
-      configurable: true
+      }
     },
     getActions: {
       value: function getActions(name) {
         return this.actions[name];
-      },
-      writable: true,
-      configurable: true
+      }
     },
     getStore: {
       value: function getStore(name) {
         return this.stores[name];
-      },
-      writable: true,
-      configurable: true
+      }
     }
   });
 

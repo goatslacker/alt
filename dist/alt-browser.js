@@ -1168,9 +1168,7 @@ var Alt = (function () {
         }
 
         return this.createActions(function () {
-          var _ref;
-
-          (_ref = this).generateActions.apply(_ref, actionNames);
+          this.generateActions.apply(this, actionNames);
         });
       }
     },
