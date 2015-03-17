@@ -239,7 +239,7 @@ const snapshot = (instance) => {
   return JSON.stringify(
     Object.keys(instance.stores).reduce((obj, key) => {
       const store = instance.stores[key]
-      const customSnapshot = store[LIFECYCLE].snapshot && store[LIFECYCLE].snapshot()
+      const customSnapshot = store[LIFECYCLE].serialize && store[LIFECYCLE].serialize()
       obj[key] = customSnapshot ? customSnapshot : store.getState()
       return obj
     }, {})

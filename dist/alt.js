@@ -279,7 +279,7 @@ var setAppState = function (instance, data, onStore) {
 var snapshot = function (instance) {
   return JSON.stringify(Object.keys(instance.stores).reduce(function (obj, key) {
     var store = instance.stores[key];
-    var customSnapshot = store[LIFECYCLE].snapshot && store[LIFECYCLE].snapshot();
+    var customSnapshot = store[LIFECYCLE].serialize && store[LIFECYCLE].serialize();
     obj[key] = customSnapshot ? customSnapshot : store.getState();
     return obj;
   }, {}));
