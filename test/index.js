@@ -217,7 +217,7 @@ class LifeCycleStore {
     this.on('bootstrap', () => {
       this.bootstrapped = true
     })
-    this.on('snapshot', () => {
+    this.on('serialize', () => {
       this.snapshotted = true
     })
     this.on('rollback', () => {
@@ -280,7 +280,7 @@ class InterceptSnapshotStore {
     this.anotherVal = 5
     this.privateVal = 10
 
-    this.on('snapshot', () => {
+    this.on('serialize', () => {
       return {
         modelData: this.modelData.data,
         anotherVal: this.anotherVal
@@ -305,7 +305,7 @@ class InterceptSnapshotStore {
   }
 }
 
-let interceptSnapshotStore = alt.createStore(InterceptSnapshotStore)
+const interceptSnapshotStore = alt.createStore(InterceptSnapshotStore)
 
 // Alt instances...
 
@@ -396,7 +396,7 @@ const tests = {
     assert(lifecycleStore.getState().snapshotted === false, 'takeSnapshot has not been called yet')
     assert(lifecycleStore.getState().rollback === false, 'rollback has not been called')
     assert(lifecycleStore.getState().init === true, 'init gets called when store initializes')
-    assert.equal(lifecycleStore.getState().deserialized, true, 'deserialize has not been called yet')
+    assert(lifecycleStore.getState().deserialized === true, 'deserialize has not been called yet')
   },
 
   'snapshots and bootstrapping'() {
@@ -406,8 +406,8 @@ const tests = {
     const bootstrapReturnValue = alt.bootstrap(initialSnapshot)
     assert(bootstrapReturnValue === undefined, 'bootstrap returns nothing')
     assert(lifecycleStore.getState().bootstrapped === true, 'bootstrap was called and the life cycle event was triggered')
-    assert.equal(lifecycleStore.getState().snapshotted, true, 'snapshot was called and the life cycle event was triggered')
-    assert.equal(lifecycleStore.getState().deserialized, true, 'deserialize was called and the life cycle event was triggered')
+    assert(lifecycleStore.getState().snapshotted === true, 'snapshot was called and the life cycle event was triggered')
+    assert(lifecycleStore.getState().deserialized === true, 'deserialize was called and the life cycle event was triggered')
   },
 
   'existence of actions'() {
@@ -475,7 +475,7 @@ const tests = {
 
   'serializing/deserializing snapshot/bootstrap data'(){
     myActions.updateAnotherVal(11)
-    let snapshot = alt.takeSnapshot()
+    const snapshot = alt.takeSnapshot()
     const expectedSerializedData = {
       modelData: {
         x: 2,
@@ -503,8 +503,8 @@ const tests = {
     const rollbackValue = alt.rollback()
     assert(rollbackValue === undefined, 'rollback returns nothing')
 
-    assert.equal(myStore.getState().name, 'first', 'state has been rolledback to last snapshot')
-    assert.equal(lifecycleStore.getState().rollback, true, 'rollback lifecycle method was called')
+    assert(myStore.getState().name === 'first', 'state has been rolledback to last snapshot')
+    assert(lifecycleStore.getState().rollback === true, 'rollback lifecycle method was called')
   },
 
   'store listening'() {
@@ -578,7 +578,7 @@ const tests = {
     assert.isObject(secondStore.getState().instance, 'instance has been now set')
     assert.isFunction(secondStore.getState().instance.getState, 'instance is a pointer to secondStore')
     assert.isFunction(secondStore.getState().instance.externalMethod, 'instance has the static methods available')
-    assert.deepEqual(secondStore.getState().instance.externalMethod(), 'bar', 'calling a static method from instance and able to use this inside')
+    assert(secondStore.getState().instance.externalMethod() === 'bar', 'calling a static method from instance and able to use this inside')
   },
 
   'conflicting listeners on a store'() {

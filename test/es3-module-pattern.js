@@ -1,5 +1,5 @@
 import Alt from '../dist/alt-with-runtime'
-import assert from 'assert'
+import { assert } from 'chai'
 import sinon from 'sinon'
 
 const alt = new Alt()
@@ -47,25 +47,25 @@ export default {
       const storePrototype = Object.getPrototypeOf(myStore)
       const assertMethods = ['constructor', 'getEventEmitter', 'emitChange', 'listen', 'unlisten', 'getState']
       assert.deepEqual(Object.getOwnPropertyNames(storePrototype), assertMethods, 'methods exist for store')
-      assert.equal(typeof myStore.addListener, 'undefined', 'event emitter methods not present')
-      assert.equal(typeof myStore.removeListener, 'undefined', 'event emitter methods not present')
-      assert.equal(typeof myStore.emit, 'undefined', 'event emitter methods not present')
+      assert.isUndefined(myStore.addListener, 'event emitter methods not present')
+      assert.isUndefined(myStore.removeListener, 'event emitter methods not present')
+      assert.isUndefined(myStore.emit, 'event emitter methods not present')
     },
 
     'public methods available'() {
-      assert.equal(typeof myStore.getData, 'function', 'public methods are available')
-      assert.equal(myStore.getData(), 1, 'initial store data is set')
+      assert.isFunction(myStore.getData, 'public methods are available')
+      assert(myStore.getData() === 1, 'initial store data is set')
     },
 
     'private and instance variables are not available'() {
-      assert.equal(myStore.privateVariable, undefined, 'encapsulated variables are not available')
-      assert.equal(myStore.testProperty, undefined, 'instance variables are not available')
+      assert.isUndefined(myStore.privateVariable, 'encapsulated variables are not available')
+      assert.isUndefined(myStore.testProperty, 'instance variables are not available')
     },
 
     'firing an action'() {
       actions.fire(2)
 
-      assert.equal(myStore.getState().data, 2, 'action was fired and handled correctly')
+      assert(myStore.getState().data === 2, 'action was fired and handled correctly')
     },
 
     'adding lifecycle events'() {
@@ -84,7 +84,7 @@ export default {
       const store = alt.createStore(new TestStore())
 
       assert.ok(spy.calledOnce, 'lifecycle event was called')
-      assert.equal(store.getState().foo, 'bar', 'state is set')
+      assert(store.getState().foo === 'bar', 'state is set')
     },
 
     'set state'() {
@@ -107,13 +107,13 @@ export default {
       }
 
       const store = alt.createStore(TestStore)
-      assert.equal(store.getState().hello, null, 'store state property has not been set yet')
-      assert.equal(store.getState().inst, null, 'store state property has not been set yet')
+      assert.isNull(store.getState().hello, 'store state property has not been set yet')
+      assert.isNull(store.getState().inst, 'store state property has not been set yet')
 
       actions.fire('world')
 
-      assert.equal(store.getState().hello, 'world', 'store state was set using setState')
-      assert.equal(store.getState().inst, store.getEventEmitter(), 'get instance works')
+      assert(store.getState().hello === 'world', 'store state was set using setState')
+      assert(store.getState().inst === store.getEventEmitter(), 'get instance works')
     },
 
     'set state in lifecycle'() {
@@ -128,7 +128,7 @@ export default {
       }
 
       const store = alt.createStore(TestStore)
-      assert.equal(store.getState().test, 'i am here', 'setting state on lifecycle')
+      assert(store.getState().test === 'i am here', 'setting state on lifecycle')
     },
   }
 }
