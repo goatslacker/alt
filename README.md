@@ -587,12 +587,12 @@ class Store {
 }
 ```
 
-`snapshot` is called before the store's state is serialized. Here you can perform any final tasks you need to before the state is saved.
+`serialize` is called before the store's state is serialized. Here you can perform any final tasks you need to before the state is saved.
 
 ```js
 class Store {
   constructor() {
-    this.on('snapshot', () => {
+    this.on('serialize', () => {
       // do something here
     })
   }
