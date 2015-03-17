@@ -1,5 +1,7 @@
 import actions from './SampleActions'
 
+export const displayName = 'SaaM'
+
 export const bindListeners = {
   handleClick: actions.FIRE
 }
