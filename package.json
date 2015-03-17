@@ -10,7 +10,7 @@
     "object-assign": "^2.0.0"
   },
   "devDependencies": {
-    "babel": "^4.6.6",
+    "babel": "^4.7.13",
     "babel-eslint": "^1.0.14",
     "babelify": "^5.0.4",
     "browserify": "^9.0.3",
