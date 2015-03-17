@@ -9,6 +9,20 @@
  * Usage:
  *
  * ```js
+ * var IsomorphicRenderer = require('alt/utils/IsomorphicRenderer');
+ * var React = require('react');
+ * var Alt = require('alt');
+ * var alt = new Alt();
+ *
+ * var App = React.createClass({
+ *   render() {
+ *     return (
+ *       <div>Hello World</div>
+ *     );
+ *   }
+ * });
+ *
+ * module.exports = IsomorphicRenderer(alt, App);
  * ```
  */
 module.exports = IsomorphicRenderer
