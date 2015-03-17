@@ -473,6 +473,12 @@ const tests = {
     assert(JSON.parse(snapshot).MyStore.name === 'bear', 'the snapshot is not affected by action')
   },
 
+  'specifying stores to snapshot'() {
+    const snapshot = alt.takeSnapshot('MyStore', 'AltSecondStore')
+    assert.deepEqual(Object.keys(JSON.parse(snapshot)), ['MyStore', 'AltSecondStore'], 'the snapshot includes specified stores')
+    assert.isFalse(Object.keys(JSON.parse(snapshot)).includes('LifeCycleStore'), 'the snapshot does not include unspecified stores')
+  },
+
   'serializing/deserializing snapshot/bootstrap data'(){
     myActions.updateAnotherVal(11)
     const snapshot = alt.takeSnapshot()

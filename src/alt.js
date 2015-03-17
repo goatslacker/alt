@@ -239,9 +239,10 @@ const setAppState = (instance, data, onStore) => {
   })
 }
 
-const snapshot = (instance) => {
+const snapshot = (instance, ...storeNames) => {
+  const stores = storeNames.length ? storeNames : Object.keys(instance.stores)
   return JSON.stringify(
-    Object.keys(instance.stores).reduce((obj, key) => {
+    stores.reduce((obj, key) => {
       const store = instance.stores[key]
       const customSnapshot = store[LIFECYCLE].serialize && store[LIFECYCLE].serialize()
       obj[key] = customSnapshot ? customSnapshot : store.getState()
@@ -456,9 +457,14 @@ class Alt {
     }, exportObj)
   }
 
-  takeSnapshot() {
-    const state = snapshot(this)
-    this[LAST_SNAPSHOT] = state
+  takeSnapshot(...storeNames) {
+    const state = snapshot(this, ...storeNames)
+    if(this[LAST_SNAPSHOT]) {
+      assign(this[LAST_SNAPSHOT], state)
+    }
+    else {
+      this[LAST_SNAPSHOT] = state
+    }
     return state
   }
 

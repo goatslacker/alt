@@ -529,12 +529,12 @@ Restart the loop by making your views kick off new actions.
 
 ### Snapshots
 
-`takeSnapshot :: String`
+`takeSnapshot :: ?...String -> String`
 
 Snapshots are a core component of alt. The idea is that at any given point in time you can `takeSnapshot` and have your entire application's state
 serialized for persistence, transferring, logging, or debugging.
 
-Taking a snapshot is as easy as calling `alt.takeSnapshot()`.
+Taking a snapshot is as easy as calling `alt.takeSnapshot()`. It can also take an optional number of arguments as strings which correspond to the store names you would like to include in the snapshot. This allows you to take a snapshot of a subset of your app's data.
 
 ### Bootstrapping
 
