@@ -232,10 +232,7 @@ const snapshot = (instance) => {
   return JSON.stringify(
     Object.keys(instance.stores).reduce((obj, key) => {
       const store = instance.stores[key]
-      let customSnapshot
-      if (store[LIFECYCLE].snapshot) {
-        customSnapshot = store[LIFECYCLE].snapshot()
-      }
+      const customSnapshot = store[LIFECYCLE].snapshot && store[LIFECYCLE].snapshot()
       obj[key] = customSnapshot ? customSnapshot : store.getState()
       return obj
     }, {})
