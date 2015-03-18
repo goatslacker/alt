@@ -147,7 +147,7 @@ You can set this up in your `package.json` like so:
 ```js
 "jest": {
   "unmockedModulePathPatterns": [
-    "../node_modules/alt",
+    "node_modules/alt",
     "alt.js"
   ]
 }
