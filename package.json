@@ -11,12 +11,11 @@
   },
   "devDependencies": {
     "babel": "^4.7.13",
-    "babel-eslint": "^1.0.14",
     "babelify": "^5.0.4",
     "browserify": "^9.0.3",
     "chai": "^2.1.0",
     "coveralls": "^2.11.2",
-    "eslint": "^0.16.1",
+    "eslint": "^0.17.1",
     "iso": "^4.0.2",
     "istanbul": "^0.3.5",
     "mocha": "^2.1.0",
@@ -50,9 +49,12 @@
     "unidirectional"
   ],
   "eslintConfig": {
-    "parser": "babel-eslint",
     "env": {
-      "node": true
+      "node": true,
+      "es6": true
+    },
+    "ecmaFeatures": {
+      "modules": true
     },
     "rules": {
       "brace-style": [
