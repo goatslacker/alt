@@ -200,7 +200,9 @@ var StoreMixinListeners = {
         _this8.bindAction(symbol, listener);
       }
     });
-  } };
+  }
+
+};
 
 var StoreMixinEssentials = {
   waitFor: function waitFor(sources) {

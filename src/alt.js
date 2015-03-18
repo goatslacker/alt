@@ -185,7 +185,7 @@ const StoreMixinListeners = {
         this.bindAction(symbol, listener)
       }
     })
-  },
+  }
 
 }
 
