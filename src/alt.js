@@ -459,10 +459,9 @@ class Alt {
 
   takeSnapshot(...storeNames) {
     const state = snapshot(this, ...storeNames)
-    if(this[LAST_SNAPSHOT]) {
+    if (this[LAST_SNAPSHOT]) {
       assign(this[LAST_SNAPSHOT], state)
-    }
-    else {
+    } else {
       this[LAST_SNAPSHOT] = state
     }
     return state
