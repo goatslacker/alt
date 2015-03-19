@@ -257,7 +257,12 @@ var setAppState = function (instance, data, onStore) {
 };
 
 var snapshot = function (instance) {
-  return JSON.stringify(Object.keys(instance.stores).reduce(function (obj, key) {
+  for (var _len = arguments.length, storeNames = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    storeNames[_key - 1] = arguments[_key];
+  }
+
+  var stores = storeNames.length ? storeNames : Object.keys(instance.stores);
+  return JSON.stringify(stores.reduce(function (obj, key) {
     var store = instance.stores[key];
     var customSnapshot = store[LIFECYCLE].serialize && store[LIFECYCLE].serialize();
     obj[key] = customSnapshot ? customSnapshot : store.getState();
@@ -503,8 +508,16 @@ var Alt = (function () {
     },
     takeSnapshot: {
       value: function takeSnapshot() {
-        var state = snapshot(this);
-        this[LAST_SNAPSHOT] = state;
+        for (var _len = arguments.length, storeNames = Array(_len), _key = 0; _key < _len; _key++) {
+          storeNames[_key] = arguments[_key];
+        }
+
+        var state = snapshot.apply(undefined, [this].concat(storeNames));
+        if (this[LAST_SNAPSHOT]) {
+          assign(this[LAST_SNAPSHOT], state);
+        } else {
+          this[LAST_SNAPSHOT] = state;
+        }
         return state;
       }
     },
