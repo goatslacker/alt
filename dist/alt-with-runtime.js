@@ -514,7 +514,7 @@ var Alt = (function () {
 
         var state = snapshot.apply(undefined, [this].concat(storeNames));
         if (this[LAST_SNAPSHOT]) {
-          assign(this[LAST_SNAPSHOT], state);
+          this[LAST_SNAPSHOT] = JSON.stringify(assign(JSON.parse(this[LAST_SNAPSHOT]), JSON.parse(state)));
         } else {
           this[LAST_SNAPSHOT] = state;
         }

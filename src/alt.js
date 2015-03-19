@@ -460,7 +460,7 @@ class Alt {
   takeSnapshot(...storeNames) {
     const state = snapshot(this, ...storeNames)
     if (this[LAST_SNAPSHOT]) {
-      assign(this[LAST_SNAPSHOT], state)
+      this[LAST_SNAPSHOT] = JSON.stringify(assign(JSON.parse(this[LAST_SNAPSHOT]), JSON.parse(state)))
     } else {
       this[LAST_SNAPSHOT] = state
     }

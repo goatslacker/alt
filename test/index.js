@@ -511,6 +511,12 @@ const tests = {
 
     assert(myStore.getState().name === 'first', 'state has been rolledback to last snapshot')
     assert(lifecycleStore.getState().rollback === true, 'rollback lifecycle method was called')
+
+    myActions.updateName('blossom')
+    // check that subsequent snapshots overwrite the LAST_SNAPSHOT such that they can be rolled back to
+    alt.takeSnapshot()
+    alt.rollback()
+    assert(myStore.getState().name === 'blossom', 'rolled back to second snapshot')
   },
 
   'store listening'() {
