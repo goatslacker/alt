@@ -223,7 +223,7 @@ var locationActions = alt.generateActions('updateLocation', 'updateCity', 'updat
 
 Stores are where you keep a part of your application's state.
 
-`alt.createStore :: Class, String -> Store`
+`alt.createStore :: Class, string -> Store`
 
 ```js
 class LocationStore {
@@ -529,7 +529,7 @@ Restart the loop by making your views kick off new actions.
 
 ### Snapshots
 
-`takeSnapshot :: ?...String -> String`
+`takeSnapshot :: ?...string -> string`
 
 Snapshots are a core component of alt. The idea is that at any given point in time you can `takeSnapshot` and have your entire application's state
 serialized for persistence, transferring, logging, or debugging.
@@ -538,7 +538,7 @@ Taking a snapshot is as easy as calling `alt.takeSnapshot()`. It can also take a
 
 ### Bootstrapping
 
-`bootstrap :: String -> undefined`
+`bootstrap :: string -> undefined`
 
 Bootstrapping can be done as many times as you wish, but it is common to use when initializing your application. The `alt.bootstrap()` function takes in a snapshot (JSON string)
 you've saved and reloads all the state with that snapshot, no events will be emitted to your components during this process, so again, it's best to do this
@@ -561,13 +561,13 @@ that it's not automatic in case of errors, and it only rolls back to the last sa
 
 ### Flushing
 
-`flush :: String`
+`flush :: string`
 
 Flush takes a snapshot of the current state and then resets all the stores back to their original initial state. This is useful if you're using alt stores as singletons and doing server side rendering because of concurrency. In this particular scenario you would load the data in via `bootstrap` and then use `flush` to take a snapshot, render the data, and reset your stores so they are ready for the next request.
 
 ### Recycling
 
-`recycle :: ?...String -> undefined`
+`recycle :: ?...string -> undefined`
 
 If you wish to reset a particular, or all, store's state back to their original initial state you would call `recycle`. Recycle takes an optional number of arguments as strings which correspond to the store's names you would like reset. If no argument is provided then all stores are reset.
 
