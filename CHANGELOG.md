@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.14.4
+
+Added:
+
+* Create stores with a POJO. [commit](https://github.com/goatslacker/alt/commit/c382b2840d7d24672d8ec1de400104a4c4dd174e)
+* Add `serialize`/`deserialize` lifecycle listener methods. [commit](https://github.com/goatslacker/alt/commit/7a42f27de1cb8a5abd3013704be488df4dccd30d)
+* Add isomorphic rendering util. [commit](https://github.com/goatslacker/alt/commit/543c28e8632114f0998596dd615c056828aa0fe0)
+* `emitChange` method lets you emit directly from within a store without having to `getInstance` first. [commit](https://github.com/goatslacker/alt/commit/e6c0fffef857b3b88dc62079dda0df798bd2eff5)
+
+Dev Dependency Update:
+
+* Update babel to 4.7.13. [commit](https://github.com/goatslacker/alt/commit/53337890ad9450b17bddd6f9a62ccfba16a518fe)
+* Update eslint to 0.17.1 and remove babel-eslint. [commit](https://github.com/goatslacker/alt/commit/a946020219ed74c73e28c46746cf2002f96da6cf).
+
 ## 0.14.3
 
 Added:
