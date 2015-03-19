@@ -28,6 +28,8 @@
  */
 module.exports = DispatcherRecorder
 
+var Symbol = require('es-symbol')
+
 function DispatcherRecorder(alt) {
   this.alt = alt
   this.events = []
@@ -35,9 +37,9 @@ function DispatcherRecorder(alt) {
 }
 
 /**
- * record(): boolean
  * If recording started you get true, otherwise false since there's a recording
  * in progress.
+ * record(): boolean
  */
 DispatcherRecorder.prototype.record = function () {
   if (this.dispatchToken) {
@@ -53,6 +55,7 @@ DispatcherRecorder.prototype.record = function () {
 
 /**
  * Stops the recording in progress.
+ * stop(): undefined
  */
 DispatcherRecorder.prototype.stop = function () {
   this.alt.dispatcher.unregister(this.dispatchToken)
@@ -61,6 +64,7 @@ DispatcherRecorder.prototype.stop = function () {
 
 /**
  * Clear all events from memory.
+ * clear(): undefined
  */
 DispatcherRecorder.prototype.clear = function () {
   this.events = []
@@ -97,4 +101,33 @@ DispatcherRecorder.prototype.replay = function (replayTime, done) {
   }
 
   next()
+}
+
+/**
+ * Serialize all the events so you can pass them around or load them into
+ * a separate recorder.
+ * serializeEvents(): string
+ */
+DispatcherRecorder.prototype.serializeEvents = function () {
+  var events = this.events.map(function (event) {
+    return {
+      action: Symbol.keyFor(event.action),
+      data: event.data
+    }
+  })
+  return JSON.stringify(events)
+}
+
+/**
+ * Load serialized events into the recorder and overwrite the current events
+ * loadEvents(events: string): undefined
+ */
+DispatcherRecorder.prototype.loadEvents = function (events) {
+  var parsedEvents = JSON.parse(events)
+  this.events = parsedEvents.map(function (event) {
+    return {
+      action: Symbol.for(event.action),
+      data: event.data
+    }
+  })
 }

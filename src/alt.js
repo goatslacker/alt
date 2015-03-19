@@ -16,6 +16,8 @@ const LISTENERS = Symbol('stores action listeners storage')
 const PUBLIC_METHODS = Symbol('store public method storage')
 const STATE_CONTAINER = Symbol('the state container')
 
+const GlobalActionsNameRegistry = {}
+
 function formatAsConstant(name) {
   return name.replace(/[a-z]([A-Z])/g, (i) => {
     return `${i[0]}_${i[1].toLowerCase()}`
@@ -428,7 +430,9 @@ class Alt {
 
     return Object.keys(actions).reduce((obj, action) => {
       const constant = formatAsConstant(action)
-      const actionName = Symbol(`${key}#${action}`)
+      const actionId = uid(GlobalActionsNameRegistry, `${key}#${action}`)
+      GlobalActionsNameRegistry[actionId] = 1
+      const actionName = Symbol.for(actionId)
 
       // Wrap the action so we can provide a dispatch method
       const newAction = new ActionCreator(

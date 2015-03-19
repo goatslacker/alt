@@ -90,7 +90,7 @@ export default {
       assert(store.getState().b === 0, 'store state is cleared')
       assert(store.getState().c === 0, 'store state is cleared')
 
-      recorder.replay(0, function () {
+      recorder.replay(0, () => {
         assert(store.getState().a === 'hello', 'store state is set')
         assert(store.getState().b === 'world', 'store state is set')
         assert(store.getState().c === 'it works', 'store state is set')
@@ -101,5 +101,43 @@ export default {
         done()
       })
     },
+
+    'serialize and deserialize events'() {
+      const recording = recorder.record()
+
+      actions.a('hello')
+      actions.b('world')
+      actions.c('it works')
+
+      recorder.stop()
+
+      assert.equal(store.getState().a, 'hello', 'store state is set')
+      assert.equal(store.getState().b, 'world', 'store state is set')
+      assert.equal(store.getState().c, 'it works', 'store state is set')
+
+      var serialized = recorder.serializeEvents()
+
+      assert.equal(typeof serialized, 'string', 'events were serialized')
+
+      const newRecorder = new DispatcherRecorder(alt)
+
+      assert.equal(newRecorder.events.length, 0, 'events are blank')
+
+      alt.recycle()
+
+      assert.equal(store.getState().a, 0, 'store state is cleared')
+      assert.equal(store.getState().b, 0, 'store state is cleared')
+      assert.equal(store.getState().c, 0, 'store state is cleared')
+
+      newRecorder.loadEvents(serialized)
+
+      assert.equal(newRecorder.events.length, 3, 'events are loaded')
+
+      newRecorder.replay()
+
+      assert.equal(store.getState().a, 'hello', 'store state is set')
+      assert.equal(store.getState().b, 'world', 'store state is set')
+      assert.equal(store.getState().c, 'it works', 'store state is set')
+    }
   }
 }
