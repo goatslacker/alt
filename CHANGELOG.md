@@ -4,33 +4,33 @@
 
 Added:
 
-* `exportPublicMethods` can be used within a store to export public getter methods from the store.
+* `exportPublicMethods` can be used within a store to export public getter methods from the store. [commit](https://github.com/goatslacker/alt/commit/0924093a177eb61b0c448cd7f057cd7499dec8c5)
 
 Other:
 
-* Future spec compliant change of making the derived store class call super before setting `this`.
+* Future spec compliant change of making the derived store class call super before setting `this`. [commit](https://github.com/goatslacker/alt/commit/ae1b7bb4b4466fdf6a95c6e0f1ee7458edefbfb2)
 
 ## 0.14.2
 
 Added:
 
-* Browser builds for bower.
+* Browser builds for bower. [commit](https://github.com/goatslacker/alt/commit/be35c3fce2a86e94e7fbcba421cc8857cf72bcd1)
 
 Changed:
 
-* The store name generator is now more robust.
+* The store name generator is now more robust. [commit](https://github.com/goatslacker/alt/commit/504c3f6cfb226e73f3352f78488831f7b2f1fd8b)
 
 ## 0.14.1
 
 Dependency Update:
 
-* es-symbol has been updated to 1.1.1
+* es-symbol has been updated to 1.1.1 [commit](https://github.com/goatslacker/alt/commit/7a9ea4c0bf6b80b677e130ab67766801614d19e1)
 
 ## 0.14.0
 
 Changed:
 
-* createStore no longer throws when it encounters a store with the same name. Instead if generates a new name for you and warns you in the console. If a store name is not specified due to using anonymous functions then a warning is also logged.
+* createStore no longer throws when it encounters a store with the same name. Instead if generates a new name for you and warns you in the console. If a store name is not specified due to using anonymous functions then a warning is also logged. [commit](https://github.com/goatslacker/alt/commit/48c589f5dfd5e623a3c6ab5b490a44ef319fc9ad)
 
 Other:
 
@@ -38,22 +38,22 @@ Other:
 
 Dependency Update:
 
-* es-symbol has been updated to 1.1.0 for better IE8 compatibility.
+* es-symbol has been updated to 1.1.0 for better IE8 compatibility. [commit](https://github.com/goatslacker/alt/commit/fcc1c91c9c511d527f6d2464b0ea141cdf6e4995)
 
 ## 0.13.11
 
 New:
 
-* Added access to the internal EventEmitter used by the store. This can be access on the store instance by using `getEventEmitter()` and can be used for custom events.
-* Added a setState method for syntactic sugar which sets the state in the instance variables inside your store and then emits a change event.
-* Added emitChange method. No more `this.getInstance().emitChange`, now you can just `this.emitChange()` from inside a store.
-* Added syntactic sugar for waitFor. `waitFor` now takes in a splat or array of stores or dispatch tokens.
-* The `alt` instance now gets passed to the store constructor as well as the actions constructor.
-* ActionListener is a util that allows you to listen in on specific actions. Now it's even more lightweight if you want to listen in on a specific action but don't want the weight of a store. This comes as a util meaning it doesn't increase the size of core alt. Use it if you need it.
+* Added access to the internal EventEmitter used by the store. This can be access on the store instance by using `getEventEmitter()` and can be used for custom events. [commit](https://github.com/goatslacker/alt/commit/0bdb3a9a9eda43f99ebfcf5e127bf6570e045d50)
+* Added a setState method for syntactic sugar which sets the state in the instance variables inside your store and then emits a change event. [commit](https://github.com/goatslacker/alt/commit/6e45ae49d23e83b3e1f67e5ef41295a09d4d097a)
+* Added emitChange method. No more `this.getInstance().emitChange`, now you can just `this.emitChange()` from inside a store. [commit](https://github.com/goatslacker/alt/commit/6e45ae49d23e83b3e1f67e5ef41295a09d4d097a)
+* Added syntactic sugar for waitFor. `waitFor` now takes in a splat or array of stores or dispatch tokens. [commit](https://github.com/goatslacker/alt/commit/05eb61887d2bb9ca54ae73d796743a60e6b127bc)
+* The `alt` instance now gets passed to the store constructor as well as the actions constructor. [commit](https://github.com/goatslacker/alt/commit/f42b43af9afabfb56494015c0be33d9625d30284)
+* ActionListener is a util that allows you to listen in on specific actions. Now it's even more lightweight if you want to listen in on a specific action but don't want the weight of a store. This comes as a util meaning it doesn't increase the size of core alt. Use it if you need it. [commit](https://github.com/goatslacker/alt/commit/ce5ddcac0e40747c6df27b3960961f8cbb854daf)
 
 Fixed:
 
-* addStore now has the `saveStore` parameter as well.
+* addStore now has the `saveStore` parameter as well. [commit](https://github.com/goatslacker/alt/commit/8e654555d9088ba6241ce713dd41234190d2ddf8)
 
 ## 0.13.10
 
@@ -61,7 +61,7 @@ New:
 
 * DispatcherRecorder is a util that allows you to record and replay a series of actions. [commit](https://github.com/goatslacker/alt/commit/834ccf1718ccd6067dadbb286ca0fbbfd5510ecb)
 * FinalStore is a util Store that emits a change once all other stores have emitted. [commit](https://github.com/goatslacker/alt/commit/c104fb73eedd61f4c1dbd4ac074ce8a2f4b818bf)
-* Added a `saveStore` parameter to `alt.createStore`. This parameter controls whether we should save the store internally (for snapshots, bootstraps) or not. Default is true.
+* Added a `saveStore` parameter to `alt.createStore`. This parameter controls whether we should save the store internally (for snapshots, bootstraps) or not. Default is true. [commit](https://github.com/goatslacker/alt/commit/c104fb73eedd61f4c1dbd4ac074ce8a2f4b818bf)
 
 Fixed:
 
