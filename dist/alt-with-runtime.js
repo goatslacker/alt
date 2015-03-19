@@ -514,6 +514,7 @@ var Alt = (function () {
           if (store[LIFECYCLE].rollback) {
             store[LIFECYCLE].rollback();
           }
+          store.emitChange();
         });
       }
     },
@@ -545,6 +546,7 @@ var Alt = (function () {
           if (store[LIFECYCLE].bootstrap) {
             store[LIFECYCLE].bootstrap();
           }
+          store.emitChange();
         });
       }
     },
