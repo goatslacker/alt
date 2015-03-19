@@ -29,7 +29,7 @@ The listen method takes a function which will be called when the store emits a c
 
 ```js
 MyStore.listen(function (state) {
-  console.log(MyStore.getState() === state);
+  assert.deepEqual(MyStore.getState(), state);
 });
 ```
 
