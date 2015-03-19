@@ -8,6 +8,7 @@ Your patch should adhere to these guidelines:
 
 * The [coding style](#coding-style) is similar.
 * All tests should pass `npm test` and coverage should remain at 100% `npm run coverage`.
+* No linting errors are present `npm run lint`.
 * The commit history is clean (no merge commits).
 * We thank you for your patch.
 
@@ -32,7 +33,7 @@ We use [EditorConfig](http://editorconfig.org/) for basics and encourage you
 to install its plugin on your text editor of choice. This will get you 25% of
 the way there.
 
-The only hard-line rule is that the code should look uniform. We losely follow
+The only hard-line rule is that the code should look uniform. We loosely follow
 the [Airbnb JS style guide](https://github.com/airbnb/javascript) with a few
 notable exceptions.
 
