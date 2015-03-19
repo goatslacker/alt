@@ -1007,12 +1007,12 @@ var snapshot = function (instance) {
   }
 
   var stores = storeNames.length ? storeNames : Object.keys(instance.stores);
-  return JSON.stringify(stores.reduce(function (obj, key) {
+  return stores.reduce(function (obj, key) {
     var store = instance.stores[key];
     var customSnapshot = store[LIFECYCLE].serialize && store[LIFECYCLE].serialize();
     obj[key] = customSnapshot ? customSnapshot : store.getState();
     return obj;
-  }, {}));
+  }, {});
 };
 
 var saveInitialSnapshot = function (instance, key) {
@@ -1020,6 +1020,7 @@ var saveInitialSnapshot = function (instance, key) {
   var initial = JSON.parse(instance[INIT_SNAPSHOT]);
   initial[key] = state;
   instance[INIT_SNAPSHOT] = JSON.stringify(initial);
+  instance[LAST_SNAPSHOT] = instance[INIT_SNAPSHOT];
 };
 
 var filterSnapshotOfStores = function (serializedSnapshot, storeNames) {
@@ -1261,12 +1262,8 @@ var Alt = (function () {
         }
 
         var state = snapshot.apply(undefined, [this].concat(storeNames));
-        if (this[LAST_SNAPSHOT]) {
-          this[LAST_SNAPSHOT] = JSON.stringify(assign(JSON.parse(this[LAST_SNAPSHOT]), JSON.parse(state)));
-        } else {
-          this[LAST_SNAPSHOT] = state;
-        }
-        return state;
+        this[LAST_SNAPSHOT] = JSON.stringify(assign(JSON.parse(this[LAST_SNAPSHOT]), state));
+        return JSON.stringify(state);
       }
     },
     rollback: {
@@ -1296,7 +1293,7 @@ var Alt = (function () {
     },
     flush: {
       value: function flush() {
-        var state = snapshot(this);
+        var state = JSON.stringify(snapshot(this));
         this.recycle();
         return state;
       }
