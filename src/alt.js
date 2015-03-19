@@ -8,6 +8,7 @@ import assign from 'object-assign'
 const ACTION_HANDLER = Symbol('action creator handler')
 const ACTION_KEY = Symbol('holds the actions uid symbol for listening')
 const ACTION_UID = Symbol('the actions uid name')
+const ALL_LISTENERS = Symbol('name of listeners')
 const EE = Symbol('event emitter instance')
 const INIT_SNAPSHOT = Symbol('init snapshot storage')
 const LAST_SNAPSHOT = Symbol('last snapshot storage')
@@ -51,10 +52,15 @@ const getInternalMethods = (obj, excluded) => {
 }
 
 class AltStore {
-  constructor(dispatcher, model, state) {
+  constructor(dispatcher, model, state, StoreModel) {
     this[EE] = new EventEmitter()
     this[LIFECYCLE] = {}
     this[STATE_CONTAINER] = state || model
+
+    this.listenerNames = model[ALL_LISTENERS]
+    this.StoreModel = typeof StoreModel === 'function'
+      ? StoreModel
+      : assign({}, StoreModel)
 
     assign(this[LIFECYCLE], model[LIFECYCLE])
     assign(this, model[PUBLIC_METHODS])
@@ -132,11 +138,9 @@ const StoreMixinListeners = {
     }
 
     // You can pass in the constant or the function itself
-    if (symbol[ACTION_KEY]) {
-      this[LISTENERS][symbol[ACTION_KEY]] = handler.bind(this)
-    } else {
-      this[LISTENERS][symbol] = handler.bind(this)
-    }
+    const key = symbol[ACTION_KEY] ? symbol[ACTION_KEY] : symbol
+    this[LISTENERS][key] = handler.bind(this)
+    this[ALL_LISTENERS].push(Symbol.keyFor(key))
   },
 
   bindActions(actions) {
@@ -273,6 +277,7 @@ const createStoreFromObject = (alt, StoreModel, key, saveStore) => {
   let storeInstance
 
   const StoreProto = {}
+  StoreProto[ALL_LISTENERS] = []
   StoreProto[LIFECYCLE] = {}
   StoreProto[LISTENERS] = {}
 
@@ -306,7 +311,7 @@ const createStoreFromObject = (alt, StoreModel, key, saveStore) => {
 
   // create the instance and assign the public methods to the instance
   storeInstance = assign(
-    new AltStore(alt.dispatcher, StoreProto, StoreProto.state),
+    new AltStore(alt.dispatcher, StoreProto, StoreProto.state, StoreModel),
     StoreProto.publicMethods
   )
 
@@ -378,6 +383,7 @@ class Alt {
       }
     })
 
+    Store.prototype[ALL_LISTENERS] = []
     Store.prototype[LIFECYCLE] = {}
     Store.prototype[LISTENERS] = {}
     Store.prototype[PUBLIC_METHODS] = {}
@@ -385,7 +391,7 @@ class Alt {
     const store = new Store(this)
 
     storeInstance = assign(
-      new AltStore(this.dispatcher, store),
+      new AltStore(this.dispatcher, store, null, StoreModel),
       getInternalMethods(StoreModel, builtIns)
     )
 
