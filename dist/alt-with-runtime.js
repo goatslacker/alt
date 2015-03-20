@@ -9,6 +9,7 @@ var assign = babelHelpers.interopRequire(require("object-assign"));
 var ACTION_HANDLER = Symbol("action creator handler");
 var ACTION_KEY = Symbol("holds the actions uid symbol for listening");
 var ACTION_UID = Symbol("the actions uid name");
+var ALL_LISTENERS = Symbol("name of listeners");
 var EE = Symbol("event emitter instance");
 var INIT_SNAPSHOT = Symbol("init snapshot storage");
 var LAST_SNAPSHOT = Symbol("last snapshot storage");
@@ -52,7 +53,7 @@ var getInternalMethods = function (obj, excluded) {
 };
 
 var AltStore = (function () {
-  function AltStore(dispatcher, model, state) {
+  function AltStore(dispatcher, model, state, StoreModel) {
     var _this8 = this;
 
     babelHelpers.classCallCheck(this, AltStore);
@@ -60,6 +61,12 @@ var AltStore = (function () {
     this[EE] = new EventEmitter();
     this[LIFECYCLE] = {};
     this[STATE_CONTAINER] = state || model;
+
+    this.boundListeners = model[ALL_LISTENERS];
+    this.StoreModel = StoreModel;
+    if (typeof this.StoreModel === "object") {
+      this.StoreModel.state = assign({}, StoreModel.state);
+    }
 
     assign(this[LIFECYCLE], model[LIFECYCLE]);
     assign(this, model[PUBLIC_METHODS]);
@@ -148,11 +155,9 @@ var StoreMixinListeners = {
     }
 
     // You can pass in the constant or the function itself
-    if (symbol[ACTION_KEY]) {
-      this[LISTENERS][symbol[ACTION_KEY]] = handler.bind(this);
-    } else {
-      this[LISTENERS][symbol] = handler.bind(this);
-    }
+    var key = symbol[ACTION_KEY] ? symbol[ACTION_KEY] : symbol;
+    this[LISTENERS][key] = handler.bind(this);
+    this[ALL_LISTENERS].push(Symbol.keyFor(key));
   },
 
   bindActions: function bindActions(actions) {
@@ -294,6 +299,7 @@ var createStoreFromObject = function (alt, StoreModel, key, saveStore) {
   var storeInstance = undefined;
 
   var StoreProto = {};
+  StoreProto[ALL_LISTENERS] = [];
   StoreProto[LIFECYCLE] = {};
   StoreProto[LISTENERS] = {};
 
@@ -328,7 +334,7 @@ var createStoreFromObject = function (alt, StoreModel, key, saveStore) {
   }
 
   // create the instance and assign the public methods to the instance
-  storeInstance = assign(new AltStore(alt.dispatcher, StoreProto, StoreProto.state), StoreProto.publicMethods);
+  storeInstance = assign(new AltStore(alt.dispatcher, StoreProto, StoreProto.state, StoreModel), StoreProto.publicMethods);
 
   /* istanbul ignore else */
   if (saveStore) {
@@ -410,13 +416,14 @@ var Alt = (function () {
           }
         });
 
+        Store.prototype[ALL_LISTENERS] = [];
         Store.prototype[LIFECYCLE] = {};
         Store.prototype[LISTENERS] = {};
         Store.prototype[PUBLIC_METHODS] = {};
 
         var store = new Store(this);
 
-        storeInstance = assign(new AltStore(this.dispatcher, store), getInternalMethods(StoreModel, builtIns));
+        storeInstance = assign(new AltStore(this.dispatcher, store, null, StoreModel), getInternalMethods(StoreModel, builtIns));
 
         if (saveStore) {
           this.stores[key] = storeInstance;
