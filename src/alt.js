@@ -241,14 +241,12 @@ const setAppState = (instance, data, onStore) => {
 
 const snapshot = (instance, ...storeNames) => {
   const stores = storeNames.length ? storeNames : Object.keys(instance.stores)
-  return JSON.stringify(
-    stores.reduce((obj, key) => {
-      const store = instance.stores[key]
-      const customSnapshot = store[LIFECYCLE].serialize && store[LIFECYCLE].serialize()
-      obj[key] = customSnapshot ? customSnapshot : store.getState()
-      return obj
-    }, {})
-  )
+  return stores.reduce((obj, key) => {
+    const store = instance.stores[key]
+    const customSnapshot = store[LIFECYCLE].serialize && store[LIFECYCLE].serialize()
+    obj[key] = customSnapshot ? customSnapshot : store.getState()
+    return obj
+  }, {})
 }
 
 const saveInitialSnapshot = (instance, key) => {
@@ -256,6 +254,7 @@ const saveInitialSnapshot = (instance, key) => {
   const initial = JSON.parse(instance[INIT_SNAPSHOT])
   initial[key] = state
   instance[INIT_SNAPSHOT] = JSON.stringify(initial)
+  instance[LAST_SNAPSHOT] = instance[INIT_SNAPSHOT]
 }
 
 const filterSnapshotOfStores = (serializedSnapshot, storeNames) => {
@@ -459,12 +458,10 @@ class Alt {
 
   takeSnapshot(...storeNames) {
     const state = snapshot(this, ...storeNames)
-    if (this[LAST_SNAPSHOT]) {
-      assign(this[LAST_SNAPSHOT], state)
-    } else {
-      this[LAST_SNAPSHOT] = state
-    }
-    return state
+    this[LAST_SNAPSHOT] = JSON.stringify(
+      assign(JSON.parse(this[LAST_SNAPSHOT]), state)
+    )
+    return JSON.stringify(state)
   }
 
   rollback() {
@@ -489,7 +486,7 @@ class Alt {
   }
 
   flush() {
-    const state = snapshot(this)
+    const state = JSON.stringify(snapshot(this))
     this.recycle()
     return state
   }
