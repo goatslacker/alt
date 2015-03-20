@@ -57,10 +57,11 @@ class AltStore {
     this[LIFECYCLE] = {}
     this[STATE_CONTAINER] = state || model
 
-    this.listenerNames = model[ALL_LISTENERS]
-    this.StoreModel = typeof StoreModel === 'function'
-      ? StoreModel
-      : assign({}, StoreModel)
+    this.boundListeners = model[ALL_LISTENERS]
+    this.StoreModel = StoreModel
+    if (typeof this.StoreModel === 'object') {
+      this.StoreModel.state = assign({}, StoreModel.state)
+    }
 
     assign(this[LIFECYCLE], model[LIFECYCLE])
     assign(this, model[PUBLIC_METHODS])
