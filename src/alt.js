@@ -324,8 +324,7 @@ class Alt {
     this.dispatcher = new Dispatcher()
     this.actions = {}
     this.stores = {}
-    this[INIT_SNAPSHOT] = '{}'
-    this[LAST_SNAPSHOT] = this[INIT_SNAPSHOT]
+    this[LAST_SNAPSHOT] = this[INIT_SNAPSHOT] = '{}'
   }
 
   dispatch(action, data) {

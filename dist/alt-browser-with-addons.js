@@ -1343,8 +1343,7 @@ var Alt = (function () {
     this.dispatcher = new Dispatcher();
     this.actions = {};
     this.stores = {};
-    this[INIT_SNAPSHOT] = "{}";
-    this[LAST_SNAPSHOT] = this[INIT_SNAPSHOT];
+    this[LAST_SNAPSHOT] = this[INIT_SNAPSHOT] = "{}";
   }
 
   _createClass(Alt, {
