@@ -1130,18 +1130,18 @@ var Alt = (function () {
         var storeInstance = undefined;
         var key = iden || StoreModel.name || StoreModel.displayName || "";
 
-        if (saveStore && (this.stores[key] || !key)) {
-          /* istanbul ignore else */
-          if (typeof console !== "undefined") {
-            if (this.stores[key]) {
-              console.warn(new ReferenceError("A store named " + key + " already exists, double check your store " + "names or pass in your own custom identifier for each store"));
-            } else {
-              console.warn(new ReferenceError("Store name was not specified"));
-            }
+        /* istanbul ignore else */
+        if (typeof console !== "undefined") {
+          if (saveStore && !key) {
+            console.warn("Store name was not specified");
           }
 
-          key = uid(this.stores, key);
+          if (saveStore && this.stores[key] && StoreModel !== this.stores[key].StoreModel) {
+            console.warn("A store named " + key + " already exists, double check your store " + "names or pass in your own custom identifier for each store");
+          }
         }
+
+        key = this.stores[key] && StoreModel === this.stores[key].StoreModel ? key : uid(this.stores, key);
 
         if (typeof StoreModel === "object") {
           return createStoreFromObject(this, StoreModel, key, saveStore);
@@ -1203,7 +1203,9 @@ var Alt = (function () {
         }
 
         return this.createActions(function () {
-          this.generateActions.apply(this, actionNames);
+          var _ref;
+
+          (_ref = this).generateActions.apply(_ref, actionNames);
         });
       }
     },

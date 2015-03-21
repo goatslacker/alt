@@ -1,5 +1,6 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.Alt = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
+
 /**
  * This mixin lets you setup your listeners. It is similar to Fluxible's mixin.
  *
@@ -79,6 +80,7 @@ module.exports = FluxyMixin;
 
 },{"./Subscribe":4}],2:[function(require,module,exports){
 "use strict";
+
 var Subscribe = require("./Subscribe");
 
 var ListenerMixin = {
@@ -109,6 +111,7 @@ module.exports = ListenerMixin;
 
 },{"./Subscribe":4}],3:[function(require,module,exports){
 "use strict";
+
 /**
  * This mixin automatically sets the state for you based on the key you provide
  *
@@ -190,6 +193,7 @@ module.exports = ReactStateMagicMixin;
 
 },{"./Subscribe":4}],4:[function(require,module,exports){
 "use strict";
+
 var Symbol = require("es-symbol");
 var MIXIN_REGISTRY = Symbol("alt store listeners");
 
@@ -1382,18 +1386,18 @@ var Alt = (function () {
         var storeInstance = undefined;
         var key = iden || StoreModel.name || StoreModel.displayName || "";
 
-        if (saveStore && (this.stores[key] || !key)) {
-          /* istanbul ignore else */
-          if (typeof console !== "undefined") {
-            if (this.stores[key]) {
-              console.warn(new ReferenceError("A store named " + key + " already exists, double check your store " + "names or pass in your own custom identifier for each store"));
-            } else {
-              console.warn(new ReferenceError("Store name was not specified"));
-            }
+        /* istanbul ignore else */
+        if (typeof console !== "undefined") {
+          if (saveStore && !key) {
+            console.warn("Store name was not specified");
           }
 
-          key = uid(this.stores, key);
+          if (saveStore && this.stores[key] && StoreModel !== this.stores[key].StoreModel) {
+            console.warn("A store named " + key + " already exists, double check your store " + "names or pass in your own custom identifier for each store");
+          }
         }
+
+        key = this.stores[key] && StoreModel === this.stores[key].StoreModel ? key : uid(this.stores, key);
 
         if (typeof StoreModel === "object") {
           return createStoreFromObject(this, StoreModel, key, saveStore);
@@ -1455,7 +1459,9 @@ var Alt = (function () {
         }
 
         return this.createActions(function () {
-          this.generateActions.apply(this, actionNames);
+          var _ref;
+
+          (_ref = this).generateActions.apply(_ref, actionNames);
         });
       }
     },
@@ -1616,6 +1622,7 @@ module.exports = Alt;
 
 },{"es-symbol":5,"eventemitter3":6,"flux":7,"object-assign":10}],13:[function(require,module,exports){
 "use strict";
+
 /**
  * ActionListeners(alt: AltInstance): ActionListenersInstance
  *
@@ -1678,6 +1685,7 @@ ActionListeners.prototype.removeAllActionListeners = function () {
 
 },{"es-symbol":5}],14:[function(require,module,exports){
 "use strict";
+
 /**
  * DispatcherRecorder(alt: AltInstance): DispatcherInstance
  *
@@ -1813,6 +1821,7 @@ DispatcherRecorder.prototype.loadEvents = function (events) {
 
 },{"es-symbol":5}],15:[function(require,module,exports){
 "use strict";
+
 /**
  * makeFinalStore(alt: AltInstance): AltStore
  *
