@@ -8,7 +8,7 @@ require 'fileutils'
 task :default => :watch
 
 GITHUB_REPONAME = 'alt'
-GITHUB_BRANCH = 'gh-pages-test'
+GITHUB_BRANCH = 'gh-pages'
 GITHUB_USER = 'goatslacker'
 
 # rake build
