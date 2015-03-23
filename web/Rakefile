@@ -15,6 +15,7 @@ GITHUB_USER = 'goatslacker'
 desc 'Build the site'
 task :build do
   clean_and_copy_docs
+  clean_and_copy_guide
   system 'jekyll build'
 end
 
@@ -22,6 +23,7 @@ end
 desc 'Serve and watch the site'
 task :watch do
   clean_and_copy_docs
+  clean_and_copy_guide
   system 'jekyll serve --watch'
 end
 
@@ -64,6 +66,12 @@ def clean_and_copy_docs
   system 'rm -rf docs/'
   system 'cp -r ../docs .'
   format_markdown_links('docs')
+end
+
+def clean_and_copy_guide
+  system 'rm -rf guide/'
+  system 'cp -r ../guide .'
+  format_markdown_links('guide')
 end
 
 def format_markdown_links(dir)
