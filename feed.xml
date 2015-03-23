@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Alt</title>
+    <description>A library for managing data within JavaScript applications. Alt is a pure flux implementation that is small, terse, well tested, extremely flexible, and forward thinking.
+</description>
+    <link>https://goatslacker.github.io/alt/</link>
+    <atom:link href="https://goatslacker.github.io/alt/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Sun, 22 Mar 2015 23:13:44 -0700</pubDate>
+    <lastBuildDate>Sun, 22 Mar 2015 23:13:44 -0700</lastBuildDate>
+    <generator>Jekyll v2.5.3</generator>
+    
+      <item>
+        <title>How to convert flux to alt</title>
+        <description>&lt;p&gt;This is a commit-by-commit tutorial on how to convert your flux-style code into alt. Why alt? because it’s a nice and terse implementation of flux, and it allows us to write in ES6.&lt;/p&gt;
+
+&lt;p&gt;This is not an introduction to flux, you should already be familiar with flux. Alt knowledge is not necessary. I assume you’re familiar with some ES6 although the syntax used isn’t exotic by any means.&lt;/p&gt;
+
+&lt;p&gt;Spoiler alert: there aren’t many steps, alt is flux. We’ll mostly be deleting code.&lt;/p&gt;
+
+&lt;p&gt;In this small tutorial we’ll be converting the &lt;code&gt;flux-chat&lt;/code&gt; application from flux to alt. As we go along I’ll be providing links to a github commit so you can read through the code.&lt;/p&gt;
+
+&lt;p&gt;Let’s get to it, first, lets import the chat application. This is just a copy of the code.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;cp -R ~/flux/examples/flux-chat .
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Full commit is here: &lt;a href=&quot;https://github.com/goatslacker/alt/commit/1a54de1064fe5bd252979380e47b0409d1306773&quot;&gt;Importing the chat project&lt;/a&gt;.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Next is my favorite part, deleting code.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-bash&quot;&gt;rm js/constants/ChatConstants.js
+rm js/dispatcher/ChatAppDispatcher.js
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We’re not going to need the constants since alt creates them for you. We also won’t need the dispatcher since alt’s actions work as a dispatcher.&lt;/p&gt;
+
+&lt;p&gt;We will also add in an &lt;code&gt;alt.js&lt;/code&gt; file, this will set up our alt instance that we’ll later use to create our stores and actions.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;// js/alt.js
+
+var Alt = require(&#39;alt&#39;);
+module.exports = new Alt();
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Full commit is here: &lt;a href=&quot;https://github.com/goatslacker/alt/commit/75ffdb53420dc32bdc2d99b5cf534cd0949331d8&quot;&gt;Adding alt and removing boilerplate&lt;/a&gt;.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Now it’s time to convert the actions into alt style actions&lt;/p&gt;
+
+&lt;p&gt;Since the actions act as a dispatcher and the flux action creators were nothing more than thin wrappers around the dispatcher we can just dispatch directly.&lt;/p&gt;
+
+&lt;p&gt;Code in flux like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;clickThread: function(threadID) {
+  ChatAppDispatcher.handleViewAction({
+    type: ActionTypes.CLICK_THREAD,
+    threadID: threadID
+  });
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;becomes something like this in alt:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;clickThread: function(threadID) {
+  this.dispatch(threadID)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Having a function that wraps &lt;code&gt;this.dispatch&lt;/code&gt; is kind of silly. If you don’t need to do anything else in your action, meaning your action just passes through a value, you can use alt’s &lt;code&gt;generateActions&lt;/code&gt; shorthand in the constructor.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;// js/actions/ChatThreadActionCreators.js
+
+class ChatThreadActions {
+  constructor() {
+    this.generateActions(&#39;clickThread&#39;);
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This will generate a &lt;code&gt;clickThread&lt;/code&gt; action which passes through its parameters.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;ChatThreadActions.clickThread(1); // passes through 1
+ChatThreadActions.clickThread(1, 2); // passes through [1, 2]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can go ahead and convert the next set of actions in &lt;code&gt;js/actions/ChatServerActionCreators.js&lt;/code&gt; the same way.&lt;/p&gt;
+
+&lt;p&gt;One difference we can note in &lt;code&gt;ChatServerActionCreators&lt;/code&gt; is the use of &lt;code&gt;ChatAppDispatcher.handleServerAction&lt;/code&gt; vs &lt;code&gt;ChatAppDispatcher.handleViewAction&lt;/code&gt;. In alt, since we don’t write our own dispatcher, having separate actions for events is a little different. If you must know the source of an action or wish to have different behavior depending on where the action originates from you have two options:&lt;/p&gt;
+
+&lt;p&gt;Dispatch an Object containing the source or some sort of identifier.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;receiveAll: function(rawMessages) {
+  this.dispatch({
+    source: &#39;server-action&#39;,
+    data: rawMessages
+  });
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Perform the steps necessary in the action itself.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;receiveAll: function(rawMessages) {
+  // do things with rawMessages here
+  log.debug(rawMessages);
+
+  this.dispatch(rawMessages);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Finally, let’s convert &lt;code&gt;js/actions/ChatMessageActionCreators.js&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;This action depends on &lt;code&gt;MessageStore&lt;/code&gt; to &lt;code&gt;getCreatedMessageData()&lt;/code&gt; but &lt;code&gt;MessageStore&lt;/code&gt; will later need to depend on these actions to listen to them. So we don’t create a circular dependency we can abstract &lt;code&gt;getCreatedMessageData&lt;/code&gt; to a util.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;var ChatWebAPIUtils = require(&#39;../utils/ChatWebAPIUtils&#39;);
+var ChatMessageDataUtils = require(&#39;../utils/ChatMessageDataUtils&#39;);
+
+class ChatMessageActions {
+  createMessage(text) {
+    this.dispatch(text);
+
+    var message = ChatMessageDataUtils.getCreatedMessageData(text);
+    ChatWebAPIUtils.createMessage(message);
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Full commits are here: &lt;a href=&quot;https://github.com/goatslacker/alt/commit/6f8cf22ba6b36c6ae91a794fad75473c9436b683&quot;&gt;Converting some actions&lt;/a&gt; and &lt;a href=&quot;https://github.com/goatslacker/alt/commit/58ea1418ecd2af25b578cd0f4b77c3d4d8631518&quot;&gt;the last action&lt;/a&gt;.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Now things get interesting. Converting stores is fairly straightforward but since stores are the most complicated piece of flux they’ll need a bit more effort.&lt;/p&gt;
+
+&lt;p&gt;The basic logistics, if you’ve followed a traditional flux implementation, are:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;You’ll be moving your outside private state into your store as part of &lt;code&gt;this&lt;/code&gt; (don’t worry it’ll still be private)&lt;/li&gt;
+  &lt;li&gt;You can get rid of the dispatcher with the massive switch statement converting each case into a specific method&lt;/li&gt;
+  &lt;li&gt;Setup how you’ll listen to which actions&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I’ll talk about one store here and just link to the rest. Let’s talk &lt;code&gt;MessageStore&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;MessageStore’s dispatcher has three main actions it responds to &lt;code&gt;CLICK_THREAD&lt;/code&gt;, &lt;code&gt;CREATE_MESSAGE&lt;/code&gt;, &lt;code&gt;RECEIVE_RAW_MESSAGES&lt;/code&gt;.&lt;br /&gt;
+clickThread comes from the &lt;code&gt;ChatThreadActions&lt;/code&gt;, createMessage from &lt;code&gt;ChatMessageActions&lt;/code&gt;, and receiveRawMessages is actually named receiveAll and exists in &lt;code&gt;ChatServerActions&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;We’ll need to setup a listener for all these actions and then do something with the payload. Setting up a listener is simple. You set the listener up in the constructor of your store’s class via this method &lt;code&gt;bindActions&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;class MessageStore {
+  constructor() {
+    this.bindActions(ChatMessageActions);
+    this.bindActions(ChatServerActions);
+    this.bindActions(ChatThreadActions);
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Passing the entire actions into bindActions sets up the ability to listen to all actions provided. Or, you can cherry pick the actions you listen to via the method &lt;code&gt;bindAction&lt;/code&gt;. You can use that method like so &lt;code&gt;this.bindAction(ChatMessageActions.CREATE_MESSAGE)&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Setting up an action handler is also intuitive. You’ll create a method with the same name or prefixed with &lt;code&gt;on&lt;/code&gt; in the store’s class. So acting on clickThread we would do something like&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;class MessageStore {
+  constructor() {
+    this.bindActions(ChatMessageActions);
+  }
+
+  // this is fine
+  createMessage() {
+  }
+
+  // this is ok too, but you should pick one or the other
+  onCreateMessage() {
+  }
+
+  // this will not work, why are you doing this
+  CREATE_MESSAGE() {
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If you do happen to have conflicting action names alt will let you know with a nice warm thrown &lt;code&gt;ReferenceError&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;For creating a message the MessageStore was modifying a private set of messages which were represented by an Object. We can actually move that to the constructor now and then access it in the class itself when handling the action.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;class MessageStore {
+  constructor() {
+    this.bindActions(ChatMessageActions);
+
+    this.messages = {};
+  }
+
+  onCreateMessage(text) {
+    // our ChatMessageDataUtils from before
+    var message = ChatMessageDataUtils.getCreatedMessageData(text);
+
+    // we can modify this.messages directly
+    this.messages[message.id] = message;
+
+    // we don&#39;t need to emit, stores automatically emit by default unless
+    // they&#39;re told not to if you return false.
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The rest follows the same process.&lt;/p&gt;
+
+&lt;p&gt;Full commits are here: Converting the stores &lt;a href=&quot;https://github.com/goatslacker/alt/commit/f4c7bb4bb9027b53c380f98ed99a2e1b6ba5fa0b&quot;&gt;MessageStore&lt;/a&gt;, &lt;a href=&quot;https://github.com/goatslacker/alt/commit/bce2aadbb52981f934b4281b3a6244d4f2c4a7a9&quot;&gt;ThreadStore&lt;/a&gt;, and &lt;a href=&quot;https://github.com/goatslacker/alt/commit/0129baa5bd505ef26228e30cfa15a6ac4503a22d&quot;&gt;UnreadThreadStore&lt;/a&gt;.&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;Last, we apply some finishing touches.&lt;/p&gt;
+
+&lt;p&gt;We need to change the listeners in the React components. Flux uses a make-your-own-listeners approach and the example provided uses &lt;code&gt;addChangeListener&lt;/code&gt;. Alt stores come with their own listener register and calls that method &lt;code&gt;listenTo&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Full commit here: &lt;a href=&quot;https://github.com/goatslacker/alt/commit/e05a4e02f3f13831361136a21cd757416b69b4d8&quot;&gt;Finishing touches&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;All done. Converting the tests are a challenge I’ll leave up to you. If you have any questions feel free to open an &lt;a href=&quot;https://github.com/goatslacker/alt/issues&quot;&gt;issue at alt&lt;/a&gt;, or ping me &lt;a href=&quot;https://twitter.com/goatslacker&quot;&gt;@goatslacker&lt;/a&gt;.&lt;/p&gt;
+</description>
+        <pubDate>Thu, 22 Jan 2015 00:00:00 -0800</pubDate>
+        <link>https://goatslacker.github.io/alt/2015/01/22/how-to-convert-flux-to-alt.html</link>
+        <guid isPermaLink="true">https://goatslacker.github.io/alt/2015/01/22/how-to-convert-flux-to-alt.html</guid>
+        
+        <category>alt</category>
+        
+        <category>flux</category>
+        
+        <category>javascript</category>
+        
+        <category>es6</category>
+        
+        <category>react</category>
+        
+        
+      </item>
+    
+  </channel>
+</rss>

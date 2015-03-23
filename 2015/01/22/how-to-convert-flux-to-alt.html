@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>How to convert flux to alt</title>
+  <meta name="description" content="This is a commit-by-commit tutorial on how to convert your flux-style code into alt. Why alt? because it’s a nice and terse implementation of flux, and it al...">
+
+  <link rel="canonical" href="https://goatslacker.github.io/alt/2015/01/22/how-to-convert-flux-to-alt.html">
+  <link rel="alternate" type="application/rss+xml" title="Alt" href="https://goatslacker.github.io/alt/feed.xml" />
+
+  <link type="text/css" rel="stylesheet" href="/assets/lotus.min.css" />
+  <link type="text/css" rel="stylesheet" href="/assets/prism.min.css" />
+  <link type="text/css" rel="stylesheet" href="/assets/styles.css" />
+</head>
+
+
+  <body>
+
+    
+<header class="sp-horiz-lg">
+  <div class="row">
+    <div class="col c2">
+      <a href="/"><img class="logo" src="/assets/alt.png" alt="Alt" width="40" /></a>
+    </div>
+    <div class="col c10">
+      <nav class="txt-light txt-right pure-menu pure-menu-horizontal">
+        <ul class="pure-menu-list">
+          <li class="pure-menu-item"><a href="/guide/" class="pure-menu-link">Getting Started</a></li>
+          <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+            <a href="/docs/" id="menuLink1" class="pure-menu-link">API Documentation</a>
+            <ul class="pure-menu-children">
+              
+              <li class="pure-menu-item">
+                <a href="/docs/createActions" class="pure-menu-link">Creating Actions</a>
+              </li>
+              
+              <li class="pure-menu-item">
+                <a href="/docs/actions" class="pure-menu-link">Actions</a>
+              </li>
+              
+              <li class="pure-menu-item">
+                <a href="/docs/createStore" class="pure-menu-link">Creating Stores</a>
+              </li>
+              
+              <li class="pure-menu-item">
+                <a href="/docs/stores" class="pure-menu-link">Stores</a>
+              </li>
+              
+              <li class="pure-menu-item">
+                <a href="/docs/lifecycleListeners" class="pure-menu-link">Lifecycle Listeners</a>
+              </li>
+              
+              <li class="pure-menu-item">
+                <a href="/docs/bootstrap" class="pure-menu-link">Bootstrap</a>
+              </li>
+              
+              <li class="pure-menu-item">
+                <a href="/docs/takeSnapshot" class="pure-menu-link">Take Snapshot</a>
+              </li>
+              
+              <li class="pure-menu-item">
+                <a href="/docs/flush" class="pure-menu-link">Flush</a>
+              </li>
+              
+              <li class="pure-menu-item">
+                <a href="/docs/recycle" class="pure-menu-link">Recycle</a>
+              </li>
+              
+              <li class="pure-menu-item">
+                <a href="/docs/rollback" class="pure-menu-link">Rollback</a>
+              </li>
+              
+              <li class="pure-menu-item">
+                <a href="/docs/altInstances" class="pure-menu-link">Alt Instances</a>
+              </li>
+              
+            </ul>
+          </li>
+          <li class="pure-menu-item">
+            <a href="/blog/">Blog</a>
+          </li>
+          <li class="pure-menu-item">
+            <a href="https://gitter.im/goatslacker/alt">Support</a>
+          </li>
+          <li class="pure-menu-item">
+            <a href="https://github.com/goatslacker/alt">GitHub</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+
+
+    <div>
+      <div class="sp-vert-sm"></div>
+
+<div class="txt-center sp-horiz-lg">
+  <h1 class="txt-light">How to convert flux to alt</h1>
+  <p class="txt-light">Jan 22, 2015</p>
+</div>
+
+<article class="sp-lg">
+  <p>This is a commit-by-commit tutorial on how to convert your flux-style code into alt. Why alt? because it’s a nice and terse implementation of flux, and it allows us to write in ES6.</p>
+
+<p>This is not an introduction to flux, you should already be familiar with flux. Alt knowledge is not necessary. I assume you’re familiar with some ES6 although the syntax used isn’t exotic by any means.</p>
+
+<p>Spoiler alert: there aren’t many steps, alt is flux. We’ll mostly be deleting code.</p>
+
+<p>In this small tutorial we’ll be converting the <code>flux-chat</code> application from flux to alt. As we go along I’ll be providing links to a github commit so you can read through the code.</p>
+
+<p>Let’s get to it, first, lets import the chat application. This is just a copy of the code.</p>
+
+<pre><code class="language-bash">cp -R ~/flux/examples/flux-chat .
+</code></pre>
+
+<p>Full commit is here: <a href="https://github.com/goatslacker/alt/commit/1a54de1064fe5bd252979380e47b0409d1306773">Importing the chat project</a>.</p>
+
+<hr />
+
+<p>Next is my favorite part, deleting code.</p>
+
+<pre><code class="language-bash">rm js/constants/ChatConstants.js
+rm js/dispatcher/ChatAppDispatcher.js
+</code></pre>
+
+<p>We’re not going to need the constants since alt creates them for you. We also won’t need the dispatcher since alt’s actions work as a dispatcher.</p>
+
+<p>We will also add in an <code>alt.js</code> file, this will set up our alt instance that we’ll later use to create our stores and actions.</p>
+
+<pre><code class="language-js">// js/alt.js
+
+var Alt = require('alt');
+module.exports = new Alt();
+</code></pre>
+
+<p>Full commit is here: <a href="https://github.com/goatslacker/alt/commit/75ffdb53420dc32bdc2d99b5cf534cd0949331d8">Adding alt and removing boilerplate</a>.</p>
+
+<hr />
+
+<p>Now it’s time to convert the actions into alt style actions</p>
+
+<p>Since the actions act as a dispatcher and the flux action creators were nothing more than thin wrappers around the dispatcher we can just dispatch directly.</p>
+
+<p>Code in flux like this:</p>
+
+<pre><code class="language-js">clickThread: function(threadID) {
+  ChatAppDispatcher.handleViewAction({
+    type: ActionTypes.CLICK_THREAD,
+    threadID: threadID
+  });
+}
+</code></pre>
+
+<p>becomes something like this in alt:</p>
+
+<pre><code class="language-js">clickThread: function(threadID) {
+  this.dispatch(threadID)
+}
+</code></pre>
+
+<p>Having a function that wraps <code>this.dispatch</code> is kind of silly. If you don’t need to do anything else in your action, meaning your action just passes through a value, you can use alt’s <code>generateActions</code> shorthand in the constructor.</p>
+
+<pre><code class="language-js">// js/actions/ChatThreadActionCreators.js
+
+class ChatThreadActions {
+  constructor() {
+    this.generateActions('clickThread');
+  }
+}
+</code></pre>
+
+<p>This will generate a <code>clickThread</code> action which passes through its parameters.</p>
+
+<pre><code class="language-js">ChatThreadActions.clickThread(1); // passes through 1
+ChatThreadActions.clickThread(1, 2); // passes through [1, 2]
+</code></pre>
+
+<p>We can go ahead and convert the next set of actions in <code>js/actions/ChatServerActionCreators.js</code> the same way.</p>
+
+<p>One difference we can note in <code>ChatServerActionCreators</code> is the use of <code>ChatAppDispatcher.handleServerAction</code> vs <code>ChatAppDispatcher.handleViewAction</code>. In alt, since we don’t write our own dispatcher, having separate actions for events is a little different. If you must know the source of an action or wish to have different behavior depending on where the action originates from you have two options:</p>
+
+<p>Dispatch an Object containing the source or some sort of identifier.</p>
+
+<pre><code class="language-js">receiveAll: function(rawMessages) {
+  this.dispatch({
+    source: 'server-action',
+    data: rawMessages
+  });
+}
+</code></pre>
+
+<p>Perform the steps necessary in the action itself.</p>
+
+<pre><code class="language-js">receiveAll: function(rawMessages) {
+  // do things with rawMessages here
+  log.debug(rawMessages);
+
+  this.dispatch(rawMessages);
+}
+</code></pre>
+
+<p>Finally, let’s convert <code>js/actions/ChatMessageActionCreators.js</code></p>
+
+<p>This action depends on <code>MessageStore</code> to <code>getCreatedMessageData()</code> but <code>MessageStore</code> will later need to depend on these actions to listen to them. So we don’t create a circular dependency we can abstract <code>getCreatedMessageData</code> to a util.</p>
+
+<pre><code class="language-js">var ChatWebAPIUtils = require('../utils/ChatWebAPIUtils');
+var ChatMessageDataUtils = require('../utils/ChatMessageDataUtils');
+
+class ChatMessageActions {
+  createMessage(text) {
+    this.dispatch(text);
+
+    var message = ChatMessageDataUtils.getCreatedMessageData(text);
+    ChatWebAPIUtils.createMessage(message);
+  }
+}
+</code></pre>
+
+<p>Full commits are here: <a href="https://github.com/goatslacker/alt/commit/6f8cf22ba6b36c6ae91a794fad75473c9436b683">Converting some actions</a> and <a href="https://github.com/goatslacker/alt/commit/58ea1418ecd2af25b578cd0f4b77c3d4d8631518">the last action</a>.</p>
+
+<hr />
+
+<p>Now things get interesting. Converting stores is fairly straightforward but since stores are the most complicated piece of flux they’ll need a bit more effort.</p>
+
+<p>The basic logistics, if you’ve followed a traditional flux implementation, are:</p>
+
+<ul>
+  <li>You’ll be moving your outside private state into your store as part of <code>this</code> (don’t worry it’ll still be private)</li>
+  <li>You can get rid of the dispatcher with the massive switch statement converting each case into a specific method</li>
+  <li>Setup how you’ll listen to which actions</li>
+</ul>
+
+<p>I’ll talk about one store here and just link to the rest. Let’s talk <code>MessageStore</code>.</p>
+
+<p>MessageStore’s dispatcher has three main actions it responds to <code>CLICK_THREAD</code>, <code>CREATE_MESSAGE</code>, <code>RECEIVE_RAW_MESSAGES</code>.<br />
+clickThread comes from the <code>ChatThreadActions</code>, createMessage from <code>ChatMessageActions</code>, and receiveRawMessages is actually named receiveAll and exists in <code>ChatServerActions</code></p>
+
+<p>We’ll need to setup a listener for all these actions and then do something with the payload. Setting up a listener is simple. You set the listener up in the constructor of your store’s class via this method <code>bindActions</code>.</p>
+
+<pre><code class="language-js">class MessageStore {
+  constructor() {
+    this.bindActions(ChatMessageActions);
+    this.bindActions(ChatServerActions);
+    this.bindActions(ChatThreadActions);
+  }
+}
+</code></pre>
+
+<p>Passing the entire actions into bindActions sets up the ability to listen to all actions provided. Or, you can cherry pick the actions you listen to via the method <code>bindAction</code>. You can use that method like so <code>this.bindAction(ChatMessageActions.CREATE_MESSAGE)</code>.</p>
+
+<p>Setting up an action handler is also intuitive. You’ll create a method with the same name or prefixed with <code>on</code> in the store’s class. So acting on clickThread we would do something like</p>
+
+<pre><code class="language-js">class MessageStore {
+  constructor() {
+    this.bindActions(ChatMessageActions);
+  }
+
+  // this is fine
+  createMessage() {
+  }
+
+  // this is ok too, but you should pick one or the other
+  onCreateMessage() {
+  }
+
+  // this will not work, why are you doing this
+  CREATE_MESSAGE() {
+  }
+}
+</code></pre>
+
+<p>If you do happen to have conflicting action names alt will let you know with a nice warm thrown <code>ReferenceError</code>.</p>
+
+<p>For creating a message the MessageStore was modifying a private set of messages which were represented by an Object. We can actually move that to the constructor now and then access it in the class itself when handling the action.</p>
+
+<pre><code class="language-js">class MessageStore {
+  constructor() {
+    this.bindActions(ChatMessageActions);
+
+    this.messages = {};
+  }
+
+  onCreateMessage(text) {
+    // our ChatMessageDataUtils from before
+    var message = ChatMessageDataUtils.getCreatedMessageData(text);
+
+    // we can modify this.messages directly
+    this.messages[message.id] = message;
+
+    // we don't need to emit, stores automatically emit by default unless
+    // they're told not to if you return false.
+  }
+}
+</code></pre>
+
+<p>The rest follows the same process.</p>
+
+<p>Full commits are here: Converting the stores <a href="https://github.com/goatslacker/alt/commit/f4c7bb4bb9027b53c380f98ed99a2e1b6ba5fa0b">MessageStore</a>, <a href="https://github.com/goatslacker/alt/commit/bce2aadbb52981f934b4281b3a6244d4f2c4a7a9">ThreadStore</a>, and <a href="https://github.com/goatslacker/alt/commit/0129baa5bd505ef26228e30cfa15a6ac4503a22d">UnreadThreadStore</a>.</p>
+
+<hr />
+
+<p>Last, we apply some finishing touches.</p>
+
+<p>We need to change the listeners in the React components. Flux uses a make-your-own-listeners approach and the example provided uses <code>addChangeListener</code>. Alt stores come with their own listener register and calls that method <code>listenTo</code>.</p>
+
+<p>Full commit here: <a href="https://github.com/goatslacker/alt/commit/e05a4e02f3f13831361136a21cd757416b69b4d8">Finishing touches</a>.</p>
+
+<p>All done. Converting the tests are a challenge I’ll leave up to you. If you have any questions feel free to open an <a href="https://github.com/goatslacker/alt/issues">issue at alt</a>, or ping me <a href="https://twitter.com/goatslacker">@goatslacker</a>.</p>
+
+</article>
+
+    </div>
+
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/prism/0.0.1/prism.min.js"></script>
+<script type="text/javascript">
+  // Alias for javascript so syntax highlighting works fine
+  Prism.languages.js = Prism.languages.javascript;
+</script>
+<footer class="sp-vert-md">
+  <a href="#">v0.10.19</a>
+  <a href="https://github.com/goatslacker/alt">
+    <span class="icon icon--github">
+      <svg viewBox="0 0 16 16">
+        <path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/>
+      </svg>
+    </span>
+
+    <span class="username">goatslacker/alt</span>
+  </a>
+
+  <a href="https://twitter.com/goatslacker">
+    <span class="icon icon--twitter">
+      <svg viewBox="0 0 16 16">
+        <path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809
+        c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/>
+      </svg>
+    </span>
+
+    <span class="username">goatslacker</span>
+  </a>
+</footer>
+
+
+  </body>
+
+</html>
