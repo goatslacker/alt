@@ -29,4 +29,4 @@ class LocationActions {
 module.exports = alt.createActions(LocationActions);
 ```
 
-[Continue to next step...](/guide/store)
+[Continue to next step...](store.md)

@@ -2,24 +2,26 @@
 <header class="sp-horiz-lg">
   <div class="row">
     <div class="col c2">
-      <a href="/"><img class="logo" src="/assets/alt.png" alt="Alt" width="40" /></a>
+      <a href="{{ site.baseurl }}/"><img class="logo" src="{{ "/assets/alt.png" | prepend: site.baseurl }}" alt="Alt" width="40" /></a>
     </div>
     <div class="col c10">
       <nav class="txt-light txt-right pure-menu pure-menu-horizontal">
         <ul class="pure-menu-list">
-          <li class="pure-menu-item"><a href="/guide/" class="pure-menu-link">Getting Started</a></li>
+          <li class="pure-menu-item">
+            <a href="{{ "/guide/" | prepend: site.baseurl }}" class="pure-menu-link">Getting Started</a>
+          </li>
           <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
-            <a href="/docs/" id="menuLink1" class="pure-menu-link">API Documentation</a>
+            <a href="{{ "/docs/" | prepend: site.baseurl }}" id="menuLink1" class="pure-menu-link">API Documentation</a>
             <ul class="pure-menu-children">
               {% for item in site.sidenav %}
               <li class="pure-menu-item">
-                <a href="{{ item.url }}" class="pure-menu-link">{{ item.title }}</a>
+                <a href="{{ item.url | prepend: site.baseurl }}" class="pure-menu-link">{{ item.title }}</a>
               </li>
               {% endfor %}
             </ul>
           </li>
           <li class="pure-menu-item">
-            <a href="/blog/">Blog</a>
+            <a href="{{ "/blog/" | prepend: site.baseurl }}">Blog</a>
           </li>
           <li class="pure-menu-item">
             <a href="https://gitter.im/goatslacker/alt">Support</a>

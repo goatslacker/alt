@@ -146,4 +146,4 @@ render() {
 }
 ```
 
-[Continue to next step...](/guide/wait-for)
+[Continue to next step...](wait-for.md)

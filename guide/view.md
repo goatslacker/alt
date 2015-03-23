@@ -76,4 +76,4 @@ var Locations = React.createClass({
 module.exports = Locations;
 ```
 
-[Continue to next step...](/guide/async)
+[Continue to next step...](async.md)

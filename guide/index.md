@@ -56,4 +56,4 @@ var alt = new Alt();
 module.exports = alt;
 ```
 
-[Continue to next step...](/guide/actions)
+[Continue to next step...](actions.md)

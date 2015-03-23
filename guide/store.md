@@ -71,4 +71,4 @@ class LocationStore {
 module.exports = alt.createStore(LocationStore, 'LocationStore');
 ```
 
-[Continue to next step...](/guide/view)
+[Continue to next step...](view.md)

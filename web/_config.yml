@@ -4,8 +4,8 @@ description: > # this means to ignore newlines until "baseurl:"
   A library for managing data within JavaScript applications. Alt is a pure
   flux implementation that is small, terse, well tested, extremely flexible,
   and forward thinking.
-baseurl: "" # the subpath of your site, e.g. /blog/
-url: "https://goatslacker.github.io/alt" # the base hostname & protocol for your site
+baseurl: "/alt" # the subpath of your site, e.g. /blog/
+url: "https://goatslacker.github.io" # the base hostname & protocol for your site
 twitter_username: goatslacker
 github_username:  goatslacker/alt
 

@@ -3,6 +3,7 @@ require 'jekyll'
 require 'tmpdir'
 require 'tempfile'
 require 'fileutils'
+require 'yaml'
 
 # Set "rake watch" as default task
 task :default => :watch
@@ -75,13 +76,15 @@ def clean_and_copy_guide
 end
 
 def format_markdown_links(dir)
+  site = YAML.load_file('_config.yml')
+
   Dir[dir + '/**/*.md'].each do |file|
     temp_file = Tempfile.new('tmp')
     begin
       File.open(file, 'r') do |file|
         file.each_line do |line|
           line.scan(/(?<all>(?<name>\[.+?\])\((?<link>.+?).md(?<hash>#.+?)?\))/).each do |all, name, link, hash|
-            line.gsub!(all, "#{name}(/#{dir}/#{link}#{hash})")
+            line.gsub!(all, "#{name}(#{site['baseurl']}/#{dir}/#{link}#{hash})")
           end
 
           temp_file.puts line
