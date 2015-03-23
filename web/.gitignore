@@ -1,2 +1,5 @@
-_site
 .sass-cache
+.bundle
+_site
+docs
+guide
