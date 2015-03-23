@@ -1,7 +1,8 @@
 TODO
+bower.json
 coverage
-coverage-test.js
 examples
+npm-debug.log
 src
 test/browser/tests.js
 web
