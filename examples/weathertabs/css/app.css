@@ -1,0 +1,90 @@
+body {
+  font-family: 'Lato', sans-serif, "Arial";
+  font-size: 16px;
+  background: #eee;
+  margin: 0;
+}
+
+h1 {
+  background: #333;
+  margin: 0;
+  padding: 20px 20px;
+  color: #eee;
+  border-bottom: solid 3px #aaa;
+}
+
+.search-box {
+  width: 600px;
+  margin: 40px auto 60px auto;
+}
+
+.search-location {
+  padding: 6px;
+  width: 380px;
+  margin-right: 10px;
+  font-size: 20px;
+  border-radius: 3px;
+  border: solid 1px #ccc;
+}
+
+button {
+  font-size: 20px;
+  padding: 6px 14px;
+  background: #333;
+  color: #eee;
+  border: solid 1px #999;
+  border-radius: 3px;
+}
+
+.content {
+  padding: 0 20px;
+}
+
+.pull-right {
+  float:right;
+}
+
+.weather-tab {
+  padding: 20px;
+  background: #ccc;
+  border-radius: 3px;
+}
+
+.loading img {
+  margin: 0 auto;
+  display: block;
+  padding: 50px 0;
+}
+
+.nav {
+  list-style: none;
+  padding: 0;
+  margin: 0 20px;
+}
+
+.nav li {
+  display: inline;
+  margin: 0;
+  font-size: 20px;
+  padding: 10px 0;
+  background: #333;
+  position: relative;
+  bottom: 10px;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.nav li a {
+  color: white;
+  padding: 0 1em;
+  text-decoration: none;
+}
+
+.nav li.selected {
+  background: #ccc;
+  padding-top: 18px;
+}
+
+.nav li.selected a {
+  color: #000;
+}
