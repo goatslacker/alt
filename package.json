@@ -10,7 +10,7 @@
     "object-assign": "^2.0.0"
   },
   "devDependencies": {
-    "babel": "^4.7.13",
+    "babel": "^4.7.16",
     "babelify": "^5.0.4",
     "browserify": "^9.0.3",
     "chai": "^2.1.0",
@@ -18,6 +18,7 @@
     "eslint": "^0.17.1",
     "iso": "^4.0.2",
     "istanbul": "^0.3.5",
+    "jsdom": "^3.1.2",
     "mocha": "^2.1.0",
     "react": "^0.13.1",
     "sinon": "^1.14.0"

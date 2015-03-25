@@ -32,6 +32,8 @@ sidenav:
   url: /docs/rollback
 - title: Alt Instances
   url: /docs/altInstances
+- title: AltNode
+  url: /docs/components/altNode
 
 guidenav:
 - title: Getting Started
