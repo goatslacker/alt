@@ -248,6 +248,9 @@ const snapshot = (instance, ...storeNames) => {
   const stores = storeNames.length ? storeNames : Object.keys(instance.stores)
   return stores.reduce((obj, key) => {
     const store = instance.stores[key]
+    if (store[LIFECYCLE].snapshot) {
+      store[LIFECYCLE].snapshot()
+    }
     const customSnapshot = store[LIFECYCLE].serialize && store[LIFECYCLE].serialize()
     obj[key] = customSnapshot ? customSnapshot : store.getState()
     return obj

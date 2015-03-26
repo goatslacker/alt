@@ -203,6 +203,7 @@ class LifeCycleStore {
     this.init = false
     this.rollback = false
     this.snapshotted = false
+    this.serialized = false
     this.deserialized = false
 
     this.bindListeners({
@@ -217,8 +218,11 @@ class LifeCycleStore {
     this.on('bootstrap', () => {
       this.bootstrapped = true
     })
-    this.on('serialize', () => {
+    this.on('snapshot', () => {
       this.snapshotted = true
+    })
+    this.on('serialize', () => {
+      this.serialized = true
     })
     this.on('rollback', () => {
       this.rollback = true
@@ -394,6 +398,7 @@ const tests = {
 
     assert(lifecycleStore.getState().bootstrapped === false, 'bootstrap has not been called yet')
     assert(lifecycleStore.getState().snapshotted === false, 'takeSnapshot has not been called yet')
+    assert(lifecycleStore.getState().serialized === false, 'takeSnapshot has not been called yet')
     assert(lifecycleStore.getState().rollback === false, 'rollback has not been called')
     assert(lifecycleStore.getState().init === true, 'init gets called when store initializes')
     assert(lifecycleStore.getState().deserialized === true, 'deserialize has not been called yet')
@@ -407,6 +412,7 @@ const tests = {
     assert(bootstrapReturnValue === undefined, 'bootstrap returns nothing')
     assert(lifecycleStore.getState().bootstrapped === true, 'bootstrap was called and the life cycle event was triggered')
     assert(lifecycleStore.getState().snapshotted === true, 'snapshot was called and the life cycle event was triggered')
+    assert(lifecycleStore.getState().serialized === true, 'takeSnapshot has not been called yet')
     assert(lifecycleStore.getState().deserialized === true, 'deserialize was called and the life cycle event was triggered')
   },
 

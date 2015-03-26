@@ -269,6 +269,9 @@ var snapshot = function (instance) {
   var stores = storeNames.length ? storeNames : Object.keys(instance.stores);
   return stores.reduce(function (obj, key) {
     var store = instance.stores[key];
+    if (store[LIFECYCLE].snapshot) {
+      store[LIFECYCLE].snapshot();
+    }
     var customSnapshot = store[LIFECYCLE].serialize && store[LIFECYCLE].serialize();
     obj[key] = customSnapshot ? customSnapshot : store.getState();
     return obj;
