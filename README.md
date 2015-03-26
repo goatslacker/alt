@@ -10,29 +10,17 @@
 [![Dependency Status](https://david-dm.org/goatslacker/alt.svg)](https://david-dm.org/goatslacker/alt)
 [![Download Count](https://img.shields.io/npm/dm/alt.svg?style=flat)](https://www.npmjs.com/package/alt)
 
-If you're in a hurry [show me the code](#examples) or [tl;dr](#tldr).
-
 Why you should be using Alt
 
-* It is pure [flux](http://facebook.github.io/flux/docs/overview.html).
-* It's [small](https://github.com/goatslacker/alt/blob/master/src/alt.js) and readable.
+* It is pure [flux](http://facebook.github.io/flux/docs/overview.html) Stores have no setters, the flow is unidirectional.
+* Isomorphic! Run a flux setup on your server and then share the same code with the client.
+* Actively maintained and being used in production.
+* Extremely [flexible](#flexibility) and unopinionated in how you use flux. Create traditional singletons or use dependency injection.
 * It is [terse](https://github.com/goatslacker/alt#no-boilerplate). No boilerplate.
-* Extremely [flexible](#flexibility) and unopinionated in how you use flux.
-* Alt is [forward thinking](#es6).
-* It's being used and actively maintained.
-
-Alt is pure flux and data flows one way. Here's an ascii chart to prove it.
-
-```txt
-      ╔═══════════════╗             ╔══════════════╗             ╔════════════╗
-      ║    Actions    ║  ═══════>   ║    Stores    ║  ═══════>   ║    View    ║
-      ╚═══════════════╝             ╚══════════════╝             ╚════════════╝
-              ▲                                                        ║
-              ║                                                        ║
-              ╚════════════════════════════════════════════════════════╝
-```
 
 ## What the flux?
+
+If you're new to flux or alt, check out our [Getting Started Guide](https://goatslacker.github.io/alt/guide/).
 
 For those new to Flux in general here's a short overview: Flux eschews MVC in favor of unidirectional data flow. What this means is that data
 enters through your actions which are then sent to the stores whose responsibility is to manage state and dependencies of that state, and then finally
@@ -48,8 +36,6 @@ The `waitFor` method is also available to help you marshall callback order.
 
 * Store uses an event emitter, in our case [EventEmitter3](https://github.com/primus/EventEmitter3), so
 one can set up the view to listen to changes on the store.
-
-* Singleton stores making your store logic simple to follow and easy to test.
 
 * Single dispatcher which allows one to listen to all events for debugging or fun.
 
@@ -71,36 +57,34 @@ Think I'm lying? [Check out an example](#differences-example).
 
 ## Additions
 
-What's new.
-
 One really cool aspect of alt is that you can save snapshots of the entire application's state at any given point in time.
-Best of all, if you really screw the state up beyond repair you can easily rollback to the last saved snapshot.
+This has many different use cases like:
 
-There's also a method available that lets you bootstrap all the application's stores with a saved snapshot (a JSON string).
-This is particularly useful if you're writing isomorphic applications where you can send down a snapshot of the state the server was in, then bootstrap it back on the client and continue working where the program left off.
+* Time traveling through the state of your application. For fun and profit.
+* Being able to debug from a broken state. Have your team send you the exact state the app was in when it crashed.
+* Isomorphism. You save a snapshot that you send from the server to the client and then bootstrap back on the client.
+* Rolling back to previous stable states.
 
-Store data is copied on retrieval. Meaning you can't just update the store through your store instance, the objects returned by `getState` are shallow copied so you won't accidentally mutate data and other stores can't mutate other stores. This makes it easy to reason about how your application exactly changes and where.
+There are also many [utils](/utils) available which interface well with alt:
 
-Last but not least, alt is meant to work with ES6. That is we're betting you'll be writing your stores and actions
-as classes. This part isn't necessary but you really should write some ES6 anyways because it's nice.
+* [DispatchRecorder](utils/DispatchRecorder.js) lets you record all your dispatches and replay them back at a later time.
+* [FinalStore](utils/makeFinalStore.js) is a Store that you can listen to that only emits when all your other stores have received all their data.
+* [IsomorphicRenderer](utils/IsomorphicRenderer.js) a function that wraps your component to be isomorphic ready.
+* [ActionListener](utils/ActionListener.js) lets you listen to individual actions without having to create a store.
+
+Last but not least, alt is meant to work with ES6. That is we're betting you'll be writing your stores and actions as classes. This part isn't necessary but you really should write some ES6 anyways because it's nice.
 
 ## Usage
 
-### Installing
+Check out the [API Reference](https://goatslacker.github.io/alt/) for full in-depth docs.
+
+First we install alt through npm. Although alt is also available through bower.
 
 ```sh
 npm install alt
 ```
 
-### Running tests
-
-Check out the repo and then:
-
-```sh
-npm test
-```
-
-### Actually Using It
+The following topical guide covers on using alt as a singleton in a traditional flux way.
 
 We'll be referring back to this code a lot by using the `alt` variable declared.
 
@@ -130,8 +114,8 @@ Actions are the way you update state. They're kind of a big deal.
 
 ```js
 class LocationActions {
-  updateLocation() {
-    this.dispatch('Paris')
+  updateLocation(city) {
+    this.dispatch(city)
   }
 }
 
@@ -143,23 +127,7 @@ Every action contains a `dispatch` method which is what sends your data to the d
 `alt.createActions` then returns an `Object` containing all the methods defined. You can then call your actions directly.
 
 ```js
-locationActions.updateLocation()
-```
-
-You can also define actions that take a parameter like so
-
-```js
-class LocationActions {
-  updateLocation(x) {
-    this.dispatch(x)
-  }
-}
-
-var locationActions = alt.createActions(LocationActions)
-```
-
-```js
-locationActions.updateLocation('San Francisco')
+locationActions.updateLocation('Paris')
 ```
 
 Writing out actions that pass data through directly can get quite tedious so there's a shorthand for writing these what are essentially `identity` functions
@@ -199,7 +167,7 @@ var locationActions = alt.createActions(LocationActions)
 locationActions.updateLocation('Miami', 'Florida')
 ```
 
-An shorthand function created in the constructor will pass through the multiple parameters as an Array
+A shorthand function created in the constructor will pass through the multiple parameters as an Array
 
 ```js
 class LocationActions {
@@ -223,6 +191,8 @@ var locationActions = alt.generateActions('updateLocation', 'updateCity', 'updat
 
 Stores are where you keep a part of your application's state.
 
+You can either define your stores as a class/constructor-prototype or as an Object.
+
 `alt.createStore :: Class, string -> Store`
 
 ```js
@@ -244,13 +214,32 @@ class LocationStore {
 var locationStore = alt.createStore(LocationStore)
 ```
 
-Stores require a constructor, that's where you'll set your initial state and bind any actions to the methods that update the state, the `action handlers` if you will. All store instances returned by `alt.createStore` will have the following methods:
+If you're creating a store via the class/constructor method then all values assigned to `this` inside the store will accessible via `LocationStore.getState()`.
 
-All values assigned to `this` inside the store will accessible via `LocationStore.getState()`.
+You can also use a regular old JavaScript Object to create your stores. This is more about aesthetic preference.
 
-#### createStore API
+```js
+var locationStore = alt.createStore({
+  displayName: 'LocationStore',
 
-##### listen :: Function -> undefined
+  bindListeners: {
+    onUpdateLocation: locationActions.updateLocation
+  },
+
+  state: {
+    city: 'Denver',
+    country: 'US'
+  },
+
+  onUpdateLocation(obj) {
+    var { city, country } = obj
+    this.city = city
+    this.country = country
+  }
+})
+```
+
+All store instances returned by `alt.createStore` will have the following methods:
 
 `listen` is meant to be used by your View components in order to await changes made to each store.
 
@@ -260,11 +249,7 @@ locationStore.listen((data) => {
 })
 ```
 
-##### unlisten :: Function -> undefined
-
 `unlisten` is a clean up method. It takes in the same function you used for `listen` and unregisters it.
-
-##### getState :: State
 
 `getState` will return a copy of your the current store's state.
 
@@ -272,9 +257,7 @@ locationStore.listen((data) => {
 locationStore.getState().city === 'Denver'
 ```
 
-##### dispatcherToken
-
-A token that can be used with waitFor.
+`dispatcherToken` is a token that can be used with waitFor.
 
 #### Important Note
 
@@ -342,9 +325,6 @@ Constants are automagically generated for you so feel free to use them to bind y
 
 #### Listening To Multiple Actions
 
-In the ~~rare~~ very common case of binding multiple actions, calling `bindAction` with each
-handler is not anyone's idea of fun.
-
 ```js
 class LocationActions {
   constructor() {
@@ -403,15 +383,7 @@ class LocationStore {
 }
 ```
 
-#### Methods available in Stores
-
-Thus brings us to our final store point. Stores have the following available methods internally:
-
-* `on :: lifecycleMethod, handler -> undefined`
-* `bindAction :: ActionsMethod, StoreMethod -> undefined`
-* `bindActions :: Actions -> undefined`
-* `bindListeners :: Object -> undefined`
-* `waitFor :: DispatcherToken | [DispatcherTokens] -> undefined`
+#### Managing Store Data Dependencies
 
 `waitFor` is mostly an alias to Flux's Dispatcher waitFor. Here's an excerpt from the flux docs on what waitFor is designed for:
 
