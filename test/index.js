@@ -70,6 +70,10 @@ class MyStore {
     this.bindAction(myActions.dontEmit, this.dontEmitEvent)
     this.bindAction(myActions.asyncStoreAction, this.doStoreAsync)
     this.name = 'first'
+    this.obj = {
+      prop1: 1,
+      prop2: 2
+    }
     this.calledInternal = false
     this.dontEmitEventCalled = false
     this.async = false
@@ -373,7 +377,7 @@ const tests = {
 
   'store methods'() {
     const storePrototype = Object.getPrototypeOf(myStore)
-    const assertMethods = ['constructor', 'getEventEmitter', 'emitChange', 'listen', 'unlisten', 'getState']
+    const assertMethods = ['constructor', 'getEventEmitter', 'emitChange', 'listen', 'unlisten', 'getState', 'getImmutState']
     assert.deepEqual(Object.getOwnPropertyNames(storePrototype), assertMethods, 'methods exist for store')
     assert.isUndefined(myStore.addListener, 'event emitter methods not present')
     assert.isUndefined(myStore.removeListener, 'event emitter methods not present')
@@ -509,6 +513,13 @@ const tests = {
     state.name = 'foobar'
     assert(state.name === 'foobar', 'mutated returned state')
     assert(myStore.getState().name === 'first', 'store state was not mutated')
+  },
+
+  'immutable state'() {
+    const state = myStore.getImmutState()
+    assert.throws(() => {
+      state.name = 'foobar'
+    }, /Cannot set on an immutable record/)
   },
 
   'rolling back'() {

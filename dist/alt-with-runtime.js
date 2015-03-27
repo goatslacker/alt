@@ -6,6 +6,8 @@ var EventEmitter = babelHelpers.interopRequire(require("eventemitter3"));
 var Symbol = babelHelpers.interopRequire(require("es-symbol"));
 var assign = babelHelpers.interopRequire(require("object-assign"));
 
+var Record = require("immutable").Record;
+
 var ACTION_HANDLER = Symbol("action creator handler");
 var ACTION_KEY = Symbol("holds the actions uid symbol for listening");
 var ACTION_UID = Symbol("the actions uid name");
@@ -115,6 +117,14 @@ var AltStore = (function () {
           obj[key] = state[key];
           return obj;
         }, {});
+      }
+    },
+    getImmutState: {
+      value: function getImmutState() {
+        /*eslint-disable*/
+        var StateRecord = Record(this.getState());
+        /*eslint-enable*/
+        return new StateRecord();
       }
     }
   });
