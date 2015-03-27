@@ -15,10 +15,8 @@ This project uses [Rake](https://github.com/ruby/rake) to run commands to build/
 To view all the Rake commands available in the `Rakefile` run `bundle exec rake -T`.
 
 - Generate the Jekyll website (gets written to `_site/`) with `bundle exec rake build`.
-- Watch for changes and serve at `localhost:4000` with `bundle exec rake watch` or just `bundle exec rake` (because it is the default task).
+- Watch for changes and serve at `localhost:4000/alt/` with `bundle exec rake watch` or just `bundle exec rake` (because it is the default task).
 
 ## Deploying
 
 Changes on the website are made directly to the `master` branch like any other alt changes, but they will not be deployed to the site automatically. The maintainers will use the rake deploy task which will commit the latest site changes to the `gh-pages` branch, where github will handle propagating these so they are viewable online.
-
-
