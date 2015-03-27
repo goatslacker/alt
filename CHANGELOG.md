@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.14.5
+
+Fixed:
+
+* Added react-native support. [commit](a2cb91c)
+
 ## 0.14.4
 
 Added:
