@@ -844,7 +844,11 @@ var AltStore = (function () {
     getState: {
       value: function getState() {
         // Copy over state so it's RO.
-        return assign({}, this[STATE_CONTAINER]);
+        var state = this[STATE_CONTAINER];
+        return Object.keys(state).reduce(function (obj, key) {
+          obj[key] = state[key];
+          return obj;
+        }, {});
       }
     }
   });
