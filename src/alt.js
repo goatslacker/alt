@@ -10,6 +10,7 @@ const ACTION_KEY = Symbol('holds the actions uid symbol for listening')
 const ACTION_UID = Symbol('the actions uid name')
 const ALL_LISTENERS = Symbol('name of listeners')
 const EE = Symbol('event emitter instance')
+const IMMUTABLE = Symbol.for('AltImmutableStore')
 const INIT_SNAPSHOT = Symbol('init snapshot storage')
 const LAST_SNAPSHOT = Symbol('last snapshot storage')
 const LIFECYCLE = Symbol('store lifecycle listeners')
@@ -32,13 +33,6 @@ function uid(container, name) {
     key = name + String(++count)
   }
   return key
-}
-
-/* for now just detect whether it's instance of Immutable.js */
-function isImmutable(state) {
-  // let's check with that for now
-  // https://github.com/facebook/immutable-js/issues/421
-  return typeof state.toJS === 'function'
 }
 
 /* istanbul ignore next */
@@ -105,18 +99,16 @@ class AltStore {
   }
 
   getState() {
-    // Copy over state so it's RO.
     const state = this[STATE_CONTAINER]
-    let result = state
 
-    if (!isImmutable(state)) {
-      result = Object.keys(state).reduce((obj, key) => {
-        obj[key] = state[key]
-        return obj
-      }, {})
+    if (this.StoreModel[IMMUTABLE] === true) {
+      return state
     }
 
-    return result
+    return Object.keys(state).reduce((obj, key) => {
+      obj[key] = state[key]
+      return obj
+    }, {})
   }
 }
 
@@ -310,18 +302,19 @@ const createStoreFromObject = (alt, StoreModel, key, saveStore) => {
       return storeInstance
     },
     setState(values = {}) {
-
-      if (!isImmutable(values)) {
-        assign(this.state, values)
-      } else {
-        // one of possibles workarounds
-        storeInstance[STATE_CONTAINER] = values
-      }
-
+      assign(this.state, values)
       this.emitChange()
       return false
     }
   }, StoreMixinListeners, StoreMixinEssentials, StoreModel)
+
+  if (StoreModel[IMMUTABLE] === true) {
+    StoreProto.setState = function (key, value) {
+      storeInstance[STATE_CONTAINER] = storeInstance[STATE_CONTAINER].set(key, value)
+      this.emitChange()
+      return false
+    }
+  }
 
   // bind the store listeners
   /* istanbul ignore else */
@@ -411,6 +404,14 @@ class Alt {
       }
     })
 
+    if (StoreModel[IMMUTABLE] === true) {
+      Store.prototype.setState = function (key, value) {
+        storeInstance[STATE_CONTAINER] = storeInstance[STATE_CONTAINER].set(key, value)
+        this.emitChange()
+        return false
+      }
+    }
+
     Store.prototype[ALL_LISTENERS] = []
     Store.prototype[LIFECYCLE] = {}
     Store.prototype[LISTENERS] = {}
@@ -418,8 +419,10 @@ class Alt {
 
     const store = new Store(this)
 
+    const thestate = StoreModel[IMMUTABLE] === true ? store.state : null
+
     storeInstance = assign(
-      new AltStore(this.dispatcher, store, null, StoreModel),
+      new AltStore(this.dispatcher, store, thestate, StoreModel),
       getInternalMethods(StoreModel, builtIns)
     )
 
