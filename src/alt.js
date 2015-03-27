@@ -38,7 +38,7 @@ function uid(container, name) {
 function isImmutable(state) {
   // let's check with that for now
   // https://github.com/facebook/immutable-js/issues/421
-  return typeof state.toJS === "function"
+  return typeof state.toJS === 'function'
 }
 
 /* istanbul ignore next */
