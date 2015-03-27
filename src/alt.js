@@ -4,6 +4,7 @@ import { Dispatcher } from 'flux'
 import EventEmitter from 'eventemitter3'
 import Symbol from 'es-symbol'
 import assign from 'object-assign'
+import {Record} from 'immutable'
 
 const ACTION_HANDLER = Symbol('action creator handler')
 const ACTION_KEY = Symbol('holds the actions uid symbol for listening')
@@ -104,6 +105,13 @@ class AltStore {
       obj[key] = state[key]
       return obj
     }, {})
+  }
+
+  getImmutState() {
+    /*eslint-disable*/
+    const StateRecord = Record(this.getState())
+    /*eslint-enable*/
+    return new StateRecord()
   }
 }
 
