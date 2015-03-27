@@ -310,8 +310,15 @@ const createStoreFromObject = (alt, StoreModel, key, saveStore) => {
       return storeInstance
     },
     setState(values = {}) {
-      assign(this.state, values)
-      this.emitChange()
+
+      if (!isImmutable(values)) {
+        assign(this.state, values)
+      } else {
+        // one of possibles workarounds
+        storeInstance[STATE_CONTAINER] = values;
+      }
+
+      this.emitChange();
       return false
     }
   }, StoreMixinListeners, StoreMixinEssentials, StoreModel)
