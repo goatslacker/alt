@@ -1,10 +1,30 @@
 # Changelog
 
+## 0.15.0
+
+Added:
+
+* `AltContainer` which is a react container component that facilitates listening to stores and managing data. [commit](https://github.com/goatslacker/alt/commit/efbd652)
+* `beforeEach` and `afterEach` hooks in stores for extending. [commit](https://github.com/goatslacker/alt/commit/46daa25)
+* Allow custom dispatcher to be specified. [commit](https://github.com/goatslacker/alt/commit/8f57b6c)
+* Adds serialize/loadEvents to the DispatcherRecorder. You can now transfer events between different alt instances and machines. [commit](https://github.com/goatslacker/alt/commit/c18b7f2)
+* You can now get a list of a store's bound listeners with `boundListeners`. [commit](https://github.com/goatslacker/alt/commit/e76ae26)
+* Testing has been made even easier with access to the original store class with `StoreModel`. [commit](https://github.com/goatslacker/alt/commit/e76ae26)
+* takeSnapshot now allows you to take a snapshot of a single store. [commit](https://github.com/goatslacker/alt/commit/98b3c04)
+* `rollback`, `flush`, and `recycle` now emit change events. [commit](https://github.com/goatslacker/alt/commit/44ad1de), [commit](bda22be)
+* Adds AltManagerUtil which lets you manage multiple instances of alt. [commit](https://github.com/goatslacker/alt/commit/a901e9c)
+
+Fixed:
+
+* Fixes build on Windows. [commit](https://github.com/goatslacker/alt/commit/42d8ca4)
+* If a non-store is passed to bootstrap it no longer crashes. [commit](https://github.com/goatslacker/alt/commit/b458450)
+* Added the `snapshot` method back in. [commit](https://github.com/goatslacker/alt/commit/5767ae6)
+
 ## 0.14.5
 
 Fixed:
 
-* Added react-native support. [commit](a2cb91c)
+* Added react-native support. [commit](https://github.com/goatslacker/alt/commit/a2cb91c)
 
 ## 0.14.4
 
