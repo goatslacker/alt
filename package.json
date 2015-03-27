@@ -33,7 +33,7 @@
     "build-alt-runtime": "babel --external-helpers src/alt.js > dist/alt-with-runtime.js",
     "build-alt-browser": "browserify src/alt.js -t [envify --NODE_ENV production ] -t babelify --outfile dist/alt-browser.js --standalone Alt",
     "build-alt-browser-with-addons": "browserify src/alt-with-addons.js -t [envify --NODE_ENV production ] -t babelify --outfile dist/alt-browser-with-addons.js --standalone Alt",
-    "coverage": "istanbul cover _mocha -- -u exports -R spec --compilers js:babel/register --require babel/external-helpers test",
+    "coverage": "istanbul cover node_modules/mocha/bin/_mocha -- -u exports -R spec --compilers js:babel/register --require babel/external-helpers test",
     "lint": "eslint src mixins utils",
     "prepublish": "npm run test-build",
     "test": "npm run build-alt-runtime && npm run tests-all",
