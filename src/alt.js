@@ -99,7 +99,11 @@ class AltStore {
 
   getState() {
     // Copy over state so it's RO.
-    return assign({}, this[STATE_CONTAINER])
+    const state = this[STATE_CONTAINER]
+    return Object.keys(state).reduce((obj, key) => {
+      obj[key] = state[key]
+      return obj
+    }, {})
   }
 }
 
