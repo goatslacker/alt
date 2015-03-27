@@ -27,6 +27,11 @@
     "type": "git",
     "url": "https://github.com/goatslacker/alt.git"
   },
+  "authors": [
+    "Josh Perez <josh@goatslacker.com>",
+    "Jonathan Lehman <jonathan.lehman91@gmail.com>"
+  ],
+  "license": "MIT",
   "scripts": {
     "build": "npm run build-alt && npm run build-alt-runtime && npm run build-alt-browser && npm run build-alt-browser-with-addons",
     "build-alt": "babel ./src/alt.js > dist/alt.js",
@@ -256,7 +261,5 @@
         "never"
       ]
     }
-  },
-  "author": "Josh Perez <josh@goatslacker.com>",
-  "license": "MIT"
+  }
 }
