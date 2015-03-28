@@ -48,6 +48,13 @@ function uid(container, name) {
   return key;
 }
 
+function setImmutableState(key, value) {
+  var instance = this.getInstance();
+  instance[STATE_CONTAINER] = instance[STATE_CONTAINER].set(key, value);
+  this.emitChange();
+  return false;
+}
+
 /* istanbul ignore next */
 function NoopClass() {}
 
@@ -346,11 +353,7 @@ var createStoreFromObject = function (alt, StoreModel, key, saveStore) {
   }, StoreMixinListeners, StoreMixinEssentials, StoreModel);
 
   if (StoreModel[IMMUTABLE] === true) {
-    StoreProto.setState = function (key, value) {
-      storeInstance[STATE_CONTAINER] = storeInstance[STATE_CONTAINER].set(key, value);
-      this.emitChange();
-      return false;
-    };
+    StoreProto.setState = setImmutableState;
   }
 
   // bind the store listeners
@@ -452,11 +455,7 @@ var Alt = (function () {
         });
 
         if (StoreModel[IMMUTABLE] === true) {
-          Store.prototype.setState = function (key, value) {
-            storeInstance[STATE_CONTAINER] = storeInstance[STATE_CONTAINER].set(key, value);
-            this.emitChange();
-            return false;
-          };
+          Store.prototype.setState = setImmutableState;
         }
 
         Store.prototype[ALL_LISTENERS] = [];

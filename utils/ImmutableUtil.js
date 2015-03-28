@@ -36,8 +36,6 @@ function makeImmutableObject(store) {
 
 function makeImmutableClass(StoreClass) {
   function ImmutableClass() {
-    var _this = this
-
     _get(Object.getPrototypeOf(ImmutableClass.prototype), 'constructor', this).call(this)
     this.state = Immutable.Map(this)
 
