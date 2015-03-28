@@ -1099,9 +1099,11 @@ var createStoreFromObject = function (alt, StoreModel, key, saveStore) {
 
 var Alt = (function () {
   function Alt() {
+    var config = arguments[0] === undefined ? {} : arguments[0];
+
     _classCallCheck(this, Alt);
 
-    this.dispatcher = new Dispatcher();
+    this.dispatcher = config.dispatcher || new Dispatcher();
     this.actions = {};
     this.stores = {};
     this[LAST_SNAPSHOT] = this[INIT_SNAPSHOT] = "{}";
@@ -1193,9 +1195,7 @@ var Alt = (function () {
         }
 
         return this.createActions(function () {
-          var _ref;
-
-          (_ref = this).generateActions.apply(_ref, actionNames);
+          this.generateActions.apply(this, actionNames);
         });
       }
     },
