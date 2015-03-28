@@ -450,9 +450,9 @@ var Alt = (function () {
 
         var store = new Store(this);
 
-        var thestate = StoreModel[IMMUTABLE] === true ? store.state : null;
+        var state = StoreModel[IMMUTABLE] === true ? store.state : null;
 
-        storeInstance = assign(new AltStore(this.dispatcher, store, thestate, StoreModel), getInternalMethods(StoreModel, builtIns));
+        storeInstance = assign(new AltStore(this.dispatcher, store, state, StoreModel), getInternalMethods(StoreModel, builtIns));
 
         if (saveStore) {
           this.stores[key] = storeInstance;

@@ -418,10 +418,10 @@ class Alt {
 
     const store = new Store(this)
 
-    const thestate = StoreModel[IMMUTABLE] === true ? store.state : null
+    const state = StoreModel[IMMUTABLE] === true ? store.state : null
 
     storeInstance = assign(
-      new AltStore(this.dispatcher, store, thestate, StoreModel),
+      new AltStore(this.dispatcher, store, state, StoreModel),
       getInternalMethods(StoreModel, builtIns)
     )
 
