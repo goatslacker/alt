@@ -257,7 +257,7 @@ locationStore.listen((data) => {
 locationStore.getState().city === 'Denver'
 ```
 
-`dispatcherToken` is a token that can be used with waitFor.
+The store exposes a `dispatchToken` that can be used with waitFor e.g. `locationStore.dispatchToken`. The store itself may be passed to `waitFor` as a shortcut.
 
 #### Important Note
 
