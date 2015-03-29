@@ -13,8 +13,8 @@ Using instances of alt is fairly straightforward.
 
 ```js
 class MyAlt extends Alt {
-  constructor() {
-    super();
+  constructor(config = {}) {
+    super(config);
 
     this.addActions('myActions', ActionCreators);
     this.addStore('storeName', Store);
@@ -25,6 +25,42 @@ var flux = new MyAlt();
 ```
 
 # AltClass
+
+## AltClass#constructor
+
+> constructor(config: object) : Alt
+
+The alt constructor takes an optional configuration object. This is where you can configure your alt instance.
+
+```js
+var flux = new Alt({
+  dispatcher: new MyDispatcher()
+});
+```
+### Config Object
+
+The following properties can be defined on the config object:
+
+- *dispatcher*: By default alt uses Facebook's Flux [dispatcher](https://github.com/facebook/flux/blob/master/src/Dispatcher.js), but you can provide your own dispatcher implementation for alt to use. Your dispatcher must have a similar interface to the Facebook dispatcher including, `waitFor`, `register`, and `dispatch`.
+
+One easy way to provide your own dispatcher is to extend the Facebook dispatcher. The following example shows a dispatcher that extends Facebook's dispatcher, but modifies it such that all dispatched payloads are logged to the console and `register` has a custom implementation.
+
+```js
+class MyDispatcher extends Dispatcher {
+  constructor() {
+    super();
+  }
+
+  dispatch(payload) {
+    console.log(payload);
+    super.dispatch(payload);
+  }
+
+  register(callback) {
+    // custom register implementation
+  }
+}
+```
 
 ## AltClass#addActions
 

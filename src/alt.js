@@ -333,8 +333,8 @@ const createStoreFromObject = (alt, StoreModel, key, saveStore) => {
 }
 
 class Alt {
-  constructor() {
-    this.dispatcher = new Dispatcher()
+  constructor(config = {}) {
+    this.dispatcher = config.dispatcher || new Dispatcher()
     this.actions = {}
     this.stores = {}
     this[LAST_SNAPSHOT] = this[INIT_SNAPSHOT] = '{}'
