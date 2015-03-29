@@ -31,7 +31,7 @@ export default {
         },
 
         handleFoo: function (x) {
-          this.setState('foo', x)
+          this.setState(this.getImmutableState().set('foo', x))
         }
       })
 
@@ -71,7 +71,7 @@ export default {
       }
 
       ImmutableStore.prototype.handleFoo = function (x) {
-        this.setState('foo', x)
+        this.setState(this.getImmutableState().set('foo', x))
       }
 
       const store = ImmutableUtil.createStore(alt, ImmutableStore, 'ImmutableStore')
@@ -97,21 +97,26 @@ export default {
     'immutable stores as a class'() {
       const alt = new Alt()
 
-      const actions = alt.generateActions('fork')
+      const actions = alt.generateActions('fork', 'rm')
 
       class ImmutableStore {
         constructor() {
           super()
 
           this.bindListeners({
-            handleFoo: actions.fork
+            handleFoo: actions.fork,
+            remove: actions.rm
           })
 
           this.bar = 'hello'
         }
 
         handleFoo(x) {
-          this.setState('foo', x)
+          this.setState(this.getImmutableState().set('foo', x))
+        }
+
+        remove() {
+          this.setState(this.getImmutableState().delete('foo'))
         }
       }
 
@@ -134,6 +139,10 @@ export default {
       }))
 
       assert(store.getState().toJS().foo === 'bar', 'foo has been set through bootstrap')
+
+      actions.rm()
+
+      assert.isUndefined(store.getState().toJS().foo, 'foo has been removed')
     },
   }
 }

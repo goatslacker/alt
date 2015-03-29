@@ -35,9 +35,9 @@ function uid(container, name) {
   return key
 }
 
-function setImmutableState(key, value) {
+function setImmutableState(state) {
   const instance = this.getInstance()
-  instance[STATE_CONTAINER] = instance[STATE_CONTAINER].set(key, value)
+  instance[STATE_CONTAINER] = state
   this.emitChange()
   return false
 }

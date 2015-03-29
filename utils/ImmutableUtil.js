@@ -28,6 +28,10 @@ function makeImmutableObject(store) {
     return Immutable.fromJS(obj)
   }
 
+  store.getImmutableState = function () {
+    return this.getInstance().getState()
+  }
+
   return store
 }
 
@@ -46,6 +50,10 @@ function makeImmutableClass(StoreClass) {
   }
 
   _inherits(ImmutableClass, StoreClass)
+
+  ImmutableClass.prototype.getImmutableState = function () {
+    return this.getInstance().getState()
+  }
 
   return ImmutableClass
 }
