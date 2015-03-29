@@ -816,11 +816,17 @@ var AltStore = (function () {
 
     // Register dispatcher
     this.dispatchToken = dispatcher.register(function (payload) {
+      if (typeof model.beforeEach === "function") {
+        model.beforeEach(payload.action.toString(), payload.data, _this8[STATE_CONTAINER]);
+      }
       if (model[LISTENERS][payload.action]) {
         var result = model[LISTENERS][payload.action](payload.data);
         if (result !== false) {
           _this8.emitChange();
         }
+      }
+      if (typeof model.afterEach === "function") {
+        model.afterEach(payload.action.toString(), payload.data, _this8[STATE_CONTAINER]);
       }
     });
 
