@@ -27,7 +27,7 @@ npm install alt
 
 ## Folder structure
 
-A typical folder structure would like like this
+A typical folder structure would look like this
 
 ```txt
 your_project
