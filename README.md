@@ -263,11 +263,17 @@ The store exposes a `dispatchToken` that can be used with waitFor e.g. `location
 
 All defined methods in your Store class **will not** be available on the store instance. They are accessible within the class but not on the returned
 Object via `alt.createStore`. This ensures that stores have no direct setters and the state remains mutable only through actions keeping the flow unidirectional.
-If you want to attach public/static functions to your store you may do so as a static method on the class itself.
+If you want to attach public/static functions to your store the recommended method is to call the `exportPublicMethods` method from the constructor:
 
 ```js
 class LocationStore {
-  static myPublicMethod() {
+  constructor() {
+    this.exportPublicMethods({
+      myPublicMethod: this.myPublicMethod
+    });
+  }
+
+  myPublicMethod() {
     var internalInstanceState = this.getState()
     return internalInstanceState
   }
@@ -276,6 +282,17 @@ class LocationStore {
 var locationStore = alt.createStore(LocationStore)
 
 locationStore.myPublicMethod()
+```
+
+Another less explicit alternative is to declare the method as `static`, which will cause alt to expose the method on the store:
+
+```js
+class LocationStore {
+  static myPublicMethod() {
+    var internalInstanceState = this.getState()
+    return internalInstanceState
+  }
+}
 ```
 
 #### Canceling An Event
@@ -744,4 +761,3 @@ var action = alt.createActions(Action)
 ## License
 
 [![MIT](https://img.shields.io/npm/l/alt.svg?style=flat)](http://josh.mit-license.org)
-
