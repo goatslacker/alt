@@ -29,6 +29,7 @@ Stores automatically emit a change event when an action is dispatched through th
 ```js
 handleUpdateLocations(locations) {
   this.locations = locations;
+  // optionally return false to suppress the store change event
 }
 ```
 
