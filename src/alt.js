@@ -68,11 +68,25 @@ class AltStore {
 
     // Register dispatcher
     this.dispatchToken = dispatcher.register((payload) => {
+      if (typeof model.beforeEach === 'function') {
+        model.beforeEach(
+          payload.action.toString(),
+          payload.data,
+          this[STATE_CONTAINER]
+        )
+      }
       if (model[LISTENERS][payload.action]) {
         const result = model[LISTENERS][payload.action](payload.data)
         if (result !== false) {
           this.emitChange()
         }
+      }
+      if (typeof model.afterEach === 'function') {
+        model.afterEach(
+          payload.action.toString(),
+          payload.data,
+          this[STATE_CONTAINER]
+        )
       }
     })
 
