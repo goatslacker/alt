@@ -258,7 +258,7 @@ var StoreMixinEssentials = {
 };
 
 var setAppState = function (instance, data, onStore) {
-  var obj = JSON.parse(data);
+  var obj = instance.deserialize(data);
   Object.keys(obj).forEach(function (key) {
     var store = instance.stores[key];
     if (store) {
@@ -290,14 +290,14 @@ var snapshot = function (instance) {
 
 var saveInitialSnapshot = function (instance, key) {
   var state = instance.stores[key][STATE_CONTAINER];
-  var initial = JSON.parse(instance[INIT_SNAPSHOT]);
+  var initial = instance.deserialize(instance[INIT_SNAPSHOT]);
   initial[key] = state;
-  instance[INIT_SNAPSHOT] = JSON.stringify(initial);
+  instance[INIT_SNAPSHOT] = instance.serialize(initial);
   instance[LAST_SNAPSHOT] = instance[INIT_SNAPSHOT];
 };
 
-var filterSnapshotOfStores = function (serializedSnapshot, storeNames) {
-  var stores = JSON.parse(serializedSnapshot);
+var filterSnapshotOfStores = function (instance, serializedSnapshot, storeNames) {
+  var stores = instance.deserialize(serializedSnapshot);
   var storesToReset = storeNames.reduce(function (obj, name) {
     if (!stores[name]) {
       throw new ReferenceError("" + name + " is not a valid store");
@@ -305,7 +305,7 @@ var filterSnapshotOfStores = function (serializedSnapshot, storeNames) {
     obj[name] = stores[name];
     return obj;
   }, {});
-  return JSON.stringify(storesToReset);
+  return instance.serialize(storesToReset);
 };
 
 var createStoreFromObject = function (alt, StoreModel, key, saveStore) {
@@ -363,6 +363,8 @@ var Alt = (function () {
     var config = arguments[0] === undefined ? {} : arguments[0];
     babelHelpers.classCallCheck(this, Alt);
 
+    this.serialize = config.serialize || JSON.stringify;
+    this.deserialize = config.deserialize || JSON.parse;
     this.dispatcher = config.dispatcher || new Dispatcher();
     this.actions = {};
     this.stores = {};
@@ -534,8 +536,8 @@ var Alt = (function () {
         }
 
         var state = snapshot.apply(undefined, [this].concat(storeNames));
-        this[LAST_SNAPSHOT] = JSON.stringify(assign(JSON.parse(this[LAST_SNAPSHOT]), state));
-        return JSON.stringify(state);
+        this[LAST_SNAPSHOT] = this.serialize(assign(this.deserialize(this[LAST_SNAPSHOT]), state));
+        return this.serialize(state);
       }
     },
     rollback: {
@@ -554,7 +556,7 @@ var Alt = (function () {
           storeNames[_key] = arguments[_key];
         }
 
-        var initialSnapshot = storeNames.length ? filterSnapshotOfStores(this[INIT_SNAPSHOT], storeNames) : this[INIT_SNAPSHOT];
+        var initialSnapshot = storeNames.length ? filterSnapshotOfStores(this, this[INIT_SNAPSHOT], storeNames) : this[INIT_SNAPSHOT];
 
         setAppState(this, initialSnapshot, function (store) {
           if (store[LIFECYCLE].init) {
@@ -566,7 +568,7 @@ var Alt = (function () {
     },
     flush: {
       value: function flush() {
-        var state = JSON.stringify(snapshot(this));
+        var state = this.serialize(snapshot(this));
         this.recycle();
         return state;
       }
