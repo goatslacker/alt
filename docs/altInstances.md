@@ -41,7 +41,9 @@ var flux = new Alt({
 
 The following properties can be defined on the config object:
 
-- *dispatcher*: By default alt uses Facebook's Flux [dispatcher](https://github.com/facebook/flux/blob/master/src/Dispatcher.js), but you can provide your own dispatcher implementation for alt to use. Your dispatcher must have a similar interface to the Facebook dispatcher including, `waitFor`, `register`, and `dispatch`.
+#### dispatcher
+
+By default alt uses Facebook's Flux [dispatcher](https://github.com/facebook/flux/blob/master/src/Dispatcher.js), but you can provide your own dispatcher implementation for alt to use. Your dispatcher must have a similar interface to the Facebook dispatcher including, `waitFor`, `register`, and `dispatch`.
 
 One easy way to provide your own dispatcher is to extend the Facebook dispatcher. The following example shows a dispatcher that extends Facebook's dispatcher, but modifies it such that all dispatched payloads are logged to the console and `register` has a custom implementation.
 
@@ -61,6 +63,14 @@ class MyDispatcher extends Dispatcher {
   }
 }
 ```
+
+#### serialize
+
+This controls how store data is serialized in snapshots. By default alt uses `JSON.stringify`, but you can provide your own function to serialize data.
+
+#### deserialize
+
+This controls how store data is deserialized from snapshot/bootstrap data. By default alt uses `JSON.parse`, but you can provide your own function to deserialize data.
 
 ## AltClass#addActions
 
