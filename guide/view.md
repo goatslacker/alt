@@ -33,7 +33,7 @@ componentWillUnmount() {
 },
 ```
 
-A few [mixins](https://github.com/goatslacker/alt/tree/master/mixins) are available to make this boilerplate go away.
+A few [mixins](https://github.com/goatslacker/alt/tree/master/mixins) or a ["higher-order-component"](https://github.com/goatslacker/alt/tree/master/utils/connectToStores.js) are available to make this boilerplate go away.
 
 ---
 
