@@ -13,7 +13,7 @@ class WeatherStore {
   }
 
   setLoading(isLoading) {
-    this.loading = isLoading
+    this.loading = isLoading;
   }
 
   setWeather(weather) {
