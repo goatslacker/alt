@@ -170,9 +170,22 @@
 }
 </code></pre>
 
+<h2 id="snapshot">Snapshot</h2>
+
+<p><code>snapshot</code> is called before the store’s state is serialized. Here you can perform any final tasks you need to before the state is saved.</p>
+
+<pre><code class="language-js">class Store {
+  constructor() {
+    this.on('snapshot', () =&gt; {
+      // do something here
+    });
+  }
+}
+</code></pre>
+
 <h2 id="serialize">Serialize</h2>
 
-<p><code>serialize</code> is called before the store’s state is serialized. Here you can perform any final tasks you need to before the state is saved. You may optionally return an object, which will be used directly as the snapshot data for the store. If you do not return anything, the default, <a href="/alt/docs/stores#storegetstate"><code>MyStore#getState()</code></a> is used for the snapshot data.</p>
+<p><code>serialize</code> is also called before the store’s state is serialized. You may optionally return an object, which will be used directly as the snapshot data for the store. If you do not return anything, the default, <a href="/alt/docs/stores#storegetstate"><code>MyStore#getState()</code></a> is used for the snapshot data.</p>
 
 <pre><code class="language-js">class Store {
   constructor() {

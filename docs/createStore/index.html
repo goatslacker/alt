@@ -401,6 +401,22 @@ class Store extends StoreBase {
 
 <p>This is a reference to the store’s internal name. This is either the identifier you provided to <code>createStore</code> or StoreModel’s class name.</p>
 
+<h2 id="storemodelbeforeeach">StoreModel#beforeEach</h2>
+
+<blockquote>
+  <p>(action: string, data: mixed, state: object): undefined</p>
+</blockquote>
+
+<p>This method gets called, if defined, before the payload hits the action. You can use this method to <code>waitFor</code> other stores, save previous state, or perform any bookeeping. The state passed in to <code>beforeEach</code> is the current state pre-action.</p>
+
+<h2 id="storemodelaftereach">StoreModel#afterEach</h2>
+
+<blockquote>
+  <p>(action: string, data: mixed, state: object): undefined</p>
+</blockquote>
+
+<p>This method gets called, if defined, after the payload hits the action and the store emits a change. You can use this method for bookeeping and as a companion to <code>beforeEach</code>. The state passed in to <code>afterEach</code> is the current state post-action.</p>
+
           </div>
         </div>
       </div>
