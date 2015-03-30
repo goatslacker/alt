@@ -14,12 +14,13 @@ import connectToStores from '../utils/connectToStores'
 
 Alt.addons = {
   ActionListeners,
+  connectToStores,
   DispatcherRecorder,
   FluxyMixin,
   ListenerMixin,
   makeFinalStore,
   ReactStateMagicMixin,
-  Subscribe
+  Subscribe,
 }
 
 export default Alt

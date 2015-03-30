@@ -20689,13 +20689,13 @@ var connectToStores = _interopRequire(require("../utils/connectToStores"));
 
 Alt.addons = {
   ActionListeners: ActionListeners,
+  connectToStores: connectToStores,
   DispatcherRecorder: DispatcherRecorder,
   FluxyMixin: FluxyMixin,
   ListenerMixin: ListenerMixin,
   makeFinalStore: makeFinalStore,
   ReactStateMagicMixin: ReactStateMagicMixin,
-  Subscribe: Subscribe
-};
+  Subscribe: Subscribe };
 
 module.exports = Alt;
 
@@ -21544,6 +21544,42 @@ var React = _interopRequire(require("react"));
  * Expects the Component to have two static methods:
  *   - getStores(): Should return an array of stores.
  *   - getPropsFromStores(props): Should return the props from the stores.
+ *
+ * Example using old React.createClass() style:
+ *
+ *    const MyComponent = React.createClass({
+ *      statics: {
+ *        getStores() {
+ *          return [myStore]
+ *        },
+ *        getPropsFromStores(props) {
+ *          return myStore.getState()
+ *        }
+ *      },
+ *      render() {
+ *        // Use this.props like normal ...
+ *      }
+ *    })
+ *    MyComponent = connectToStores(MyComponent)
+ *
+ *
+ * Example using ES6 Class:
+ *
+ *    class MyComponent extends React.Component {
+ *      static getStores() {
+ *        return [myStore]
+ *      }
+ *      static getPropsFromStores(props) {
+ *        return myStore.getState()
+ *      }
+ *      render() {
+ *        // Use this.props like normal ...
+ *      }
+ *    }
+ *    MyComponent = connectToStores(MyComponent)
+ *
+ * A great explanation of the merits of higher order components can be found at
+ * http://bit.ly/1abPkrP
  */
 var connectToStores = (function (_connectToStores) {
   var _connectToStoresWrapper = function connectToStores(_x) {
