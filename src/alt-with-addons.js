@@ -20,7 +20,7 @@ Alt.addons = {
   ListenerMixin,
   makeFinalStore,
   ReactStateMagicMixin,
-  Subscribe,
+  Subscribe
 }
 
 export default Alt
