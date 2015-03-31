@@ -18,36 +18,89 @@ Why you should be using Alt
 * Extremely [flexible](#flexibility) and unopinionated in how you use flux. Create traditional singletons or use dependency injection.
 * It is [terse](https://github.com/goatslacker/alt#no-boilerplate). No boilerplate.
 
-## What the flux?
+What does it look like?
 
-If you're new to flux or alt, check out our [Getting Started Guide](https://goatslacker.github.io/alt/guide/).
+Alt
 
-For those new to Flux in general here's a short overview: Flux eschews MVC in favor of unidirectional data flow. What this means is that data
-enters through your actions which are then sent to the stores whose responsibility is to manage state and dependencies of that state, and then finally
-the store informs the view via event listeners so the view can update. The view then triggers more actions via user input and the flow restarts.
+```js
+import Alt from 'alt';
+export default new Alt();
+```
 
-## Pure flux
+Actions
 
-Alt is a terse implementation of Flux that encourages unadulterated flux and all the nice ideas that come along with it:
+```js
+import alt from './alt';
 
-* The Flux [dispatcher](https://github.com/facebook/flux/blob/master/src/Dispatcher.js), which
-means one can only dispatch one action per cycle to ensure a predictable and simple data flow (rather than cascading actions).
-The `waitFor` method is also available to help you marshall callback order.
+class TodoActions {
+  updateTodo(id, text) {
+    this.dispatch({ id, text });
+  }
+}
 
-* Store uses an event emitter, in our case [EventEmitter3](https://github.com/primus/EventEmitter3), so
-one can set up the view to listen to changes on the store.
+export default alt.createActions(TodoActions);
+```
 
-* Single dispatcher which allows one to listen to all events for debugging or fun.
+Store
 
-## No Boilerplate
+```js
+import alt from './alt';
+import TodoActions from './TodoActions'
 
-Some boilerplate has been removed from flux such as the [JS "constants"](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/constants/ChatConstants.js),
-the [static string tossing](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/dispatcher/ChatAppDispatcher.js#L39),
-and the [massive switch statements](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/stores/MessageStore.js#L111) you're required to code.
+class TodoStore {
+  constructor() {
+    this.bindListeners({
+      updateTodo: TodoActions.updateTodo
+    });
+
+    this.todos = {};
+  }
+
+  updateTodo({ id, text }) {
+    const { todos } = this.todos;
+
+    todos[id] = todos[id] || {};
+    todos[id].text = text;
+
+    this.setState({ todos });
+  }
+}
+
+export default alt.createStore(TodoStore, 'TodoStore');
+```
+
+## Principles of Flux
+
+Alt is a terse implementation of Flux that encourages pure flux and all the nice ideas that come along with it:
+
+* Unidirectional data flow.
+
+Data flows through a series of transforms (actions and stores) before reaching its final destination, the view.
+
+* Stores have no setters.
+
+The only way to get data into the stores is through the central dispatcher. The stores can't set data directly via setter methods, this leads to an easier to follow mental model on how state is manipulated.
+
+* Actions are fire and forget.
+
+The only way you know the action has completed is by listening to the stores for their data.
+
+* Single [Dispatcher](https://github.com/facebook/flux/blob/master/src/Dispatcher.js).
+
+There is a central dispatcher which ensures only one dispatch event goes through at a time. This eliminates cascading events from happening when firing a single action.
+
+* All stores receive the dispatch.
+
+Every store has access to the dispatcher and receives each dispatch. We can set up dependencies between stores this way.
+
+## Flux minus the boilerplate
+
+* No [JS "constants"](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/constants/ChatConstants.js).
+* No [static string tossing](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/dispatcher/ChatAppDispatcher.js#L39).
+* No [massive switch statements](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/stores/MessageStore.js#L111).
 
 There is no giant switch statement you have to write in your store and this is because alt removes the burden of constants from the developer.
-This has the wonderful side effect of making the custom dispatcher logic unnecessary, thus removing one of the boxes from the flow
-chart (not pictured above) the dispatcher.
+This has the wonderful side effect of making the custom dispatcher logic unnecessary, thus removing the dispatcher from the equation.
 
 Make no mistake, there is still a single dispatcher through which actions flow through on their merry way to the store, in fact, you still get the benefit of being able to hook into the dispatcher to listen to all the global events for debugging, fun, or misery.
 The dispatcher is just a part of alt and something you don't necessarily have to write custom code for.
@@ -55,7 +108,7 @@ The dispatcher is just a part of alt and something you don't necessarily have to
 These removals make the code terse and easy to follow, there is less indirection and the learning curve to grok is much lower.
 Think I'm lying? [Check out an example](#differences-example).
 
-## Additions
+## Flux enhanced
 
 One really cool aspect of alt is that you can save snapshots of the entire application's state at any given point in time.
 This has many different use cases like:
@@ -74,7 +127,7 @@ There are also many [utils](/utils) available which interface well with alt:
 
 Last but not least, alt is meant to work with ES6. That is we're betting you'll be writing your stores and actions as classes. This part isn't necessary but you really should write some ES6 anyways because it's nice.
 
-## Usage
+## Topical Guide
 
 Check out the [API Reference](https://goatslacker.github.io/alt/) for full in-depth docs.
 
