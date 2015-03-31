@@ -120,10 +120,10 @@ This has many different use cases like:
 
 There are also many [utils](/utils) available which interface well with alt:
 
-* [DispatchRecorder](utils/DispatchRecorder.js) lets you record all your dispatches and replay them back at a later time.
-* [FinalStore](utils/makeFinalStore.js) is a Store that you can listen to that only emits when all your other stores have received all their data.
-* [IsomorphicRenderer](utils/IsomorphicRenderer.js) a function that wraps your component to be isomorphic ready.
-* [ActionListener](utils/ActionListener.js) lets you listen to individual actions without having to create a store.
+* [DispatchRecorder](/utils/DispatcherRecorder.js) lets you record all your dispatches and replay them back at a later time.
+* [FinalStore](/utils/makeFinalStore.js) is a Store that you can listen to that only emits when all your other stores have received all their data.
+* [IsomorphicRenderer](/utils/IsomorphicRenderer.js) a function that wraps your component to be isomorphic ready.
+* [ActionListener](/utils/ActionListeners.js) lets you listen to individual actions without having to create a store.
 
 Last but not least, alt is meant to work with ES6. That is we're betting you'll be writing your stores and actions as classes. This part isn't necessary but you really should write some ES6 anyways because it's nice.
 
