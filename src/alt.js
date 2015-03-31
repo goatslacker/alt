@@ -34,6 +34,13 @@ function uid(container, name) {
   return key
 }
 
+/* for now just detect whether it's instance of Immutable.js */
+function isImmutable(state) {
+  // let's check with that for now
+  // https://github.com/facebook/immutable-js/issues/421
+  return typeof state.toJS === 'function'
+}
+
 /* istanbul ignore next */
 function NoopClass() { }
 
@@ -114,10 +121,16 @@ class AltStore {
   getState() {
     // Copy over state so it's RO.
     const state = this[STATE_CONTAINER]
-    return Object.keys(state).reduce((obj, key) => {
-      obj[key] = state[key]
-      return obj
-    }, {})
+    let result = state
+
+    if (!isImmutable(state)) {
+      result = Object.keys(state).reduce((obj, key) => {
+        obj[key] = state[key]
+        return obj
+      }, {})
+    }
+
+    return result
   }
 }
 
@@ -311,7 +324,14 @@ const createStoreFromObject = (alt, StoreModel, key, saveStore) => {
       return storeInstance
     },
     setState(values = {}) {
-      assign(this.state, values)
+
+      if (!isImmutable(values)) {
+        assign(this.state, values)
+      } else {
+        // one of possibles workarounds
+        storeInstance[STATE_CONTAINER] = values
+      }
+
       this.emitChange()
       return false
     }
