@@ -10,7 +10,7 @@
 [![Dependency Status](https://david-dm.org/goatslacker/alt.svg)](https://david-dm.org/goatslacker/alt)
 [![Download Count](https://img.shields.io/npm/dm/alt.svg?style=flat)](https://www.npmjs.com/package/alt)
 
-Why you should be using Alt
+### Why you should be using Alt
 
 * It is pure [flux](http://facebook.github.io/flux/docs/overview.html) Stores have no setters, the flow is unidirectional.
 * Isomorphic! Run a flux setup on your server and then share the same code with the client.
@@ -18,7 +18,7 @@ Why you should be using Alt
 * Extremely [flexible](#flexibility) and unopinionated in how you use flux. Create traditional singletons or use dependency injection.
 * It is [terse](https://github.com/goatslacker/alt#no-boilerplate). No boilerplate.
 
-What does it look like?
+### What does it look like?
 
 Alt
 
@@ -71,27 +71,27 @@ export default alt.createStore(TodoStore, 'TodoStore');
 
 ## Principles of Flux
 
-Alt is a terse implementation of Flux that encourages pure flux and all the nice ideas that come along with it:
+Alt is a terse implementation of Flux that encourages pure flux and all the nice ideas that come along with it.
 
 * Unidirectional data flow.
 
-Data flows through a series of transforms (actions and stores) before reaching its final destination, the view.
+  Data flows through a series of transforms (actions and stores) before reaching its final destination, the view.
 
 * Stores have no setters.
 
-The only way to get data into the stores is through the central dispatcher. The stores can't set data directly via setter methods, this leads to an easier to follow mental model on how state is manipulated.
+  The only way to get data into the stores is through the central dispatcher. The stores can't set data directly via setter methods, this leads to an easier to follow mental model on how state is manipulated.
 
 * Actions are fire and forget.
 
-The only way you know the action has completed is by listening to the stores for their data.
+  The only way you know the action has completed is by listening to the stores for their data.
 
 * Single [Dispatcher](https://github.com/facebook/flux/blob/master/src/Dispatcher.js).
 
-There is a central dispatcher which ensures only one dispatch event goes through at a time. This eliminates cascading events from happening when firing a single action.
+  There is a central dispatcher which ensures only one dispatch event goes through at a time. This eliminates cascading events from happening when firing a single action.
 
 * All stores receive the dispatch.
 
-Every store has access to the dispatcher and receives each dispatch. We can set up dependencies between stores this way.
+  Every store has access to the dispatcher and receives each dispatch. We can set up dependencies between stores this way.
 
 ## Flux minus the boilerplate
 
@@ -405,7 +405,30 @@ class LocationActions {
 var locationActions = alt.createActions(LocationActions)
 ```
 
-You can bind all the actions inside `locationActions` using the shortcut `bindActions`
+Using the function `bindListeners` you're able to specify which action handlers belong to which actions this way you have ultimate control over what gets called and handled.
+
+The function `bindListeners` is the inverse of `bindAction`. `bindListeners` takes an object of action handlers as keys and actions as a value.
+
+```js
+class LocationStore {
+  constructor() {
+    this.bindListeners({
+      handleCity: locationActions.updateCity,
+      handleCountry: [locationActions.updateCountry, locationActions.updateLatLng]
+    });
+  }
+
+  handleCity(data) {
+    // will only be called by locationActions.updateCity()
+  }
+
+  handleCountry(data) {
+    // will be called by locationActions.updateCountry() and locationActions.updateLatLng()
+  }
+}
+```
+
+Alternatively, you can bind all the actions inside `locationActions` using the shortcut `bindActions`
 
 ```js
 class LocationStore {
@@ -429,29 +452,6 @@ var locationStore = alt.createStore(LocationStore)
 ```
 
 Actions who have a `onCamelCasedAction` method or an `actionName` method available in the store will be bound. In this example `locationActions.updateCity` will be handled by `onUpdateCity`. There is no difference between calling the action handler `updateCity` or `onUpdateCity` it's just a matter of aesthetic preference.
-
-#### bindListeners
-
-A better approach is to specify which action handlers belong to which actions this way you have ultimate control over what gets called and handled. The function `bindListeners` is the inverse of `bindActions`. `bindListeners` takes an object of action handlers as keys and actions as a value.
-
-```js
-class LocationStore {
-  constructor() {
-    this.bindListeners({
-      handleCity: locationActions.updateCity,
-      handleCountry: [locationActions.updateCountry, locationActions.updateLatLng]
-    });
-  }
-
-  handleCity(data) {
-    // will only be called by locationActions.updateCity()
-  }
-
-  handleCountry(data) {
-    // will be called by locationActions.updateCountry() and locationActions.updateLatLng()
-  }
-}
-```
 
 #### Managing Store Data Dependencies
 
@@ -613,7 +613,7 @@ Flush takes a snapshot of the current state and then resets all the stores back 
 
 If you wish to reset a particular, or all, store's state back to their original initial state you would call `recycle`. Recycle takes an optional number of arguments as strings which correspond to the store's names you would like reset. If no argument is provided then all stores are reset.
 
-### Life Cycle Methods
+### Lifecycle Methods
 
 When bootstrapping, snapshotting, or recycling there are special methods you can assign to your store to ensure any bookeeping that needs to be done. You would place these in your store's constructor.
 
