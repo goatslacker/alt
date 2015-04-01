@@ -2,7 +2,7 @@
 layout: docs
 title: AltContainer
 description: A Store Controller component for better composition
-permalink: /docs/components/altContainer
+permalink: /docs/components/altContainer/
 ---
 
 # AltContainer
@@ -19,11 +19,13 @@ For example:
 
 ```js
 <AltContainer
-  stores={{
-    BlogPosts: BlogStore,
-    Comments: CommentsStore,
-    Shares: ShareStore
-  }}
+  stores={
+    {
+      BlogPosts: BlogStore,
+      Comments: CommentsStore,
+      Shares: ShareStore
+    }
+  }
 >
   <div />
 </AltContainer>
@@ -35,17 +37,19 @@ You can pass in a custom function as the value in order to control what each pro
 
 ```js
 <AltContainer
-  stores={{
-    post: function (props) {
-      return BlogStore.getPostFor(props.blogId);
-    },
-    comments: function (props) {
-      return CommentsStore.getCommentsFor(props.blogId)
-    },
-    shares: function (props) {
-      return ShareStore.getSharesFor(props.blogId)
+  stores={
+    {
+      post: function (props) {
+        return BlogStore.getPostFor(props.blogId);
+      },
+      comments: function (props) {
+        return CommentsStore.getCommentsFor(props.blogId)
+      },
+      shares: function (props) {
+        return ShareStore.getSharesFor(props.blogId)
+      }
     }
-  }}
+  }
 >
   <BlogPost />
 </AltContainer>
