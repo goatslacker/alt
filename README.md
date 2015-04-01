@@ -57,7 +57,7 @@ class TodoStore {
   }
 
   updateTodo({ id, text }) {
-    const { todos } = this.todos;
+    const todos = this.todos;
 
     todos[id] = todos[id] || {};
     todos[id].text = text;
