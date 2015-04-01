@@ -6,11 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Creating Actions</title>
+  <title>AltContainer</title>
   <meta name="description" content="A library for managing data within JavaScript applications. Alt is a pure flux implementation that is small, terse, well tested, extremely flexible, and forward thinking.
 ">
 
-  <link rel="canonical" href="https://goatslacker.github.io/alt/docs/createActions/">
+  <link rel="canonical" href="https://goatslacker.github.io/alt/docs/components/altContainer/">
   <link rel="alternate" type="application/rss+xml" title="Alt" href="https://goatslacker.github.io/alt/feed.xml" />
 
   <link type="text/css" rel="stylesheet" href="/alt/assets/lotus.min.css" />
@@ -161,90 +161,118 @@
         </div>
         <div class="col c10">
           <div class="sp-horiz-md">
-            <h1 id="createactions">createActions</h1>
+            <h1 id="altcontainer">AltContainer</h1>
 
-<blockquote>
-  <p>(ActionsClass: function, exportObj: ?object): <a href="/alt/docs/actions">Actions</a></p>
-</blockquote>
+<p>AltContainer is not an idea exclusive to alt. For more information on why you should be using container components check out React.js Conf 2015 talk <a href="https://youtu.be/KYzlpRvWZ6c?t=22m48s">Making your app fast with high-performance components</a>.</p>
 
-<p>This is a function that takes in a class of actions and returns back an object with those actions defined. The second argument <code>exportObj</code> is optional and provides a way to export to a specific object. This is useful when you have circular dependencies you can either export to an app managed global or straight to <code>exports</code>.</p>
+<p>The basic idea is that you have a container that wraps your component, the duty of this container component is to handle all the data fetching and communication with the stores, it then renders the corresponding children. The sub-components just render markup and are data agnostic thus making them highly reusable.</p>
 
-<h1 id="generateactions">generateActions</h1>
+<h2 id="stores"><code>stores</code></h2>
 
-<blockquote>
-  <p>(…actions: string): <a href="/alt/docs/actions">Actions</a></p>
-</blockquote>
+<p>You can pass in an object to <code>stores</code> where the keys correspond to the prop that the children will receive and their value the store we should retrieve the state from.</p>
 
-<p>If all of your actions are just straight through dispatches you can shorthand generate them using this function.</p>
+<p>For example:</p>
 
-<pre><code class="language-js">var MyActions = alt.generateActions('foo', 'bar', 'baz');
-</code></pre>
-
-<p>Which could then be used like this:</p>
-
-<pre><code class="language-js">MyActions.foo();
-MyActions.bar();
-MyActions.baz();
-</code></pre>
-
-<h1 id="actionsclass">ActionsClass</h1>
-
-<h2 id="actionsclassconstructor">ActionsClass#constructor</h2>
-
-<blockquote>
-  <p>(alt: Alt): ActionsClass</p>
-</blockquote>
-
-<p>The constructor of your actions receieves the alt instance as its first and only argument.</p>
-
-<h2 id="actionsclassgenerateactions">ActionsClass#generateActions</h2>
-
-<blockquote>
-  <p>(…actions: string): undefined</p>
-</blockquote>
-
-<p>This is a method that can be used in the ActionsClass constructor to set up any actions that just pass data straight-through.</p>
-
-<p>Actions like these:</p>
-
-<pre><code class="language-js">ActionsClass.prototype.myAction = function (data) {
-  this.dispatch(data);
-};
-</code></pre>
-
-<p>can be converted to:</p>
-
-<pre><code class="language-js">function ActionsClass {
-  this.generateActions('myAction');
-}
-</code></pre>
-
-<p>There is also a shorthand for this shorthand <a href="/alt/docs/generateActions">available</a> on the alt instance.</p>
-
-<h2 id="actionsclassdispatch">ActionsClass#dispatch</h2>
-
-<blockquote>
-  <p>(data: mixed): undefined</p>
-</blockquote>
-
-<p>This method is available inside every action. It is a method that is unique to every action which lets the dispatcher know where each dispatch is coming from.</p>
-
-<h2 id="actionsclassactions">ActionsClass#actions</h2>
-
-<p>This is an object which contains a reference to all the other actions created in your ActionsClass. You can use this for calling multiple actions within an action:</p>
-
-<pre><code class="language-js">ActionsClass.prototype.myActionFail = function (data) {
-  this.dispatch(data);
-};
-
-ActionsClass.prototype.myAction = function (data) {
-  if (someValidationFunction(data)) {
-    this.dispatch(data);
-  } else {
-    this.actions.myActionFail(data);
+<pre><code class="language-js">&lt;AltContainer
+  stores={
+    {
+      BlogPosts: BlogStore,
+      Comments: CommentsStore,
+      Shares: ShareStore
+    }
   }
-};
+&gt;
+  &lt;div /&gt;
+&lt;/AltContainer&gt;
 </code></pre>
+
+<p>Will pass the state from <code>FooStore</code> (<code>FooStore.getState()</code>) into the <code>&lt;div /&gt;</code> as <code>this.props.FooStore</code>. <code>BarStore</code> will be available in <code>this.props.BarStore</code>, etc.</p>
+
+<p>You can pass in a custom function as the value in order to control what each prop will represent. Say you have multiple getters on a store and only want to pass a subset of the state rather than the whole state.</p>
+
+<pre><code class="language-js">&lt;AltContainer
+  stores={
+    {
+      post: function (props) {
+        return BlogStore.getPostFor(props.blogId);
+      },
+      comments: function (props) {
+        return CommentsStore.getCommentsFor(props.blogId)
+      },
+      shares: function (props) {
+        return ShareStore.getSharesFor(props.blogId)
+      }
+    }
+  }
+&gt;
+  &lt;BlogPost /&gt;
+&lt;/AltContainer&gt;
+</code></pre>
+
+<h2 id="store"><code>store</code></h2>
+
+<p>If you only have a single store you can use <code>store</code> to bind it. The state will then be passed as props straight through.</p>
+
+<pre><code class="language-js">var PostStore = alt.createStore({
+  displayName: 'PostStore',
+  state: {
+    id: 1,
+    title: 'Hello, World!'
+  }
+});
+
+&lt;AltContainer store={PostStore}&gt;
+  &lt;BlogPost /&gt;
+&lt;/AltContainer&gt;
+</code></pre>
+
+<p><code>BlogPost</code> in this case will receive all the state of <code>BlogStore</code> as props. <code>this.props.id</code> and <code>this.props.title</code> will be passed through to <code>BlogPost</code>.</p>
+
+<p>Just like <code>stores</code>, you can define your own custom function to use with <code>store</code>.</p>
+
+<pre><code class="language-js">
+function blogStoreFetcher(props) {
+  return BlogStore.getPostFor(props.blogId);
+}
+
+&lt;AltContainer store={blogStoreFetcher}&gt;
+  &lt;BlogPost /&gt;
+&lt;/AltContainer&gt;
+</code></pre>
+
+<p>Children will get the properties you define.</p>
+
+<pre><code class="language-js">&lt;AltContainer store={BlogStore}&gt;
+  &lt;BlogPost className="my-awesome-post" /&gt;
+&lt;/AltContainer&gt;
+</code></pre>
+
+<h2 id="render"><code>render</code></h2>
+
+<p>But you can also specify a special <code>render</code> function which will render whatever your heart desires.</p>
+
+<pre><code class="language-js">&lt;AltContainer
+  store={BlogStore}
+  render={function (props) {
+    return &lt;BlogPost className="my-awesome-post" id={props.id} title="Overriding the title" /&gt;
+  }}
+/&gt;
+</code></pre>
+
+<h2 id="flux"><code>flux</code></h2>
+
+<p><code>AltContainer</code> also works with Alt instances. If you’re passing the alt instance around as a <code>flux</code> prop, it’ll bind it to all its children.</p>
+
+<pre><code class="language-js">const flux = new Flux();
+
+&lt;AltContainer flux={flux}&gt;
+  &lt;Header /&gt;
+  &lt;Body /&gt;
+  &lt;Footer /&gt;
+&lt;/AltContainer&gt;
+</code></pre>
+
+<p>Header, Body, and Footer will have the <code>flux</code> context passed down.</p>
 
           </div>
         </div>
