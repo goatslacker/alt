@@ -1,5 +1,5 @@
 'use strict'
-import React from 'react'
+const React = require('react')
 
 /**
  * 'Higher Order Component' that controls the props of a wrapped
@@ -45,7 +45,7 @@ import React from 'react'
  * A great explanation of the merits of higher order components can be found at
  * http://bit.ly/1abPkrP
  */
-const connectToStores = function (Component) {
+function connectToStores (Component) {
 
   // Check for required static methods.
   if (typeof Component.getStores !== 'function') {
@@ -91,4 +91,4 @@ const connectToStores = function (Component) {
  */
 connectToStores.createClass = React.createClass
 
-export default connectToStores
+module.exports = connectToStores
