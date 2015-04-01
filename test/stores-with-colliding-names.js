@@ -4,7 +4,9 @@ import Alt from '../dist/alt-with-runtime'
 
 const alt = new Alt()
 
-alt.createStore(function MyStore() { })
+function MyStore() { }
+
+alt.createStore(MyStore)
 
 export default {
   'console warn for missing identifier': {
@@ -38,7 +40,25 @@ export default {
 
     afterEach() {
       assert.ok(console.warn.calledOnce, 'the warning was called')
-      assert.instanceOf(console.warn.returnValues[0], ReferenceError, 'value returned is an instanceof referenceerror')
+      assert.isString(console.warn.returnValues[0], 'value returned is a string error message')
+    },
+  },
+
+  'overwriting stores': {
+    beforeEach() {
+      // delete all existing stores
+      alt.stores = {}
+      alt.createStore(MyStore)
+      console.warn = sinon.stub()
+      console.warn.returnsArg(0)
+    },
+
+    'providing the same exact store many times'() {
+      alt.createStore(MyStore)
+      alt.createStore(MyStore)
+      alt.createStore(MyStore)
+      assert.notOk(console.warn.called, 'the warning was not called')
+      assert(Object.keys(alt.stores).length === 1, 'there is only one store')
     },
   }
 }
