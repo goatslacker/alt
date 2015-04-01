@@ -9,8 +9,8 @@ const reactRender = React.render
 export default {
   'Isomorphic Flux rendering util': {
     afterEach() {
-      global.window = undefined
-      global.document = undefined
+      delete global.window
+      delete global.document
       React.render = reactRender
     },
 

@@ -1203,7 +1203,9 @@ var Alt = (function () {
         }
 
         return this.createActions(function () {
-          this.generateActions.apply(this, actionNames);
+          var _ref;
+
+          (_ref = this).generateActions.apply(_ref, actionNames);
         });
       }
     },
