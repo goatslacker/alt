@@ -104,7 +104,7 @@ var AltContainer = React.createClass({
     }
   },
 
-  addSubscription(store) {
+  addSubscription: function(store) {
     if (typeof store === 'object') {
       Subscribe.add(this, store, this.altSetState)
     }
