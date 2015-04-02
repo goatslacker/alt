@@ -31,7 +31,7 @@ For example:
 </AltContainer>
 ```
 
-Will pass the state from `FooStore` (`FooStore.getState()`) into the `<div />` as `this.props.FooStore`. `BarStore` will be available in `this.props.BarStore`, etc.
+Will pass the state from `BlogStore` (`BlogStore.getState()`) into the `<div />` as `this.props.BlogPosts`. `CommentsStore` will be available in `this.props.Comments`, etc.
 
 You can pass in a custom function as the value in order to control what each prop will represent. Say you have multiple getters on a store and only want to pass a subset of the state rather than the whole state.
 
