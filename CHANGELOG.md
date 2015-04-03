@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.15.1
+
+Fixed:
+
+* A bug with `AltContainer` where it was using ES6 syntax. [commit](https://github.com/goatslacker/alt/commit/accea51)
+
 ## 0.15.0
 
 Added:
