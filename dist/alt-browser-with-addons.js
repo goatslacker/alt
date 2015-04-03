@@ -1010,6 +1010,7 @@ var ACTION_KEY = Symbol("holds the actions uid symbol for listening");
 var ACTION_UID = Symbol("the actions uid name");
 var ALL_LISTENERS = Symbol("name of listeners");
 var EE = Symbol("event emitter instance");
+var IMMUTABLE = Symbol["for"]("AltImmutableStore");
 var INIT_SNAPSHOT = Symbol("init snapshot storage");
 var LAST_SNAPSHOT = Symbol("last snapshot storage");
 var LIFECYCLE = Symbol("store lifecycle listeners");
@@ -1032,6 +1033,13 @@ function uid(container, name) {
     key = name + String(++count);
   }
   return key;
+}
+
+function setImmutableState(state) {
+  var instance = this.getInstance();
+  instance[STATE_CONTAINER] = state;
+  this.emitChange();
+  return false;
 }
 
 /* istanbul ignore next */
@@ -1114,8 +1122,12 @@ var AltStore = (function () {
     },
     getState: {
       value: function getState() {
-        // Copy over state so it's RO.
         var state = this[STATE_CONTAINER];
+
+        if (this.StoreModel[IMMUTABLE] === true) {
+          return state;
+        }
+
         return Object.keys(state).reduce(function (obj, key) {
           obj[key] = state[key];
           return obj;
@@ -1333,6 +1345,10 @@ var createStoreFromObject = function (alt, StoreModel, key, saveStore) {
     }
   }, StoreMixinListeners, StoreMixinEssentials, StoreModel);
 
+  if (StoreModel[IMMUTABLE] === true) {
+    StoreProto.setState = setImmutableState;
+  }
+
   // bind the store listeners
   /* istanbul ignore else */
   if (StoreProto.bindListeners) {
@@ -1435,6 +1451,10 @@ var Alt = (function () {
           }
         });
 
+        if (StoreModel[IMMUTABLE] === true) {
+          Store.prototype.setState = setImmutableState;
+        }
+
         Store.prototype[ALL_LISTENERS] = [];
         Store.prototype[LIFECYCLE] = {};
         Store.prototype[LISTENERS] = {};
@@ -1442,7 +1462,9 @@ var Alt = (function () {
 
         var store = new Store(this);
 
-        storeInstance = assign(new AltStore(this.dispatcher, store, null, StoreModel), getInternalMethods(StoreModel, builtIns));
+        var state = StoreModel[IMMUTABLE] === true ? store.state : null;
+
+        storeInstance = assign(new AltStore(this.dispatcher, store, state, StoreModel), getInternalMethods(StoreModel, builtIns));
 
         if (saveStore) {
           this.stores[key] = storeInstance;

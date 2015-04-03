@@ -10,6 +10,7 @@ const ACTION_KEY = Symbol('holds the actions uid symbol for listening')
 const ACTION_UID = Symbol('the actions uid name')
 const ALL_LISTENERS = Symbol('name of listeners')
 const EE = Symbol('event emitter instance')
+const IMMUTABLE = Symbol.for('AltImmutableStore')
 const INIT_SNAPSHOT = Symbol('init snapshot storage')
 const LAST_SNAPSHOT = Symbol('last snapshot storage')
 const LIFECYCLE = Symbol('store lifecycle listeners')
@@ -32,6 +33,13 @@ function uid(container, name) {
     key = name + String(++count)
   }
   return key
+}
+
+function setImmutableState(state) {
+  const instance = this.getInstance()
+  instance[STATE_CONTAINER] = state
+  this.emitChange()
+  return false
 }
 
 /* istanbul ignore next */
@@ -112,8 +120,12 @@ class AltStore {
   }
 
   getState() {
-    // Copy over state so it's RO.
     const state = this[STATE_CONTAINER]
+
+    if (this.StoreModel[IMMUTABLE] === true) {
+      return state
+    }
+
     return Object.keys(state).reduce((obj, key) => {
       obj[key] = state[key]
       return obj
@@ -317,6 +329,10 @@ const createStoreFromObject = (alt, StoreModel, key, saveStore) => {
     }
   }, StoreMixinListeners, StoreMixinEssentials, StoreModel)
 
+  if (StoreModel[IMMUTABLE] === true) {
+    StoreProto.setState = setImmutableState
+  }
+
   // bind the store listeners
   /* istanbul ignore else */
   if (StoreProto.bindListeners) {
@@ -407,6 +423,10 @@ class Alt {
       }
     })
 
+    if (StoreModel[IMMUTABLE] === true) {
+      Store.prototype.setState = setImmutableState
+    }
+
     Store.prototype[ALL_LISTENERS] = []
     Store.prototype[LIFECYCLE] = {}
     Store.prototype[LISTENERS] = {}
@@ -414,8 +434,10 @@ class Alt {
 
     const store = new Store(this)
 
+    const state = StoreModel[IMMUTABLE] === true ? store.state : null
+
     storeInstance = assign(
-      new AltStore(this.dispatcher, store, null, StoreModel),
+      new AltStore(this.dispatcher, store, state, StoreModel),
       getInternalMethods(StoreModel, builtIns)
     )
 
