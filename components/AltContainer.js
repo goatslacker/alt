@@ -116,8 +116,8 @@ var AltContainer = React.createClass({
 
   getProps: function () {
     return assign(
-      this.context.flux || this.props.flux
-        ? { flux: this.context.flux || this.props.flux }
+      (this.context && this.context.flux) || this.props.flux
+        ? { flux: (this.context && this.context.flux) || this.props.flux }
         : {},
       this.state
     )
