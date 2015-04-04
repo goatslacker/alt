@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.15.2
+
+Added/Fixed:
+
+* AltContainer can now receive new props and it'll change. [commit](https://github.com/goatslacker/alt/commit/07debf2)
+
 ## 0.15.1
 
 Fixed:
