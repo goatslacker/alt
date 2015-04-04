@@ -4,7 +4,7 @@ Copyright 2014 Yahoo! Inc. All rights reserved.
 Licensed under the BSD License.
 https://github.com/yahoo/pure/blob/master/LICENSE.md
 */
-.pure-menu{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}
+/*.pure-menu{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}
 .pure-menu-list,.pure-menu-item{position:relative}
 .pure-menu-list{list-style:none;margin:0;padding:0}
 .pure-menu-item{padding:0;margin:0;height:100%}
@@ -20,6 +20,10 @@ https://github.com/yahoo/pure/blob/master/LICENSE.md
 .pure-menu-children{background-color:#210d00}
 .pure-menu-children .pure-menu-item .pure-menu-link{display:block}
 .pure-menu-children .pure-menu-item:hover{background-color:#301300}
+*/
+/*
+ * Responsive Header
+ */
 
 /*
  * alt
@@ -49,35 +53,51 @@ header {
   position: relative;
   top: 0.85em;
 }
-
-header img {
-  vertical-align: middle;
+.navbar.navbar-default {
+  margin-bottom: 0;
+  background: #210D00;
+  border-radius: 0;
+  border-color: #210D00;
 }
 
-header a.btn {
-  color: #210d00;
-  width: 10em;
-}
-
-nav a {
+.navbar-default .navbar-nav > li > a, .navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
   color: #fff;
-  font-size: 1em;
-  line-height: 3.5em;
-  margin: 0 0.5em;
+  background: #210D00;
 }
 
-nav a:hover {
-  text-decoration: none;
+.navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:hover, .navbar-default .navbar-nav > .open > a:focus {
+  background: #210D00;
+  color: #fff;
 }
 
-nav ul.pure-menu-children {
-  border-radius: 0 0 10px 10px;
-  font-size: 0.85em;
-  padding: 0 0.5em 1em;
+.navbar-default .navbar-nav .open .dropdown-menu > li > a, .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover, .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {
+  background: #210D00;
+  color: #fff;
 }
 
-nav .pure-menu-children a.pure-menu-link {
-  line-height: 2.5em;
+.navbar {
+  min-height: 30px;
+}
+
+.navbar-brand {
+  height: auto;
+}
+
+.navbar-default .navbar-toggle {
+  border-color: #fff;
+}
+
+.navbar-default .navbar-toggle .icon-bar {
+  background-color: #fff;
+}
+
+.navbar-default .navbar-toggle:hover, .navbar-default .navbar-toggle:focus {
+  background-color: #fff;
+
+}
+
+.navbar-default .navbar-toggle:hover .icon-bar, .navbar-default .navbar-toggle:focus .icon-bar {
+  background: #210D00;
 }
 
 .main {
