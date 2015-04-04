@@ -53,16 +53,30 @@ var AltContainer = React.createClass({
       throw new ReferenceError('Cannot define both store and stores')
     }
 
-    return this.getStateFromStores() || {}
+    return this.getStateFromStores(this.props) || {}
+  },
+
+  componentWillReceiveProps: function (nextProps) {
+    this.destroySubscriptions()
+    this.setState(this.getStateFromStores(nextProps))
+    this.registerStores(nextProps)
   },
 
   componentDidMount: function () {
+    this.registerStores(this.props)
+  },
+
+  componentWillUnmount: function () {
+    this.destroySubscriptions()
+  },
+
+  registerStores: function (props) {
     Subscribe.create(this)
 
-    if (this.props.store) {
-      this.addSubscription(this.props.store)
-    } else if (this.props.stores) {
-      var stores = this.props.stores
+    if (props.store) {
+      this.addSubscription(props.store)
+    } else if (props.stores) {
+      var stores = props.stores
 
       if (Array.isArray(stores)) {
         stores.forEach(function (store) {
@@ -76,26 +90,26 @@ var AltContainer = React.createClass({
     }
   },
 
-  componentWillUnmount: function () {
+  destroySubscriptions: function () {
     Subscribe.destroy(this)
   },
 
-  getStateFromStores: function () {
-    if (this.props.store) {
-      return getState(this.props.store, this.props)
-    } else if (this.props.stores) {
-      var stores = this.props.stores
+  getStateFromStores: function (props) {
+    if (props.store) {
+      return getState(props.store, props)
+    } else if (props.stores) {
+      var stores = props.stores
 
       // If you pass in an array of stores the state is merged together.
       if (Array.isArray(stores)) {
         return stores.reduce(function (obj, store) {
-          return assign(obj, getState(store, this.props))
+          return assign(obj, getState(store, props))
         }.bind(this), {})
 
       // if it is an object then the state is added to the key specified
       } else {
         return Object.keys(stores).reduce(function (obj, key) {
-          obj[key] = getState(stores[key], this.props)
+          obj[key] = getState(stores[key], props)
           return obj
         }.bind(this), {})
       }
@@ -104,14 +118,14 @@ var AltContainer = React.createClass({
     }
   },
 
-  addSubscription: function(store) {
+  addSubscription: function (store) {
     if (typeof store === 'object') {
       Subscribe.add(this, store, this.altSetState)
     }
   },
 
   altSetState: function () {
-    this.setState(this.getStateFromStores())
+    this.setState(this.getStateFromStores(this.props))
   },
 
   getProps: function () {

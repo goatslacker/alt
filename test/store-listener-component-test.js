@@ -372,5 +372,35 @@ export default {
         )
       })
     },
+
+    'changing an already mounted components props'() {
+      let cb = null
+
+      const El = React.createClass({
+        getInitialState() {
+          return { store: TestStore }
+        },
+
+        componentDidMount() {
+          cb = state => this.setState(state)
+        },
+
+        render() {
+          return (
+            <AltContainer ref="test" store={this.state.store}>
+              <span />
+            </AltContainer>
+          )
+        }
+      })
+
+      const node = TestUtils.renderIntoDocument(<El />)
+
+      assert(node.refs.test.props.store === TestStore, 'node gets first state')
+
+      cb({ store: Store2 })
+
+      assert(node.refs.test.props.store === Store2, 'node changes props properly')
+    },
   }
 }
