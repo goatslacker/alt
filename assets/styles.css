@@ -1,30 +1,3 @@
-/*!
-Pure v0.6.0
-Copyright 2014 Yahoo! Inc. All rights reserved.
-Licensed under the BSD License.
-https://github.com/yahoo/pure/blob/master/LICENSE.md
-*/
-/*.pure-menu{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}
-.pure-menu-list,.pure-menu-item{position:relative}
-.pure-menu-list{list-style:none;margin:0;padding:0}
-.pure-menu-item{padding:0;margin:0;height:100%}
-.pure-menu-horizontal{width:100%;white-space:nowrap}
-.pure-menu-horizontal .pure-menu-list{display:inline-block}
-.pure-menu-horizontal .pure-menu-item,.pure-menu-horizontal .pure-menu-heading,.pure-menu-horizontal .pure-menu-separator{display:inline-block;*display:inline;zoom:1;vertical-align:middle}
-.pure-menu-item .pure-menu-item{display:block}
-.pure-menu-children{display:none;position:absolute;left:100%;top:0;margin:0;padding:0;z-index:3}
-.pure-menu-horizontal .pure-menu-children{left:0;text-align:left;top:auto;width:11em}
-.pure-menu-allow-hover:hover>.pure-menu-children,.pure-menu-active>.pure-menu-children{display:block;position:absolute}
-.pure-menu-has-children>.pure-menu-link:after{padding-left:.5em;content:"\25B8";font-size:small}
-.pure-menu-horizontal .pure-menu-has-children>.pure-menu-link:after{content:"\25BE"}
-.pure-menu-children{background-color:#210d00}
-.pure-menu-children .pure-menu-item .pure-menu-link{display:block}
-.pure-menu-children .pure-menu-item:hover{background-color:#301300}
-*/
-/*
- * Responsive Header
- */
-
 /*
  * alt
  */
@@ -53,16 +26,17 @@ header {
   position: relative;
   top: 0.85em;
 }
+
 .navbar.navbar-default {
-  margin-bottom: 0;
   background: #210D00;
   border-radius: 0;
   border-color: #210D00;
+  margin-bottom: 0;
 }
 
 .navbar-default .navbar-nav > li > a, .navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
-  color: #fff;
   background: #210D00;
+  color: #fff;
 }
 
 .navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:hover, .navbar-default .navbar-nav > .open > a:focus {
@@ -73,6 +47,10 @@ header {
 .navbar-default .navbar-nav .open .dropdown-menu > li > a, .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover, .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {
   background: #210D00;
   color: #fff;
+}
+
+.dropdown-menu {
+  padding: 0;
 }
 
 .navbar {
@@ -93,7 +71,6 @@ header {
 
 .navbar-default .navbar-toggle:hover, .navbar-default .navbar-toggle:focus {
   background-color: #fff;
-
 }
 
 .navbar-default .navbar-toggle:hover .icon-bar, .navbar-default .navbar-toggle:focus .icon-bar {
@@ -105,8 +82,8 @@ header {
 }
 
 .sidenav {
-  padding: 0;
   margin-top: 0.5em;
+  padding: 0;
 }
 
 .sidenav li {
