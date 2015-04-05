@@ -13,6 +13,7 @@
   <link rel="canonical" href="https://goatslacker.github.io/alt/docs/takeSnapshot/">
   <link rel="alternate" type="application/rss+xml" title="Alt" href="https://goatslacker.github.io/alt/feed.xml" />
 
+  <link type="text/css" rel="stylesheet" href="/alt/assets/bootstrap-navbar.css" />
   <link type="text/css" rel="stylesheet" href="/alt/assets/lotus.min.css" />
   <link type="text/css" rel="stylesheet" href="/alt/assets/prism.min.css" />
   <link type="text/css" rel="stylesheet" href="/alt/assets/styles.css" />
@@ -22,86 +23,93 @@
   <body>
 
     
-<header class="sp-horiz-lg">
-  <div class="row">
-    <div class="col c2">
-      <a href="/alt/"><img class="logo" src="/alt/assets/alt.png" alt="Alt" width="40" /></a>
+<nav class="navbar navbar-default sp-horiz-lg">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/alt/"><img src="/alt/assets/alt.png" alt="Alt" width="40" /></a>
     </div>
-    <div class="col c10">
-      <nav class="txt-light txt-right pure-menu pure-menu-horizontal">
-        <ul class="pure-menu-list">
-          <li class="pure-menu-item">
-            <a href="/alt/guide/" class="pure-menu-link">Getting Started</a>
-          </li>
-          <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
-            <a href="/alt/docs/" id="menuLink1" class="pure-menu-link">API Documentation</a>
-            <ul class="pure-menu-children">
-              
-              <li class="pure-menu-item">
-                <a href="/alt/docs/createActions" class="pure-menu-link">Creating Actions</a>
-              </li>
-              
-              <li class="pure-menu-item">
-                <a href="/alt/docs/actions" class="pure-menu-link">Actions</a>
-              </li>
-              
-              <li class="pure-menu-item">
-                <a href="/alt/docs/createStore" class="pure-menu-link">Creating Stores</a>
-              </li>
-              
-              <li class="pure-menu-item">
-                <a href="/alt/docs/stores" class="pure-menu-link">Stores</a>
-              </li>
-              
-              <li class="pure-menu-item">
-                <a href="/alt/docs/lifecycleListeners" class="pure-menu-link">Lifecycle Listeners</a>
-              </li>
-              
-              <li class="pure-menu-item">
-                <a href="/alt/docs/bootstrap" class="pure-menu-link">Bootstrap</a>
-              </li>
-              
-              <li class="pure-menu-item">
-                <a href="/alt/docs/takeSnapshot" class="pure-menu-link">Take Snapshot</a>
-              </li>
-              
-              <li class="pure-menu-item">
-                <a href="/alt/docs/flush" class="pure-menu-link">Flush</a>
-              </li>
-              
-              <li class="pure-menu-item">
-                <a href="/alt/docs/recycle" class="pure-menu-link">Recycle</a>
-              </li>
-              
-              <li class="pure-menu-item">
-                <a href="/alt/docs/rollback" class="pure-menu-link">Rollback</a>
-              </li>
-              
-              <li class="pure-menu-item">
-                <a href="/alt/docs/altInstances" class="pure-menu-link">Alt Instances</a>
-              </li>
-              
-              <li class="pure-menu-item">
-                <a href="/alt/docs/components/altContainer" class="pure-menu-link">AltContainer</a>
-              </li>
-              
-            </ul>
-          </li>
-          <li class="pure-menu-item">
-            <a href="/alt/blog/">Blog</a>
-          </li>
-          <li class="pure-menu-item">
-            <a href="https://gitter.im/goatslacker/alt">Support</a>
-          </li>
-          <li class="pure-menu-item">
-            <a href="https://github.com/goatslacker/alt">GitHub</a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  </div>
-</header>
 
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <a href="/alt/guide/">Getting Started</a>
+        </li>
+        <li class="dropdown">
+          <a href='#' class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">API Documentation <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li>
+              <a href="/alt/docs/">Welcome</a>
+            </li>
+            
+            <li>
+              <a href="/alt/docs/createActions">Creating Actions</a>
+            </li>
+            
+            <li>
+              <a href="/alt/docs/actions">Actions</a>
+            </li>
+            
+            <li>
+              <a href="/alt/docs/createStore">Creating Stores</a>
+            </li>
+            
+            <li>
+              <a href="/alt/docs/stores">Stores</a>
+            </li>
+            
+            <li>
+              <a href="/alt/docs/lifecycleListeners">Lifecycle Listeners</a>
+            </li>
+            
+            <li>
+              <a href="/alt/docs/bootstrap">Bootstrap</a>
+            </li>
+            
+            <li>
+              <a href="/alt/docs/takeSnapshot">Take Snapshot</a>
+            </li>
+            
+            <li>
+              <a href="/alt/docs/flush">Flush</a>
+            </li>
+            
+            <li>
+              <a href="/alt/docs/recycle">Recycle</a>
+            </li>
+            
+            <li>
+              <a href="/alt/docs/rollback">Rollback</a>
+            </li>
+            
+            <li>
+              <a href="/alt/docs/altInstances">Alt Instances</a>
+            </li>
+            
+            <li>
+              <a href="/alt/docs/components/altContainer">AltContainer</a>
+            </li>
+            
+          </ul>
+        </li>
+        <li>
+          <a href="/alt/blog/">Blog</a>
+        </li>
+        <li>
+          <a href="https://gitter.im/goatslacker/alt">Support</a>
+        </li>
+        <li>
+          <a href="https://github.com/goatslacker/alt">GitHub</a>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
 
     <div class="main sp-vert-md sp-horiz-lg">
       <div class="row">
@@ -182,6 +190,9 @@ var partialSnapshot = alt.takeSnapshot('Store1', 'Store3');
     </div>
 
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/prism/0.0.1/prism.min.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.2.min.js" ></script>
+<script type="text/javascript" src="/alt/assets/bootstrap-navbar.min.js" />
+
 <script type="text/javascript">
   // Alias for javascript so syntax highlighting works fine
   Prism.languages.js = Prism.languages.javascript;
