@@ -26,16 +26,17 @@ header {
   position: relative;
   top: 0.85em;
 }
+
 .navbar.navbar-default {
-  margin-bottom: 0;
   background: #210D00;
   border-radius: 0;
   border-color: #210D00;
+  margin-bottom: 0;
 }
 
 .navbar-default .navbar-nav > li > a, .navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
-  color: #fff;
   background: #210D00;
+  color: #fff;
 }
 
 .navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:hover, .navbar-default .navbar-nav > .open > a:focus {
@@ -46,6 +47,10 @@ header {
 .navbar-default .navbar-nav .open .dropdown-menu > li > a, .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover, .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {
   background: #210D00;
   color: #fff;
+}
+
+.dropdown-menu {
+  padding: 0;
 }
 
 .navbar {
@@ -66,7 +71,6 @@ header {
 
 .navbar-default .navbar-toggle:hover, .navbar-default .navbar-toggle:focus {
   background-color: #fff;
-
 }
 
 .navbar-default .navbar-toggle:hover .icon-bar, .navbar-default .navbar-toggle:focus .icon-bar {
@@ -78,8 +82,8 @@ header {
 }
 
 .sidenav {
-  padding: 0;
   margin-top: 0.5em;
+  padding: 0;
 }
 
 .sidenav li {
