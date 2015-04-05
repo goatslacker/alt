@@ -1,36 +1,44 @@
 
-<header class="sp-horiz-lg">
-  <div class="row">
-    <div class="col c2">
-      <a href="{{ site.baseurl }}/"><img class="logo" src="{{ "/assets/alt.png" | prepend: site.baseurl }}" alt="Alt" width="40" /></a>
+<nav class="navbar navbar-default sp-horiz-lg">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="{{ site.baseurl }}/"><img src="{{ "/assets/alt.png" | prepend: site.baseurl }}" alt="Alt" width="40" /></a>
     </div>
-    <div class="col c10">
-      <nav class="txt-light txt-right pure-menu pure-menu-horizontal">
-        <ul class="pure-menu-list">
-          <li class="pure-menu-item">
-            <a href="{{ "/guide/" | prepend: site.baseurl }}" class="pure-menu-link">Getting Started</a>
-          </li>
-          <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
-            <a href="{{ "/docs/" | prepend: site.baseurl }}" id="menuLink1" class="pure-menu-link">API Documentation</a>
-            <ul class="pure-menu-children">
-              {% for item in site.sidenav %}
-              <li class="pure-menu-item">
-                <a href="{{ item.url | prepend: site.baseurl }}" class="pure-menu-link">{{ item.title }}</a>
-              </li>
-              {% endfor %}
-            </ul>
-          </li>
-          <li class="pure-menu-item">
-            <a href="{{ "/blog/" | prepend: site.baseurl }}">Blog</a>
-          </li>
-          <li class="pure-menu-item">
-            <a href="https://gitter.im/goatslacker/alt">Support</a>
-          </li>
-          <li class="pure-menu-item">
-            <a href="https://github.com/goatslacker/alt">GitHub</a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  </div>
-</header>
+
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <a href="{{ "/guide/" | prepend: site.baseurl }}">Getting Started</a>
+        </li>
+        <li class="dropdown">
+          <a href='#' class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">API Documentation <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li>
+              <a href="{{ "/docs/" | prepend: site.baseurl }}">Welcome</a>
+            </li>
+            {% for item in site.sidenav %}
+            <li>
+              <a href="{{ item.url | prepend: site.baseurl }}">{{ item.title }}</a>
+            </li>
+            {% endfor %}
+          </ul>
+        </li>
+        <li>
+          <a href="{{ "/blog/" | prepend: site.baseurl }}">Blog</a>
+        </li>
+        <li>
+          <a href="https://gitter.im/goatslacker/alt">Support</a>
+        </li>
+        <li>
+          <a href="https://github.com/goatslacker/alt">GitHub</a>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
