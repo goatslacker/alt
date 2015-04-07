@@ -37,6 +37,7 @@ var flux = new Alt({
   dispatcher: new MyDispatcher()
 });
 ```
+
 ### Config Object
 
 The following properties can be defined on the config object:
