@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.15.3
+
+Added:
+
+* Define your actions as POJO. [commit](https://github.com/goatslacker/alt/commit/d99a872)
+* Use generateActions with alt instances. [commit](https://github.com/goatslacker/alt/commit/06d07e1)
+
 ## 0.15.2
 
 Added/Fixed:
