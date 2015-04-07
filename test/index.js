@@ -317,6 +317,7 @@ class AltInstance extends Alt {
   constructor() {
     super()
     this.addActions('myActions', MyActions)
+    this.addActions('fauxActions', ['one', 'two'])
     this.addStore('myStore', MyStore)
   }
 }
@@ -761,6 +762,9 @@ const tests = {
 
     const myActionsFromInst = altInstance.getActions('myActions')
     assert.isObject(myActionsFromInst, 'the actions exist')
+
+    const fauxActions = altInstance.getActions('fauxActions')
+    assert.isFunction(fauxActions.one, 'faux actions were generated')
 
     const myActionsFail = altInstance.getActions('ActionsThatDontExist')
     assert.isUndefined(myActionsFail, 'undefined actions')

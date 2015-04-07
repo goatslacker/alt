@@ -1339,7 +1339,7 @@ var Alt = (function () {
       // Instance type methods for injecting alt into your application as context
 
       value: function addActions(name, ActionsClass) {
-        this.actions[name] = this.createActions(ActionsClass);
+        this.actions[name] = Array.isArray(ActionsClass) ? this.generateActions.apply(this, ActionsClass) : this.createActions(ActionsClass);
       }
     },
     addStore: {

@@ -533,7 +533,9 @@ class Alt {
   // Instance type methods for injecting alt into your application as context
 
   addActions(name, ActionsClass) {
-    this.actions[name] = this.createActions(ActionsClass)
+    this.actions[name] = Array.isArray(ActionsClass)
+      ? this.generateActions.apply(this, ActionsClass)
+      : this.createActions(ActionsClass)
   }
 
   addStore(name, StoreModel, saveStore) {
