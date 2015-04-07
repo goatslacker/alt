@@ -71,27 +71,13 @@ export default alt.createStore(TodoStore, 'TodoStore');
 
 ## Principles of Flux
 
-Alt is a terse implementation of Flux that encourages pure flux and all the nice ideas that come along with it.
+* Unidirectional data flow
+* Stores have no setters
+* Inversion of control
+* Single central dispatcher
+* All Stores receive the dispatch
 
-* Unidirectional data flow.
-
-  Data flows through a series of transforms (actions and stores) before reaching its final destination, the view.
-
-* Stores have no setters.
-
-  The only way to get data into the stores is through the central dispatcher. The stores can't set data directly via setter methods, this leads to an easier to follow mental model on how state is manipulated.
-
-* Actions are fire and forget.
-
-  The only way you know the action has completed is by listening to the stores for their data.
-
-* Single [Dispatcher](https://github.com/facebook/flux/blob/master/src/Dispatcher.js).
-
-  There is a central dispatcher which ensures only one dispatch event goes through at a time. This eliminates cascading events from happening when firing a single action.
-
-* All stores receive the dispatch.
-
-  Every store has access to the dispatcher and receives each dispatch. We can set up dependencies between stores this way.
+Read more about the [Principles of Flux](https://medium.com/@goatslacker/principles-of-flux-ea872bc20772).
 
 ## Flux minus the boilerplate
 
