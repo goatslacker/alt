@@ -183,3 +183,8 @@ footer a:hover {
 .post h2 {
   margin: 0;
 }
+
+a.btn-brand {
+  background: #db5800;
+  border-bottom: 2px solid #bb3800;
+}
