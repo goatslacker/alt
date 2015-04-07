@@ -1471,43 +1471,51 @@ var Alt = (function () {
 
         var exportObj = arguments[1] === undefined ? {} : arguments[1];
 
-        var actions = assign({}, getInternalMethods(ActionsClass.prototype, builtInProto));
+        var actions = {};
         var key = ActionsClass.name || ActionsClass.displayName || "";
 
-        var ActionsGenerator = (function (_ActionsClass) {
-          function ActionsGenerator(alt) {
-            _classCallCheck(this, ActionsGenerator);
+        if (typeof ActionsClass === "function") {
+          (function () {
+            assign(actions, getInternalMethods(ActionsClass.prototype, builtInProto));
 
-            _get(Object.getPrototypeOf(ActionsGenerator.prototype), "constructor", this).call(this, alt);
-          }
+            var ActionsGenerator = (function (_ActionsClass) {
+              function ActionsGenerator(alt) {
+                _classCallCheck(this, ActionsGenerator);
 
-          _inherits(ActionsGenerator, _ActionsClass);
+                _get(Object.getPrototypeOf(ActionsGenerator.prototype), "constructor", this).call(this, alt);
+              }
 
-          _createClass(ActionsGenerator, {
-            generateActions: {
-              value: function generateActions() {
-                for (var _len = arguments.length, actionNames = Array(_len), _key = 0; _key < _len; _key++) {
-                  actionNames[_key] = arguments[_key];
-                }
+              _inherits(ActionsGenerator, _ActionsClass);
 
-                actionNames.forEach(function (actionName) {
-                  // This is a function so we can later bind this to ActionCreator
-                  actions[actionName] = function (x) {
-                    for (var _len2 = arguments.length, a = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-                      a[_key2 - 1] = arguments[_key2];
+              _createClass(ActionsGenerator, {
+                generateActions: {
+                  value: function generateActions() {
+                    for (var _len = arguments.length, actionNames = Array(_len), _key = 0; _key < _len; _key++) {
+                      actionNames[_key] = arguments[_key];
                     }
 
-                    this.dispatch(a.length ? [x].concat(a) : x);
-                  };
-                });
-              }
-            }
-          });
+                    actionNames.forEach(function (actionName) {
+                      // This is a function so we can later bind this to ActionCreator
+                      actions[actionName] = function (x) {
+                        for (var _len2 = arguments.length, a = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+                          a[_key2 - 1] = arguments[_key2];
+                        }
 
-          return ActionsGenerator;
-        })(ActionsClass);
+                        this.dispatch(a.length ? [x].concat(a) : x);
+                      };
+                    });
+                  }
+                }
+              });
 
-        new ActionsGenerator(this);
+              return ActionsGenerator;
+            })(ActionsClass);
+
+            new ActionsGenerator(_this8);
+          })();
+        } else {
+          assign(actions, ActionsClass);
+        }
 
         return Object.keys(actions).reduce(function (obj, action) {
           var constant = formatAsConstant(action);

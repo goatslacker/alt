@@ -56,6 +56,11 @@ class MyActions {
 const myActions = {}
 alt.createActions(MyActions, myActions)
 
+const objActions = alt.createActions({
+  hello() { },
+  world() { }
+})
+
 const myShorthandActions = alt.generateActions("actionOne", "actionTwo")
 
 class MyStore {
@@ -427,6 +432,8 @@ const tests = {
     assert(myActions.updateTwo.length === 2, 'actions can have > 1 arity')
     assert.isFunction(myShorthandActions.actionOne, 'action created with shorthand createActions exists')
     assert.isFunction(myShorthandActions.actionTwo, 'other action created with shorthand createActions exists')
+    assert.isFunction(objActions.hello, 'actions created by obj are functions')
+    assert.isFunction(objActions.world, 'actions created by obj are functions')
   },
 
   'existence of constants'() {

@@ -434,28 +434,30 @@ class Alt {
   }
 
   createActions(ActionsClass, exportObj = {}) {
-    const actions = assign(
-      {},
-      getInternalMethods(ActionsClass.prototype, builtInProto)
-    )
+    const actions = {}
     const key = ActionsClass.name || ActionsClass.displayName || ''
 
-    class ActionsGenerator extends ActionsClass {
-      constructor(alt) {
-        super(alt)
+    if (typeof ActionsClass === 'function') {
+      assign(actions, getInternalMethods(ActionsClass.prototype, builtInProto))
+      class ActionsGenerator extends ActionsClass {
+        constructor(alt) {
+          super(alt)
+        }
+
+        generateActions(...actionNames) {
+          actionNames.forEach((actionName) => {
+            // This is a function so we can later bind this to ActionCreator
+            actions[actionName] = function (x, ...a) {
+              this.dispatch(a.length ? [x].concat(a) : x)
+            }
+          })
+        }
       }
 
-      generateActions(...actionNames) {
-        actionNames.forEach((actionName) => {
-          // This is a function so we can later bind this to ActionCreator
-          actions[actionName] = function (x, ...a) {
-            this.dispatch(a.length ? [x].concat(a) : x)
-          }
-        })
-      }
+      new ActionsGenerator(this)
+    } else {
+      assign(actions, ActionsClass)
     }
-
-    new ActionsGenerator(this)
 
     return Object.keys(actions).reduce((obj, action) => {
       const constant = formatAsConstant(action)
