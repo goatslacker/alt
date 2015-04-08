@@ -1,3 +1,4 @@
+/*global window*/
 function chromeDebug(alt) {
   window['goatslacker.github.io/alt/'] = alt
 }
