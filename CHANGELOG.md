@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.15.4
+
+Added:
+
+* Chrome debugging exporter for devtool. [commit](https://github.com/goatslacker/alt/commit/d925db1)
+
 ## 0.15.3
 
 Added:
