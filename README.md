@@ -12,7 +12,7 @@
 
 ### Why you should be using Alt
 
-* It is pure [flux](http://facebook.github.io/flux/docs/overview.html) Stores have no setters, the flow is unidirectional.
+* It is pure [flux](http://facebook.github.io/flux/docs/overview.html). Stores have no setters, the flow is unidirectional.
 * Isomorphic! Run a flux setup on your server and then share the same code with the client.
 * Actively maintained and being used in production.
 * Extremely [flexible](#flexibility) and unopinionated in how you use flux. Create traditional singletons or use dependency injection.
