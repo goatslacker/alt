@@ -462,7 +462,7 @@ var Alt = (function () {
     },
     createAction: {
       value: function createAction(name, implementation, obj) {
-        var actionId = uid(GlobalActionsNameRegistry, "#" + name);
+        var actionId = uid(GlobalActionsNameRegistry, name);
         GlobalActionsNameRegistry[actionId] = 1;
         var actionName = Symbol["for"](actionId);
 
@@ -534,7 +534,7 @@ var Alt = (function () {
         }
 
         return Object.keys(actions).reduce(function (obj, action) {
-          obj[action] = _this8.createAction(action, actions[action], obj);
+          obj[action] = _this8.createAction("" + key + "#" + action, actions[action], obj);
           var constant = formatAsConstant(action);
           obj[constant] = obj[action][ACTION_KEY];
           return obj;

@@ -434,7 +434,7 @@ class Alt {
   }
 
   createAction(name, implementation, obj) {
-    const actionId = uid(GlobalActionsNameRegistry, `#${name}`)
+    const actionId = uid(GlobalActionsNameRegistry, name)
     GlobalActionsNameRegistry[actionId] = 1
     const actionName = Symbol.for(actionId)
 
@@ -478,7 +478,7 @@ class Alt {
     }
 
     return Object.keys(actions).reduce((obj, action) => {
-      obj[action] = this.createAction(action, actions[action], obj)
+      obj[action] = this.createAction(`${key}#${action}`, actions[action], obj)
       const constant = formatAsConstant(action)
       obj[constant] = obj[action][ACTION_KEY]
       return obj
