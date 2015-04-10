@@ -123,3 +123,44 @@ class MyComponent extends Component {
   }
 }
 ```
+
+## Serializing/Deserializing Immutable Data
+
+If you are using immutable data and plan on taking advantage of alt's [snapshot](../takeSnapshot.md) and [bootstrap](../bootstrap.md) capabilities you must ensure that [serialize](../lifecycleListeners.md#serialize) and [deserialize](../lifecycleListeners.md#deserialize) handle the immutable data.
+
+Serialize returns the data from the store to be used in a snapshot so the immutable getters will need to be used to return a plain JS object to be serialized.
+
+Deserialize takes bootstrap data and uses it to set the state of the store. This means in order for your store to function as you initially set it up, the bootstrapped data must be converted back to immutable data structures.
+
+Example serialize/deserialize with immutable data structures:
+
+```js
+// MyStore.js
+import {Map} from 'immutable';
+
+class MyStore {
+  constructor() {
+
+    this.on('serialize', () => {
+      return {
+        data: {
+          prop1: this.data.get('prop1'),
+          prop2: this.data.get('prop2')
+        }
+      };
+    });
+
+    this.on('deserialize', (data) => {
+      return new Map({
+        prop1: data.prop1,
+        prop2: data.prop2
+      });
+    });
+
+    this.data = new Map({
+      prop1: 1,
+      prop2: 2
+    });
+  }
+}
+```
