@@ -433,6 +433,24 @@ class Alt {
     })
   }
 
+  createAction(name, implementation, obj) {
+    const actionId = uid(GlobalActionsNameRegistry, `#${name}`)
+    GlobalActionsNameRegistry[actionId] = 1
+    const actionName = Symbol.for(actionId)
+
+    // Wrap the action so we can provide a dispatch method
+    const newAction = new ActionCreator(this, actionName, implementation, obj)
+
+    const action = newAction[ACTION_HANDLER]
+    action.defer = (...args) => {
+      setTimeout(() => {
+        newAction[ACTION_HANDLER].apply(null, args)
+      })
+    }
+    action[ACTION_KEY] = actionName
+    return action
+  }
+
   createActions(ActionsClass, exportObj = {}) {
     const actions = {}
     const key = ActionsClass.name || ActionsClass.displayName || ''
@@ -460,29 +478,9 @@ class Alt {
     }
 
     return Object.keys(actions).reduce((obj, action) => {
+      obj[action] = this.createAction(action, actions[action], obj)
       const constant = formatAsConstant(action)
-      const actionId = uid(GlobalActionsNameRegistry, `${key}#${action}`)
-      GlobalActionsNameRegistry[actionId] = 1
-      const actionName = Symbol.for(actionId)
-
-      // Wrap the action so we can provide a dispatch method
-      const newAction = new ActionCreator(
-        this,
-        actionName,
-        actions[action],
-        obj
-      )
-
-      // Set all the properties on action
-      obj[action] = newAction[ACTION_HANDLER]
-      obj[action].defer = (...args) => {
-        setTimeout(() => {
-          newAction[ACTION_HANDLER].apply(null, args)
-        })
-      }
-      obj[action][ACTION_KEY] = actionName
-      obj[constant] = actionName
-
+      obj[constant] = obj[action][ACTION_KEY]
       return obj
     }, exportObj)
   }

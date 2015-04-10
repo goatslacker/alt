@@ -1237,6 +1237,26 @@ const tests = {
       alt.bootstrap('{"AStoreThatIJustMadeUpButDoesNotReallyExist": {}}')
     })
   },
+
+  'creating one off actions'() {
+    const action = alt.createAction('hello', function (x) {
+      this.dispatch(x)
+    })
+
+    const store = alt.createStore({
+      state: { x: 0 },
+      bindListeners: {
+        hello: action
+      },
+      hello(x) { this.state.x = x }
+    })
+
+    assert.isFunction(action, 'action was created')
+
+    action(1)
+
+    assert(store.getState().x === 1, 'action fires correctly')
+  },
 }
 
 export default tests

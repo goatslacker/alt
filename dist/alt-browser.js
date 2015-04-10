@@ -1209,6 +1209,29 @@ var Alt = (function () {
         });
       }
     },
+    createAction: {
+      value: function createAction(name, implementation, obj) {
+        var actionId = uid(GlobalActionsNameRegistry, "#" + name);
+        GlobalActionsNameRegistry[actionId] = 1;
+        var actionName = Symbol["for"](actionId);
+
+        // Wrap the action so we can provide a dispatch method
+        var newAction = new ActionCreator(this, actionName, implementation, obj);
+
+        var action = newAction[ACTION_HANDLER];
+        action.defer = function () {
+          for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+          }
+
+          setTimeout(function () {
+            newAction[ACTION_HANDLER].apply(null, args);
+          });
+        };
+        action[ACTION_KEY] = actionName;
+        return action;
+      }
+    },
     createActions: {
       value: function createActions(ActionsClass) {
         var _this8 = this;
@@ -1262,28 +1285,9 @@ var Alt = (function () {
         }
 
         return Object.keys(actions).reduce(function (obj, action) {
+          obj[action] = _this8.createAction(action, actions[action], obj);
           var constant = formatAsConstant(action);
-          var actionId = uid(GlobalActionsNameRegistry, "" + key + "#" + action);
-          GlobalActionsNameRegistry[actionId] = 1;
-          var actionName = Symbol["for"](actionId);
-
-          // Wrap the action so we can provide a dispatch method
-          var newAction = new ActionCreator(_this8, actionName, actions[action], obj);
-
-          // Set all the properties on action
-          obj[action] = newAction[ACTION_HANDLER];
-          obj[action].defer = function () {
-            for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-              args[_key] = arguments[_key];
-            }
-
-            setTimeout(function () {
-              newAction[ACTION_HANDLER].apply(null, args);
-            });
-          };
-          obj[action][ACTION_KEY] = actionName;
-          obj[constant] = actionName;
-
+          obj[constant] = obj[action][ACTION_KEY];
           return obj;
         }, exportObj);
       }
