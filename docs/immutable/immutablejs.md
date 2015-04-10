@@ -136,22 +136,19 @@ Example serialize/deserialize with immutable data structures:
 
 ```js
 // MyStore.js
-import {Map} from 'immutable';
+import Immutable, {Map} from 'immutable';
 
 class MyStore {
   constructor() {
 
     this.on('serialize', () => {
       return {
-        data: {
-          prop1: this.data.get('prop1'),
-          prop2: this.data.get('prop2')
-        }
+        data: this.data.toJS()
       };
     });
 
     this.on('deserialize', (data) => {
-      return new Map({
+      return Immutable.fromJS({
         prop1: data.prop1,
         prop2: data.prop2
       });
