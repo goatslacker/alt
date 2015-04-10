@@ -60,6 +60,14 @@ export default {
       assert(store3.getState().value === 3, 'store3 value correct')
 
       assert.ok(finalStoreListener.calledAfter(store2Listener), 'final store was last one to be called')
+
+      const stateListen = sinon.spy()
+      FinalStore.listen(stateListen)
+
+      action.set(27)
+
+      assert.ok(stateListen.calledOnce, 'final store called once')
+      assert(stateListen.args[0][0].payload.data === 27, 'the payload was received')
     },
   }
 }
