@@ -11,6 +11,8 @@ AltContainer is not an idea exclusive to alt. For more information on why you sh
 
 The basic idea is that you have a container that wraps your component, the duty of this container component is to handle all the data fetching and communication with the stores, it then renders the corresponding children. The sub-components just render markup and are data agnostic thus making them highly reusable.
 
+AltContainer doesn't just wrap your dumb components into a high-performance store listener but it also serves as a jack-of-all-trades component where you can directly inject any dependencies into your components such as stores, actions, or the flux context.
+
 ## `stores`
 
 You can pass in an object to `stores` where the keys correspond to the prop that the children will receive and their value the store we should retrieve the state from.
@@ -92,6 +94,63 @@ Children will get the properties you define.
 
 ```js
 <AltContainer store={BlogStore}>
+  <BlogPost className="my-awesome-post" />
+</AltContainer>
+```
+
+## `actions`
+
+You can directly inject any actions you wish to make available to your child components which will then be available via their props.
+
+For example, say you have a pretty standard `BlogActions`.
+
+```js
+var BlogActions = alt.generateActions('makePost');
+```
+
+You can inject these actions into BlogPost like so:
+
+```js
+<AltContainer
+  store={BlogStore}
+  actions={{ MyActions: BlogActions }}
+/>
+  <BlogPost className="my-awesome-post" />
+</AltContainer>
+```
+
+The actions found in `BlogActions` will now be available in an object you defined `MyActions`. So you may call `this.props.MyActions.makePost()` and the `BlogActions.makePost` action will be fired.
+
+You can inject these actions directly on the props themselves:
+
+```js
+<AltContainer
+  store={BlogStore}
+  actions={BlogActions}
+/>
+  <BlogPost className="my-awesome-post" />
+</AltContainer>
+```
+
+`BlogPost` here will receive all of the state of `BlogStore` as props, and all of the actions of `BlogActions`. So you may call `this.props.makePost()` and the `BlogActions.makePost` action will be fired.
+
+Similar to stores and store the actions prop also accepts a function where you can customize the behavior of the actions:
+
+```js
+<AltContainer
+  store={BlogStore}
+  actions={function (props) {
+    return {
+      makePost: function (postText) {
+        // trim the post first
+        postText.trim()
+
+        // then call the action
+        return BlogActions.makePost(postText)
+      }
+    }
+  }}
+/>
   <BlogPost className="my-awesome-post" />
 </AltContainer>
 ```

@@ -402,5 +402,50 @@ export default {
 
       assert(node.refs.test.props.store === Store2, 'node changes props properly')
     },
+
+    'inject actions'() {
+      const node = TestUtils.renderIntoDocument(
+        <AltContainer actions={{ MyActions: action }}>
+          <span />
+        </AltContainer>
+      )
+
+      const span = TestUtils.findRenderedDOMComponentWithTag(node, 'span')
+
+      assert.isObject(span.props.MyActions, 'MyActions exist')
+      assert(span.props.MyActions === action, 'MyActions is injected actions')
+      assert.isFunction(span.props.MyActions.sup, 'sup action is available')
+    },
+
+    'inject all actions directly shorthand'() {
+      const node = TestUtils.renderIntoDocument(
+        <AltContainer actions={action}>
+          <span />
+        </AltContainer>
+      )
+
+      const span = TestUtils.findRenderedDOMComponentWithTag(node, 'span')
+
+      assert.isFunction(span.props.sup, 'sup is available directly on the props')
+    },
+
+    'inject all actions using a function'() {
+      const node = TestUtils.renderIntoDocument(
+        <AltContainer actions={function (props) {
+          return {
+            FooActions: {
+              sup: action.sup.bind(action)
+            }
+          }
+        }}>
+          <span />
+        </AltContainer>
+      )
+
+      const span = TestUtils.findRenderedDOMComponentWithTag(node, 'span')
+
+      assert.isObject(span.props.FooActions, 'actions are injected')
+      assert.isFunction(span.props.FooActions.sup, 'sup is available')
+    },
   }
 }

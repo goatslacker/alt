@@ -1856,13 +1856,13 @@ DispatcherRecorder.prototype.loadEvents = function (events) {
 module.exports = makeFinalStore;
 
 function FinalStore() {
-  this.dispatcher.register((function () {
+  this.dispatcher.register((function (payload) {
     var stores = Object.keys(this.alt.stores).reduce((function (arr, store) {
       return (arr.push(this.alt.stores[store].dispatchToken), arr);
     }).bind(this), []);
 
     this.waitFor(stores);
-    this.getInstance().emitChange();
+    this.setState({ payload: payload });
   }).bind(this));
 }
 

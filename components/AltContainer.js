@@ -43,8 +43,12 @@ var assign = require('object-assign')
 
 var cloneWithProps = React.addons.cloneWithProps
 
-function getState(store, props) {
+function getStateFromStore(store, props) {
   return typeof store === 'function' ? store(props) : store.getState()
+}
+
+function getStateFromActionsProp(actions, props) {
+  return typeof actions === 'function' ? actions(props) : actions
 }
 
 var AltContainer = React.createClass({
@@ -53,12 +57,12 @@ var AltContainer = React.createClass({
       throw new ReferenceError('Cannot define both store and stores')
     }
 
-    return this.getStateFromStores(this.props) || {}
+    return this.reduceState(this.props)
   },
 
   componentWillReceiveProps: function (nextProps) {
     this.destroySubscriptions()
-    this.setState(this.getStateFromStores(nextProps))
+    this.setState(this.reduceState(nextProps))
     this.registerStores(nextProps)
   },
 
@@ -96,26 +100,42 @@ var AltContainer = React.createClass({
 
   getStateFromStores: function (props) {
     if (props.store) {
-      return getState(props.store, props)
+      return getStateFromStore(props.store, props)
     } else if (props.stores) {
       var stores = props.stores
 
       // If you pass in an array of stores the state is merged together.
       if (Array.isArray(stores)) {
         return stores.reduce(function (obj, store) {
-          return assign(obj, getState(store, props))
+          return assign(obj, getStateFromStore(store, props))
         }.bind(this), {})
 
       // if it is an object then the state is added to the key specified
       } else {
         return Object.keys(stores).reduce(function (obj, key) {
-          obj[key] = getState(stores[key], props)
+          obj[key] = getStateFromStore(stores[key], props)
           return obj
         }.bind(this), {})
       }
     } else {
       return {}
     }
+  },
+
+  getStateFromActions: function (props) {
+    if (props.actions) {
+      return getStateFromActionsProp(props.actions, props)
+    } else {
+      return {}
+    }
+  },
+
+  reduceState: function (props) {
+    return assign(
+      {},
+      this.getStateFromStores(props),
+      this.getStateFromActions(props)
+    )
   },
 
   addSubscription: function (store) {
@@ -125,7 +145,7 @@ var AltContainer = React.createClass({
   },
 
   altSetState: function () {
-    this.setState(this.getStateFromStores(this.props))
+    this.setState(this.reduceState(this.props))
   },
 
   getProps: function () {
