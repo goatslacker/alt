@@ -4,10 +4,10 @@
     <title>Alt</title>
     <description>A library for managing data within JavaScript applications. Alt is a pure flux implementation that is small, terse, well tested, extremely flexible, and forward thinking.
 </description>
-    <link>https://goatslacker.github.io/alt/</link>
-    <atom:link href="https://goatslacker.github.io/alt/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 10 Apr 2015 11:37:50 -0700</pubDate>
-    <lastBuildDate>Fri, 10 Apr 2015 11:37:50 -0700</lastBuildDate>
+    <link>http://alt.js.org/</link>
+    <atom:link href="http://alt.js.org/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Fri, 10 Apr 2015 12:27:46 -0700</pubDate>
+    <lastBuildDate>Fri, 10 Apr 2015 12:27:46 -0700</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
     
       <item>
@@ -220,8 +220,8 @@ clickThread comes from the &lt;code&gt;ChatThreadActions&lt;/code&gt;, createMes
 &lt;p&gt;All done. Converting the tests are a challenge I’ll leave up to you. If you have any questions feel free to open an &lt;a href=&quot;https://github.com/goatslacker/alt/issues&quot;&gt;issue at alt&lt;/a&gt;, or ping me &lt;a href=&quot;https://twitter.com/goatslacker&quot;&gt;@goatslacker&lt;/a&gt;.&lt;/p&gt;
 </description>
         <pubDate>Thu, 22 Jan 2015 00:00:00 -0800</pubDate>
-        <link>https://goatslacker.github.io/alt/2015/01/22/how-to-convert-flux-to-alt.html</link>
-        <guid isPermaLink="true">https://goatslacker.github.io/alt/2015/01/22/how-to-convert-flux-to-alt.html</guid>
+        <link>http://alt.js.org/2015/01/22/how-to-convert-flux-to-alt.html</link>
+        <guid isPermaLink="true">http://alt.js.org/2015/01/22/how-to-convert-flux-to-alt.html</guid>
         
         <category>alt</category>
         
