@@ -76,7 +76,23 @@ class AltStore {
         )
       }
       if (model[LISTENERS][payload.action]) {
-        const result = model[LISTENERS][payload.action](payload.data)
+        let result = false
+
+        try {
+          result = model[LISTENERS][payload.action](payload.data)
+        } catch (e) {
+          if (typeof model.failedDispatch === 'function') {
+            result = !!model.failedDispatch(
+              e,
+              payload.action.toString(),
+              payload.data,
+              this[STATE_CONTAINER]
+            )
+          } else {
+            throw e
+          }
+        }
+
         if (result !== false) {
           this.emitChange()
         }
