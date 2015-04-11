@@ -370,7 +370,7 @@ const filterSnapshotOfStores = (instance, serializedSnapshot, storeNames) => {
   return instance.serialize(storesToReset)
 }
 
-const createStoreFromObject = (alt, StoreModel, key, saveStore) => {
+function createStoreFromObject(alt, StoreModel, key) {
   let storeInstance
 
   const StoreProto = {}
@@ -410,11 +410,44 @@ const createStoreFromObject = (alt, StoreModel, key, saveStore) => {
     StoreProto.publicMethods
   )
 
-  /* istanbul ignore else */
-  if (saveStore) {
-    alt.stores[key] = storeInstance
-    saveInitialSnapshot(alt, key)
+  return storeInstance
+}
+
+function createStoreFromClass(alt, StoreModel, key, ...args) {
+  let storeInstance
+
+  // Creating a class here so we don't overload the provided store's
+  // prototype with the mixin behaviour and I'm extending from StoreModel
+  // so we can inherit any extensions from the provided store.
+  class Store extends StoreModel {
+    constructor(...args) {
+      super(...args)
+    }
   }
+
+  assign(Store.prototype, StoreMixinListeners, StoreMixinEssentials, {
+    _storeName: key,
+    alt: alt,
+    dispatcher: alt.dispatcher,
+    getInstance() {
+      return storeInstance
+    },
+    setState(nextState) {
+      doSetState(this, storeInstance, nextState)
+    }
+  })
+
+  Store.prototype[ALL_LISTENERS] = []
+  Store.prototype[LIFECYCLE] = {}
+  Store.prototype[LISTENERS] = {}
+  Store.prototype[PUBLIC_METHODS] = {}
+
+  const store = new Store(...args)
+
+  storeInstance = assign(
+    new AltStore(alt.dispatcher, store, null, StoreModel),
+    getInternalMethods(StoreModel, builtIns)
+  )
 
   return storeInstance
 }
@@ -433,11 +466,17 @@ class Alt {
     this.dispatcher.dispatch({ action, data })
   }
 
-  createStore(StoreModel, iden, saveStore = true) {
-    let storeInstance
+  createUnsavedStore(StoreModel, ...args) {
+    const key = StoreModel.displayName || ''
+    return typeof StoreModel === 'object'
+      ? createStoreFromObject(this, StoreModel, key)
+      : createStoreFromClass(this, StoreModel, key, ...args)
+  }
+
+  createStore(StoreModel, iden, ...args) {
     let key = iden || StoreModel.name || StoreModel.displayName || ''
 
-    if (saveStore && (this.stores[key] || !key)) {
+    if (this.stores[key] || !key) {
       if (this.stores[key]) {
         warn(
           `A store named ${key} already exists, double check your store ` +
@@ -450,47 +489,12 @@ class Alt {
       key = uid(this.stores, key)
     }
 
-    if (typeof StoreModel === 'object') {
-      return createStoreFromObject(this, StoreModel, key, saveStore)
-    }
+    const storeInstance = typeof StoreModel === 'object'
+      ? createStoreFromObject(this, StoreModel, key)
+      : createStoreFromClass(this, StoreModel, key, ...args)
 
-    // Creating a class here so we don't overload the provided store's
-    // prototype with the mixin behaviour and I'm extending from StoreModel
-    // so we can inherit any extensions from the provided store.
-    class Store extends StoreModel {
-      constructor(alt) {
-        super(alt)
-      }
-    }
-
-    assign(Store.prototype, StoreMixinListeners, StoreMixinEssentials, {
-      _storeName: key,
-      alt: this,
-      dispatcher: this.dispatcher,
-      getInstance() {
-        return storeInstance
-      },
-      setState(nextState) {
-        doSetState(this, storeInstance, nextState)
-      }
-    })
-
-    Store.prototype[ALL_LISTENERS] = []
-    Store.prototype[LIFECYCLE] = {}
-    Store.prototype[LISTENERS] = {}
-    Store.prototype[PUBLIC_METHODS] = {}
-
-    const store = new Store(this)
-
-    storeInstance = assign(
-      new AltStore(this.dispatcher, store, null, StoreModel),
-      getInternalMethods(StoreModel, builtIns)
-    )
-
-    if (saveStore) {
-      this.stores[key] = storeInstance
-      saveInitialSnapshot(this, key)
-    }
+    this.stores[key] = storeInstance
+    saveInitialSnapshot(this, key)
 
     return storeInstance
   }
@@ -519,15 +523,15 @@ class Alt {
     return action
   }
 
-  createActions(ActionsClass, exportObj = {}) {
+  createActions(ActionsClass, exportObj = {}, ...args) {
     const actions = {}
     const key = ActionsClass.name || ActionsClass.displayName || ''
 
     if (typeof ActionsClass === 'function') {
       assign(actions, getInternalMethods(ActionsClass.prototype, builtInProto))
       class ActionsGenerator extends ActionsClass {
-        constructor(alt) {
-          super(alt)
+        constructor(...args) {
+          super(...args)
         }
 
         generateActions(...actionNames) {
@@ -540,7 +544,7 @@ class Alt {
         }
       }
 
-      assign(actions, new ActionsGenerator(this))
+      assign(actions, new ActionsGenerator(...args))
     } else {
       assign(actions, ActionsClass)
     }
@@ -606,8 +610,8 @@ class Alt {
       : this.createActions(ActionsClass)
   }
 
-  addStore(name, StoreModel, saveStore) {
-    this.createStore(StoreModel, name, saveStore)
+  addStore(name, StoreModel, ...args) {
+    this.createStore(StoreModel, name, ...args)
   }
 
   getActions(name) {

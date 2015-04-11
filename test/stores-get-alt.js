@@ -11,7 +11,7 @@ export default {
       }
     }
 
-    alt.createStore(MyStore)
+    alt.createStore(MyStore, 'MyStore', alt)
   },
 
   'the actions get the alt instance'() {
@@ -21,6 +21,6 @@ export default {
       }
     }
 
-    alt.createActions(MyActions)
+    alt.createActions(MyActions, undefined, alt)
   }
 }

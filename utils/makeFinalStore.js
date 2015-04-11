@@ -37,5 +37,5 @@ function FinalStore() {
 }
 
 function makeFinalStore(alt) {
-  return alt.createStore(FinalStore, 'AltFinalStore', false)
+  return alt.createUnsavedStore(FinalStore)
 }
