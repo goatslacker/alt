@@ -89,7 +89,18 @@ var AltStore = (function () {
         model.beforeEach(payload.action.toString(), payload.data, _this8[STATE_CONTAINER]);
       }
       if (model[LISTENERS][payload.action]) {
-        var result = model[LISTENERS][payload.action](payload.data);
+        var result = false;
+
+        try {
+          result = model[LISTENERS][payload.action](payload.data);
+        } catch (e) {
+          if (typeof model.failedDispatch === "function") {
+            result = !!model.failedDispatch(e, payload.action.toString(), payload.data, _this8[STATE_CONTAINER]);
+          } else {
+            throw e;
+          }
+        }
+
         if (result !== false) {
           _this8.emitChange();
         }
