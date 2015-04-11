@@ -44,7 +44,7 @@
     "build-utils": "babel src/utils --out-dir utils --stage 0",
     "build-alt-browser": "browserify src/alt -t [envify --NODE_ENV production ] -t babelify --outfile dist/alt.js --standalone Alt",
     "build-alt-browser-with-addons": "browserify src/alt/addons.js -t [envify --NODE_ENV production ] -t babelify -t browserify-shim --outfile dist/alt-with-addons.js --standalone Alt",
-    "build-test": "babel src/alt --out-dir lib -r && babel src/utils --out-dir utils -r",
+    "build-test": "babel src/alt --out-dir lib -r --stage 0 && babel src/utils --out-dir utils -r --stage 0",
     "coverage": "npm run build-test && istanbul cover node_modules/mocha/bin/_mocha -- -u exports -R spec --require ./test/babel --require babel-core/external-helpers test",
     "clean": "rimraf lib && rimraf utils",
     "lint": "eslint src mixins components",
