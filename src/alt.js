@@ -76,7 +76,7 @@ function NoopClass() { }
 const builtIns = Object.getOwnPropertyNames(NoopClass)
 const builtInProto = Object.getOwnPropertyNames(NoopClass.prototype)
 
-const getInternalMethods = (obj, excluded) => {
+function getInternalMethods(obj, excluded) {
   return Object.getOwnPropertyNames(obj).reduce((value, m) => {
     if (excluded.indexOf(m) !== -1) {
       return value
@@ -323,7 +323,7 @@ const StoreMixinEssentials = {
   }
 }
 
-const setAppState = (instance, data, onStore) => {
+function setAppState(instance, data, onStore) {
   const obj = instance.deserialize(data)
   Object.keys(obj).forEach((key) => {
     const store = instance.stores[key]
@@ -337,7 +337,7 @@ const setAppState = (instance, data, onStore) => {
   })
 }
 
-const snapshot = (instance, ...storeNames) => {
+function snapshot(instance, ...storeNames) {
   const stores = storeNames.length ? storeNames : Object.keys(instance.stores)
   return stores.reduce((obj, key) => {
     const store = instance.stores[key]
@@ -350,7 +350,7 @@ const snapshot = (instance, ...storeNames) => {
   }, {})
 }
 
-const saveInitialSnapshot = (instance, key) => {
+function saveInitialSnapshot(instance, key) {
   const state = instance.stores[key][STATE_CONTAINER]
   const initial = instance.deserialize(instance[INIT_SNAPSHOT])
   initial[key] = state
@@ -358,7 +358,7 @@ const saveInitialSnapshot = (instance, key) => {
   instance[LAST_SNAPSHOT] = instance[INIT_SNAPSHOT]
 }
 
-const filterSnapshotOfStores = (instance, serializedSnapshot, storeNames) => {
+function filterSnapshotOfStores(instance, serializedSnapshot, storeNames) {
   const stores = instance.deserialize(serializedSnapshot)
   const storesToReset = storeNames.reduce((obj, name) => {
     if (!stores[name]) {
@@ -413,7 +413,7 @@ function createStoreFromObject(alt, StoreModel, key) {
   return storeInstance
 }
 
-function createStoreFromClass(alt, StoreModel, key, ...args) {
+function createStoreFromClass(alt, StoreModel, key, ...argsForConstructor) {
   let storeInstance
 
   // Creating a class here so we don't overload the provided store's
@@ -442,7 +442,7 @@ function createStoreFromClass(alt, StoreModel, key, ...args) {
   Store.prototype[LISTENERS] = {}
   Store.prototype[PUBLIC_METHODS] = {}
 
-  const store = new Store(...args)
+  const store = new Store(...argsForConstructor)
 
   storeInstance = assign(
     new AltStore(alt.dispatcher, store, null, StoreModel),
@@ -523,7 +523,7 @@ class Alt {
     return action
   }
 
-  createActions(ActionsClass, exportObj = {}, ...args) {
+  createActions(ActionsClass, exportObj = {}, ...argsForConstructor) {
     const actions = {}
     const key = ActionsClass.name || ActionsClass.displayName || ''
 
@@ -544,7 +544,7 @@ class Alt {
         }
       }
 
-      assign(actions, new ActionsGenerator(...args))
+      assign(actions, new ActionsGenerator(...argsForConstructor))
     } else {
       assign(actions, ActionsClass)
     }
@@ -604,10 +604,10 @@ class Alt {
 
   // Instance type methods for injecting alt into your application as context
 
-  addActions(name, ActionsClass) {
+  addActions(name, ActionsClass, ...args) {
     this.actions[name] = Array.isArray(ActionsClass)
       ? this.generateActions.apply(this, ActionsClass)
-      : this.createActions(ActionsClass)
+      : this.createActions(ActionsClass, ...args)
   }
 
   addStore(name, StoreModel, ...args) {

@@ -816,7 +816,7 @@ function NoopClass() {}
 var builtIns = Object.getOwnPropertyNames(NoopClass);
 var builtInProto = Object.getOwnPropertyNames(NoopClass.prototype);
 
-var getInternalMethods = function (obj, excluded) {
+function getInternalMethods(obj, excluded) {
   return Object.getOwnPropertyNames(obj).reduce(function (value, m) {
     if (excluded.indexOf(m) !== -1) {
       return value;
@@ -825,7 +825,7 @@ var getInternalMethods = function (obj, excluded) {
     value[m] = obj[m];
     return value;
   }, {});
-};
+}
 
 var AltStore = (function () {
   function AltStore(dispatcher, model, state, StoreModel) {
@@ -1064,7 +1064,7 @@ var StoreMixinEssentials = {
   }
 };
 
-var setAppState = function (instance, data, onStore) {
+function setAppState(instance, data, onStore) {
   var obj = instance.deserialize(data);
   Object.keys(obj).forEach(function (key) {
     var store = instance.stores[key];
@@ -1076,9 +1076,9 @@ var setAppState = function (instance, data, onStore) {
       onStore(store);
     }
   });
-};
+}
 
-var snapshot = function (instance) {
+function snapshot(instance) {
   for (var _len = arguments.length, storeNames = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
     storeNames[_key - 1] = arguments[_key];
   }
@@ -1093,17 +1093,17 @@ var snapshot = function (instance) {
     obj[key] = customSnapshot ? customSnapshot : store.getState();
     return obj;
   }, {});
-};
+}
 
-var saveInitialSnapshot = function (instance, key) {
+function saveInitialSnapshot(instance, key) {
   var state = instance.stores[key][STATE_CONTAINER];
   var initial = instance.deserialize(instance[INIT_SNAPSHOT]);
   initial[key] = state;
   instance[INIT_SNAPSHOT] = instance.serialize(initial);
   instance[LAST_SNAPSHOT] = instance[INIT_SNAPSHOT];
-};
+}
 
-var filterSnapshotOfStores = function (instance, serializedSnapshot, storeNames) {
+function filterSnapshotOfStores(instance, serializedSnapshot, storeNames) {
   var stores = instance.deserialize(serializedSnapshot);
   var storesToReset = storeNames.reduce(function (obj, name) {
     if (!stores[name]) {
@@ -1113,7 +1113,7 @@ var filterSnapshotOfStores = function (instance, serializedSnapshot, storeNames)
     return obj;
   }, {});
   return instance.serialize(storesToReset);
-};
+}
 
 function createStoreFromObject(alt, StoreModel, key) {
   var storeInstance = undefined;
@@ -1156,8 +1156,8 @@ function createStoreFromObject(alt, StoreModel, key) {
 }
 
 function createStoreFromClass(alt, StoreModel, key) {
-  for (var _len = arguments.length, args = Array(_len > 3 ? _len - 3 : 0), _key = 3; _key < _len; _key++) {
-    args[_key - 3] = arguments[_key];
+  for (var _len = arguments.length, argsForConstructor = Array(_len > 3 ? _len - 3 : 0), _key = 3; _key < _len; _key++) {
+    argsForConstructor[_key - 3] = arguments[_key];
   }
 
   var storeInstance = undefined;
@@ -1199,7 +1199,7 @@ function createStoreFromClass(alt, StoreModel, key) {
   Store.prototype[LISTENERS] = {};
   Store.prototype[PUBLIC_METHODS] = {};
 
-  var store = _applyConstructor(Store, args);
+  var store = _applyConstructor(Store, argsForConstructor);
 
   storeInstance = assign(new AltStore(alt.dispatcher, store, null, StoreModel), getInternalMethods(StoreModel, builtIns));
 
@@ -1300,8 +1300,8 @@ var Alt = (function () {
       value: function createActions(ActionsClass) {
         var _this8 = this;
 
-        for (var _len = arguments.length, args = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
-          args[_key - 2] = arguments[_key];
+        for (var _len = arguments.length, argsForConstructor = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+          argsForConstructor[_key - 2] = arguments[_key];
         }
 
         var exportObj = arguments[1] === undefined ? {} : arguments[1];
@@ -1350,7 +1350,7 @@ var Alt = (function () {
               return ActionsGenerator;
             })(ActionsClass);
 
-            assign(actions, _applyConstructor(ActionsGenerator, args));
+            assign(actions, _applyConstructor(ActionsGenerator, argsForConstructor));
           })();
         } else {
           assign(actions, ActionsClass);
@@ -1423,18 +1423,20 @@ var Alt = (function () {
       // Instance type methods for injecting alt into your application as context
 
       value: function addActions(name, ActionsClass) {
-        this.actions[name] = Array.isArray(ActionsClass) ? this.generateActions.apply(this, ActionsClass) : this.createActions(ActionsClass);
-      }
-    },
-    addStore: {
-      value: function addStore(name, StoreModel) {
-        var _ref;
-
         for (var _len = arguments.length, args = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
           args[_key - 2] = arguments[_key];
         }
 
-        (_ref = this).createStore.apply(_ref, [StoreModel, name].concat(args));
+        this.actions[name] = Array.isArray(ActionsClass) ? this.generateActions.apply(this, ActionsClass) : this.createActions.apply(this, [ActionsClass].concat(args));
+      }
+    },
+    addStore: {
+      value: function addStore(name, StoreModel) {
+        for (var _len = arguments.length, args = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+          args[_key - 2] = arguments[_key];
+        }
+
+        this.createStore.apply(this, [StoreModel, name].concat(args));
       }
     },
     getActions: {
