@@ -16,7 +16,7 @@
 * Isomorphic! Run a flux setup on your server and then share the same code with the client.
 * Actively maintained and being used in production.
 * Extremely [flexible](#flexibility) and unopinionated in how you use flux. Create traditional singletons or use dependency injection.
-* It is [terse](https://github.com/goatslacker/alt#no-boilerplate). No boilerplate.
+* It is [terse](https://github.com/goatslacker/alt#flux-minus-the-boilerplate). No boilerplate.
 
 ### What does it look like?
 
