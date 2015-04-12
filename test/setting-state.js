@@ -26,6 +26,10 @@ const myStore = alt.createStore(MyStore)
 
 export default {
   'setState': {
+    beforeEach() {
+      alt.recycle()
+    },
+
     'using setState to set the state'() {
       const spy = sinon.spy()
       myStore.listen(spy)
@@ -33,7 +37,7 @@ export default {
       actions.fire()
 
       assert(myStore.getState().foo === 2, 'foo was incremented')
-      assert(myStore.getState().retVal === false, 'return value of setState is false')
+      assert.isUndefined(myStore.getState().retVal, 'return value of setState is undefined')
 
       myStore.unlisten(spy)
 
@@ -41,6 +45,19 @@ export default {
       actions.nothing()
 
       assert.ok(spy.calledOnce, 'spy was only called once')
-    }
+    },
+
+    'by using setState a change event is not emitted twice'() {
+      const spy = sinon.spy()
+      myStore.listen(spy)
+
+      actions.nothing()
+
+      assert(myStore.getState().foo === 1, 'foo remains the same')
+
+      assert.ok(spy.calledOnce, 'spy was only called once')
+
+      myStore.unlisten(spy)
+    },
   }
 }

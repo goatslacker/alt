@@ -15,6 +15,7 @@ const LAST_SNAPSHOT = Symbol('last snapshot storage')
 const LIFECYCLE = Symbol('store lifecycle listeners')
 const LISTENERS = Symbol('stores action listeners storage')
 const PUBLIC_METHODS = Symbol('store public method storage')
+const SET_STATE = Symbol()
 const STATE_CONTAINER = Symbol('the state container')
 
 const GlobalActionsNameRegistry = {}
@@ -76,8 +77,9 @@ class AltStore {
         )
       }
       if (model[LISTENERS][payload.action]) {
+        this[SET_STATE] = false
         const result = model[LISTENERS][payload.action](payload.data)
-        if (result !== false) {
+        if (result !== false && this[SET_STATE] === false) {
           this.emitChange()
         }
       }
@@ -311,9 +313,9 @@ const createStoreFromObject = (alt, StoreModel, key, saveStore) => {
       return storeInstance
     },
     setState(values = {}) {
+      storeInstance[SET_STATE] = true
       assign(this.state, values)
       this.emitChange()
-      return false
     }
   }, StoreMixinListeners, StoreMixinEssentials, StoreModel)
 
@@ -401,9 +403,9 @@ class Alt {
         return storeInstance
       },
       setState(values = {}) {
+        storeInstance[SET_STATE] = true
         assign(this, values)
         this.emitChange()
-        return false
       }
     })
 

@@ -1015,6 +1015,7 @@ var LAST_SNAPSHOT = Symbol("last snapshot storage");
 var LIFECYCLE = Symbol("store lifecycle listeners");
 var LISTENERS = Symbol("stores action listeners storage");
 var PUBLIC_METHODS = Symbol("store public method storage");
+var SET_STATE = Symbol();
 var STATE_CONTAINER = Symbol("the state container");
 
 var GlobalActionsNameRegistry = {};
@@ -1076,8 +1077,9 @@ var AltStore = (function () {
         model.beforeEach(payload.action.toString(), payload.data, _this8[STATE_CONTAINER]);
       }
       if (model[LISTENERS][payload.action]) {
+        _this8[SET_STATE] = false;
         var result = model[LISTENERS][payload.action](payload.data);
-        if (result !== false) {
+        if (result !== false && _this8[SET_STATE] === false) {
           _this8.emitChange();
         }
       }
@@ -1327,9 +1329,9 @@ var createStoreFromObject = function (alt, StoreModel, key, saveStore) {
     setState: function setState() {
       var values = arguments[0] === undefined ? {} : arguments[0];
 
+      storeInstance[SET_STATE] = true;
       assign(this.state, values);
       this.emitChange();
-      return false;
     }
   }, StoreMixinListeners, StoreMixinEssentials, StoreModel);
 
@@ -1429,9 +1431,9 @@ var Alt = (function () {
           setState: function setState() {
             var values = arguments[0] === undefined ? {} : arguments[0];
 
+            storeInstance[SET_STATE] = true;
             assign(this, values);
             this.emitChange();
-            return false;
           }
         });
 
