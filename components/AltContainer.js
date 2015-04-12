@@ -52,6 +52,10 @@ function getStateFromActionsProp(actions, props) {
 }
 
 var AltContainer = React.createClass({
+  contextTypes: {
+    flux: React.PropTypes.object
+  },
+
   getInitialState: function () {
     if (this.props.stores && this.props.store) {
       throw new ReferenceError('Cannot define both store and stores')

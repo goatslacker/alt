@@ -1,6 +1,7 @@
 import Alt from '../dist/alt-with-runtime'
 import React from 'react/addons'
 import AltContainer from '../components/AltContainer'
+import withAltContext from '../utils/withAltContext'
 import { assert } from 'chai'
 import { jsdom } from 'jsdom'
 import sinon from 'sinon'
@@ -64,9 +65,9 @@ class Flux extends Alt {
 export default {
   'AltContainer': {
     beforeEach() {
-      global.document = jsdom('<!doctype html><html><body></body></html>');
-      global.window = global.document.parentWindow;
-      global.navigator = global.window.navigator;
+      global.document = jsdom('<!doctype html><html><body></body></html>')
+      global.window = global.document.parentWindow
+      global.navigator = global.window.navigator
 
       alt.recycle()
     },
@@ -118,29 +119,42 @@ export default {
     'works with context'() {
       const flux = new Flux()
 
-      const withContext = (context, Component) => {
-        return React.createClass({
-          childContextTypes: {
-            flux: React.PropTypes.instanceOf(Alt)
-          },
-
-          getChildContext() {
-            return context
-          },
-
-          render() {
-            return <Component {...this.props} />
-          }
-        })
-      }
-
-      const ContextComponent = withContext({ flux }, AltContainer)
-      const tree = TestUtils.renderIntoDocument(<ContextComponent />);
+      const ContextComponent = withAltContext(flux, AltContainer)
+      const tree = TestUtils.renderIntoDocument(<ContextComponent />)
 
       const contextComponent = TestUtils.findRenderedComponentWithType(
         tree,
         AltContainer
-      );
+      )
+
+      assert.instanceOf(contextComponent.context.flux, Flux)
+    },
+
+    'children get flux as props with context'() {
+      const flux = new Flux()
+
+      const TestComponent = React.createClass({
+        render() {
+          return (
+            <AltContainer>
+              <div>
+                <div>
+                  <AltContainer>
+                    <span />
+                  </AltContainer>
+                </div>
+              </div>
+            </AltContainer>
+          )
+        }
+      })
+
+      const WrappedComponent = withAltContext(flux, TestComponent)
+
+      const node = TestUtils.renderIntoDocument(<WrappedComponent />)
+      const span = TestUtils.findRenderedDOMComponentWithTag(node, 'span')
+
+      assert.instanceOf(span.props.flux, Flux)
     },
 
     'works with instances and props'() {
