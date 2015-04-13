@@ -88,7 +88,7 @@ Read more about the [Principles of Flux](https://medium.com/@goatslacker/princip
 There is no giant switch statement you have to write in your store and this is because alt removes the burden of constants from the developer.
 This has the wonderful side effect of making the custom dispatcher logic unnecessary, thus removing the dispatcher from the equation.
 
-Make no mistake, there is still a single dispatcher through which actions flow through on their merry way to the store, in fact, you still get the benefit of being able to hook into the dispatcher to listen to all the global events for debugging, fun, or misery.
+Make no mistake, there is still a single dispatcher through which actions flow on their merry way to the store, in fact, you still get the benefit of being able to hook into the dispatcher to listen to all the global events for debugging, fun, or misery.
 The dispatcher is just a part of alt and something you don't necessarily have to write custom code for.
 
 These removals make the code terse and easy to follow, there is less indirection and the learning curve to grok is much lower.
