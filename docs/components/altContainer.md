@@ -13,6 +13,20 @@ The basic idea is that you have a container that wraps your component, the duty 
 
 AltContainer doesn't just wrap your dumb components into a high-performance store listener but it also serves as a jack-of-all-trades component where you can directly inject any dependencies into your components such as stores, actions, or the flux context.
 
+## Importing
+
+To import `AltContainer`, you may do it like the following:
+
+```js
+import AltContainer from 'alt/components/AltContainer';
+```
+
+**For CommonJS**:
+
+```js
+var AltContainer = require('alt/components/AltContainer');
+```
+
 ## `stores`
 
 You can pass in an object to `stores` where the keys correspond to the prop that the children will receive and their value the store we should retrieve the state from.
