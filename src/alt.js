@@ -78,7 +78,23 @@ class AltStore {
       }
       if (model[LISTENERS][payload.action]) {
         this[SET_STATE] = false
-        const result = model[LISTENERS][payload.action](payload.data)
+        let result = false
+
+        try {
+          result = model[LISTENERS][payload.action](payload.data)
+        } catch (e) {
+          if (this[LIFECYCLE].error) {
+            this[LIFECYCLE].error(
+              e,
+              payload.action.toString(),
+              payload.data,
+              this[STATE_CONTAINER]
+            )
+          } else {
+            throw e
+          }
+        }
+
         if (result !== false && this[SET_STATE] === false) {
           this.emitChange()
         }

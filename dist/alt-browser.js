@@ -822,7 +822,18 @@ var AltStore = (function () {
       }
       if (model[LISTENERS][payload.action]) {
         _this8[SET_STATE] = false;
-        var result = model[LISTENERS][payload.action](payload.data);
+        var result = false;
+
+        try {
+          result = model[LISTENERS][payload.action](payload.data);
+        } catch (e) {
+          if (_this8[LIFECYCLE].error) {
+            _this8[LIFECYCLE].error(e, payload.action.toString(), payload.data, _this8[STATE_CONTAINER]);
+          } else {
+            throw e;
+          }
+        }
+
         if (result !== false && _this8[SET_STATE] === false) {
           _this8.emitChange();
         }
