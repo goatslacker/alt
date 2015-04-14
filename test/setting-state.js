@@ -59,5 +59,94 @@ export default {
 
       myStore.unlisten(spy)
     },
+
+    'transactional setState'() {
+      const alt = new Alt()
+
+      const actions = alt.generateActions('fire')
+      class SetState {
+        constructor() {
+          this.bindActions(actions)
+          this.x = 0
+        }
+
+        fire() {
+          this.setState(() => {
+            return {
+              x: 1
+            }
+          })
+        }
+      }
+
+      const store = alt.createStore(SetState)
+
+      assert(store.getState().x === 0, 'x is initially 0')
+      actions.fire()
+      assert(store.getState().x === 1, 'x is 1')
+    },
+
+    'transactional setState with failure'() {
+      const alt = new Alt()
+
+      const actions = alt.generateActions('fire')
+      class SetState {
+        constructor() {
+          this.bindActions(actions)
+          this.x = 0
+        }
+
+        fire() {
+          this.setState(() => {
+            throw new Error('error')
+          })
+        }
+      }
+
+      const store = alt.createStore(SetState)
+
+      assert(store.getState().x === 0, 'x is initially 0')
+      assert.throws(() => actions.fire())
+      assert(store.getState().x === 0, 'x remains 0')
+    },
+
+    'setState no dispatch'() {
+      const alt = new Alt()
+
+      const actions = alt.generateActions('fire')
+      class BrokenSetState {
+        constructor() {
+          this.x = 0
+          this.setState({ x: 1 })
+        }
+      }
+
+      assert.throws(() => {
+        alt.createStore(BrokenSetState)
+      })
+    },
+
+    'state is set not replaced'() {
+      const alt = new Alt()
+
+      const actions = alt.generateActions('fire')
+      class SetState {
+        constructor() {
+          this.bindActions(actions)
+          this.x = 0
+          this.y = 0
+        }
+
+        fire() {
+          this.setState({ x: 1 })
+        }
+      }
+      const store = alt.createStore(SetState)
+
+      assert(store.getState().x === 0, 'x is initially 0')
+      actions.fire()
+      assert(store.getState().x === 1, 'x is now 1')
+      assert(store.getState().y === 0, 'y was untouched')
+    },
   }
 }

@@ -759,7 +759,7 @@ var LAST_SNAPSHOT = Symbol("last snapshot storage");
 var LIFECYCLE = Symbol("store lifecycle listeners");
 var LISTENERS = Symbol("stores action listeners storage");
 var PUBLIC_METHODS = Symbol("store public method storage");
-var SET_STATE = Symbol();
+var STATE_CHANGED = Symbol();
 var STATE_CONTAINER = Symbol("the state container");
 
 var GlobalActionsNameRegistry = {};
@@ -777,6 +777,24 @@ function uid(container, name) {
     key = name + String(++count);
   }
   return key;
+}
+
+function doSetState(store, storeInstance, nextState) {
+  if (!nextState) {
+    return;
+  }
+
+  if (!store.alt.dispatcher.isDispatching()) {
+    throw new Error("You can only use setState while dispatching");
+  }
+
+  if (typeof nextState === "function") {
+    assign(storeInstance[STATE_CONTAINER], nextState(storeInstance[STATE_CONTAINER]));
+  } else {
+    assign(storeInstance[STATE_CONTAINER], nextState);
+  }
+
+  storeInstance[STATE_CHANGED] = true;
 }
 
 /* istanbul ignore next */
@@ -804,6 +822,7 @@ var AltStore = (function () {
 
     this[EE] = new EventEmitter();
     this[LIFECYCLE] = {};
+    this[STATE_CHANGED] = false;
     this[STATE_CONTAINER] = state || model;
 
     this.boundListeners = model[ALL_LISTENERS];
@@ -820,8 +839,8 @@ var AltStore = (function () {
       if (typeof model.beforeEach === "function") {
         model.beforeEach(payload.action.toString(), payload.data, _this8[STATE_CONTAINER]);
       }
+
       if (model[LISTENERS][payload.action]) {
-        _this8[SET_STATE] = false;
         var result = false;
 
         try {
@@ -834,10 +853,13 @@ var AltStore = (function () {
           }
         }
 
-        if (result !== false && _this8[SET_STATE] === false) {
+        if (result !== false || _this8[STATE_CHANGED]) {
           _this8.emitChange();
         }
+
+        _this8[STATE_CHANGED] = false;
       }
+
       if (typeof model.afterEach === "function") {
         model.afterEach(payload.action.toString(), payload.data, _this8[STATE_CONTAINER]);
       }
@@ -1081,12 +1103,8 @@ var createStoreFromObject = function (alt, StoreModel, key, saveStore) {
     getInstance: function getInstance() {
       return storeInstance;
     },
-    setState: function setState() {
-      var values = arguments[0] === undefined ? {} : arguments[0];
-
-      storeInstance[SET_STATE] = true;
-      assign(this.state, values);
-      this.emitChange();
+    setState: function setState(nextState) {
+      doSetState(this, storeInstance, nextState);
     }
   }, StoreMixinListeners, StoreMixinEssentials, StoreModel);
 
@@ -1183,12 +1201,8 @@ var Alt = (function () {
           getInstance: function getInstance() {
             return storeInstance;
           },
-          setState: function setState() {
-            var values = arguments[0] === undefined ? {} : arguments[0];
-
-            storeInstance[SET_STATE] = true;
-            assign(this, values);
-            this.emitChange();
+          setState: function setState(nextState) {
+            doSetState(this, storeInstance, nextState);
           }
         });
 
