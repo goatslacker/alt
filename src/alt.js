@@ -79,8 +79,12 @@ class AltStore {
       if (model[LISTENERS][payload.action]) {
         this[SET_STATE] = false
         const result = model[LISTENERS][payload.action](payload.data)
-        if (result !== false && this[SET_STATE] === false) {
-          this.emitChange()
+        if (this[SET_STATE] === false) {
+          if (result instanceof Promise) {
+            result.then(() => { this.emitChange(); });
+          } else if (result !== false) {
+            this.emitChange()
+          }
         }
       }
       if (typeof model.afterEach === 'function') {
