@@ -22,13 +22,13 @@ If you're using [`react-native`](http://www.reactnative.com/) then you'll want t
 To import `AltContainer`, you may do it like the following:
 
 ```js
-import AltContainer from 'alt/components/AltContainer';
+import AltContainer from 'alt/AltContainer';
 ```
 
 **For CommonJS**:
 
 ```js
-var AltContainer = require('alt/components/AltContainer');
+var AltContainer = require('alt/AltContainer');
 ```
 
 ## `stores`
