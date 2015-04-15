@@ -1,47 +1,14 @@
 /**
- * AltContainer.
+ * AltNativeContainer.
  *
- * There are many ways to use AltContainer.
- *
- * Using the `stores` prop.
- *
- * <AltContainer stores={{ FooStore: FooStore }}>
- *   children get this.props.FootStore.storeData
- * </AltContainer>
- *
- * You can also pass in functions.
- *
- * <AltContainer stores={{ FooStore: function () { return { storeData: true } } }}>
- *   children get this.props.FootStore.storeData
- * </AltContainer>
- *
- * Using the `store` prop.
- *
- * <AltContainer store={FooStore}>
- *   children get this.props.storeData
- * </AltContainer>
- *
- * Passing in `flux` because you're using alt instances
- *
- * <AltContainer flux={flux}>
- *   children get this.props.flux
- * </AltContainer>
- *
- * Using a custom render function.
- *
- * <AltContainer
- *   render={function (props) {
- *     return <div />;
- *   }}
- * />
- *
- * Full docs available at http://goatslacker.github.io/alt/
+ * @see AltContainer
  */
-var React = require('react/addons')
+var React = require('react-native')
 var Subscribe = require('../mixins/Subscribe')
 var assign = require('object-assign')
 
-var cloneWithProps = React.addons.cloneWithProps
+var View = React.View
+var cloneWithProps = React.cloneWithProps
 
 function getStateFromStore(store, props) {
   return typeof store === 'function' ? store(props) : store.getState()
@@ -51,8 +18,8 @@ function getStateFromActionsProp(actions, props) {
   return typeof actions === 'function' ? actions(props) : actions
 }
 
-var AltContainer = React.createClass({
-  displayName: 'AltContainer',
+var AltNativeContainer = React.createClass({
+  displayName: 'AltNativeContainer',
 
   contextTypes: {
     flux: React.PropTypes.object
@@ -189,4 +156,4 @@ var AltContainer = React.createClass({
   }
 })
 
-module.exports = AltContainer
+module.exports = AltNativeContainer
