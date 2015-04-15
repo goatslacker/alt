@@ -255,6 +255,29 @@
 }
 </code></pre>
 
+<h2 id="error">Error</h2>
+
+<p><code>error</code> is called whenever an error occurs in your store during a dispatch. You can use this listener to catch errors and perform any cleanup tasks.</p>
+
+<pre><code class="language-js">class Store {
+  constructor() {
+    this.on('error', (err, actionName, payloadData, currentState) =&gt; {
+      if (actionName === MyActions.fire) {
+        logError(err, payloadData);
+      }
+    });
+
+    this.bindListeners({
+      handleFire: MyActions.fire
+    });
+  }
+
+  handleFire() {
+    throw new Error('Something is broken');
+  }
+}
+</code></pre>
+
           </div>
         </div>
       </div>

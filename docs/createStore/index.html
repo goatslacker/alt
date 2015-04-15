@@ -294,6 +294,38 @@
 }
 </code></pre>
 
+<h2 id="storemodelsetstate">StoreModel#setState</h2>
+
+<blockquote>
+  <table>
+    <tbody>
+      <tr>
+        <td>(state = {}: function</td>
+        <td>object): undefined</td>
+      </tr>
+    </tbody>
+  </table>
+</blockquote>
+
+<p><code>setState</code> is the recommended way to set state for a store. This method automatically emits a change event. <code>setState</code> also accepts a function which returns an object of the state to be set. For convenience, calls to <code>setState</code> are automatically batched as they are in React and only one change event will be emitted once the action finishes dispatching.</p>
+
+<pre><code class="language-js">class MyStore {
+  handleFoo() {
+    this.foo = 0;
+
+    setTimeout(() =&gt; {
+      // set foo to 1 and emit a change.
+      this.setState({
+        foo: 1
+      });
+    }, 100);
+
+    // supress emitting a change.
+    return false;
+  }
+}
+</code></pre>
+
 <h2 id="storemodelexportpublicmethods">StoreModel#exportPublicMethods</h2>
 
 <blockquote>
@@ -361,31 +393,6 @@ class Store extends StoreBase {
   handleFoo() {
     setTimeout(() =&gt; {
       this.emitChange();
-    }, 100);
-
-    // supress emitting a change.
-    return false;
-  }
-}
-</code></pre>
-
-<h2 id="storemodelsetstate">StoreModel#setState</h2>
-
-<blockquote>
-  <p>(state = {}: object): false</p>
-</blockquote>
-
-<p><code>setState</code> is syntactic sugar for setting state. This method automatically emits a change event. This can be particularly useful when performing async in your stores when you wish to update the state and emit a change event all in one.</p>
-
-<pre><code class="language-js">class MyStore {
-  handleFoo() {
-    this.foo = 0;
-
-    setTimeout(() =&gt; {
-      // set foo to 1 and emit a change.
-      this.setState({
-        foo: 1
-      });
     }, 100);
 
     // supress emitting a change.
