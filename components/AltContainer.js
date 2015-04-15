@@ -160,6 +160,12 @@ var AltContainer = React.createClass({
     )
   },
 
+  shouldComponentUpdate: function () {
+    return this.props.shouldComponentUpdate
+      ? this.props.shouldComponentUpdate(this.getProps())
+      : true
+  },
+
   render: function () {
     var children = this.props.children
 

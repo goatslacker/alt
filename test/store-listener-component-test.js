@@ -461,5 +461,20 @@ export default {
       assert.isObject(span.props.FooActions, 'actions are injected')
       assert.isFunction(span.props.FooActions.sup, 'sup is available')
     },
+
+    'scu'() {
+      const scu = sinon.stub().returns(true)
+
+      const node = TestUtils.renderIntoDocument(
+        <AltContainer shouldComponentUpdate={scu} store={TestStore}>
+          <span />
+        </AltContainer>
+      )
+
+      action.sup()
+      assert.ok(scu.calledOnce, 'custom shouldComponentUpdate was called')
+      assert(scu.args[0].length === 1, 'only one arg is passed, the props')
+      assert.isDefined(scu.args[0][0].x, 'x prop exists')
+    },
   }
 }

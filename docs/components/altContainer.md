@@ -197,3 +197,19 @@ const flux = new Flux();
 ```
 
 Header, Body, and Footer will have the `flux` context passed down.
+
+## `shouldComponentUpdate`
+
+`shouldComponentUpdate` prop allows you to fine-tune your performance needs for AltContainer only rendering when absolutely necessary.
+
+This is a function that gets called with the props that your children will receive. You return a boolean depending on if you wish to re-render or not.
+
+```js
+<AltContainer shouldComponentUpdate={(nextProps) => false}>
+  <Header />
+  <Body />
+  <Footer />
+</AltContainer>
+```
+
+In this example, Header, Body, and Footer will not re-render because we're returning false.
