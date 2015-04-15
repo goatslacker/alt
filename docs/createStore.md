@@ -120,6 +120,30 @@ class MyStore {
 }
 ```
 
+## StoreModel#setState
+
+> (state = {}: function | object): undefined
+
+`setState` is the recommended way to set state for a store. This method automatically emits a change event. `setState` also accepts a function which returns an object of the state to be set. For convenience, calls to `setState` are automatically batched as they are in React and only one change event will be emitted once the action finishes dispatching.
+
+```js
+class MyStore {
+  handleFoo() {
+    this.foo = 0;
+
+    setTimeout(() => {
+      // set foo to 1 and emit a change.
+      this.setState({
+        foo: 1
+      });
+    }, 100);
+
+    // supress emitting a change.
+    return false;
+  }
+}
+```
+
 ## StoreModel#exportPublicMethods
 
 > (methods: object): undefined
@@ -184,30 +208,6 @@ class MyStore {
   handleFoo() {
     setTimeout(() => {
       this.emitChange();
-    }, 100);
-
-    // supress emitting a change.
-    return false;
-  }
-}
-```
-
-## StoreModel#setState
-
-> (state = {}: object): false
-
-`setState` is syntactic sugar for setting state. This method automatically emits a change event. This can be particularly useful when performing async in your stores when you wish to update the state and emit a change event all in one.
-
-```js
-class MyStore {
-  handleFoo() {
-    this.foo = 0;
-
-    setTimeout(() => {
-      // set foo to 1 and emit a change.
-      this.setState({
-        foo: 1
-      });
     }, 100);
 
     // supress emitting a change.

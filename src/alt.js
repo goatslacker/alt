@@ -15,7 +15,7 @@ const LAST_SNAPSHOT = Symbol('last snapshot storage')
 const LIFECYCLE = Symbol('store lifecycle listeners')
 const LISTENERS = Symbol('stores action listeners storage')
 const PUBLIC_METHODS = Symbol('store public method storage')
-const SET_STATE = Symbol()
+const STATE_CHANGED = Symbol()
 const STATE_CONTAINER = Symbol('the state container')
 
 const GlobalActionsNameRegistry = {}
@@ -33,6 +33,27 @@ function uid(container, name) {
     key = name + String(++count)
   }
   return key
+}
+
+function doSetState(store, storeInstance, nextState) {
+  if (!nextState) {
+    return
+  }
+
+  if (!store.alt.dispatcher.isDispatching()) {
+    throw new Error('You can only use setState while dispatching')
+  }
+
+  if (typeof nextState === 'function') {
+    assign(
+      storeInstance[STATE_CONTAINER],
+      nextState(storeInstance[STATE_CONTAINER])
+    )
+  } else {
+    assign(storeInstance[STATE_CONTAINER], nextState)
+  }
+
+  storeInstance[STATE_CHANGED] = true
 }
 
 /* istanbul ignore next */
@@ -56,6 +77,7 @@ class AltStore {
   constructor(dispatcher, model, state, StoreModel) {
     this[EE] = new EventEmitter()
     this[LIFECYCLE] = {}
+    this[STATE_CHANGED] = false
     this[STATE_CONTAINER] = state || model
 
     this.boundListeners = model[ALL_LISTENERS]
@@ -76,8 +98,8 @@ class AltStore {
           this[STATE_CONTAINER]
         )
       }
+
       if (model[LISTENERS][payload.action]) {
-        this[SET_STATE] = false
         let result = false
 
         try {
@@ -95,10 +117,13 @@ class AltStore {
           }
         }
 
-        if (result !== false && this[SET_STATE] === false) {
+        if (result !== false || this[STATE_CHANGED]) {
           this.emitChange()
         }
+
+        this[STATE_CHANGED] = false
       }
+
       if (typeof model.afterEach === 'function') {
         model.afterEach(
           payload.action.toString(),
@@ -328,10 +353,8 @@ const createStoreFromObject = (alt, StoreModel, key, saveStore) => {
     getInstance() {
       return storeInstance
     },
-    setState(values = {}) {
-      storeInstance[SET_STATE] = true
-      assign(this.state, values)
-      this.emitChange()
+    setState(nextState) {
+      doSetState(this, storeInstance, nextState)
     }
   }, StoreMixinListeners, StoreMixinEssentials, StoreModel)
 
@@ -418,10 +441,8 @@ class Alt {
       getInstance() {
         return storeInstance
       },
-      setState(values = {}) {
-        storeInstance[SET_STATE] = true
-        assign(this, values)
-        this.emitChange()
+      setState(nextState) {
+        doSetState(this, storeInstance, nextState)
       }
     })
 

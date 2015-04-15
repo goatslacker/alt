@@ -96,9 +96,8 @@ export default {
         },
 
         handleFire(data) {
-          this.state.inst = this.getInstance().getEventEmitter()
-
           this.setState({
+            inst: this.getInstance().getEventEmitter(),
             hello: data
           })
 
