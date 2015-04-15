@@ -1894,6 +1894,7 @@ function FinalStore() {
 
     this.waitFor(stores);
     this.setState({ payload: payload });
+    this.emitChange();
   }).bind(this));
 }
 
