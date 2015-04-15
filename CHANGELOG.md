@@ -4,14 +4,14 @@
 
 Added:
 
-* setState has been batched, it emits a change event if there were changes. [commit](a7d98d7)
-* Util for having atomic transactions in stores. [commit](868a9ac)
-* AltNativeContainer for react-native. [commit](569b4c9)
-* Add shouldComponentUpdate to AltContainer. [commit](edda162)
-* Centralized error handling inside stores. [commit](1dfdd75)
-* Creating single actions. [commit](63d3a72)
-* You can now inject actions into your child React components using AltContainer. [commit](1bd3112)
-* FinalStore now contains the payload as state. [commit](b8480ba)
+* setState has been batched, it emits a change event if there were changes. [commit](https://github.com/goatslacker/alt/commit/a7d98d7)
+* Util for having atomic transactions in stores. [commit](https://github.com/goatslacker/alt/commit/868a9ac)
+* AltNativeContainer for react-native. [commit](https://github.com/goatslacker/alt/commit/569b4c9)
+* Add shouldComponentUpdate to AltContainer. [commit](https://github.com/goatslacker/alt/commit/edda162)
+* Centralized error handling inside stores. [commit](https://github.com/goatslacker/alt/commit/1dfdd75)
+* Creating single actions. [commit](https://github.com/goatslacker/alt/commit/63d3a72)
+* You can now inject actions into your child React components using AltContainer. [commit](https://github.com/goatslacker/alt/commit/1bd3112)
+* FinalStore now contains the payload as state. [commit](https://github.com/goatslacker/alt/commit/b8480ba)
 
 ## 0.15.4
 
