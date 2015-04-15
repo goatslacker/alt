@@ -17,12 +17,14 @@ const store = alt.createStore({
     change: action.fire
   },
 
+  lifecycle: {
+    beforeEach,
+    afterEach
+  },
+
   change(x) {
     this.setState({ a: x })
   },
-
-  beforeEach,
-  afterEach
 })
 
 export default {
@@ -65,14 +67,16 @@ export default {
         bindListeners: {
           change: action.fire
         },
+        lifecycle: {
+          beforeEach(a, b, state) {
+            beforeValue = state.a
+          },
+          afterEach(a, b, state) {
+            afterValue = state.a
+          }
+        },
         change(x) {
           this.setState({ a: x })
-        },
-        beforeEach(a, b, state) {
-          beforeValue = state.a
-        },
-        afterEach(a, b, state) {
-          afterValue = state.a
         }
       })
 
@@ -80,6 +84,29 @@ export default {
 
       assert.ok(beforeValue === 1, 'before has current state')
       assert.ok(afterValue === 2, 'after has next state')
+    },
+
+    'deprecated warning'() {
+      console.warn = sinon.spy()
+
+      class Foo {
+        constructor() {
+          this.bindListeners({
+            change: action.fire
+          })
+        }
+        beforeEach() { }
+        afterEach() { }
+        change() { }
+      }
+
+      assert(console.warn.callCount === 0)
+
+      alt.createStore(Foo)
+
+      action.fire()
+
+      assert.ok(console.warn.calledTwice)
     }
   }
 }
