@@ -23,9 +23,9 @@ MyStore.getState();
 
 ## Store#listen
 
-> (handler: function): undefined
+> (handler: function): function
 
-The listen method takes a function which will be called when the store emits a change. A change event is emitted automatically whenever a dispatch completes unless you return `false` from the action handler method defined in the StoreModel.
+The listen method takes a function which will be called when the store emits a change. A change event is emitted automatically whenever a dispatch completes unless you return `false` from the action handler method defined in the StoreModel. The `listen` method returns a function that you can use to unsubscribe to store updates.
 
 ```js
 MyStore.listen(function (state) {

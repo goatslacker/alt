@@ -280,7 +280,7 @@ var locationStore = alt.createStore({
 
 All store instances returned by `alt.createStore` will have the following methods:
 
-`listen` is meant to be used by your View components in order to await changes made to each store.
+`listen` is meant to be used by your View components in order to await changes made to each store. It returns a function you can use to un-listen to your store.
 
 ```js
 locationStore.listen((data) => {
@@ -288,7 +288,7 @@ locationStore.listen((data) => {
 })
 ```
 
-`unlisten` is a clean up method. It takes in the same function you used for `listen` and unregisters it.
+Alternatively, you can use the `unlisten` method. It takes in the same function you used for `listen` and unregisters it.
 
 `getState` will return a copy of your the current store's state.
 
