@@ -25,6 +25,10 @@ class MyActions {
       'updateAnotherVal'
     )
     this.generateActions('anotherAction')
+
+    this.actionOnThis = function (x) {
+      this.dispatch(x)
+    }
   }
 
   updateName(name) {
@@ -435,6 +439,7 @@ const tests = {
     assert.isFunction(myShorthandActions.actionTwo, 'other action created with shorthand createActions exists')
     assert.isFunction(objActions.hello, 'actions created by obj are functions')
     assert.isFunction(objActions.world, 'actions created by obj are functions')
+    assert.isFunction(myActions.actionOnThis, 'actions defined in `this` are functions')
   },
 
   'existence of constants'() {

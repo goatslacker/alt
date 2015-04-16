@@ -540,7 +540,7 @@ class Alt {
         }
       }
 
-      new ActionsGenerator(this)
+      assign(actions, new ActionsGenerator(this))
     } else {
       assign(actions, ActionsClass)
     }

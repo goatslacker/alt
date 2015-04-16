@@ -1583,7 +1583,7 @@ var Alt = (function () {
               return ActionsGenerator;
             })(ActionsClass);
 
-            new ActionsGenerator(_this8);
+            assign(actions, new ActionsGenerator(_this8));
           })();
         } else {
           assign(actions, ActionsClass);
