@@ -764,17 +764,6 @@ var STATE_CONTAINER = Symbol("the state container");
 
 var GlobalActionsNameRegistry = {};
 
-function warn(msg) {
-  /* istanbul ignore else */
-  if (typeof console !== "undefined") {
-    console.warn(new ReferenceError(msg));
-  }
-}
-
-function deprecatedBeforeAfterEachWarning() {
-  warn("beforeEach/afterEach functions on the store are deprecated " + "use beforeEach/afterEach as a lifecycle method instead");
-}
-
 function formatAsConstant(name) {
   return name.replace(/[a-z]([A-Z])/g, function (i) {
     return "" + i[0] + "_" + i[1].toLowerCase();
@@ -847,10 +836,7 @@ var AltStore = (function () {
 
     // Register dispatcher
     this.dispatchToken = dispatcher.register(function (payload) {
-      if (model[LIFECYCLE].beforeEach) {
-        model[LIFECYCLE].beforeEach(payload.action.toString(), payload.data, _this8[STATE_CONTAINER]);
-      } else if (typeof model.beforeEach === "function") {
-        deprecatedBeforeAfterEachWarning();
+      if (typeof model.beforeEach === "function") {
         model.beforeEach(payload.action.toString(), payload.data, _this8[STATE_CONTAINER]);
       }
 
@@ -874,10 +860,7 @@ var AltStore = (function () {
         _this8[STATE_CHANGED] = false;
       }
 
-      if (model[LIFECYCLE].afterEach) {
-        model[LIFECYCLE].afterEach(payload.action.toString(), payload.data, _this8[STATE_CONTAINER]);
-      } else if (typeof model.afterEach === "function") {
-        deprecatedBeforeAfterEachWarning();
+      if (typeof model.afterEach === "function") {
         model.afterEach(payload.action.toString(), payload.data, _this8[STATE_CONTAINER]);
       }
     });
@@ -1187,10 +1170,13 @@ var Alt = (function () {
         var key = iden || StoreModel.name || StoreModel.displayName || "";
 
         if (saveStore && (this.stores[key] || !key)) {
-          if (this.stores[key]) {
-            warn("A store named " + key + " already exists, double check your store " + "names or pass in your own custom identifier for each store");
-          } else {
-            warn("Store name was not specified");
+          /* istanbul ignore else */
+          if (typeof console !== "undefined") {
+            if (this.stores[key]) {
+              console.warn(new ReferenceError("A store named " + key + " already exists, double check your store " + "names or pass in your own custom identifier for each store"));
+            } else {
+              console.warn(new ReferenceError("Store name was not specified"));
+            }
           }
 
           key = uid(this.stores, key);

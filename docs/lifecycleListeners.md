@@ -120,20 +120,6 @@ class Store {
 }
 ```
 
-## beforeEach
-
-> (action: string, data: mixed, state: object): undefined
-
-This method gets called, if defined, before the payload hits the action. You can use this method to `waitFor` other stores, save previous state, or perform any bookeeping. The state passed in to `beforeEach` is the current state pre-action.
-
-`action` corresponds to the action name that is being called, `data` is the payload, `state` is the current store's state.
-
-## afterEach
-
-> (action: string, data: mixed, state: object): undefined
-
-This method gets called, if defined, after the payload hits the action and the store emits a change. You can use this method for bookeeping and as a companion to `beforeEach`. The state passed in to `afterEach` is the current state post-action.
-
 ## unlisten
 
 > (): undefined
