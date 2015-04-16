@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.15.6
+
+* Adding unlisten lifecycle method. [commit](91a67d4)
+* AltContainer now takes in store listeners for functions. [commit](7083141)
+* `listen` now returns the unlisten function. [commit](864d99c)
+
 ## 0.15.5
 
 Added:
