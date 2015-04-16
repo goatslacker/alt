@@ -53,20 +53,29 @@ For example:
 
 Will pass the state from `BlogStore` (`BlogStore.getState()`) into the `<div />` as `this.props.BlogPosts`. `CommentsStore` will be available in `this.props.Comments`, etc.
 
-You can pass in a custom function as the value in order to control what each prop will represent. Say you have multiple getters on a store and only want to pass a subset of the state rather than the whole state.
+You can pass in a custom function as the value in order to control what each prop will represent. Say you have multiple getters on a store and only want to pass a subset of the state rather than the whole state. These functions must return a special object in order to let AltContainer know which store they'll listen to.
 
 ```js
 <AltContainer
   stores={
     {
       post: function (props) {
-        return BlogStore.getPostFor(props.blogId);
+        return {
+          store: BlogStore,
+          value: BlogStore.getPostFor(props.blogId)
+        };
       },
       comments: function (props) {
-        return CommentsStore.getCommentsFor(props.blogId)
+        return {
+          store: CommentsStore,
+          value: CommentsStore.getCommentsFor(props.blogId)
+        };
       },
       shares: function (props) {
-        return ShareStore.getSharesFor(props.blogId)
+        return {
+          store: ShareStore,
+          value: ShareStore.getSharesFor(props.blogId)
+        };
       }
     }
   }
@@ -100,7 +109,10 @@ Just like `stores`, you can define your own custom function to use with `store`.
 ```js
 
 function blogStoreFetcher(props) {
-  return BlogStore.getPostFor(props.blogId);
+  return {
+    store: BlogStore,
+    value: BlogStore.getPostFor(props.blogId)
+  };
 }
 
 <AltContainer store={blogStoreFetcher}>

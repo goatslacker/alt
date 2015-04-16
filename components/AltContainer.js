@@ -44,7 +44,7 @@ var assign = require('object-assign')
 var cloneWithProps = React.addons.cloneWithProps
 
 function getStateFromStore(store, props) {
-  return typeof store === 'function' ? store(props) : store.getState()
+  return typeof store === 'function' ? store(props).value : store.getState()
 }
 
 function getStateFromActionsProp(actions, props) {
@@ -145,7 +145,9 @@ var AltContainer = React.createClass({
   },
 
   addSubscription: function (store) {
-    if (typeof store === 'object') {
+    if (typeof store === 'function') {
+      Subscribe.add(this, store(this.props).store, this.altSetState)
+    } else {
       Subscribe.add(this, store, this.altSetState)
     }
   },

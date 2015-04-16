@@ -265,11 +265,17 @@ export default {
 
     'passing in array of functions'() {
       function a() {
-        return { x: 'test' }
+        return {
+          store: TestStore,
+          value: { x: 'test' }
+        }
       }
 
       function b() {
-        return { y: 'test2' }
+        return {
+          store: TestStore,
+          value: { y: 'test2' }
+        }
       }
 
       const node = TestUtils.renderIntoDocument(
@@ -298,7 +304,12 @@ export default {
 
     'pass in single function'() {
       const node = TestUtils.renderIntoDocument(
-        <AltContainer store={() => { return { x: 'jesting' } }}>
+        <AltContainer store={() => {
+          return {
+            store: TestStore,
+            value: { x: 'jesting' }
+          }
+        }}>
           <span />
         </AltContainer>
       )
@@ -308,26 +319,40 @@ export default {
     },
 
     'function is called with props'() {
-      const Store = sinon.spy()
+      const storeFunction = sinon.stub()
+      storeFunction.returns({
+        store: TestStore,
+        value: {}
+      })
+
       TestUtils.renderIntoDocument(
-        <AltContainer className="foo" store={Store}>
+        <AltContainer className="foo" store={storeFunction}>
           <span />
         </AltContainer>
       )
 
-      assert.ok(Store.calledOnce)
-      assert(Store.args[0].length === 1, 'called with one parameter')
-      assert.isObject(Store.args[0][0], 'called with the props')
-      assert(Store.args[0][0].className === 'foo', 'props match')
+      assert.ok(storeFunction.calledTwice, 'called twice, once for store listening and another for props')
+      assert(storeFunction.args[0].length === 1, 'called with one parameter')
+      assert(storeFunction.args[1].length === 1, 'called with one parameter')
+      assert.isObject(storeFunction.args[0][0], 'called with the props')
+      assert.isObject(storeFunction.args[1][0], 'called with the props')
+      assert(storeFunction.args[0][0].className === 'foo', 'props match')
+      assert(storeFunction.args[1][0].className === 'foo', 'props match')
     },
 
     'pass in key-value of functions'() {
       const Functions = {
         x() {
-          return { a: 'hello' }
+          return {
+            store: TestStore,
+            value: { a: 'hello' }
+          }
         },
         y() {
-          return { b: 'goodbye' }
+          return {
+            store: TestStore,
+            value: { b: 'goodbye' }
+          }
         }
       }
 
