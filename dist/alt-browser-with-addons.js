@@ -1,194 +1,224 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.Alt = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
+
+module.exports = require("./components/AltContainer.js");
+
+},{"./components/AltContainer.js":2}],2:[function(require,module,exports){
+(function (global){
 /**
- * This mixin lets you setup your listeners. It is similar to Fluxible's mixin.
+ * AltContainer.
  *
- * Usage:
+ * There are many ways to use AltContainer.
  *
- * mixins: [FluxyMixin],
+ * Using the `stores` prop.
  *
- * statics: {
- *   storeListeners: {
- *     doFoo: FooStore,
- *     doBar: BarStore
- *   }
- * },
+ * <AltContainer stores={{ FooStore: FooStore }}>
+ *   children get this.props.FootStore.storeData
+ * </AltContainer>
  *
- * doFoo: function (storeState) {
- *   this.setState({ foo: FooStore.getState() })
- * },
+ * You can also pass in functions.
  *
- * doBar: function (storeState) { },
+ * <AltContainer stores={{ FooStore: function () { return { storeData: true } } }}>
+ *   children get this.props.FootStore.storeData
+ * </AltContainer>
  *
- * render: function () {
- *   // state will be in the keys you provided
- *   this.state.foo
- * }
+ * Using the `store` prop.
  *
- * ----
+ * <AltContainer store={FooStore}>
+ *   children get this.props.storeData
+ * </AltContainer>
  *
- * You can also pass in an Array of stores to storeListeners:
+ * Passing in `flux` because you're using alt instances
  *
- * statics: {
- *   storeListeners: [FooStore, BarStore]
- * }
+ * <AltContainer flux={flux}>
+ *   children get this.props.flux
+ * </AltContainer>
  *
- * Changes will then be passed to a function `onChange` which you will have
- * to define:
+ * Using a custom render function.
  *
- * onChange() {
- *   this.setState({
- *     foo: FooStore.getState(),
- *     bar: BarStore.getState()
- *   })
- * }
+ * <AltContainer
+ *   render={function (props) {
+ *     return <div />;
+ *   }}
+ * />
+ *
+ * Full docs available at http://goatslacker.github.io/alt/
  */
-var Subscribe = require("./Subscribe");
+"use strict";
 
-var FluxyMixin = {
-  componentDidMount: function componentDidMount() {
-    Subscribe.create(this);
+var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
+var mixinContainer = require("./mixinContainer");
+var assign = require("object-assign");
 
-    var stores = this.constructor.storeListeners;
+var cloneWithProps = React.addons.cloneWithProps;
 
-    if (Array.isArray(stores)) {
-      if (!this.onChange) {
-        throw new ReferenceError("onChange should exist in your React component but is not defined");
+var AltContainer = React.createClass(assign({
+  displayName: "AltContainer",
+
+  render: function render() {
+    return this.altRender(cloneWithProps);
+  }
+}, mixinContainer(React)));
+
+module.exports = AltContainer;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./mixinContainer":3,"object-assign":10}],3:[function(require,module,exports){
+"use strict";
+
+var Subscribe = require("../mixins/Subscribe");
+var assign = require("object-assign");
+
+function getStateFromStore(store, props) {
+  return typeof store === "function" ? store(props).value : store.getState();
+}
+
+function getStateFromKey(actions, props) {
+  return typeof actions === "function" ? actions(props) : actions;
+}
+
+function mixinContainer(React) {
+  return {
+    contextTypes: {
+      flux: React.PropTypes.object
+    },
+
+    getInitialState: function getInitialState() {
+      if (this.props.stores && this.props.store) {
+        throw new ReferenceError("Cannot define both store and stores");
       }
 
-      stores.forEach(function (store) {
-        Subscribe.add(this, store, this.onChange);
-      }, this);
-    } else {
-      Object.keys(stores).forEach(function (handler) {
-        if (!this[handler]) {
-          throw new ReferenceError(handler + " does not exist in your React component");
+      return this.reduceState(this.props);
+    },
+
+    componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+      this.destroySubscriptions();
+      this.setState(this.reduceState(nextProps));
+      this.registerStores(nextProps);
+    },
+
+    componentDidMount: function componentDidMount() {
+      this.registerStores(this.props);
+    },
+
+    componentWillUnmount: function componentWillUnmount() {
+      this.destroySubscriptions();
+    },
+
+    registerStores: function registerStores(props) {
+      Subscribe.create(this);
+
+      if (props.store) {
+        this.addSubscription(props.store);
+      } else if (props.stores) {
+        var stores = props.stores;
+
+        if (Array.isArray(stores)) {
+          stores.forEach(function (store) {
+            this.addSubscription(store);
+          }, this);
+        } else {
+          Object.keys(stores).forEach(function (formatter) {
+            this.addSubscription(stores[formatter]);
+          }, this);
         }
+      }
+    },
 
-        Subscribe.add(this, stores[handler], this[handler]);
-      }, this);
+    destroySubscriptions: function destroySubscriptions() {
+      Subscribe.destroy(this);
+    },
+
+    getStateFromStores: function getStateFromStores(props) {
+      if (props.store) {
+        return getStateFromStore(props.store, props);
+      } else if (props.stores) {
+        var stores = props.stores;
+
+        // If you pass in an array of stores then we are just listening to them
+        // it should be an object then the state is added to the key specified
+        if (!Array.isArray(stores)) {
+          return Object.keys(stores).reduce((function (obj, key) {
+            obj[key] = getStateFromStore(stores[key], props);
+            return obj;
+          }).bind(this), {});
+        }
+      } else {
+        return {};
+      }
+    },
+
+    getStateFromActions: function getStateFromActions(props) {
+      if (props.actions) {
+        return getStateFromKey(props.actions, props);
+      } else {
+        return {};
+      }
+    },
+
+    getInjected: function getInjected(props) {
+      if (props.inject) {
+        return Object.keys(props.inject).reduce(function (obj, key) {
+          obj[key] = getStateFromKey(props.inject[key], props);
+          return obj;
+        }, {});
+      } else {
+        return {};
+      }
+    },
+
+    reduceState: function reduceState(props) {
+      return assign({}, this.getStateFromStores(props), this.getStateFromActions(props), this.getInjected(props));
+    },
+
+    addSubscription: function addSubscription(store) {
+      if (typeof store === "function") {
+        Subscribe.add(this, store(this.props).store, this.altSetState);
+      } else {
+        Subscribe.add(this, store, this.altSetState);
+      }
+    },
+
+    altSetState: function altSetState() {
+      this.setState(this.reduceState(this.props));
+    },
+
+    getProps: function getProps() {
+      var flux = this.props.flux || this.context.flux;
+      return assign(flux ? { flux: flux } : {}, this.state);
+    },
+
+    shouldComponentUpdate: function shouldComponentUpdate() {
+      return this.props.shouldComponentUpdate ? this.props.shouldComponentUpdate(this.getProps()) : true;
+    },
+
+    altRender: function altRender(cloneWithProps) {
+      // Custom rendering function
+      if (typeof this.props.render === "function") {
+        return this.props.render(this.getProps());
+      } else if (this.props.component) {
+        return React.createElement(this.props.component, this.getProps());
+      }
+
+      var children = this.props.children;
+
+      // Does not wrap child in a div if we don't have to.
+      if (Array.isArray(children)) {
+        return React.createElement("div", null, children.map(function (child, i) {
+          return cloneWithProps(child, assign({ key: i }, this.getProps()));
+        }, this));
+      } else if (children) {
+        return cloneWithProps(children, this.getProps());
+      } else {
+        return React.createElement("div", this.getProps());
+      }
     }
-  },
+  };
+}
 
-  componentWillUnmount: function componentWillUnmount() {
-    Subscribe.destroy(this);
-  }
-};
+module.exports = mixinContainer;
 
-module.exports = FluxyMixin;
-
-},{"./Subscribe":4}],2:[function(require,module,exports){
-"use strict";
-var Subscribe = require("./Subscribe");
-
-var ListenerMixin = {
-  componentWillMount: function componentWillMount() {
-    Subscribe.create(this);
-  },
-
-  componentWillUnmount: function componentWillUnmount() {
-    Subscribe.destroy(this);
-  },
-
-  listenTo: function listenTo(store, handler) {
-    Subscribe.add(this, store, handler);
-  },
-
-  listenToMany: function listenToMany(stores, handler) {
-    stores.forEach(function (store) {
-      this.listenTo(store, handler);
-    }, this);
-  },
-
-  getListeners: function getListeners() {
-    return Subscribe.listeners(this);
-  }
-};
-
-module.exports = ListenerMixin;
-
-},{"./Subscribe":4}],3:[function(require,module,exports){
-"use strict";
-/**
- * This mixin automatically sets the state for you based on the key you provide
- *
- * Usage:
- *
- * mixins: [ReactStateMagicMixin],
- *
- * statics: {
- *   registerStores: {
- *     foo: FooStore,
- *     bar: BarStore
- *   }
- * },
- *
- * render: function () {
- *   // state will be in the keys you provided
- *   this.state.foo
- *   this.state.bar
- * }
- *
- * Alternatively:
- *
- * statics: {
- *   registerStore: FooStore
- * },
- *
- * render: function () {
- *   // all of FooStore's state will be dumped into this.state
- *   this.state
- * }
- */
-var Subscribe = require("./Subscribe");
-
-var ReactStateMagicMixin = {
-  getInitialState: function getInitialState() {
-    return this.getStateFromStores();
-  },
-
-  componentDidMount: function componentDidMount() {
-    Subscribe.create(this);
-
-    var stores = this.constructor.registerStores;
-
-    if (this.constructor.registerStore && this.constructor.registerStores) {
-      throw new ReferenceError("You are attempting to use `registerStore` and `registerStores` " + "pick one");
-    }
-
-    if (this.constructor.registerStore) {
-      Subscribe.add(this, this.constructor.registerStore, this.altSetState);
-    } else {
-      Object.keys(stores).forEach(function (formatter) {
-        Subscribe.add(this, stores[formatter], this.altSetState);
-      }, this);
-    }
-  },
-
-  componentWillUnmount: function componentWillUnmount() {
-    Subscribe.destroy(this);
-  },
-
-  getStateFromStores: function getStateFromStores() {
-    if (this.constructor.registerStore) {
-      return this.constructor.registerStore.getState();
-    }
-
-    var stores = this.constructor.registerStores;
-
-    return Object.keys(stores).reduce(function (obj, key) {
-      return (obj[key] = stores[key].getState(), obj);
-    }, {});
-  },
-
-  altSetState: function altSetState() {
-    this.setState(this.getStateFromStores());
-  }
-};
-
-module.exports = ReactStateMagicMixin;
-
-},{"./Subscribe":4}],4:[function(require,module,exports){
+},{"../mixins/Subscribe":4,"object-assign":10}],4:[function(require,module,exports){
 "use strict";
 var Symbol = require("es-symbol");
 var MIXIN_REGISTRY = Symbol("alt store listeners");
@@ -954,33 +984,36 @@ var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["defau
 
 var Alt = _interopRequire(require("./alt"));
 
-var FluxyMixin = _interopRequire(require("../mixins/FluxyMixin"));
-
-var ListenerMixin = _interopRequire(require("../mixins/ListenerMixin"));
-
-var ReactStateMagicMixin = _interopRequire(require("../mixins/ReactStateMagicMixin"));
-
-var Subscribe = _interopRequire(require("../mixins/Subscribe"));
-
 var ActionListeners = _interopRequire(require("../utils/ActionListeners"));
+
+var AltManager = _interopRequire(require("../utils/AltManager"));
 
 var DispatcherRecorder = _interopRequire(require("../utils/DispatcherRecorder"));
 
+var atomicTransactions = _interopRequire(require("../utils/atomicTransactions"));
+
+var chromeDebug = _interopRequire(require("../utils/chromeDebug"));
+
 var makeFinalStore = _interopRequire(require("../utils/makeFinalStore"));
+
+var withAltContext = _interopRequire(require("../utils/withAltContext"));
+
+var AltContainer = _interopRequire(require("../AltContainer"));
 
 Alt.addons = {
   ActionListeners: ActionListeners,
+  AltContainer: AltContainer,
+  AltManager: AltManager,
   DispatcherRecorder: DispatcherRecorder,
-  FluxyMixin: FluxyMixin,
-  ListenerMixin: ListenerMixin,
+  atomicTransactions: atomicTransactions,
+  chromeDebug: chromeDebug,
   makeFinalStore: makeFinalStore,
-  ReactStateMagicMixin: ReactStateMagicMixin,
-  Subscribe: Subscribe
+  withAltContext: withAltContext
 };
 
 module.exports = Alt;
 
-},{"../mixins/FluxyMixin":1,"../mixins/ListenerMixin":2,"../mixins/ReactStateMagicMixin":3,"../mixins/Subscribe":4,"../utils/ActionListeners":13,"../utils/DispatcherRecorder":14,"../utils/makeFinalStore":15,"./alt":12}],12:[function(require,module,exports){
+},{"../AltContainer":1,"../utils/ActionListeners":13,"../utils/AltManager":14,"../utils/DispatcherRecorder":15,"../utils/atomicTransactions":16,"../utils/chromeDebug":17,"../utils/makeFinalStore":18,"../utils/withAltContext":19,"./alt":12}],12:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -1771,6 +1804,95 @@ ActionListeners.prototype.removeAllActionListeners = function () {
 };
 
 },{"es-symbol":5}],14:[function(require,module,exports){
+/**
+ * AltManager(Alt: AltClass): undefined
+ *
+ * > AltManager Util
+ *
+ * AltManager util allows for a developer to create multiple alt instances in
+ * their app. This is useful for building apps that encapsulates an alt instance
+ * inside of a outer parent. Popular examples include HipMunk flight search or
+ * Google Spreadsheets's multiple sheet tabs. This also allows for caching of
+ * client side instance if you need to store a new copy of an alt for each
+ * action.
+ *
+ * Usage:
+ *
+ * ```js
+ * var Alt = require('alt'); // Alt class, not alt instance
+ * var altManager = new AltManager(Alt);
+ *
+ * var altInstance = altManager.create('uniqueKeyName');
+ * altInstance.createAction(SomeAction);
+ * var someOtherOtherAlt = altManager.create('anotherKeyName');
+ * altManager.delete('uniqueKeyName');
+ *
+ * ```
+ */
+
+"use strict";
+
+function AltManager(Alt) {
+  this.Alt = Alt;
+  this.alts = {};
+}
+
+AltManager.prototype.create = function (altKey) {
+  if (this.get(altKey)) {
+    throw new ReferenceError("Alt key " + altKey + " already exists");
+  }
+
+  if (typeof altKey !== "string") {
+    throw new TypeError("altKey must be a string");
+  }
+
+  this.alts[altKey] = new this.Alt();
+  return this.alts[altKey];
+};
+
+AltManager.prototype.get = function (altKey) {
+  return this.alts[altKey];
+};
+
+// returns all alt instances
+AltManager.prototype.all = function () {
+  return this.alts;
+};
+
+AltManager.prototype.findWhere = function (regex) {
+  var results = {};
+  for (var i in this.alts) {
+    if (regex.exec(i) === null) {
+      continue;
+    }
+
+    results[i] = this.alts[i];
+  }
+
+  return results;
+};
+
+AltManager.prototype["delete"] = function (altKey) {
+  if (!this.get(altKey)) {
+    return false;
+  }
+
+  delete this.alts[altKey];
+  return true;
+};
+
+AltManager.prototype.getOrCreate = function (altKey) {
+  var alt = this.get(altKey);
+  if (alt) {
+    return alt;
+  }
+
+  return this.create(altKey);
+};
+
+module.exports = AltManager;
+
+},{}],15:[function(require,module,exports){
 "use strict";
 /**
  * DispatcherRecorder(alt: AltInstance): DispatcherInstance
@@ -1905,7 +2027,67 @@ DispatcherRecorder.prototype.loadEvents = function (events) {
   });
 };
 
-},{"es-symbol":5}],15:[function(require,module,exports){
+},{"es-symbol":5}],16:[function(require,module,exports){
+"use strict";
+
+var makeFinalStore = require("./makeFinalStore");
+
+// babelHelpers
+/*eslint-disable */
+/* istanbul ignore next */
+var _inherits = function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
+  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) subClass.__proto__ = superClass;
+};
+/*eslint-enable */
+
+function makeAtomicClass(alt, StoreModel) {
+  function AtomicClass() {
+    StoreModel.call(this);
+
+    this.on("error", function () {
+      alt.rollback();
+    });
+  }
+  _inherits(AtomicClass, StoreModel);
+  AtomicClass.displayName = StoreModel.displayName || StoreModel.name || "AtomicClass";
+  return AtomicClass;
+}
+
+function makeAtomicObject(alt, StoreModel) {
+  StoreModel.lifecycle = StoreModel.lifecycle || {};
+  StoreModel.lifecycle.error = function () {
+    alt.rollback();
+  };
+  return StoreModel;
+}
+
+function atomicTransactions(alt) {
+  var finalStore = makeFinalStore(alt);
+
+  finalStore.listen(function () {
+    alt.takeSnapshot();
+  });
+
+  return function (StoreModel) {
+    return typeof StoreModel === "function" ? makeAtomicClass(alt, StoreModel) : makeAtomicObject(alt, StoreModel);
+  };
+}
+
+module.exports = atomicTransactions;
+
+},{"./makeFinalStore":18}],17:[function(require,module,exports){
+/*global window*/
+"use strict";
+
+function chromeDebug(alt) {
+  window["goatslacker.github.io/alt/"] = alt;
+}
+
+module.exports = chromeDebug;
+
+},{}],18:[function(require,module,exports){
 "use strict";
 /**
  * makeFinalStore(alt: AltInstance): AltStore
@@ -1948,5 +2130,30 @@ function makeFinalStore(alt) {
   return alt.createUnsavedStore(FinalStore);
 }
 
+},{}],19:[function(require,module,exports){
+(function (global){
+"use strict";
+
+var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
+
+function withAltContext(flux, Component) {
+  return React.createClass({
+    childContextTypes: {
+      flux: React.PropTypes.object
+    },
+
+    getChildContext: function getChildContext() {
+      return { flux: flux };
+    },
+
+    render: function render() {
+      return React.createElement(Component, this.props);
+    }
+  });
+}
+
+module.exports = withAltContext;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}]},{},[11])(11)
 });
