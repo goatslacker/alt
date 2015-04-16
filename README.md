@@ -673,6 +673,8 @@ class Store {
 }
 ```
 
+[See all the lifecycle methods](http://alt.js.org/docs/lifecycleListeners/)
+
 ### Single Dispatcher
 
 A single dispatcher instance is made available for listening to all events passing through. You can access this via the `dispatcher` property: `alt.dispatcher`

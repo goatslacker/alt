@@ -180,6 +180,9 @@ class AltStore {
   }
 
   unlisten(cb) {
+    if (this[LIFECYCLE].unlisten) {
+      this[LIFECYCLE].unlisten()
+    }
     this[EE].removeListener('change', cb)
   }
 

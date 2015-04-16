@@ -133,3 +133,9 @@ This method gets called, if defined, before the payload hits the action. You can
 > (action: string, data: mixed, state: object): undefined
 
 This method gets called, if defined, after the payload hits the action and the store emits a change. You can use this method for bookeeping and as a companion to `beforeEach`. The state passed in to `afterEach` is the current state post-action.
+
+## unlisten
+
+> (): undefined
+
+`unlisten` is called when you call unlisten on your store subscription. You can use this method to perform any teardown type tasks.

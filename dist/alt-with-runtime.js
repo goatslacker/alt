@@ -167,6 +167,9 @@ var AltStore = (function () {
     },
     unlisten: {
       value: function unlisten(cb) {
+        if (this[LIFECYCLE].unlisten) {
+          this[LIFECYCLE].unlisten();
+        }
         this[EE].removeListener("change", cb);
       }
     },

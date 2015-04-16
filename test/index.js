@@ -567,6 +567,21 @@ const tests = {
     assert.ok(mooseChecker.calledOnce)
   },
 
+  'unlisten lifecycle hook'() {
+    const unlistener = sinon.spy()
+    class XStore {
+      constructor() {
+        this.on('unlisten', unlistener)
+      }
+    }
+    const store = alt.createStore(XStore)
+
+    // unlisten directly
+    store.listen()()
+
+    assert.ok(unlistener.calledOnce, 'unlisten lifecycle hook called')
+  },
+
   'bootstrapping'() {
     alt.bootstrap('{"MyStore":{"name":"bee"}}')
     assert(myStore.getState().name === 'bee', 'I can bootstrap many times')
