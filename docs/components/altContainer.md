@@ -84,6 +84,35 @@ You can pass in a custom function as the value in order to control what each pro
 </AltContainer>
 ```
 
+If you pass an Array to `stores` the stores described will only be listened to.
+
+```js
+<AltContainer stores={[BlogStore]}>
+  <BlogPost />
+</AltContainer>
+```
+
+The example above will only listen to BlogStore and re-render BlogPost when state changes in BlogStore. You can combine this with `inject` for full control of what gets added and listened to.
+
+## `inject`
+
+This allows you to inject anything into your children. Functions defined inside inject are evaluated and their results passed down via props.
+
+```js
+<AltContainer
+  stores={[BlogStore]}
+  inject={{
+    className: 'blog-post',
+    blogId: function (props) {
+      return BlogStore.getState().id
+    }
+  }}>
+  <BlogPost />
+</AltContainer>
+```
+
+The above example will pass the `className` of blog-post to BlogPost component. BlogPost wil also receive `blogId` as a prop which will be evaluated whenever BlogStore changes.
+
 ## `store`
 
 If you only have a single store you can use `store` to bind it. The state will then be passed as props straight through.

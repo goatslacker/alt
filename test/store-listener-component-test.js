@@ -249,46 +249,6 @@ export default {
       assert.ok(Array.isArray(many.props.children), 'multiple nodes are wrapped')
     },
 
-    'passing in array of stores for merging state'() {
-      const node = TestUtils.renderIntoDocument(
-        <AltContainer stores={[TestStore, Store2]}>
-          <span />
-        </AltContainer>
-      )
-      const span = TestUtils.findRenderedDOMComponentWithTag(node, 'span')
-
-      action.sup('foobar')
-
-      assert(span.props.x === 'foobar')
-      assert(span.props.y === 'foobar')
-    },
-
-    'passing in array of functions'() {
-      function a() {
-        return {
-          store: TestStore,
-          value: { x: 'test' }
-        }
-      }
-
-      function b() {
-        return {
-          store: TestStore,
-          value: { y: 'test2' }
-        }
-      }
-
-      const node = TestUtils.renderIntoDocument(
-        <AltContainer stores={[a, b]}>
-          <span />
-        </AltContainer>
-      )
-      const span = TestUtils.findRenderedDOMComponentWithTag(node, 'span')
-
-      assert(span.props.x === 'test')
-      assert(span.props.y === 'test2')
-    },
-
     'passing in a single store'() {
       const node = TestUtils.renderIntoDocument(
         <AltContainer store={TestStore}>
@@ -500,6 +460,28 @@ export default {
       assert.ok(scu.calledOnce, 'custom shouldComponentUpdate was called')
       assert(scu.args[0].length === 1, 'only one arg is passed, the props')
       assert.isDefined(scu.args[0][0].x, 'x prop exists')
+    },
+
+    'injectables'() {
+      const node = TestUtils.renderIntoDocument(
+        <AltContainer stores={[TestStore]} inject={{
+          className: 'foo',
+          foo: function () {
+            return TestStore.getState()
+          }
+        }}>
+          <span />
+        </AltContainer>
+      )
+
+      const span = TestUtils.findRenderedDOMComponentWithTag(node, 'span')
+
+      assert(span.props.className === 'foo', 'you can inject custom things')
+      assert.isDefined(span.props.foo.x, 'functions are ran')
+
+      action.sup(888)
+
+      assert(span.props.foo.x === 888, 'when passing stores as Array they are just listened on')
     },
   }
 }

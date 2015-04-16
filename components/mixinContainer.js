@@ -5,7 +5,7 @@ function getStateFromStore(store, props) {
   return typeof store === 'function' ? store(props).value : store.getState()
 }
 
-function getStateFromActionsProp(actions, props) {
+function getStateFromKey(actions, props) {
   return typeof actions === 'function' ? actions(props) : actions
 }
 
@@ -67,14 +67,9 @@ function mixinContainer(React) {
       } else if (props.stores) {
         var stores = props.stores
 
-        // If you pass in an array of stores the state is merged together.
-        if (Array.isArray(stores)) {
-          return stores.reduce(function (obj, store) {
-            return assign(obj, getStateFromStore(store, props))
-          }.bind(this), {})
-
-        // if it is an object then the state is added to the key specified
-        } else {
+        // If you pass in an array of stores then we are just listening to them
+        // it should be an object then the state is added to the key specified
+        if (!Array.isArray(stores)) {
           return Object.keys(stores).reduce(function (obj, key) {
             obj[key] = getStateFromStore(stores[key], props)
             return obj
@@ -87,7 +82,18 @@ function mixinContainer(React) {
 
     getStateFromActions: function (props) {
       if (props.actions) {
-        return getStateFromActionsProp(props.actions, props)
+        return getStateFromKey(props.actions, props)
+      } else {
+        return {}
+      }
+    },
+
+    getInjected: function (props) {
+      if (props.inject) {
+        return Object.keys(props.inject).reduce(function (obj, key) {
+          obj[key] = getStateFromKey(props.inject[key], props)
+          return obj
+        }, {})
       } else {
         return {}
       }
@@ -97,7 +103,8 @@ function mixinContainer(React) {
       return assign(
         {},
         this.getStateFromStores(props),
-        this.getStateFromActions(props)
+        this.getStateFromActions(props),
+        this.getInjected(props)
       )
     },
 
