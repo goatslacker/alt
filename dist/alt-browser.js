@@ -900,7 +900,12 @@ var AltStore = (function () {
     },
     listen: {
       value: function listen(cb) {
+        var _this8 = this;
+
         this[EE].on("change", cb);
+        return function () {
+          return _this8.unlisten(cb);
+        };
       }
     },
     unlisten: {

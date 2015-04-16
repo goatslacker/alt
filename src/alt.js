@@ -176,6 +176,7 @@ class AltStore {
 
   listen(cb) {
     this[EE].on('change', cb)
+    return () => this.unlisten(cb)
   }
 
   unlisten(cb) {

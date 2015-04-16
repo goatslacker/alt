@@ -1,5 +1,6 @@
 import Alt from '../dist/alt-with-runtime'
 import { assert } from 'chai'
+import sinon from 'sinon'
 
 import ListenerMixin from '../mixins/ListenerMixin'
 import FluxyMixin from '../mixins/FluxyMixin'
@@ -547,6 +548,23 @@ const tests = {
     myActions.updateName('badger')
 
     assert(myStore.getState().name === 'badger', 'new store state present')
+  },
+
+  'unlistening'() {
+    assert(myStore.getState().name !== 'moose', 'state has not been updated')
+
+    const mooseChecker = sinon.spy()
+    const unlisten = myStore.listen(mooseChecker)
+    myActions.updateName('moose')
+
+    assert(myStore.getState().name === 'moose', 'new store state present')
+
+    unlisten()
+
+    myActions.updateName('badger')
+
+    assert(myStore.getState().name === 'badger', 'new store state present')
+    assert.ok(mooseChecker.calledOnce)
   },
 
   'bootstrapping'() {
