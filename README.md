@@ -272,8 +272,10 @@ var locationStore = alt.createStore({
 
   onUpdateLocation: function(obj) {
     var { city, country } = obj
-    this.city = city
-    this.country = country
+    this.setState({
+      city: city,
+      country: country
+    })
   }
 })
 ```
