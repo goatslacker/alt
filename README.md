@@ -270,7 +270,7 @@ var locationStore = alt.createStore({
     country: 'US'
   },
 
-  onUpdateLocation(obj) {
+  onUpdateLocation: function(obj) {
     var { city, country } = obj
     this.city = city
     this.country = country
