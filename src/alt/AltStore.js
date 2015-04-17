@@ -2,7 +2,7 @@
 
 import EventEmitter from 'eventemitter3'
 import assign from 'object-assign'
-import {warn, deprecatedBeforeAfterEachWarning} from '../../src/shared/warnings'
+import {warn, deprecatedBeforeAfterEachWarning} from './utils/warnings'
 import {
   ALL_LISTENERS,
   EE,
@@ -11,7 +11,7 @@ import {
   PUBLIC_METHODS,
   STATE_CHANGED,
   STATE_CONTAINER
-} from '../../src/shared/symbols'
+} from './symbols/symbols'
 
 export default class AltStore {
   constructor(dispatcher, model, state, StoreModel) {

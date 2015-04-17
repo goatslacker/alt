@@ -1,6 +1,6 @@
 'use strict'
 
-import { ACTION_HANDLER, ACTION_UID} from '../../src/shared/symbols'
+import { ACTION_HANDLER, ACTION_UID} from './symbols/symbols'
 
 export default class ActionCreator {
   constructor(alt, name, action, actions) {
