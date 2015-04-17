@@ -36,6 +36,14 @@ var AltTestingUtils = {
     _inherits(DerivedStore, UnwrappedStore)
     assign(DerivedStore.prototype, StorePrototype)
     return new DerivedStore()
+  },
+
+  mockGetState: function (state) {
+    return {
+      getState: function () {
+        return state || {}
+      }
+    }
   }
 }
 
