@@ -2,23 +2,26 @@
 
 import Alt from './alt'
 
-import FluxyMixin from '../mixins/FluxyMixin'
-import ListenerMixin from '../mixins/ListenerMixin'
-import ReactStateMagicMixin from '../mixins/ReactStateMagicMixin'
-import Subscribe from '../mixins/Subscribe'
-
 import ActionListeners from '../utils/ActionListeners'
+import AltManager from '../utils/AltManager'
 import DispatcherRecorder from '../utils/DispatcherRecorder'
+
+import atomicTransactions from '../utils/atomicTransactions'
+import chromeDebug from '../utils/chromeDebug'
 import makeFinalStore from '../utils/makeFinalStore'
+import withAltContext from '../utils/withAltContext'
+
+import AltContainer from '../AltContainer'
 
 Alt.addons = {
   ActionListeners,
+  AltContainer,
+  AltManager,
   DispatcherRecorder,
-  FluxyMixin,
-  ListenerMixin,
+  atomicTransactions,
+  chromeDebug,
   makeFinalStore,
-  ReactStateMagicMixin,
-  Subscribe
+  withAltContext
 }
 
 export default Alt

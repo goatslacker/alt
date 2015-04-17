@@ -13,6 +13,7 @@
     "babel": "^4.7.16",
     "babelify": "^5.0.4",
     "browserify": "^9.0.3",
+    "browserify-shim": "^3.8.5",
     "chai": "^2.1.0",
     "coveralls": "^2.11.2",
     "envify": "^3.4.0",
@@ -38,7 +39,7 @@
     "build-alt": "babel ./src/alt.js > dist/alt.js",
     "build-alt-runtime": "babel --external-helpers src/alt.js > dist/alt-with-runtime.js",
     "build-alt-browser": "browserify src/alt.js -t [envify --NODE_ENV production ] -t babelify --outfile dist/alt-browser.js --standalone Alt",
-    "build-alt-browser-with-addons": "browserify src/alt-with-addons.js -t [envify --NODE_ENV production ] -t babelify --outfile dist/alt-browser-with-addons.js --standalone Alt",
+    "build-alt-browser-with-addons": "browserify src/alt-with-addons.js -t [envify --NODE_ENV production ] -t babelify -t browserify-shim --outfile dist/alt-browser-with-addons.js --standalone Alt",
     "coverage": "istanbul cover node_modules/mocha/bin/_mocha -- -u exports -R spec --compilers js:babel/register --require babel/external-helpers test",
     "lint": "eslint src mixins utils",
     "prepublish": "npm run test-build",
@@ -46,6 +47,10 @@
     "test-build": "npm run build && npm run tests-all",
     "test-browser": "browserify test/browser/index.js -t babelify --outfile test/browser/tests.js",
     "tests-all": "mocha -u exports -R spec --compilers js:babel/register --require babel/external-helpers test"
+  },
+  "browserify-shim": {
+    "react": "global:React",
+    "react/addons": "global:React"
   },
   "keywords": [
     "alt",
