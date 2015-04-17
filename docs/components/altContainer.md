@@ -101,12 +101,12 @@ This allows you to inject anything into your children. Functions defined inside 
 ```js
 <AltContainer
   stores={[BlogStore]}
-  inject={{
+  inject={ {
     className: 'blog-post',
     blogId: function (props) {
       return BlogStore.getState().id
     }
-  }}>
+  } }>
   <BlogPost />
 </AltContainer>
 ```
@@ -172,7 +172,7 @@ You can inject these actions into BlogPost like so:
 ```js
 <AltContainer
   store={BlogStore}
-  actions={{ MyActions: BlogActions }}
+  actions={ { MyActions: BlogActions } }
 />
   <BlogPost className="my-awesome-post" />
 </AltContainer>
