@@ -445,7 +445,14 @@ function createStoreFromClass(alt, StoreModel, key, ...argsForConstructor) {
   const store = new Store(...argsForConstructor)
 
   storeInstance = assign(
-    new AltStore(alt.dispatcher, store, null, StoreModel),
+    new AltStore(
+      alt.dispatcher,
+      store,
+      typeof alt._stateKey === 'string'
+        ? store[alt._stateKey]
+        : null,
+      StoreModel
+    ),
     getInternalMethods(StoreModel, builtIns)
   )
 
@@ -460,6 +467,7 @@ class Alt {
     this.actions = {}
     this.stores = {}
     this[LAST_SNAPSHOT] = this[INIT_SNAPSHOT] = '{}'
+    this._stateKey = config.stateKey
   }
 
   dispatch(action, data) {

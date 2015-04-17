@@ -470,7 +470,7 @@ function createStoreFromClass(alt, StoreModel, key) {
 
   var store = _applyConstructor(Store, argsForConstructor);
 
-  storeInstance = assign(new AltStore(alt.dispatcher, store, null, StoreModel), getInternalMethods(StoreModel, builtIns));
+  storeInstance = assign(new AltStore(alt.dispatcher, store, typeof alt._stateKey === "string" ? store[alt._stateKey] : null, StoreModel), getInternalMethods(StoreModel, builtIns));
 
   return storeInstance;
 }
@@ -487,6 +487,7 @@ var Alt = (function () {
     this.actions = {};
     this.stores = {};
     this[LAST_SNAPSHOT] = this[INIT_SNAPSHOT] = "{}";
+    this._stateKey = config.stateKey;
   }
 
   _createClass(Alt, {
