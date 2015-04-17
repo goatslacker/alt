@@ -483,5 +483,24 @@ export default {
 
       assert(span.props.foo.x === 888, 'when passing stores as Array they are just listened on')
     },
+
+    'passing in a component as a prop'() {
+      const App = React.createClass({
+        render() {
+          return <strong x={this.props.x} />
+        }
+      })
+
+      const node = TestUtils.renderIntoDocument(
+        <AltContainer store={TestStore} component={App} />
+      )
+
+      const strong = TestUtils.findRenderedDOMComponentWithTag(node, 'strong')
+
+      action.sup(1337)
+
+      assert.isDefined(strong, 'component exists')
+      assert(strong.props.x === 1337, 'and we have props from TestStore')
+    },
   }
 }

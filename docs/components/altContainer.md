@@ -258,3 +258,13 @@ This is a function that gets called with the props that your children will recei
 ```
 
 In this example, Header, Body, and Footer will not re-render because we're returning false.
+
+## `component`
+
+With this prop you can define which component you want to render within your AltContainer. If you have a single component and you're using required propTypes then this is a legitimate way of rendering the components without getting a warning about invalid propTypes from React due to cloneWithProps.
+
+```js
+<AltContainer component={Body} />
+```
+
+This example renders Body inside of the AltContainer.

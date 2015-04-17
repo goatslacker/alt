@@ -135,12 +135,14 @@ function mixinContainer(React) {
     },
 
     altRender: function (cloneWithProps) {
-      var children = this.props.children
-
       // Custom rendering function
       if (typeof this.props.render === 'function') {
         return this.props.render(this.getProps())
+      } else if (this.props.component) {
+        return React.createElement(this.props.component, this.getProps())
       }
+
+      var children = this.props.children
 
       // Does not wrap child in a div if we don't have to.
       if (Array.isArray(children)) {
