@@ -968,8 +968,11 @@ var DispatcherRecorder = _interopRequire(require("../utils/DispatcherRecorder"))
 
 var makeFinalStore = _interopRequire(require("../utils/makeFinalStore"));
 
+var connectToStores = _interopRequire(require("../utils/connectToStores"));
+
 Alt.addons = {
   ActionListeners: ActionListeners,
+  connectToStores: connectToStores,
   DispatcherRecorder: DispatcherRecorder,
   FluxyMixin: FluxyMixin,
   ListenerMixin: ListenerMixin,
@@ -980,7 +983,7 @@ Alt.addons = {
 
 module.exports = Alt;
 
-},{"../mixins/FluxyMixin":1,"../mixins/ListenerMixin":2,"../mixins/ReactStateMagicMixin":3,"../mixins/Subscribe":4,"../utils/ActionListeners":13,"../utils/DispatcherRecorder":14,"../utils/makeFinalStore":15,"./alt":12}],12:[function(require,module,exports){
+},{"../mixins/FluxyMixin":1,"../mixins/ListenerMixin":2,"../mixins/ReactStateMagicMixin":3,"../mixins/Subscribe":4,"../utils/ActionListeners":13,"../utils/DispatcherRecorder":14,"../utils/connectToStores":15,"../utils/makeFinalStore":16,"./alt":12}],12:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -1906,6 +1909,123 @@ DispatcherRecorder.prototype.loadEvents = function (events) {
 };
 
 },{"es-symbol":5}],15:[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var React = _interopRequire(require("react"));
+
+/**
+ * 'Higher Order Component' that controls the props of a wrapped
+ * component via stores.
+ *
+ * Expects the Component to have two static methods:
+ *   - getStores(): Should return an array of stores.
+ *   - getPropsFromStores(props): Should return the props from the stores.
+ *
+ * Example using old React.createClass() style:
+ *
+ *    const MyComponent = React.createClass({
+ *      statics: {
+ *        getStores() {
+ *          return [myStore]
+ *        },
+ *        getPropsFromStores(props) {
+ *          return myStore.getState()
+ *        }
+ *      },
+ *      render() {
+ *        // Use this.props like normal ...
+ *      }
+ *    })
+ *    MyComponent = connectToStores(MyComponent)
+ *
+ *
+ * Example using ES6 Class:
+ *
+ *    class MyComponent extends React.Component {
+ *      static getStores() {
+ *        return [myStore]
+ *      }
+ *      static getPropsFromStores(props) {
+ *        return myStore.getState()
+ *      }
+ *      render() {
+ *        // Use this.props like normal ...
+ *      }
+ *    }
+ *    MyComponent = connectToStores(MyComponent)
+ *
+ * A great explanation of the merits of higher order components can be found at
+ * http://bit.ly/1abPkrP
+ */
+var connectToStores = (function (_connectToStores) {
+  var _connectToStoresWrapper = function connectToStores(_x) {
+    return _connectToStores.apply(this, arguments);
+  };
+
+  _connectToStoresWrapper.toString = function () {
+    return _connectToStores.toString();
+  };
+
+  return _connectToStoresWrapper;
+})(function (Component) {
+
+  // Check for required static methods.
+  if (typeof Component.getStores !== "function") {
+    throw new Error("connectToStores() expects the wrapped component to have a static getStores() method");
+  }
+  if (typeof Component.getPropsFromStores !== "function") {
+    throw new Error("connectToStores() expects the wrapped component to have a static getPropsFromStores() method");
+  }
+
+  // Cache stores.
+  var stores = Component.getStores();
+
+  // Wrapper Component.
+  var StoreConnection = connectToStores.createClass({
+
+    getInitialState: function getInitialState() {
+      return Component.getPropsFromStores(this.props);
+    },
+
+    componentDidMount: function componentDidMount() {
+      var _this = this;
+
+      stores.forEach(function (store) {
+        return store.listen(_this.onChange);
+      });
+    },
+
+    componentWillUnmount: function componentWillUnmount() {
+      var _this = this;
+
+      stores.forEach(function (store) {
+        return store.unlisten(_this.onChange);
+      });
+    },
+
+    onChange: function onChange() {
+      this.setState(Component.getPropsFromStores(this.props));
+    },
+
+    render: function render() {
+      return React.createElement(Component, Object.assign({}, this.props, this.state));
+    }
+
+  });
+
+  return StoreConnection;
+});
+
+/**
+ * Expose createClass to facilitate testing.
+ */
+connectToStores.createClass = React.createClass;
+
+module.exports = connectToStores;
+
+},{"react":undefined}],16:[function(require,module,exports){
 "use strict";
 /**
  * makeFinalStore(alt: AltInstance): AltStore

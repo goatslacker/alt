@@ -4,8 +4,8 @@ class ReactComponent {
     this.render()
   }
 
-  // A not at all react spec compliant way to test fake react components
-  static test(Component, testFn, props) {
+  // Create the mocked component.
+  static prepare(Component) {
     const builtInProto = Object.getOwnPropertyNames(Component.prototype)
 
     // A trolol way of doing the react <0.13 auto-binding.
@@ -13,35 +13,46 @@ class ReactComponent {
       Component.call(this)
 
       builtInProto.forEach((method) => {
-        if (method !== 'constructor') {
+        if (typeof this[method] === 'function' && method !== 'constructor') {
           this[method] = this[method].bind(this)
         }
       })
     }
     AutoBoundComponent.prototype = Component.prototype
 
-    // initialize the component
-    const component = new AutoBoundComponent()
-
-    Component.mixins.forEach((mixin) => {
-      // transfer over the mixins.
-      Object.keys(mixin).forEach((method) => {
-        component[method] = mixin[method].bind(component)
+    // Move over the statics.
+    if (Component.statics) {
+      Object.keys(Component.statics).forEach((stat) => {
+        Component[stat] = Component.statics[stat]
       })
+    }
 
-      // move over the statics
-      if (Component.statics) {
-        Object.keys(Component.statics).forEach((stat) => {
-          Component[stat] = Component.statics[stat]
+    return AutoBoundComponent
+  }
+
+  // A not at all react spec compliant way to test fake react components.
+  static test(Component, testFn, props = {}) {
+    // Prepare the class.
+    const PreparedComponent = ReactComponent.prepare(Component)
+
+    // Initialize the component.
+    const component = new PreparedComponent()
+
+    // Transfer over the mixins.
+    if (Component.mixins) {
+      Component.mixins.forEach((mixin) => {
+        Object.keys(mixin).forEach((method) => {
+          component[method] = mixin[method].bind(component)
         })
-      }
-    })
+      })
+    }
 
-    // call the lifecycle methods and the test function
+    // Call the lifecycle methods and the test function.
     try {
-      component.props = component.getDefaultProps
+      let defaultProps = component.getDefaultProps
         ? component.getDefaultProps()
         : {}
+      component.props = Object.assign({}, defaultProps, props)
 
       component.state = component.getInitialState
         ? component.getInitialState()
@@ -54,7 +65,7 @@ class ReactComponent {
     } catch (e) {
       throw e;
     } finally {
-      // end with last lifecycle method
+      // End with last lifecycle method.
       component.componentWillUnmount && component.componentWillUnmount();
     }
   }

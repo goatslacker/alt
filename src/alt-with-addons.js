@@ -10,9 +10,11 @@ import Subscribe from '../mixins/Subscribe'
 import ActionListeners from '../utils/ActionListeners'
 import DispatcherRecorder from '../utils/DispatcherRecorder'
 import makeFinalStore from '../utils/makeFinalStore'
+import connectToStores from '../utils/connectToStores'
 
 Alt.addons = {
   ActionListeners,
+  connectToStores,
   DispatcherRecorder,
   FluxyMixin,
   ListenerMixin,
