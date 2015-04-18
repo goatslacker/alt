@@ -49,6 +49,12 @@ guidenav:
 - title: Data Dependencies
   url: /guide/wait-for/
 
+guidesnav:
+- title: Getting Started
+  url: /guide/
+- title: Using Alt with ES5
+  url: /guides/es5/
+
 # Build settings
 markdown: kramdown
 

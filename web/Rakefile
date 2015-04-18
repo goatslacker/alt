@@ -70,9 +70,9 @@ def clean_and_copy_docs
 end
 
 def clean_and_copy_guide
-  system 'rm -rf guide/'
-  system 'cp -r ../guide .'
-  format_markdown_links('guide')
+  system 'rm -rf guides/'
+  system 'cp -r ../guides .'
+  format_markdown_links('guides')
 end
 
 def format_markdown_links(dir)
