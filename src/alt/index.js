@@ -1,4 +1,4 @@
-import ActionCreator from './ActionCreator'
+import AltAction from './AltAction'
 import Symbol from 'es-symbol'
 import assign from 'object-assign'
 import formatAsConstant from './utils/formatAsConstant'
@@ -86,7 +86,7 @@ class Alt {
     const actionName = Symbol.for(actionId)
 
     // Wrap the action so we can provide a dispatch method
-    const newAction = new ActionCreator(this, actionName, implementation, obj)
+    const newAction = new AltAction(this, actionName, implementation, obj)
 
     const action = newAction[ACTION_HANDLER]
     action.defer = (...args) => {
@@ -111,7 +111,7 @@ class Alt {
 
         generateActions(...actionNames) {
           actionNames.forEach((actionName) => {
-            // This is a function so we can later bind this to ActionCreator
+            // This is a function so we can later bind this to AltAction
             actions[actionName] = function (x, ...a) {
               this.dispatch(a.length ? [x].concat(a) : x)
             }
