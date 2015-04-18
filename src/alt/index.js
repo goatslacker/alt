@@ -19,14 +19,9 @@ import ActionCreator from './ActionCreator'
 import {createStoreFromObject, createStoreFromClass} from './utils/createStore'
 import {warn} from './utils/warnings'
 import {getInternalMethods, builtInProto} from './utils/helpers'
+import formatAsConstant from './utils/formatAsConstant'
 
 const GlobalActionsNameRegistry = {}
-
-function formatAsConstant(name) {
-  return name.replace(/[a-z]([A-Z])/g, (i) => {
-    return `${i[0]}_${i[1].toLowerCase()}`
-  }).toUpperCase()
-}
 
 function uid(container, name) {
   let count = 0
