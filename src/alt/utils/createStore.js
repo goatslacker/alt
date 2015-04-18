@@ -1,5 +1,3 @@
-'use strict'
-
 import assign from 'object-assign'
 import AltStore from '../AltStore'
 import {StoreMixinListeners, StoreMixinEssentials} from './storeMixins'

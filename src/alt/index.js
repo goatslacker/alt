@@ -1,5 +1,3 @@
-'use strict'
-
 import { Dispatcher } from 'flux'
 import Symbol from 'es-symbol'
 import assign from 'object-assign'

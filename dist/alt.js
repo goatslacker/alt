@@ -933,9 +933,172 @@ var AltStore = (function () {
   return AltStore;
 })();
 
+<<<<<<< HEAD
 var ActionCreator = (function () {
   function ActionCreator(alt, name, action, actions) {
     _classCallCheck(this, ActionCreator);
+=======
+module.exports = AltStore;
+
+},{"./symbols/symbols":9,"./utils/warnings":13,"eventemitter3":2,"object-assign":6}],9:[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var Symbol = _interopRequire(require("es-symbol"));
+
+// action creator handler
+var ACTION_HANDLER = Symbol();
+
+exports.ACTION_HANDLER = ACTION_HANDLER;
+// the action's uid symbol for listening
+var ACTION_KEY = Symbol();
+
+exports.ACTION_KEY = ACTION_KEY;
+// the action's name
+var ACTION_UID = Symbol();
+
+exports.ACTION_UID = ACTION_UID;
+// store all of a store's listeners
+var ALL_LISTENERS = Symbol();
+
+exports.ALL_LISTENERS = ALL_LISTENERS;
+// event emitter instance
+var EE = Symbol();
+
+exports.EE = EE;
+// initial snapshot
+var INIT_SNAPSHOT = Symbol();
+
+exports.INIT_SNAPSHOT = INIT_SNAPSHOT;
+// last snapshot
+var LAST_SNAPSHOT = Symbol();
+
+exports.LAST_SNAPSHOT = LAST_SNAPSHOT;
+// all lifecycle listeners
+var LIFECYCLE = Symbol();
+
+exports.LIFECYCLE = LIFECYCLE;
+// store action listeners
+var LISTENERS = Symbol();
+
+exports.LISTENERS = LISTENERS;
+// public methods
+var PUBLIC_METHODS = Symbol();
+
+exports.PUBLIC_METHODS = PUBLIC_METHODS;
+// boolean if state has changed for emitting change event
+var STATE_CHANGED = Symbol();
+
+exports.STATE_CHANGED = STATE_CHANGED;
+// contains all state
+var STATE_CONTAINER = Symbol();
+exports.STATE_CONTAINER = STATE_CONTAINER;
+
+},{"es-symbol":1}],10:[function(require,module,exports){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var _applyConstructor = function (Constructor, args) { var instance = Object.create(Constructor.prototype); var result = Constructor.apply(instance, args); return result != null && (typeof result == "object" || typeof result == "function") ? result : instance; };
+
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+exports.createStoreFromObject = createStoreFromObject;
+exports.createStoreFromClass = createStoreFromClass;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var assign = _interopRequire(require("object-assign"));
+
+var AltStore = _interopRequire(require("../AltStore"));
+
+var _storeMixins = require("./storeMixins");
+
+var StoreMixinListeners = _storeMixins.StoreMixinListeners;
+var StoreMixinEssentials = _storeMixins.StoreMixinEssentials;
+
+var _helpers = require("./helpers");
+
+var getInternalMethods = _helpers.getInternalMethods;
+var builtIns = _helpers.builtIns;
+
+var _symbolsSymbols = require("../symbols/symbols");
+
+var ALL_LISTENERS = _symbolsSymbols.ALL_LISTENERS;
+var LIFECYCLE = _symbolsSymbols.LIFECYCLE;
+var LISTENERS = _symbolsSymbols.LISTENERS;
+var PUBLIC_METHODS = _symbolsSymbols.PUBLIC_METHODS;
+var STATE_CHANGED = _symbolsSymbols.STATE_CHANGED;
+var STATE_CONTAINER = _symbolsSymbols.STATE_CONTAINER;
+
+function doSetState(store, storeInstance, nextState) {
+  if (!nextState) {
+    return;
+  }
+
+  if (!store.alt.dispatcher.isDispatching()) {
+    throw new Error("You can only use setState while dispatching");
+  }
+
+  if (typeof nextState === "function") {
+    assign(storeInstance[STATE_CONTAINER], nextState(storeInstance[STATE_CONTAINER]));
+  } else {
+    assign(storeInstance[STATE_CONTAINER], nextState);
+  }
+
+  storeInstance[STATE_CHANGED] = true;
+}
+
+function createStoreFromObject(alt, StoreModel, key) {
+  var storeInstance = undefined;
+
+  var StoreProto = {};
+  StoreProto[ALL_LISTENERS] = [];
+  StoreProto[LIFECYCLE] = {};
+  StoreProto[LISTENERS] = {};
+
+  assign(StoreProto, {
+    _storeName: key,
+    alt: alt,
+    dispatcher: alt.dispatcher,
+    getInstance: function getInstance() {
+      return storeInstance;
+    },
+    setState: function setState(nextState) {
+      doSetState(this, storeInstance, nextState);
+    }
+  }, StoreMixinListeners, StoreMixinEssentials, StoreModel);
+
+  // bind the store listeners
+  /* istanbul ignore else */
+  if (StoreProto.bindListeners) {
+    StoreMixinListeners.bindListeners.call(StoreProto, StoreProto.bindListeners);
+  }
+
+  // bind the lifecycle events
+  /* istanbul ignore else */
+  if (StoreProto.lifecycle) {
+    Object.keys(StoreProto.lifecycle).forEach(function (event) {
+      StoreMixinListeners.on.call(StoreProto, event, StoreProto.lifecycle[event]);
+    });
+  }
+
+  // create the instance and assign the public methods to the instance
+  storeInstance = assign(new AltStore(alt.dispatcher, StoreProto, StoreProto.state, StoreModel), StoreProto.publicMethods);
+
+  return storeInstance;
+}
+>>>>>>> Remove use strict since its implicit
 
     this[ACTION_UID] = name;
     this[ACTION_HANDLER] = action.bind(this);
@@ -951,8 +1114,99 @@ var ActionCreator = (function () {
     }
   });
 
+<<<<<<< HEAD
   return ActionCreator;
 })();
+=======
+  Store.prototype[ALL_LISTENERS] = [];
+  Store.prototype[LIFECYCLE] = {};
+  Store.prototype[LISTENERS] = {};
+  Store.prototype[PUBLIC_METHODS] = {};
+
+  var store = _applyConstructor(Store, argsForConstructor);
+
+  storeInstance = assign(new AltStore(alt.dispatcher, store, null, StoreModel), getInternalMethods(StoreModel, builtIns));
+
+  return storeInstance;
+}
+
+},{"../AltStore":8,"../symbols/symbols":9,"./helpers":11,"./storeMixins":12,"object-assign":6}],11:[function(require,module,exports){
+"use strict";
+
+exports.getInternalMethods = getInternalMethods;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/* istanbul ignore next */
+function NoopClass() {}
+
+var builtIns = Object.getOwnPropertyNames(NoopClass);
+exports.builtIns = builtIns;
+var builtInProto = Object.getOwnPropertyNames(NoopClass.prototype);
+
+exports.builtInProto = builtInProto;
+
+function getInternalMethods(obj, excluded) {
+  return Object.getOwnPropertyNames(obj).reduce(function (value, m) {
+    if (excluded.indexOf(m) !== -1) {
+      return value;
+    }
+
+    value[m] = obj[m];
+    return value;
+  }, {});
+}
+
+},{}],12:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _symbolsSymbols = require("../symbols/symbols");
+
+var ACTION_KEY = _symbolsSymbols.ACTION_KEY;
+var ALL_LISTENERS = _symbolsSymbols.ALL_LISTENERS;
+var LIFECYCLE = _symbolsSymbols.LIFECYCLE;
+var LISTENERS = _symbolsSymbols.LISTENERS;
+var PUBLIC_METHODS = _symbolsSymbols.PUBLIC_METHODS;
+var StoreMixinEssentials = {
+  waitFor: function waitFor(sources) {
+    if (!sources) {
+      throw new ReferenceError("Dispatch tokens not provided");
+    }
+
+    if (arguments.length === 1) {
+      sources = Array.isArray(sources) ? sources : [sources];
+    } else {
+      sources = Array.prototype.slice.call(arguments);
+    }
+
+    var tokens = sources.map(function (source) {
+      return source.dispatchToken || source;
+    });
+
+    this.dispatcher.waitFor(tokens);
+  },
+
+  exportPublicMethods: function exportPublicMethods(methods) {
+    var _this = this;
+
+    Object.keys(methods).forEach(function (methodName) {
+      if (typeof methods[methodName] !== "function") {
+        throw new TypeError("exportPublicMethods expects a function");
+      }
+
+      _this[PUBLIC_METHODS][methodName] = methods[methodName];
+    });
+  },
+
+  emitChange: function emitChange() {
+    this.getInstance().emitChange();
+  }
+};
+>>>>>>> Remove use strict since its implicit
 
 var StoreMixinListeners = {
   on: function on(lifecycleEvent, handler) {
@@ -1027,6 +1281,26 @@ var StoreMixinListeners = {
   }
 
 };
+<<<<<<< HEAD
+=======
+exports.StoreMixinListeners = StoreMixinListeners;
+
+},{"../symbols/symbols":9}],13:[function(require,module,exports){
+"use strict";
+
+exports.warn = warn;
+exports.deprecatedBeforeAfterEachWarning = deprecatedBeforeAfterEachWarning;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+function warn(msg) {
+  /* istanbul ignore else */
+  if (typeof console !== "undefined") {
+    console.warn(new ReferenceError(msg));
+  }
+}
+>>>>>>> Remove use strict since its implicit
 
 var StoreMixinEssentials = {
   waitFor: function waitFor(sources) {

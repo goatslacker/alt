@@ -1,5 +1,3 @@
-'use strict'
-
 /* istanbul ignore next */
 function NoopClass() { }
 

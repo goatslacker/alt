@@ -1,5 +1,3 @@
-'use strict'
-
 export function warn(msg) {
   /* istanbul ignore else */
   if (typeof console !== 'undefined') {

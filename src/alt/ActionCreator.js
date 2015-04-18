@@ -1,5 +1,3 @@
-'use strict'
-
 import { ACTION_HANDLER, ACTION_UID} from './symbols/symbols'
 
 export default class ActionCreator {

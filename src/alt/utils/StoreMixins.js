@@ -1,5 +1,3 @@
-'use strict'
-
 import {
   ACTION_KEY,
   ALL_LISTENERS,

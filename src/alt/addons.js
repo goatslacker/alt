@@ -1,5 +1,3 @@
-'use strict'
-
 import Alt from './'
 
 import ActionListeners from '../../utils/ActionListeners'

@@ -1,5 +1,3 @@
-'use strict'
-
 import EventEmitter from 'eventemitter3'
 import assign from 'object-assign'
 import {warn, deprecatedBeforeAfterEachWarning} from './utils/warnings'
