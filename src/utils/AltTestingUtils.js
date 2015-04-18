@@ -21,7 +21,11 @@ const AltTestingUtils = {
 
   makeStoreTestable(alt, UnwrappedStore) {
     const StorePrototype = AltTestingUtils.createStoreSpy(alt)
-    class DerivedStore extends UnwrappedStore { }
+    class DerivedStore extends UnwrappedStore {
+      constructor() {
+        super()
+      }
+    }
     assign(DerivedStore.prototype, StorePrototype)
     return new DerivedStore()
   },
