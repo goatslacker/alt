@@ -20,17 +20,10 @@ import {createStoreFromObject, createStoreFromClass} from './utils/createStore'
 import {warn} from './utils/warnings'
 import {getInternalMethods, builtInProto} from './utils/helpers'
 import formatAsConstant from './utils/formatAsConstant'
+import uid from './utils/uid'
 
 const GlobalActionsNameRegistry = {}
 
-function uid(container, name) {
-  let count = 0
-  let key = name
-  while (Object.hasOwnProperty.call(container, key)) {
-    key = name + String(++count)
-  }
-  return key
-}
 
 function setAppState(instance, data, onStore) {
   const obj = instance.deserialize(data)
