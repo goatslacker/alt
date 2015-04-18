@@ -3,7 +3,7 @@ import {
   INIT_SNAPSHOT,
   LAST_SNAPSHOT,
   LIFECYCLE,
-  STATE_CONTAINER,
+  STATE_CONTAINER
 } from '../symbols/symbols'
 
 export function setAppState(instance, data, onStore) {

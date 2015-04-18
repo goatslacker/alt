@@ -8,22 +8,21 @@ import { Dispatcher } from 'flux'
 import { warn } from './utils/warnings'
 import {
   createStoreFromObject,
-  createStoreFromClass,
+  createStoreFromClass
 } from './utils/createStore'
 import {
   ACTION_HANDLER,
   ACTION_KEY,
   INIT_SNAPSHOT,
   LAST_SNAPSHOT,
-  LIFECYCLE,
+  LIFECYCLE
 } from './symbols/symbols'
 import {
   filterSnapshots,
   saveInitialSnapshot,
   setAppState,
-  snapshot,
+  snapshot
 } from './utils/stateFunctions'
-
 
 const GlobalActionsNameRegistry = {}
 

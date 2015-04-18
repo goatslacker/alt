@@ -23,6 +23,7 @@
     "jsdom": "^3.1.2",
     "mocha": "^2.1.0",
     "react": "^0.13.1",
+    "rimraf": "^2.3.2",
     "sinon": "^1.14.0"
   },
   "repository": {
@@ -35,14 +36,15 @@
   ],
   "license": "MIT",
   "scripts": {
-    "build": "npm run build-alt && npm run build-alt-browser && npm run build-alt-browser-with-addons",
+    "build": "npm run clean && npm run build-alt && npm run build-alt-browser && npm run build-alt-browser-with-addons",
     "build-alt": "babel src --out-dir lib",
     "build-alt-browser": "browserify src/alt -t [envify --NODE_ENV production ] -t babelify --outfile dist/alt.js --standalone Alt",
     "build-alt-browser-with-addons": "browserify src/alt/addons.js -t [envify --NODE_ENV production ] -t babelify -t browserify-shim --outfile dist/alt-with-addons.js --standalone Alt",
     "coverage": "istanbul cover node_modules/mocha/bin/_mocha -- -u exports -R spec --compilers js:babel/register --require babel/external-helpers test",
+    "clean": "rimraf lib",
     "lint": "eslint src mixins utils",
     "prepublish": "npm run lint && npm run test && npm run build",
-    "test": "babel --external-helpers src --out-dir lib && npm run tests-node",
+    "test": "npm run clean && babel --external-helpers src --out-dir lib && npm run tests-node",
     "test-browser": "browserify test/browser/index.js -t babelify --outfile test/browser/tests.js",
     "tests-node": "mocha -u exports -R spec --compilers js:babel/register --require babel/external-helpers test"
   },
@@ -84,6 +86,10 @@
           "before": false,
           "after": true
         }
+      ],
+      "comma-dangle": [
+        0,
+        "always-multiline"
       ],
       "comma-style": [
         2,

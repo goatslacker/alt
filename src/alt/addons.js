@@ -19,7 +19,7 @@ Alt.addons = {
   atomicTransactions,
   chromeDebug,
   makeFinalStore,
-  withAltContext
+  withAltContext,
 }
 
 export default Alt
