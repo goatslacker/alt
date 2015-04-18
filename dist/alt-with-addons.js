@@ -1025,6 +1025,8 @@ var EventEmitter = _interopRequire(require("eventemitter3"));
 
 var assign = _interopRequire(require("object-assign"));
 
+var Symbol = _interopRequire(require("es-symbol"));
+
 var _utilsWarnings = require("./utils/warnings");
 
 var warn = _utilsWarnings.warn;
@@ -1033,19 +1035,24 @@ var deprecatedBeforeAfterEachWarning = _utilsWarnings.deprecatedBeforeAfterEachW
 var _symbolsSymbols = require("./symbols/symbols");
 
 var ALL_LISTENERS = _symbolsSymbols.ALL_LISTENERS;
-var EE = _symbolsSymbols.EE;
 var LIFECYCLE = _symbolsSymbols.LIFECYCLE;
 var LISTENERS = _symbolsSymbols.LISTENERS;
 var PUBLIC_METHODS = _symbolsSymbols.PUBLIC_METHODS;
 var STATE_CHANGED = _symbolsSymbols.STATE_CHANGED;
 var STATE_CONTAINER = _symbolsSymbols.STATE_CONTAINER;
 
+// alt container
+var ALT = Symbol();
+// event emitter instance
+var EE = Symbol();
+
 var AltStore = (function () {
-  function AltStore(dispatcher, model, state, StoreModel) {
+  function AltStore(alt, model, state, StoreModel) {
     var _this = this;
 
     _classCallCheck(this, AltStore);
 
+    this[ALT] = alt;
     this[EE] = new EventEmitter();
     this[LIFECYCLE] = {};
     this[STATE_CHANGED] = false;
@@ -1061,7 +1068,7 @@ var AltStore = (function () {
     assign(this, model[PUBLIC_METHODS]);
 
     // Register dispatcher
-    this.dispatchToken = dispatcher.register(function (payload) {
+    this.dispatchToken = alt.dispatcher.register(function (payload) {
       if (model[LIFECYCLE].beforeEach) {
         model[LIFECYCLE].beforeEach(payload.action.toString(), payload.data, _this[STATE_CONTAINER]);
       } else if (typeof model.beforeEach === "function") {
@@ -1133,12 +1140,7 @@ var AltStore = (function () {
     },
     getState: {
       value: function getState() {
-        // Copy over state so it's RO.
-        var state = this[STATE_CONTAINER];
-        return Object.keys(state).reduce(function (obj, key) {
-          obj[key] = state[key];
-          return obj;
-        }, {});
+        return this[ALT].getState(this[STATE_CONTAINER]);
       }
     }
   });
@@ -1148,7 +1150,7 @@ var AltStore = (function () {
 
 module.exports = AltStore;
 
-},{"./symbols/symbols":15,"./utils/warnings":22,"eventemitter3":6,"object-assign":10}],13:[function(require,module,exports){
+},{"./symbols/symbols":15,"./utils/warnings":22,"es-symbol":5,"eventemitter3":6,"object-assign":10}],13:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -1244,6 +1246,13 @@ var Alt = (function () {
 
     this.serialize = config.serialize || JSON.stringify;
     this.deserialize = config.deserialize || JSON.parse;
+    this.setState = config.setState || assign;
+    this.getState = config.getState || function (state) {
+      return Object.keys(state).reduce(function (obj, key) {
+        obj[key] = state[key];
+        return obj;
+      }, {});
+    };
     this.dispatcher = config.dispatcher || new Dispatcher();
     this.actions = {};
     this.stores = {};
@@ -1514,10 +1523,6 @@ exports.ACTION_UID = ACTION_UID;
 var ALL_LISTENERS = Symbol();
 
 exports.ALL_LISTENERS = ALL_LISTENERS;
-// event emitter instance
-var EE = Symbol();
-
-exports.EE = EE;
 // initial snapshot
 var INIT_SNAPSHOT = Symbol();
 
@@ -1711,8 +1716,8 @@ var PUBLIC_METHODS = _symbolsSymbols.PUBLIC_METHODS;
 var STATE_CHANGED = _symbolsSymbols.STATE_CHANGED;
 var STATE_CONTAINER = _symbolsSymbols.STATE_CONTAINER;
 
-function doSetState(store, storeInstance, nextState) {
-  if (!nextState) {
+function doSetState(store, storeInstance, state) {
+  if (!state) {
     return;
   }
 
@@ -1720,12 +1725,9 @@ function doSetState(store, storeInstance, nextState) {
     throw new Error("You can only use setState while dispatching");
   }
 
-  if (typeof nextState === "function") {
-    assign(storeInstance[STATE_CONTAINER], nextState(storeInstance[STATE_CONTAINER]));
-  } else {
-    assign(storeInstance[STATE_CONTAINER], nextState);
-  }
+  var nextState = typeof state === "function" ? state(storeInstance[STATE_CONTAINER]) : state;
 
+  storeInstance[STATE_CONTAINER] = store.alt.setState(storeInstance[STATE_CONTAINER], nextState);
   storeInstance[STATE_CHANGED] = true;
 }
 
@@ -1764,7 +1766,7 @@ function createStoreFromObject(alt, StoreModel, key) {
   }
 
   // create the instance and assign the public methods to the instance
-  storeInstance = assign(new AltStore(alt.dispatcher, StoreProto, StoreProto.state, StoreModel), StoreProto.publicMethods);
+  storeInstance = assign(new AltStore(alt, StoreProto, StoreProto.state, StoreModel), StoreProto.publicMethods);
 
   return storeInstance;
 }
@@ -1815,7 +1817,7 @@ function createStoreFromClass(alt, StoreModel, key) {
 
   var store = _applyConstructor(Store, argsForClass);
 
-  storeInstance = assign(new AltStore(alt.dispatcher, store, typeof alt._stateKey === "string" ? store[alt._stateKey] : null, StoreModel), getInternalMethods(StoreModel));
+  storeInstance = assign(new AltStore(alt, store, typeof alt._stateKey === "string" ? store[alt._stateKey] : null, StoreModel), getInternalMethods(StoreModel));
 
   return storeInstance;
 }

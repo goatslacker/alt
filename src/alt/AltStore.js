@@ -1,9 +1,9 @@
 import EventEmitter from 'eventemitter3'
 import assign from 'object-assign'
+import Symbol from 'es-symbol'
 import { warn, deprecatedBeforeAfterEachWarning } from './utils/warnings'
 import {
   ALL_LISTENERS,
-  EE,
   LIFECYCLE,
   LISTENERS,
   PUBLIC_METHODS,
@@ -11,8 +11,14 @@ import {
   STATE_CONTAINER
 } from './symbols/symbols'
 
+// alt container
+const ALT = Symbol()
+// event emitter instance
+const EE = Symbol()
+
 export default class AltStore {
-  constructor(dispatcher, model, state, StoreModel) {
+  constructor(alt, model, state, StoreModel) {
+    this[ALT] = alt
     this[EE] = new EventEmitter()
     this[LIFECYCLE] = {}
     this[STATE_CHANGED] = false
@@ -28,7 +34,7 @@ export default class AltStore {
     assign(this, model[PUBLIC_METHODS])
 
     // Register dispatcher
-    this.dispatchToken = dispatcher.register((payload) => {
+    this.dispatchToken = alt.dispatcher.register((payload) => {
       if (model[LIFECYCLE].beforeEach) {
         model[LIFECYCLE].beforeEach(
           payload.action.toString(),
@@ -111,11 +117,6 @@ export default class AltStore {
   }
 
   getState() {
-    // Copy over state so it's RO.
-    const state = this[STATE_CONTAINER]
-    return Object.keys(state).reduce((obj, key) => {
-      obj[key] = state[key]
-      return obj
-    }, {})
+    return this[ALT].getState(this[STATE_CONTAINER])
   }
 }

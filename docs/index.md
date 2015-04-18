@@ -65,6 +65,43 @@ This controls how store data is serialized in snapshots. By default alt uses `JS
 
 This controls how store data is deserialized from snapshot/bootstrap data. By default alt uses `JSON.parse`, but you can provide your own function to deserialize data.
 
+#### stateKey
+
+`stateKey` is a string that controls where state should be defined at the store level. For example:
+
+```js
+var alt = new Alt({
+  stateKey: 'cherry'
+});
+
+class MyStore {
+  constructor() {
+    // state now goes in this.cherry
+    this.cherry = {
+      a: 1,
+      b: 2,
+      c: 3
+    };
+
+    // instance properties declared below do not go into state
+    this.isPrivate = 'yes'
+    this.yay = true
+  }
+}
+```
+
+#### setState
+
+> setState(currentState: object, nextState: object): object
+
+`setState` is used internally by Alt to set the state. You can override this to provide your own setState implementation. Internally, setState is an alias for `Object.assign`. `setState` must return an object.
+
+#### getState
+
+> getState(currentState: object): mixed
+
+`getState` receives the current state and returns a copy of it. You can override this function to provide your own implementation.
+
 ## Instances
 
 Alternatively, you can [create instances](/docs/altInstances/) of the entire alt universe including stores.

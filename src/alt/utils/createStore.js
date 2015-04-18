@@ -24,7 +24,10 @@ function doSetState(store, storeInstance, state) {
     ? state(storeInstance[STATE_CONTAINER])
     : state
 
-  assign(storeInstance[STATE_CONTAINER], nextState)
+  storeInstance[STATE_CONTAINER] = store.alt.setState(
+    storeInstance[STATE_CONTAINER],
+    nextState
+  )
   storeInstance[STATE_CHANGED] = true
 }
 
@@ -71,7 +74,7 @@ export function createStoreFromObject(alt, StoreModel, key) {
 
   // create the instance and assign the public methods to the instance
   storeInstance = assign(
-    new AltStore(alt.dispatcher, StoreProto, StoreProto.state, StoreModel),
+    new AltStore(alt, StoreProto, StoreProto.state, StoreModel),
     StoreProto.publicMethods
   )
 
@@ -111,7 +114,7 @@ export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
 
   storeInstance = assign(
     new AltStore(
-      alt.dispatcher,
+      alt,
       store,
       typeof alt._stateKey === 'string'
         ? store[alt._stateKey]

@@ -30,6 +30,13 @@ class Alt {
   constructor(config = {}) {
     this.serialize = config.serialize || JSON.stringify
     this.deserialize = config.deserialize || JSON.parse
+    this.setState = config.setState || assign
+    this.getState = config.getState || function (state) {
+      return Object.keys(state).reduce((obj, key) => {
+        obj[key] = state[key]
+        return obj
+      }, {})
+    }
     this.dispatcher = config.dispatcher || new Dispatcher()
     this.actions = {}
     this.stores = {}
