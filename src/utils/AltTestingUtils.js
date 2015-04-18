@@ -1,5 +1,5 @@
 import assign from 'object-assign'
-const noop = function () { }
+var noop = function () { }
 
 // babelHelpers
 /*eslint-disable */
@@ -10,8 +10,8 @@ const _get = function get(object, property, receiver) { var desc = Object.getOwn
 const _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
 /*eslint-enable */
 
-export default class AltTestingUtils {
-  static createStoreSpy(alt) {
+const AltTestingUtils = {
+  createStoreSpy: (alt) => {
     return {
       _storeName: 'ALT_TEST_STORE',
       alt: alt,
@@ -26,9 +26,9 @@ export default class AltTestingUtils {
       setState: noop,
       waitFor: noop
     }
-  }
+  },
 
-  static makeStoreTestable(alt, UnwrappedStore) {
+  makeStoreTestable(alt, UnwrappedStore) {
     const StorePrototype = AltTestingUtils.createStoreSpy(alt)
     function DerivedStore() {
       _get(Object.getPrototypeOf(DerivedStore.prototype), 'constructor', this).call(this)
@@ -36,9 +36,9 @@ export default class AltTestingUtils {
     _inherits(DerivedStore, UnwrappedStore)
     assign(DerivedStore.prototype, StorePrototype)
     return new DerivedStore()
-  }
+  },
 
-  static mockGetState(state = {}) {
+  mockGetState(state = {}) {
     return {
       getState: () => {
         return state
@@ -46,3 +46,5 @@ export default class AltTestingUtils {
     }
   }
 }
+
+module.exports = AltTestingUtils

@@ -1,7 +1,7 @@
 import Alt from '../dist/alt-with-runtime'
 import React from 'react/addons'
 import AltContainer from '../components/AltContainer'
-import withAltContext from '../src/utils/withAltContext'
+import withAltContext from '../lib/utils/withAltContext'
 import { assert } from 'chai'
 import { jsdom } from 'jsdom'
 import sinon from 'sinon'

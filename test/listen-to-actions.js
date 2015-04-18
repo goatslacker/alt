@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import Alt from '../dist/alt-with-runtime'
 
-import ActionListeners from '../src/utils/ActionListeners'
+import ActionListeners from '../lib/utils/ActionListeners'
 
 const alt = new Alt()
 
