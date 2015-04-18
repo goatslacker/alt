@@ -1,5 +1,5 @@
 import Alt from '../dist/alt-with-runtime'
-import AltTestingUtils from '../lib/utils/AltTestingUtils'
+import AltTestingUtils from '../utils/AltTestingUtils'
 import { assert } from 'chai'
 
 const alt = new Alt()

@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 import Alt from '../dist/alt-with-runtime'
-import atomicTransactions from '../lib/utils/atomicTransactions'
+import atomicTransactions from '../utils/atomicTransactions'
 
 const alt = new Alt()
 

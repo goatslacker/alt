@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 import Alt from '../dist/alt-with-runtime'
-import AltManager from '../lib/utils/AltManager'
+import AltManager from '../utils/AltManager'
 
 export default {
   'the altManager gets constructed'() {

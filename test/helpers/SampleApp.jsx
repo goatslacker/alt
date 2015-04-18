@@ -1,5 +1,5 @@
 import React from 'react'
-import IsomorphicRenderer from '../../lib/utils/IsomorphicRenderer'
+import IsomorphicRenderer from '../../utils/IsomorphicRenderer'
 import Alt from '../../dist/alt-with-runtime'
 
 const alt = new Alt()
