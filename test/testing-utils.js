@@ -39,10 +39,12 @@ class UnwrappedPetStore {
 export default {
   'make a store testable by auto mocking alt.createStore'() {
     var context = AltTestingUtils.mockGetState({ pets: [1, 2, 3] })
+    var emptyContext = AltTestingUtils.mockGetState()
 
     var unwrappedStore = AltTestingUtils.makeStoreTestable(alt, UnwrappedPetStore)
     assert(unwrappedStore.roundMoney(21.221234) === 21.22)
     assert(unwrappedStore.roundMoney(11.2561341) === 11.26)
     assert(UnwrappedPetStore.getInventory.call(context)[0] === 1)
+    assert.isUndefined(UnwrappedPetStore.getInventory.call(emptyContext))
   }
 }

@@ -2,7 +2,7 @@
   "name": "alt",
   "version": "0.15.5",
   "description": "A flux implementation",
-  "main": "lib/alt/index.js",
+  "main": "lib/alt",
   "dependencies": {
     "es-symbol": "^1.1.1",
     "eventemitter3": "^0.1.6",
@@ -35,18 +35,16 @@
   ],
   "license": "MIT",
   "scripts": {
-    "build": "npm run build-alt && npm run build-alt-runtime && npm run build-alt-browser && npm run build-alt-browser-with-addons",
+    "build": "npm run build-alt && npm run build-alt-browser && npm run build-alt-browser-with-addons",
     "build-alt": "babel src --out-dir lib",
-    "build-alt-runtime": "browserify src/alt -t [envify --NODE_ENV production ] -t babelify --external-helpers --outfile dist/alt-with-runtime.js --standalone Alt",
-    "build-alt-browser": "browserify src/alt -t [envify --NODE_ENV production ] -t babelify --outfile dist/alt-browser.js --standalone Alt",
-    "build-alt-browser-with-addons": "browserify src/alt/alt-with-addons.js -t [envify --NODE_ENV production ] -t babelify -t browserify-shim --outfile dist/alt-browser-with-addons.js --standalone Alt",
+    "build-alt-browser": "browserify src/alt -t [envify --NODE_ENV production ] -t babelify --outfile dist/alt.js --standalone Alt",
+    "build-alt-browser-with-addons": "browserify src/alt/addons.js -t [envify --NODE_ENV production ] -t babelify -t browserify-shim --outfile dist/alt-with-addons.js --standalone Alt",
     "coverage": "istanbul cover node_modules/mocha/bin/_mocha -- -u exports -R spec --compilers js:babel/register --require babel/external-helpers test",
     "lint": "eslint src mixins utils",
-    "prepublish": "npm run test-build",
-    "test": "npm run build-alt-runtime && npm run tests-all",
-    "test-build": "npm run build && npm run tests-all",
+    "prepublish": "npm run lint && npm run test && npm run build",
+    "test": "babel --external-helpers src --out-dir lib && npm run tests-node",
     "test-browser": "browserify test/browser/index.js -t babelify --outfile test/browser/tests.js",
-    "tests-all": "mocha -u exports -R spec --compilers js:babel/register --require babel/external-helpers test"
+    "tests-node": "mocha -u exports -R spec --compilers js:babel/register --require babel/external-helpers test"
   },
   "browserify-shim": {
     "react": "global:React",
