@@ -1,4 +1,4 @@
-import Alt from '../dist/alt-with-runtime'
+import Alt from '../'
 import { assert } from 'chai'
 import sinon from 'sinon'
 
