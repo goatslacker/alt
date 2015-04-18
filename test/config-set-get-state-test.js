@@ -46,8 +46,6 @@ export default {
         state: { x: 1 }
       })
 
-      console.log(store)
-
       assert.isUndefined(store.getState().x)
 
       assert.ok(getState.calledOnce)
