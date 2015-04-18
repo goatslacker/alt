@@ -14,7 +14,7 @@ var AltNativeContainer = React.createClass(assign({
   displayName: 'AltNativeContainer',
 
   render: function () {
-    return this.altRender(cloneWithProps)
+    return this.altRender(cloneWithProps, View)
   }
 }, mixinContainer(React)))
 

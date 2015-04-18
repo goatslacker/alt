@@ -1,4 +1,3 @@
-'use strict'
 /**
  * IsomorphicRenderer(alt: AltInstance, App: ReactElement): mixed
  *
@@ -25,22 +24,21 @@
  * module.exports = IsomorphicRenderer(alt, App);
  * ```
  */
-module.exports = IsomorphicRenderer
 
-var Iso = require('iso')
-var React = require('react')
+import Iso from 'iso'
+import React from 'react'
 
-function IsomorphicRenderer(alt, App) {
+export default function IsomorphicRenderer(alt, App) {
   if (typeof window === 'undefined') {
-    return function () {
-      var app = React.renderToString(React.createElement(App))
-      var markup = Iso.render(app, alt.takeSnapshot())
+    return () => {
+      const app = React.renderToString(React.createElement(App))
+      const markup = Iso.render(app, alt.takeSnapshot())
       alt.flush()
       return markup
     }
   } else {
-    Iso.bootstrap(function (state, _, node) {
-      var app = React.createElement(App)
+    Iso.bootstrap((state, _, node) => {
+      const app = React.createElement(App)
       alt.bootstrap(state)
       React.render(app, node)
     })

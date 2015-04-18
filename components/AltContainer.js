@@ -47,7 +47,7 @@ var AltContainer = React.createClass(assign({
   displayName: 'AltContainer',
 
   render: function () {
-    return this.altRender(cloneWithProps)
+    return this.altRender(cloneWithProps, React.DOM.div)
   }
 }, mixinContainer(React)))
 

@@ -1,4 +1,3 @@
-'use strict'
 /**
  * DispatcherRecorder(alt: AltInstance): DispatcherInstance
  *
@@ -26,9 +25,8 @@
  * recorder.replay();
  * ```
  */
-module.exports = DispatcherRecorder
 
-var Symbol = require('es-symbol')
+import Symbol from 'es-symbol'
 
 function DispatcherRecorder(alt) {
   this.alt = alt
@@ -46,9 +44,9 @@ DispatcherRecorder.prototype.record = function () {
     return false
   }
 
-  this.dispatchToken = this.alt.dispatcher.register(function (payload) {
+  this.dispatchToken = this.alt.dispatcher.register((payload) => {
     this.events.push(payload)
-  }.bind(this))
+  })
 
   return true
 }
@@ -75,27 +73,27 @@ DispatcherRecorder.prototype.clear = function () {
  * replay(replayTime: ?number, done: ?function): undefined
  */
 DispatcherRecorder.prototype.replay = function (replayTime, done) {
-  var alt = this.alt
+  const alt = this.alt
 
   if (replayTime === void 0) {
-    this.events.forEach(function (payload) {
+    this.events.forEach((payload) => {
       alt.dispatch(payload.action, payload.data)
     })
   }
 
-  var onNext = function (payload, nextAction) {
-    return function () {
-      setTimeout(function () {
+  const onNext = (payload, nextAction) => {
+    return () => {
+      setTimeout(() => {
         alt.dispatch(payload.action, payload.data)
         nextAction()
       }, replayTime)
     }
   }
 
-  var next = done || function () { }
-  var i = this.events.length - 1
+  let next = done || function () { }
+  let i = this.events.length - 1
   while (i >= 0) {
-    var event = this.events[i]
+    let event = this.events[i]
     next = onNext(event, next)
     i -= 1
   }
@@ -109,7 +107,7 @@ DispatcherRecorder.prototype.replay = function (replayTime, done) {
  * serializeEvents(): string
  */
 DispatcherRecorder.prototype.serializeEvents = function () {
-  var events = this.events.map(function (event) {
+  const events = this.events.map((event) => {
     return {
       action: Symbol.keyFor(event.action),
       data: event.data
@@ -123,11 +121,13 @@ DispatcherRecorder.prototype.serializeEvents = function () {
  * loadEvents(events: string): undefined
  */
 DispatcherRecorder.prototype.loadEvents = function (events) {
-  var parsedEvents = JSON.parse(events)
-  this.events = parsedEvents.map(function (event) {
+  const parsedEvents = JSON.parse(events)
+  this.events = parsedEvents.map((event) => {
     return {
       action: Symbol.for(event.action),
       data: event.data
     }
   })
 }
+
+export default DispatcherRecorder

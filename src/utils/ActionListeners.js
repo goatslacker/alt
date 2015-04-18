@@ -1,4 +1,3 @@
-'use strict'
 /**
  * ActionListeners(alt: AltInstance): ActionListenersInstance
  *
@@ -17,10 +16,9 @@
  * })
  * ```
  */
-module.exports = ActionListeners
 
-var Symbol = require('es-symbol')
-var ALT_LISTENERS = Symbol('global dispatcher listeners')
+import Symbol from 'es-symbol'
+const ALT_LISTENERS = Symbol('global dispatcher listeners')
 
 function ActionListeners(alt) {
   this.dispatcher = alt.dispatcher
@@ -32,7 +30,7 @@ function ActionListeners(alt) {
  * Adds a listener to a specified action and returns the dispatch token.
  */
 ActionListeners.prototype.addActionListener = function (symAction, handler) {
-  var id = this.dispatcher.register(function (payload) {
+  const id = this.dispatcher.register((payload) => {
     /* istanbul ignore else */
     if (symAction === payload.action) {
       handler(payload.data)
@@ -60,3 +58,5 @@ ActionListeners.prototype.removeAllActionListeners = function () {
   )
   this[ALT_LISTENERS] = {}
 }
+
+export default ActionListeners
