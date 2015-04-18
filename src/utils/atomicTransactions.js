@@ -1,4 +1,4 @@
-var makeFinalStore = require('./makeFinalStore')
+import makeFinalStore from './makeFinalStore'
 
 // babelHelpers
 /*eslint-disable */
@@ -10,9 +10,7 @@ function makeAtomicClass(alt, StoreModel) {
   function AtomicClass() {
     StoreModel.call(this)
 
-    this.on('error', function () {
-      alt.rollback()
-    })
+    this.on('error', () => alt.rollback())
   }
   _inherits(AtomicClass, StoreModel)
   AtomicClass.displayName = StoreModel.displayName || StoreModel.name || 'AtomicClass'
@@ -21,25 +19,21 @@ function makeAtomicClass(alt, StoreModel) {
 
 function makeAtomicObject(alt, StoreModel) {
   StoreModel.lifecycle = StoreModel.lifecycle || {}
-  StoreModel.lifecycle.error = function () {
+  StoreModel.lifecycle.error = () => {
     alt.rollback()
   }
   return StoreModel
 }
 
 
-function atomicTransactions(alt) {
+export default function atomicTransactions(alt) {
   var finalStore = makeFinalStore(alt)
 
-  finalStore.listen(function () {
-    alt.takeSnapshot()
-  })
+  finalStore.listen(() => alt.takeSnapshot())
 
-  return function (StoreModel) {
+  return (StoreModel) => {
     return typeof StoreModel === 'function'
       ? makeAtomicClass(alt, StoreModel)
       : makeAtomicObject(alt, StoreModel)
   }
 }
-
-module.exports = atomicTransactions

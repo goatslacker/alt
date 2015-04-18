@@ -1,4 +1,3 @@
-'use strict'
 /**
  * DispatcherRecorder(alt: AltInstance): DispatcherInstance
  *
@@ -26,108 +25,107 @@
  * recorder.replay();
  * ```
  */
-module.exports = DispatcherRecorder
 
-var Symbol = require('es-symbol')
+import Symbol from 'es-symbol'
 
-function DispatcherRecorder(alt) {
-  this.alt = alt
-  this.events = []
-  this.dispatchToken = null
-}
-
-/**
- * If recording started you get true, otherwise false since there's a recording
- * in progress.
- * record(): boolean
- */
-DispatcherRecorder.prototype.record = function () {
-  if (this.dispatchToken) {
-    return false
+export default class DispatcherRecorder {
+  constructor(alt) {
+    this.alt = alt
+    this.events = []
+    this.dispatchToken = null
   }
 
-  this.dispatchToken = this.alt.dispatcher.register(function (payload) {
-    this.events.push(payload)
-  }.bind(this))
+  /**
+   * If recording started you get true, otherwise false since there's a recording
+   * in progress.
+   * record(): boolean
+   */
+  record() {
+    if (this.dispatchToken) {
+      return false
+    }
 
-  return true
-}
+    this.dispatchToken = this.alt.dispatcher.register(function (payload) {
+      this.events.push(payload)
+    }.bind(this))
 
-/**
- * Stops the recording in progress.
- * stop(): undefined
- */
-DispatcherRecorder.prototype.stop = function () {
-  this.alt.dispatcher.unregister(this.dispatchToken)
-  this.dispatchToken = null
-}
+    return true
+  }
 
-/**
- * Clear all events from memory.
- * clear(): undefined
- */
-DispatcherRecorder.prototype.clear = function () {
-  this.events = []
-}
+  /**
+   * Stops the recording in progress.
+   * stop(): undefined
+   */
+  stop() {
+    this.alt.dispatcher.unregister(this.dispatchToken)
+    this.dispatchToken = null
+  }
 
-/**
- * (As|S)ynchronously replay all events that were recorded.
- * replay(replayTime: ?number, done: ?function): undefined
- */
-DispatcherRecorder.prototype.replay = function (replayTime, done) {
-  var alt = this.alt
+  /**
+   * Clear all events from memory.
+   * clear(): undefined
+   */
+  clear() {
+    this.events = []
+  }
 
-  if (replayTime === void 0) {
-    this.events.forEach(function (payload) {
-      alt.dispatch(payload.action, payload.data)
+  /**
+   * (As|S)ynchronously replay all events that were recorded.
+   * replay(replayTime: ?number, done: ?function): undefined
+   */
+  replay(replayTime, done) {
+    if (replayTime === void 0) {
+      this.events.forEach((payload) => {
+        this.alt.dispatch(payload.action, payload.data)
+      })
+    }
+
+    const onNext = (payload, nextAction) => {
+      return () => {
+        setTimeout(() => {
+          this.alt.dispatch(payload.action, payload.data)
+          nextAction()
+        }, replayTime)
+      }
+    }
+
+    let next = done || function () { }
+    let i = this.events.length - 1
+    while (i >= 0) {
+      var event = this.events[i]
+      next = onNext(event, next)
+      i -= 1
+    }
+
+    next()
+  }
+
+  /**
+   * Serialize all the events so you can pass them around or load them into
+   * a separate recorder.
+   * serializeEvents(): string
+   */
+  serializeEvents() {
+    const events = this.events.map((event) => {
+      return {
+        action: Symbol.keyFor(event.action),
+        data: event.data
+      }
+    })
+    return JSON.stringify(events)
+  }
+
+  /**
+   * Load serialized events into the recorder and overwrite the current events
+   * loadEvents(events: string): undefined
+   */
+  loadEvents(events) {
+    const parsedEvents = JSON.parse(events)
+    this.events = parsedEvents.map((event) => {
+      return {
+        action: Symbol.for(event.action),
+        data: event.data
+      }
     })
   }
-
-  var onNext = function (payload, nextAction) {
-    return function () {
-      setTimeout(function () {
-        alt.dispatch(payload.action, payload.data)
-        nextAction()
-      }, replayTime)
-    }
-  }
-
-  var next = done || function () { }
-  var i = this.events.length - 1
-  while (i >= 0) {
-    var event = this.events[i]
-    next = onNext(event, next)
-    i -= 1
-  }
-
-  next()
-}
-
-/**
- * Serialize all the events so you can pass them around or load them into
- * a separate recorder.
- * serializeEvents(): string
- */
-DispatcherRecorder.prototype.serializeEvents = function () {
-  var events = this.events.map(function (event) {
-    return {
-      action: Symbol.keyFor(event.action),
-      data: event.data
-    }
-  })
-  return JSON.stringify(events)
-}
-
-/**
- * Load serialized events into the recorder and overwrite the current events
- * loadEvents(events: string): undefined
- */
-DispatcherRecorder.prototype.loadEvents = function (events) {
-  var parsedEvents = JSON.parse(events)
-  this.events = parsedEvents.map(function (event) {
-    return {
-      action: Symbol.for(event.action),
-      data: event.data
-    }
-  })
 }

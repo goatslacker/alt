@@ -24,62 +24,62 @@
  * ```
  */
 
-function AltManager(Alt) {
-  this.Alt = Alt
-  this.alts = {}
-}
-
-AltManager.prototype.create = function (altKey) {
-  if (this.get(altKey)) {
-    throw new ReferenceError(`Alt key ${altKey} already exists`)
+export default class AltManager {
+  constructor(Alt) {
+    this.Alt = Alt
+    this.alts = {}
   }
 
-  if (typeof altKey !== 'string') {
-    throw new TypeError('altKey must be a string')
-  }
-
-  this.alts[altKey] = new this.Alt()
-  return this.alts[altKey]
-}
-
-AltManager.prototype.get = function (altKey) {
-  return this.alts[altKey]
-}
-
-// returns all alt instances
-AltManager.prototype.all = function () {
-  return this.alts
-}
-
-AltManager.prototype.findWhere = function (regex) {
-  var results = {}
-  for (var i in this.alts) {
-    if (regex.exec(i) === null) {
-      continue
+  create(altKey) {
+    if (this.get(altKey)) {
+      throw new ReferenceError(`Alt key ${altKey} already exists`)
     }
 
-    results[i] = this.alts[i]
+    if (typeof altKey !== 'string') {
+      throw new TypeError('altKey must be a string')
+    }
+
+    this.alts[altKey] = new this.Alt()
+    return this.alts[altKey]
   }
 
-  return results
-}
-
-AltManager.prototype.delete = function (altKey) {
-  if (!this.get(altKey)) {
-    return false
+  get(altKey) {
+    return this.alts[altKey]
   }
 
-  delete this.alts[altKey]
-  return true
-}
-
-AltManager.prototype.getOrCreate = function (altKey) {
-  var alt = this.get(altKey)
-  if (alt) {
-    return alt
+  // returns all alt instances
+  all() {
+    return this.alts
   }
 
-  return this.create(altKey)
-}
+  findWhere(regex) {
+    let results = {}
+    for (let i in this.alts) {
+      if (regex.exec(i) === null) {
+        continue
+      }
 
-module.exports = AltManager
+      results[i] = this.alts[i]
+    }
+
+    return results
+  }
+
+  delete(altKey) {
+    if (!this.get(altKey)) {
+      return false
+    }
+
+    delete this.alts[altKey]
+    return true
+  }
+
+  getOrCreate(altKey) {
+    const alt = this.get(altKey)
+    if (alt) {
+      return alt
+    }
+
+    return this.create(altKey)
+  }
+}

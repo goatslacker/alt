@@ -1,6 +1,4 @@
 /*global window*/
-function chromeDebug(alt) {
+export default function chromeDebug(alt) {
   window['goatslacker.github.io/alt/'] = alt
 }
-
-module.exports = chromeDebug

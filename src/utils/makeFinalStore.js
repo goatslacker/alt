@@ -1,4 +1,3 @@
-'use strict'
 /**
  * makeFinalStore(alt: AltInstance): AltStore
  *
@@ -22,20 +21,19 @@
  * });
  * ```
  */
-module.exports = makeFinalStore
 
 function FinalStore() {
-  this.dispatcher.register(function (payload) {
-    var stores = Object.keys(this.alt.stores).reduce(function (arr, store) {
+  this.dispatcher.register((payload) => {
+    const stores = Object.keys(this.alt.stores).reduce((arr, store) => {
       return arr.push(this.alt.stores[store].dispatchToken), arr
-    }.bind(this), [])
+    }, [])
 
     this.waitFor(stores)
     this.setState({ payload: payload })
     this.emitChange()
-  }.bind(this))
+  })
 }
 
-function makeFinalStore(alt) {
+export default function makeFinalStore(alt) {
   return alt.createUnsavedStore(FinalStore)
 }

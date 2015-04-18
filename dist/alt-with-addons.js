@@ -138,10 +138,10 @@ function mixinContainer(React) {
         // If you pass in an array of stores then we are just listening to them
         // it should be an object then the state is added to the key specified
         if (!Array.isArray(stores)) {
-          return Object.keys(stores).reduce((function (obj, key) {
+          return Object.keys(stores).reduce(function (obj, key) {
             obj[key] = getStateFromStore(stores[key], props);
             return obj;
-          }).bind(this), {});
+          }, {});
         }
       } else {
         return {};
@@ -1155,19 +1155,19 @@ var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["defau
 
 var Alt = _interopRequire(require("./"));
 
-var ActionListeners = _interopRequire(require("../../utils/ActionListeners"));
+var ActionListeners = _interopRequire(require("../utils/ActionListeners"));
 
-var AltManager = _interopRequire(require("../../utils/AltManager"));
+var AltManager = _interopRequire(require("../utils/AltManager"));
 
-var DispatcherRecorder = _interopRequire(require("../../utils/DispatcherRecorder"));
+var DispatcherRecorder = _interopRequire(require("../utils/DispatcherRecorder"));
 
-var atomicTransactions = _interopRequire(require("../../utils/atomicTransactions"));
+var atomicTransactions = _interopRequire(require("../utils/atomicTransactions"));
 
-var chromeDebug = _interopRequire(require("../../utils/chromeDebug"));
+var chromeDebug = _interopRequire(require("../utils/chromeDebug"));
 
-var makeFinalStore = _interopRequire(require("../../utils/makeFinalStore"));
+var makeFinalStore = _interopRequire(require("../utils/makeFinalStore"));
 
-var withAltContext = _interopRequire(require("../../utils/withAltContext"));
+var withAltContext = _interopRequire(require("../utils/withAltContext"));
 
 var AltContainer = _interopRequire(require("../../AltContainer"));
 
@@ -1183,7 +1183,7 @@ Alt.addons = {
 
 module.exports = Alt;
 
-},{"../../AltContainer":1,"../../utils/ActionListeners":23,"../../utils/AltManager":24,"../../utils/DispatcherRecorder":25,"../../utils/atomicTransactions":26,"../../utils/chromeDebug":27,"../../utils/makeFinalStore":28,"../../utils/withAltContext":29,"./":14}],14:[function(require,module,exports){
+},{"../../AltContainer":1,"../utils/ActionListeners":23,"../utils/AltManager":24,"../utils/DispatcherRecorder":25,"../utils/atomicTransactions":26,"../utils/chromeDebug":27,"../utils/makeFinalStore":28,"../utils/withAltContext":29,"./":14}],14:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -1962,6 +1962,13 @@ function deprecatedBeforeAfterEachWarning() {
 
 },{}],23:[function(require,module,exports){
 "use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
 /**
  * ActionListeners(alt: AltInstance): ActionListenersInstance
  *
@@ -1980,49 +1987,75 @@ function deprecatedBeforeAfterEachWarning() {
  * })
  * ```
  */
-module.exports = ActionListeners;
 
-var Symbol = require("es-symbol");
+var Symbol = _interopRequire(require("es-symbol"));
+
 var ALT_LISTENERS = Symbol("global dispatcher listeners");
 
-function ActionListeners(alt) {
-  this.dispatcher = alt.dispatcher;
-  this[ALT_LISTENERS] = {};
-}
+var ActionListeners = (function () {
+  function ActionListeners(alt) {
+    _classCallCheck(this, ActionListeners);
 
-/*
- * addActionListener(symAction: symbol, handler: function): number
- * Adds a listener to a specified action and returns the dispatch token.
- */
-ActionListeners.prototype.addActionListener = function (symAction, handler) {
-  var id = this.dispatcher.register(function (payload) {
-    /* istanbul ignore else */
-    if (symAction === payload.action) {
-      handler(payload.data);
+    this.dispatcher = alt.dispatcher;
+    this[ALT_LISTENERS] = {};
+  }
+
+  _createClass(ActionListeners, {
+    addActionListener: {
+
+      /*
+       * addActionListener(symAction: symbol, handler: function): number
+       * Adds a listener to a specified action and returns the dispatch token.
+       */
+
+      value: function addActionListener(symAction, handler) {
+        var id = this.dispatcher.register(function (payload) {
+          /* istanbul ignore else */
+          if (symAction === payload.action) {
+            handler(payload.data);
+          }
+        });
+        this[ALT_LISTENERS][id] = true;
+        return id;
+      }
+    },
+    removeActionListener: {
+
+      /*
+       * removeActionListener(id: number): undefined
+       * Removes the specified dispatch registration.
+       */
+
+      value: function removeActionListener(id) {
+        delete this[ALT_LISTENERS][id];
+        this.dispatcher.unregister(id);
+      }
+    },
+    removeAllActionListeners: {
+
+      /**
+       * Remove all listeners.
+       */
+
+      value: function removeAllActionListeners() {
+        Object.keys(this[ALT_LISTENERS]).forEach(this.removeActionListener.bind(this));
+        this[ALT_LISTENERS] = {};
+      }
     }
   });
-  this[ALT_LISTENERS][id] = true;
-  return id;
-};
 
-/*
- * removeActionListener(id: number): undefined
- * Removes the specified dispatch registration.
- */
-ActionListeners.prototype.removeActionListener = function (id) {
-  delete this[ALT_LISTENERS][id];
-  this.dispatcher.unregister(id);
-};
+  return ActionListeners;
+})();
 
-/**
- * Remove all listeners.
- */
-ActionListeners.prototype.removeAllActionListeners = function () {
-  Object.keys(this[ALT_LISTENERS]).forEach(this.removeActionListener.bind(this));
-  this[ALT_LISTENERS] = {};
-};
+module.exports = ActionListeners;
 
 },{"es-symbol":5}],24:[function(require,module,exports){
+"use strict";
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
 /**
  * AltManager(Alt: AltClass): undefined
  *
@@ -2049,70 +2082,92 @@ ActionListeners.prototype.removeAllActionListeners = function () {
  * ```
  */
 
-"use strict";
+var AltManager = (function () {
+  function AltManager(Alt) {
+    _classCallCheck(this, AltManager);
 
-function AltManager(Alt) {
-  this.Alt = Alt;
-  this.alts = {};
-}
-
-AltManager.prototype.create = function (altKey) {
-  if (this.get(altKey)) {
-    throw new ReferenceError("Alt key " + altKey + " already exists");
+    this.Alt = Alt;
+    this.alts = {};
   }
 
-  if (typeof altKey !== "string") {
-    throw new TypeError("altKey must be a string");
-  }
+  _createClass(AltManager, {
+    create: {
+      value: function create(altKey) {
+        if (this.get(altKey)) {
+          throw new ReferenceError("Alt key " + altKey + " already exists");
+        }
 
-  this.alts[altKey] = new this.Alt();
-  return this.alts[altKey];
-};
+        if (typeof altKey !== "string") {
+          throw new TypeError("altKey must be a string");
+        }
 
-AltManager.prototype.get = function (altKey) {
-  return this.alts[altKey];
-};
+        this.alts[altKey] = new this.Alt();
+        return this.alts[altKey];
+      }
+    },
+    get: {
+      value: function get(altKey) {
+        return this.alts[altKey];
+      }
+    },
+    all: {
 
-// returns all alt instances
-AltManager.prototype.all = function () {
-  return this.alts;
-};
+      // returns all alt instances
 
-AltManager.prototype.findWhere = function (regex) {
-  var results = {};
-  for (var i in this.alts) {
-    if (regex.exec(i) === null) {
-      continue;
+      value: function all() {
+        return this.alts;
+      }
+    },
+    findWhere: {
+      value: function findWhere(regex) {
+        var results = {};
+        for (var i in this.alts) {
+          if (regex.exec(i) === null) {
+            continue;
+          }
+
+          results[i] = this.alts[i];
+        }
+
+        return results;
+      }
+    },
+    "delete": {
+      value: function _delete(altKey) {
+        if (!this.get(altKey)) {
+          return false;
+        }
+
+        delete this.alts[altKey];
+        return true;
+      }
+    },
+    getOrCreate: {
+      value: function getOrCreate(altKey) {
+        var alt = this.get(altKey);
+        if (alt) {
+          return alt;
+        }
+
+        return this.create(altKey);
+      }
     }
+  });
 
-    results[i] = this.alts[i];
-  }
-
-  return results;
-};
-
-AltManager.prototype["delete"] = function (altKey) {
-  if (!this.get(altKey)) {
-    return false;
-  }
-
-  delete this.alts[altKey];
-  return true;
-};
-
-AltManager.prototype.getOrCreate = function (altKey) {
-  var alt = this.get(altKey);
-  if (alt) {
-    return alt;
-  }
-
-  return this.create(altKey);
-};
+  return AltManager;
+})();
 
 module.exports = AltManager;
 
 },{}],25:[function(require,module,exports){
 "use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
 /**
  * DispatcherRecorder(alt: AltInstance): DispatcherInstance
  *
@@ -2140,116 +2195,148 @@ module.exports = AltManager;
  * recorder.replay();
  * ```
  */
+
+var Symbol = _interopRequire(require("es-symbol"));
+
+var DispatcherRecorder = (function () {
+  function DispatcherRecorder(alt) {
+    _classCallCheck(this, DispatcherRecorder);
+
+    this.alt = alt;
+    this.events = [];
+    this.dispatchToken = null;
+  }
+
+  _createClass(DispatcherRecorder, {
+    record: {
+
+      /**
+       * If recording started you get true, otherwise false since there's a recording
+       * in progress.
+       * record(): boolean
+       */
+
+      value: function record() {
+        if (this.dispatchToken) {
+          return false;
+        }
+
+        this.dispatchToken = this.alt.dispatcher.register((function (payload) {
+          this.events.push(payload);
+        }).bind(this));
+
+        return true;
+      }
+    },
+    stop: {
+
+      /**
+       * Stops the recording in progress.
+       * stop(): undefined
+       */
+
+      value: function stop() {
+        this.alt.dispatcher.unregister(this.dispatchToken);
+        this.dispatchToken = null;
+      }
+    },
+    clear: {
+
+      /**
+       * Clear all events from memory.
+       * clear(): undefined
+       */
+
+      value: function clear() {
+        this.events = [];
+      }
+    },
+    replay: {
+
+      /**
+       * (As|S)ynchronously replay all events that were recorded.
+       * replay(replayTime: ?number, done: ?function): undefined
+       */
+
+      value: function replay(replayTime, done) {
+        var _this = this;
+
+        if (replayTime === void 0) {
+          this.events.forEach(function (payload) {
+            _this.alt.dispatch(payload.action, payload.data);
+          });
+        }
+
+        var onNext = function (payload, nextAction) {
+          return function () {
+            setTimeout(function () {
+              _this.alt.dispatch(payload.action, payload.data);
+              nextAction();
+            }, replayTime);
+          };
+        };
+
+        var next = done || function () {};
+        var i = this.events.length - 1;
+        while (i >= 0) {
+          var event = this.events[i];
+          next = onNext(event, next);
+          i -= 1;
+        }
+
+        next();
+      }
+    },
+    serializeEvents: {
+
+      /**
+       * Serialize all the events so you can pass them around or load them into
+       * a separate recorder.
+       * serializeEvents(): string
+       */
+
+      value: function serializeEvents() {
+        var events = this.events.map(function (event) {
+          return {
+            action: Symbol.keyFor(event.action),
+            data: event.data
+          };
+        });
+        return JSON.stringify(events);
+      }
+    },
+    loadEvents: {
+
+      /**
+       * Load serialized events into the recorder and overwrite the current events
+       * loadEvents(events: string): undefined
+       */
+
+      value: function loadEvents(events) {
+        var parsedEvents = JSON.parse(events);
+        this.events = parsedEvents.map(function (event) {
+          return {
+            action: Symbol["for"](event.action),
+            data: event.data
+          };
+        });
+      }
+    }
+  });
+
+  return DispatcherRecorder;
+})();
+
 module.exports = DispatcherRecorder;
-
-var Symbol = require("es-symbol");
-
-function DispatcherRecorder(alt) {
-  this.alt = alt;
-  this.events = [];
-  this.dispatchToken = null;
-}
-
-/**
- * If recording started you get true, otherwise false since there's a recording
- * in progress.
- * record(): boolean
- */
-DispatcherRecorder.prototype.record = function () {
-  if (this.dispatchToken) {
-    return false;
-  }
-
-  this.dispatchToken = this.alt.dispatcher.register((function (payload) {
-    this.events.push(payload);
-  }).bind(this));
-
-  return true;
-};
-
-/**
- * Stops the recording in progress.
- * stop(): undefined
- */
-DispatcherRecorder.prototype.stop = function () {
-  this.alt.dispatcher.unregister(this.dispatchToken);
-  this.dispatchToken = null;
-};
-
-/**
- * Clear all events from memory.
- * clear(): undefined
- */
-DispatcherRecorder.prototype.clear = function () {
-  this.events = [];
-};
-
-/**
- * (As|S)ynchronously replay all events that were recorded.
- * replay(replayTime: ?number, done: ?function): undefined
- */
-DispatcherRecorder.prototype.replay = function (replayTime, done) {
-  var alt = this.alt;
-
-  if (replayTime === void 0) {
-    this.events.forEach(function (payload) {
-      alt.dispatch(payload.action, payload.data);
-    });
-  }
-
-  var onNext = function onNext(payload, nextAction) {
-    return function () {
-      setTimeout(function () {
-        alt.dispatch(payload.action, payload.data);
-        nextAction();
-      }, replayTime);
-    };
-  };
-
-  var next = done || function () {};
-  var i = this.events.length - 1;
-  while (i >= 0) {
-    var event = this.events[i];
-    next = onNext(event, next);
-    i -= 1;
-  }
-
-  next();
-};
-
-/**
- * Serialize all the events so you can pass them around or load them into
- * a separate recorder.
- * serializeEvents(): string
- */
-DispatcherRecorder.prototype.serializeEvents = function () {
-  var events = this.events.map(function (event) {
-    return {
-      action: Symbol.keyFor(event.action),
-      data: event.data
-    };
-  });
-  return JSON.stringify(events);
-};
-
-/**
- * Load serialized events into the recorder and overwrite the current events
- * loadEvents(events: string): undefined
- */
-DispatcherRecorder.prototype.loadEvents = function (events) {
-  var parsedEvents = JSON.parse(events);
-  this.events = parsedEvents.map(function (event) {
-    return {
-      action: Symbol["for"](event.action),
-      data: event.data
-    };
-  });
-};
 
 },{"es-symbol":5}],26:[function(require,module,exports){
 "use strict";
 
-var makeFinalStore = require("./makeFinalStore");
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+module.exports = atomicTransactions;
+
+var makeFinalStore = _interopRequire(require("./makeFinalStore"));
 
 // babelHelpers
 /*eslint-disable */
@@ -2266,7 +2353,7 @@ function makeAtomicClass(alt, StoreModel) {
     StoreModel.call(this);
 
     this.on("error", function () {
-      alt.rollback();
+      return alt.rollback();
     });
   }
   _inherits(AtomicClass, StoreModel);
@@ -2286,7 +2373,7 @@ function atomicTransactions(alt) {
   var finalStore = makeFinalStore(alt);
 
   finalStore.listen(function () {
-    alt.takeSnapshot();
+    return alt.takeSnapshot();
   });
 
   return function (StoreModel) {
@@ -2294,20 +2381,20 @@ function atomicTransactions(alt) {
   };
 }
 
-module.exports = atomicTransactions;
-
 },{"./makeFinalStore":28}],27:[function(require,module,exports){
 /*global window*/
 "use strict";
+
+module.exports = chromeDebug;
 
 function chromeDebug(alt) {
   window["goatslacker.github.io/alt/"] = alt;
 }
 
-module.exports = chromeDebug;
-
 },{}],28:[function(require,module,exports){
 "use strict";
+
+module.exports = makeFinalStore;
 /**
  * makeFinalStore(alt: AltInstance): AltStore
  *
@@ -2331,18 +2418,19 @@ module.exports = chromeDebug;
  * });
  * ```
  */
-module.exports = makeFinalStore;
 
 function FinalStore() {
-  this.dispatcher.register((function (payload) {
-    var stores = Object.keys(this.alt.stores).reduce((function (arr, store) {
-      return (arr.push(this.alt.stores[store].dispatchToken), arr);
-    }).bind(this), []);
+  var _this = this;
 
-    this.waitFor(stores);
-    this.setState({ payload: payload });
-    this.emitChange();
-  }).bind(this));
+  this.dispatcher.register(function (payload) {
+    var stores = Object.keys(_this.alt.stores).reduce(function (arr, store) {
+      return (arr.push(_this.alt.stores[store].dispatchToken), arr);
+    }, []);
+
+    _this.waitFor(stores);
+    _this.setState({ payload: payload });
+    _this.emitChange();
+  });
 }
 
 function makeFinalStore(alt) {
@@ -2353,7 +2441,11 @@ function makeFinalStore(alt) {
 (function (global){
 "use strict";
 
-var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+module.exports = withAltContext;
+
+var React = _interopRequire((typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null));
 
 function withAltContext(flux, Component) {
   return React.createClass({
@@ -2370,8 +2462,6 @@ function withAltContext(flux, Component) {
     }
   });
 }
-
-module.exports = withAltContext;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}]},{},[13])(13)

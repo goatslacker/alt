@@ -1,6 +1,6 @@
-var React = require('react')
+import React from 'react'
 
-function withAltContext(flux, Component) {
+export default function withAltContext(flux, Component) {
   return React.createClass({
     childContextTypes: {
       flux: React.PropTypes.object
@@ -15,5 +15,3 @@ function withAltContext(flux, Component) {
     }
   })
 }
-
-module.exports = withAltContext
