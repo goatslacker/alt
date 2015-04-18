@@ -73,7 +73,7 @@ function mixinContainer(React) {
           return Object.keys(stores).reduce(function (obj, key) {
             obj[key] = getStateFromStore(stores[key], props)
             return obj
-          }.bind(this), {})
+          }, {})
         }
       } else {
         return {}
