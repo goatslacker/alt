@@ -1,6 +1,15 @@
-import { Dispatcher } from 'flux'
+import ActionCreator from './ActionCreator'
 import Symbol from 'es-symbol'
 import assign from 'object-assign'
+import formatAsConstant from './utils/formatAsConstant'
+import getInternalMethods from './utils/getInternalMethods'
+import uid from './utils/uid'
+import { Dispatcher } from 'flux'
+import { warn } from './utils/warnings'
+import {
+  createStoreFromObject,
+  createStoreFromClass,
+} from './utils/createStore'
 import {
   ACTION_HANDLER,
   ACTION_KEY,
@@ -13,20 +22,15 @@ import {
   LISTENERS,
   PUBLIC_METHODS,
   STATE_CHANGED,
-  STATE_CONTAINER
+  STATE_CONTAINER,
 } from './symbols/symbols'
-import ActionCreator from './ActionCreator'
-import {createStoreFromObject, createStoreFromClass} from './utils/createStore'
-import {warn} from './utils/warnings'
-import {getInternalMethods, builtInProto} from './utils/helpers'
-import formatAsConstant from './utils/formatAsConstant'
-import uid from './utils/uid'
 import {
   filterSnapshots,
   saveInitialSnapshot,
   setAppState,
   snapshot,
 } from './utils/stateFunctions'
+
 
 const GlobalActionsNameRegistry = {}
 
@@ -106,7 +110,7 @@ class Alt {
     const key = ActionsClass.name || ActionsClass.displayName || ''
 
     if (typeof ActionsClass === 'function') {
-      assign(actions, getInternalMethods(ActionsClass.prototype, builtInProto))
+      assign(actions, getInternalMethods(ActionsClass.prototype, true))
       class ActionsGenerator extends ActionsClass {
         constructor(...args) {
           super(...args)

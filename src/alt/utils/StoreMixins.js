@@ -3,7 +3,7 @@ import {
   ALL_LISTENERS,
   LIFECYCLE,
   LISTENERS,
-  PUBLIC_METHODS
+  PUBLIC_METHODS,
 } from '../symbols/symbols'
 
 export const StoreMixinEssentials = {

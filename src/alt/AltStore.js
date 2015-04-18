@@ -1,6 +1,6 @@
 import EventEmitter from 'eventemitter3'
 import assign from 'object-assign'
-import {warn, deprecatedBeforeAfterEachWarning} from './utils/warnings'
+import { warn, deprecatedBeforeAfterEachWarning } from './utils/warnings'
 import {
   ALL_LISTENERS,
   EE,

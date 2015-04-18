@@ -1,7 +1,7 @@
 import assign from 'object-assign'
 import AltStore from '../AltStore'
-import {StoreMixinListeners, StoreMixinEssentials} from './storeMixins'
-import {getInternalMethods, builtIns} from './helpers'
+import { StoreMixinListeners, StoreMixinEssentials } from './storeMixins'
+import getInternalMethods from './getInternalMethods'
 import {
   ALL_LISTENERS,
   LIFECYCLE,
@@ -108,7 +108,7 @@ export function createStoreFromClass(alt, StoreModel, key, ...argsForConstructor
 
   storeInstance = assign(
     new AltStore(alt.dispatcher, store, null, StoreModel),
-    getInternalMethods(StoreModel, builtIns)
+    getInternalMethods(StoreModel)
   )
 
   return storeInstance
