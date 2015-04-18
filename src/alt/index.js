@@ -13,16 +13,9 @@ import {
 import {
   ACTION_HANDLER,
   ACTION_KEY,
-  ACTION_UID,
-  ALL_LISTENERS,
-  EE,
   INIT_SNAPSHOT,
   LAST_SNAPSHOT,
   LIFECYCLE,
-  LISTENERS,
-  PUBLIC_METHODS,
-  STATE_CHANGED,
-  STATE_CONTAINER,
 } from './symbols/symbols'
 import {
   filterSnapshots,
