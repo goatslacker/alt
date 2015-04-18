@@ -33,6 +33,7 @@ class Alt {
     this.dispatcher = config.dispatcher || new Dispatcher()
     this.actions = {}
     this.stores = {}
+    this._stateKey = config.stateKey
     this[LAST_SNAPSHOT] = this[INIT_SNAPSHOT] = '{}'
   }
 

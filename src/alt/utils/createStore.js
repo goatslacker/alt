@@ -1,6 +1,6 @@
 import assign from 'object-assign'
 import AltStore from '../AltStore'
-import { StoreMixinListeners, StoreMixinEssentials } from './storeMixins'
+import { StoreMixinListeners, StoreMixinEssentials } from './StoreMixins'
 import getInternalMethods from './getInternalMethods'
 import {
   ALL_LISTENERS,
@@ -55,14 +55,21 @@ export function createStoreFromObject(alt, StoreModel, key) {
   // bind the store listeners
   /* istanbul ignore else */
   if (StoreProto.bindListeners) {
-    StoreMixinListeners.bindListeners.call(StoreProto, StoreProto.bindListeners)
+    StoreMixinListeners.bindListeners.call(
+      StoreProto,
+      StoreProto.bindListeners
+    )
   }
 
   // bind the lifecycle events
   /* istanbul ignore else */
   if (StoreProto.lifecycle) {
     Object.keys(StoreProto.lifecycle).forEach((event) => {
-      StoreMixinListeners.on.call(StoreProto, event, StoreProto.lifecycle[event])
+      StoreMixinListeners.on.call(
+        StoreProto,
+        event,
+        StoreProto.lifecycle[event]
+      )
     })
   }
 
@@ -75,7 +82,7 @@ export function createStoreFromObject(alt, StoreModel, key) {
   return storeInstance
 }
 
-export function createStoreFromClass(alt, StoreModel, key, ...argsForConstructor) {
+export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
   let storeInstance
 
   // Creating a class here so we don't overload the provided store's
@@ -104,10 +111,17 @@ export function createStoreFromClass(alt, StoreModel, key, ...argsForConstructor
   Store.prototype[LISTENERS] = {}
   Store.prototype[PUBLIC_METHODS] = {}
 
-  const store = new Store(...argsForConstructor)
+  const store = new Store(...argsForClass)
 
   storeInstance = assign(
-    new AltStore(alt.dispatcher, store, null, StoreModel),
+    new AltStore(
+      alt.dispatcher,
+      store,
+      typeof alt._stateKey === 'string'
+        ? store[alt._stateKey]
+        : null,
+        StoreModel
+    ),
     getInternalMethods(StoreModel)
   )
 
