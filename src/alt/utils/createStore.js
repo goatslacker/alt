@@ -11,8 +11,8 @@ import {
   STATE_CONTAINER
 } from '../symbols/symbols'
 
-function doSetState(store, storeInstance, nextState) {
-  if (!nextState) {
+function doSetState(store, storeInstance, state) {
+  if (!state) {
     return
   }
 
@@ -20,15 +20,11 @@ function doSetState(store, storeInstance, nextState) {
     throw new Error('You can only use setState while dispatching')
   }
 
-  if (typeof nextState === 'function') {
-    assign(
-      storeInstance[STATE_CONTAINER],
-      nextState(storeInstance[STATE_CONTAINER])
-    )
-  } else {
-    assign(storeInstance[STATE_CONTAINER], nextState)
-  }
+  const nextState = typeof state === 'function'
+    ? state(storeInstance[STATE_CONTAINER])
+    : state
 
+  assign(storeInstance[STATE_CONTAINER], nextState)
   storeInstance[STATE_CHANGED] = true
 }
 
