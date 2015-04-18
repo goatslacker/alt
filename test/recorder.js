@@ -1,7 +1,7 @@
 import Alt from '../dist/alt-with-runtime'
 import { assert } from 'chai'
 
-import DispatcherRecorder from '../utils/DispatcherRecorder'
+import DispatcherRecorder from '../src/utils/DispatcherRecorder'
 
 const alt = new Alt()
 const recorder = new DispatcherRecorder(alt)

@@ -1,5 +1,5 @@
 import Alt from '../dist/alt-with-runtime'
-import makeFinalStore from '../utils/makeFinalStore'
+import makeFinalStore from '../src/utils/makeFinalStore'
 import { assert } from 'chai'
 import sinon from 'sinon'
 
