@@ -1967,10 +1967,6 @@ function deprecatedBeforeAfterEachWarning() {
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
-var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
-
 /**
  * ActionListeners(alt: AltInstance): ActionListenersInstance
  *
@@ -1994,60 +1990,42 @@ var Symbol = _interopRequire(require("es-symbol"));
 
 var ALT_LISTENERS = Symbol("global dispatcher listeners");
 
-var ActionListeners = (function () {
-  function ActionListeners(alt) {
-    _classCallCheck(this, ActionListeners);
+function ActionListeners(alt) {
+  this.dispatcher = alt.dispatcher;
+  this[ALT_LISTENERS] = {};
+}
 
-    this.dispatcher = alt.dispatcher;
-    this[ALT_LISTENERS] = {};
-  }
-
-  _createClass(ActionListeners, {
-    addActionListener: {
-
-      /*
-       * addActionListener(symAction: symbol, handler: function): number
-       * Adds a listener to a specified action and returns the dispatch token.
-       */
-
-      value: function addActionListener(symAction, handler) {
-        var id = this.dispatcher.register(function (payload) {
-          /* istanbul ignore else */
-          if (symAction === payload.action) {
-            handler(payload.data);
-          }
-        });
-        this[ALT_LISTENERS][id] = true;
-        return id;
-      }
-    },
-    removeActionListener: {
-
-      /*
-       * removeActionListener(id: number): undefined
-       * Removes the specified dispatch registration.
-       */
-
-      value: function removeActionListener(id) {
-        delete this[ALT_LISTENERS][id];
-        this.dispatcher.unregister(id);
-      }
-    },
-    removeAllActionListeners: {
-
-      /**
-       * Remove all listeners.
-       */
-
-      value: function removeAllActionListeners() {
-        Object.keys(this[ALT_LISTENERS]).forEach(this.removeActionListener.bind(this));
-        this[ALT_LISTENERS] = {};
-      }
+/*
+ * addActionListener(symAction: symbol, handler: function): number
+ * Adds a listener to a specified action and returns the dispatch token.
+ */
+ActionListeners.prototype.addActionListener = function (symAction, handler) {
+  var id = this.dispatcher.register(function (payload) {
+    /* istanbul ignore else */
+    if (symAction === payload.action) {
+      handler(payload.data);
     }
   });
+  this[ALT_LISTENERS][id] = true;
+  return id;
+};
 
-  return ActionListeners;
-})();
+/*
+ * removeActionListener(id: number): undefined
+ * Removes the specified dispatch registration.
+ */
+ActionListeners.prototype.removeActionListener = function (id) {
+  delete this[ALT_LISTENERS][id];
+  this.dispatcher.unregister(id);
+};
+
+/**
+ * Remove all listeners.
+ */
+ActionListeners.prototype.removeAllActionListeners = function () {
+  Object.keys(this[ALT_LISTENERS]).forEach(this.removeActionListener.bind(this));
+  this[ALT_LISTENERS] = {};
+};
 
 module.exports = ActionListeners;
 
@@ -2166,10 +2144,6 @@ module.exports = AltManager;
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
-var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
-
 /**
  * DispatcherRecorder(alt: AltInstance): DispatcherInstance
  *
@@ -2200,134 +2174,109 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 
 var Symbol = _interopRequire(require("es-symbol"));
 
-var DispatcherRecorder = (function () {
-  function DispatcherRecorder(alt) {
-    _classCallCheck(this, DispatcherRecorder);
+function DispatcherRecorder(alt) {
+  this.alt = alt;
+  this.events = [];
+  this.dispatchToken = null;
+}
 
-    this.alt = alt;
-    this.events = [];
-    this.dispatchToken = null;
+/**
+ * If recording started you get true, otherwise false since there's a recording
+ * in progress.
+ * record(): boolean
+ */
+DispatcherRecorder.prototype.record = function () {
+  var _this = this;
+
+  if (this.dispatchToken) {
+    return false;
   }
 
-  _createClass(DispatcherRecorder, {
-    record: {
-
-      /**
-       * If recording started you get true, otherwise false since there's a recording
-       * in progress.
-       * record(): boolean
-       */
-
-      value: function record() {
-        if (this.dispatchToken) {
-          return false;
-        }
-
-        this.dispatchToken = this.alt.dispatcher.register((function (payload) {
-          this.events.push(payload);
-        }).bind(this));
-
-        return true;
-      }
-    },
-    stop: {
-
-      /**
-       * Stops the recording in progress.
-       * stop(): undefined
-       */
-
-      value: function stop() {
-        this.alt.dispatcher.unregister(this.dispatchToken);
-        this.dispatchToken = null;
-      }
-    },
-    clear: {
-
-      /**
-       * Clear all events from memory.
-       * clear(): undefined
-       */
-
-      value: function clear() {
-        this.events = [];
-      }
-    },
-    replay: {
-
-      /**
-       * (As|S)ynchronously replay all events that were recorded.
-       * replay(replayTime: ?number, done: ?function): undefined
-       */
-
-      value: function replay(replayTime, done) {
-        var _this = this;
-
-        if (replayTime === void 0) {
-          this.events.forEach(function (payload) {
-            _this.alt.dispatch(payload.action, payload.data);
-          });
-        }
-
-        var onNext = function (payload, nextAction) {
-          return function () {
-            setTimeout(function () {
-              _this.alt.dispatch(payload.action, payload.data);
-              nextAction();
-            }, replayTime);
-          };
-        };
-
-        var next = done || function () {};
-        var i = this.events.length - 1;
-        while (i >= 0) {
-          var event = this.events[i];
-          next = onNext(event, next);
-          i -= 1;
-        }
-
-        next();
-      }
-    },
-    serializeEvents: {
-
-      /**
-       * Serialize all the events so you can pass them around or load them into
-       * a separate recorder.
-       * serializeEvents(): string
-       */
-
-      value: function serializeEvents() {
-        var events = this.events.map(function (event) {
-          return {
-            action: Symbol.keyFor(event.action),
-            data: event.data
-          };
-        });
-        return JSON.stringify(events);
-      }
-    },
-    loadEvents: {
-
-      /**
-       * Load serialized events into the recorder and overwrite the current events
-       * loadEvents(events: string): undefined
-       */
-
-      value: function loadEvents(events) {
-        var parsedEvents = JSON.parse(events);
-        this.events = parsedEvents.map(function (event) {
-          return {
-            action: Symbol["for"](event.action),
-            data: event.data
-          };
-        });
-      }
-    }
+  this.dispatchToken = this.alt.dispatcher.register(function (payload) {
+    _this.events.push(payload);
   });
 
-  return DispatcherRecorder;
-})();
+  return true;
+};
+
+/**
+ * Stops the recording in progress.
+ * stop(): undefined
+ */
+DispatcherRecorder.prototype.stop = function () {
+  this.alt.dispatcher.unregister(this.dispatchToken);
+  this.dispatchToken = null;
+};
+
+/**
+ * Clear all events from memory.
+ * clear(): undefined
+ */
+DispatcherRecorder.prototype.clear = function () {
+  this.events = [];
+};
+
+/**
+ * (As|S)ynchronously replay all events that were recorded.
+ * replay(replayTime: ?number, done: ?function): undefined
+ */
+DispatcherRecorder.prototype.replay = function (replayTime, done) {
+  var alt = this.alt;
+
+  if (replayTime === void 0) {
+    this.events.forEach(function (payload) {
+      alt.dispatch(payload.action, payload.data);
+    });
+  }
+
+  var onNext = function (payload, nextAction) {
+    return function () {
+      setTimeout(function () {
+        alt.dispatch(payload.action, payload.data);
+        nextAction();
+      }, replayTime);
+    };
+  };
+
+  var next = done || function () {};
+  var i = this.events.length - 1;
+  while (i >= 0) {
+    var _event = this.events[i];
+    next = onNext(_event, next);
+    i -= 1;
+  }
+
+  next();
+};
+
+/**
+ * Serialize all the events so you can pass them around or load them into
+ * a separate recorder.
+ * serializeEvents(): string
+ */
+DispatcherRecorder.prototype.serializeEvents = function () {
+  var events = this.events.map(function (event) {
+    return {
+      action: Symbol.keyFor(event.action),
+      data: event.data
+    };
+  });
+  return JSON.stringify(events);
+};
+
+/**
+ * Load serialized events into the recorder and overwrite the current events
+ * loadEvents(events: string): undefined
+ */
+DispatcherRecorder.prototype.loadEvents = function (events) {
+  var parsedEvents = JSON.parse(events);
+  this.events = parsedEvents.map(function (event) {
+    return {
+      action: Symbol["for"](event.action),
+      data: event.data
+    };
+  });
+};
 
 module.exports = DispatcherRecorder;
 
@@ -2336,29 +2285,32 @@ module.exports = DispatcherRecorder;
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
 
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
+var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
 module.exports = atomicTransactions;
 
 var makeFinalStore = _interopRequire(require("./makeFinalStore"));
 
-// babelHelpers
-/*eslint-disable */
-/* istanbul ignore next */
-var _inherits = function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-  }subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) subClass.__proto__ = superClass;
-};
-/*eslint-enable */
-
 function makeAtomicClass(alt, StoreModel) {
-  function AtomicClass() {
-    StoreModel.call(this);
+  var AtomicClass = (function (_StoreModel) {
+    function AtomicClass() {
+      _classCallCheck(this, AtomicClass);
 
-    this.on("error", function () {
-      return alt.rollback();
-    });
-  }
-  _inherits(AtomicClass, StoreModel);
+      _get(Object.getPrototypeOf(AtomicClass.prototype), "constructor", this).call(this);
+      this.on("error", function () {
+        return alt.rollback();
+      });
+    }
+
+    _inherits(AtomicClass, _StoreModel);
+
+    return AtomicClass;
+  })(StoreModel);
+
   AtomicClass.displayName = StoreModel.displayName || StoreModel.name || "AtomicClass";
   return AtomicClass;
 }
