@@ -7,7 +7,7 @@ export default function withAltContext(flux, Component) {
     },
 
     getChildContext() {
-      return { flux: flux }
+      return { flux }
     },
 
     render() {
