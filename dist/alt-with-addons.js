@@ -1285,7 +1285,7 @@ var Alt = (function () {
           args[_key - 2] = arguments[_key];
         }
 
-        var key = iden || StoreModel.name || StoreModel.displayName || "";
+        var key = iden || StoreModel.displayName || StoreModel.name || "";
 
         if (this.stores[key] || !key) {
           if (this.stores[key]) {
@@ -1350,7 +1350,7 @@ var Alt = (function () {
         var exportObj = arguments[1] === undefined ? {} : arguments[1];
 
         var actions = {};
-        var key = ActionsClass.name || ActionsClass.displayName || "";
+        var key = ActionsClass.displayName || ActionsClass.name || "";
 
         if (typeof ActionsClass === "function") {
           (function () {

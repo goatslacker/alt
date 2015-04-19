@@ -56,7 +56,7 @@ class Alt {
   }
 
   createStore(StoreModel, iden, ...args) {
-    let key = iden || StoreModel.name || StoreModel.displayName || ''
+    let key = iden || StoreModel.displayName || StoreModel.name || ''
 
     if (this.stores[key] || !key) {
       if (this.stores[key]) {
@@ -107,7 +107,7 @@ class Alt {
 
   createActions(ActionsClass, exportObj = {}, ...argsForConstructor) {
     const actions = {}
-    const key = ActionsClass.name || ActionsClass.displayName || ''
+    const key = ActionsClass.displayName || ActionsClass.name || ''
 
     if (typeof ActionsClass === 'function') {
       assign(actions, getInternalMethods(ActionsClass.prototype, true))
