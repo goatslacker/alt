@@ -15,6 +15,41 @@ export default {
       assert(Object.keys(store.getState().toJS()).length === 0)
     },
 
+    'normal stores'() {
+      const alt = new Alt()
+      ImmutableUtil.enhance(alt)
+
+      const action = alt.generateActions('addY')
+
+      const store1 = alt.createImmutableStore({
+        displayName: 'ImmutableStore',
+        bindListeners: { addY: action.addY },
+        state: Immutable.Map({ x: 1 }),
+        addY() {
+          this.setState(this.state.set('y', 2))
+        }
+      })
+
+      const store2 = alt.createStore({
+        displayName: 'MutableStore',
+        bindListeners: { addY: action.addY },
+        state: { x: 1 },
+        addY() {
+          this.setState({ y: 2 })
+        }
+      })
+
+      assert(store1.getState().toJS().x === 1)
+      assert(store2.getState().x === 1)
+
+      action.addY()
+
+      assert(store1.getState().toJS().x === 1)
+      assert(store2.getState().x === 1, 'store2 state was not replaced')
+      assert(store1.getState().toJS().y === 2)
+      assert(store2.getState().y === 2, 'new state exists')
+    },
+
     'using list'() {
       const alt = new Alt()
       ImmutableUtil.enhance(alt)
