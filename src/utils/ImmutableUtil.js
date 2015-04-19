@@ -1,8 +1,6 @@
 import Immutable from 'immutable'
 
-function makeImmutableObject(Collection, store, iden) {
-  store.state = Collection(store.state || {})
-
+function makeImmutableObject(store, iden) {
   if (iden) {
     store.displayName = iden
   }
@@ -20,12 +18,10 @@ function makeImmutableObject(Collection, store, iden) {
   return store
 }
 
-function makeImmutableClass(Collection, alt, Store, iden) {
+function makeImmutableClass(alt, Store, iden) {
   class ImmutableClass extends Store {
-    constructor() {
-      super()
-
-      this.state = Collection(this.state)
+    constructor(...args) {
+      super(...args)
 
       this.on('serialize', function () {
         return this.getInstance().getState().toJS()
@@ -37,12 +33,12 @@ function makeImmutableClass(Collection, alt, Store, iden) {
     }
   }
 
-  ImmutableClass.displayName = iden || Store.name || Store.displayName || ''
+  ImmutableClass.displayName = iden || Store.displayName || ''
 
   return ImmutableClass
 }
 
-function enhance(alt, Collection = Immutable.Map) {
+function enhance(alt) {
   const stateKey = alt._stateKey
 
   alt.setState = (currentState, nextState) => {
@@ -53,8 +49,8 @@ function enhance(alt, Collection = Immutable.Map) {
 
   alt.createImmutableStore = (store, iden, ...args) => {
     const StoreModel = typeof store === 'function'
-      ? makeImmutableClass(Collection, alt, store, iden)
-      : makeImmutableObject(Collection, store, iden)
+      ? makeImmutableClass(alt, store, iden)
+      : makeImmutableObject(store, iden)
 
     alt._stateKey = 'state'
     const store = alt.createStore(StoreModel, iden, ...args)

@@ -5,14 +5,36 @@ import { assert } from 'chai'
 
 export default {
   'Immutable Stores': {
-    'empty immutable store'() {
+    'no name immutable'() {
       const alt = new Alt()
       ImmutableUtil.enhance(alt)
-      const store = alt.createImmutableStore({
-        displayName: 'ImmutableStore'
+      const store = alt.createImmutableStore(function ImmutableStore() {
+        this.state = Immutable.Map({})
       })
 
       assert(Object.keys(store.getState().toJS()).length === 0)
+    },
+
+    'using list'() {
+      const alt = new Alt()
+      ImmutableUtil.enhance(alt)
+      const store = alt.createImmutableStore({
+        state: Immutable.List([1, 2, 3])
+      }, 'ListImmutableStore')
+
+      assert(store.getState().get(0) === 1)
+    },
+
+    'passing args to constructor'() {
+      const alt = new Alt()
+      ImmutableUtil.enhance(alt)
+
+      const store = alt.createImmutableStore(function ImmutableStore(x) {
+        assert(x === 'hello world')
+        this.state = Immutable.Map({ x: x })
+      }, 'MyImmutableStore', 'hello world')
+
+      assert(store.getState().toJS().x === 'hello world')
     },
 
     'immutable stores as an object'() {
@@ -24,9 +46,9 @@ export default {
       const store = alt.createImmutableStore({
         displayName: 'ImmutableStore',
 
-        state: {
+        state: Immutable.Map({
           bar: 'hello'
-        },
+        }),
 
         bindListeners: {
           handleFoo: actions.fire
@@ -70,16 +92,18 @@ export default {
           handleFoo: actions.fork
         })
 
-        this.state = {
+        this.state = Immutable.Map({
           bar: 'hello'
-        }
+        })
       }
 
       ImmutableStore.prototype.handleFoo = function (x) {
         this.setState(this.state.set('foo', x))
       }
 
-      const store = alt.createImmutableStore(ImmutableStore, 'ImmutableStore')
+      ImmutableStore.displayName = 'ImmutableStore'
+
+      const store = alt.createImmutableStore(ImmutableStore)
 
       assert.isUndefined(store.getState().toJS().foo, 'foo has not been defined')
       assert(store.getState().toJS().bar === 'hello', 'bar is part of state')
@@ -112,9 +136,9 @@ export default {
             remove: actions.rm
           })
 
-          this.state = {
+          this.state = Immutable.Map({
             bar: 'hello'
-          }
+          })
         }
 
         handleFoo(x) {

@@ -1,22 +1,8 @@
 "use strict";
 
-var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+var Immutable = babelHelpers.interopRequire(require("immutable"));
 
-var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
-
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
-
-var Immutable = _interopRequire(require("immutable"));
-
-var Symbol = _interopRequire(require("es-symbol"));
-
-var IMMUTABLE_STATE = Symbol();
-
-function makeImmutableObject(Collection, store, iden) {
-  store.state = Collection(store.state || {});
-
+function makeImmutableObject(store, iden) {
   if (iden) {
     store.displayName = iden;
   }
@@ -34,14 +20,16 @@ function makeImmutableObject(Collection, store, iden) {
   return store;
 }
 
-function makeImmutableClass(Collection, alt, Store, iden) {
+function makeImmutableClass(alt, Store, iden) {
   var ImmutableClass = (function (_Store) {
     function ImmutableClass() {
-      _classCallCheck(this, ImmutableClass);
+      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
 
-      _get(Object.getPrototypeOf(ImmutableClass.prototype), "constructor", this).call(this);
+      babelHelpers.classCallCheck(this, ImmutableClass);
 
-      this.state = Collection(this.state);
+      babelHelpers.get(Object.getPrototypeOf(ImmutableClass.prototype), "constructor", this).apply(this, args);
 
       this.on("serialize", function () {
         return this.getInstance().getState().toJS();
@@ -52,19 +40,16 @@ function makeImmutableClass(Collection, alt, Store, iden) {
       });
     }
 
-    _inherits(ImmutableClass, _Store);
-
+    babelHelpers.inherits(ImmutableClass, _Store);
     return ImmutableClass;
   })(Store);
 
-  ImmutableClass.displayName = iden || Store.name || Store.displayName || "";
+  ImmutableClass.displayName = iden || Store.displayName || "";
 
   return ImmutableClass;
 }
 
 function enhance(alt) {
-  var Collection = arguments[1] === undefined ? Immutable.Map : arguments[1];
-
   var stateKey = alt._stateKey;
 
   alt.setState = function (currentState, nextState) {
@@ -80,7 +65,7 @@ function enhance(alt) {
       args[_key - 2] = arguments[_key];
     }
 
-    var StoreModel = typeof store === "function" ? makeImmutableClass(Collection, alt, store, iden) : makeImmutableObject(Collection, store, iden);
+    var StoreModel = typeof store === "function" ? makeImmutableClass(alt, store, iden) : makeImmutableObject(store, iden);
 
     alt._stateKey = "state";
     var store = alt.createStore.apply(alt, [StoreModel, iden].concat(args));
