@@ -1165,6 +1165,8 @@ var DispatcherRecorder = _interopRequire(require("../utils/DispatcherRecorder"))
 
 var atomicTransactions = _interopRequire(require("../utils/atomicTransactions"));
 
+var connectToStores = _interopRequire(require("../utils/connectToStores"));
+
 var chromeDebug = _interopRequire(require("../utils/chromeDebug"));
 
 var makeFinalStore = _interopRequire(require("../utils/makeFinalStore"));
@@ -1180,12 +1182,13 @@ Alt.addons = {
   DispatcherRecorder: DispatcherRecorder,
   atomicTransactions: atomicTransactions,
   chromeDebug: chromeDebug,
+  connectToStores: connectToStores,
   makeFinalStore: makeFinalStore,
   withAltContext: withAltContext };
 
 module.exports = Alt;
 
-},{"../../AltContainer":1,"../utils/ActionListeners":23,"../utils/AltManager":24,"../utils/DispatcherRecorder":25,"../utils/atomicTransactions":26,"../utils/chromeDebug":27,"../utils/makeFinalStore":28,"../utils/withAltContext":29,"./":14}],14:[function(require,module,exports){
+},{"../../AltContainer":1,"../utils/ActionListeners":23,"../utils/AltManager":24,"../utils/DispatcherRecorder":25,"../utils/atomicTransactions":26,"../utils/chromeDebug":27,"../utils/connectToStores":28,"../utils/makeFinalStore":29,"../utils/withAltContext":30,"./":14}],14:[function(require,module,exports){
 "use strict";
 
 var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
@@ -2335,7 +2338,7 @@ function atomicTransactions(alt) {
   };
 }
 
-},{"./makeFinalStore":28}],27:[function(require,module,exports){
+},{"./makeFinalStore":29}],27:[function(require,module,exports){
 /*global window*/
 "use strict";
 
@@ -2346,6 +2349,113 @@ function chromeDebug(alt) {
 }
 
 },{}],28:[function(require,module,exports){
+(function (global){
+"use strict";
+
+var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["default"] : obj; };
+
+/**
+ * 'Higher Order Component' that controls the props of a wrapped
+ * component via stores.
+ *
+ * Expects the Component to have two static methods:
+ *   - getStores(): Should return an array of stores.
+ *   - getPropsFromStores(props): Should return the props from the stores.
+ *
+ * Example using old React.createClass() style:
+ *
+ *    const MyComponent = React.createClass({
+ *      statics: {
+ *        getStores() {
+ *          return [myStore]
+ *        },
+ *        getPropsFromStores(props) {
+ *          return myStore.getState()
+ *        }
+ *      },
+ *      render() {
+ *        // Use this.props like normal ...
+ *      }
+ *    })
+ *    MyComponent = connectToStores(MyComponent)
+ *
+ *
+ * Example using ES6 Class:
+ *
+ *    class MyComponent extends React.Component {
+ *      static getStores() {
+ *        return [myStore]
+ *      }
+ *      static getPropsFromStores(props) {
+ *        return myStore.getState()
+ *      }
+ *      render() {
+ *        // Use this.props like normal ...
+ *      }
+ *    }
+ *    MyComponent = connectToStores(MyComponent)
+ *
+ * A great explanation of the merits of higher order components can be found at
+ * http://bit.ly/1abPkrP
+ */
+
+var React = _interopRequire((typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null));
+
+var assign = _interopRequire(require("object-assign"));
+
+function connectToStores(Component) {
+
+  // Check for required static methods.
+  if (typeof Component.getStores !== "function") {
+    throw new Error("connectToStores() expects the wrapped component to have a static getStores() method");
+  }
+  if (typeof Component.getPropsFromStores !== "function") {
+    throw new Error("connectToStores() expects the wrapped component to have a static getPropsFromStores() method");
+  }
+
+  // Cache stores.
+  var stores = Component.getStores();
+
+  // Wrapper Component.
+  var StoreConnection = React.createClass({
+    displayName: "StoreConnection",
+
+    getInitialState: function getInitialState() {
+      return Component.getPropsFromStores(this.props);
+    },
+
+    componentDidMount: function componentDidMount() {
+      var _this = this;
+
+      stores.forEach(function (store) {
+        store.listen(_this.onChange);
+      });
+    },
+
+    componentWillUnmount: function componentWillUnmount() {
+      var _this = this;
+
+      stores.forEach(function (store) {
+        store.unlisten(_this.onChange);
+      });
+    },
+
+    onChange: function onChange() {
+      this.setState(Component.getPropsFromStores(this.props));
+    },
+
+    render: function render() {
+      return React.createElement(Component, assign({}, this.props, this.state));
+    }
+  });
+
+  return StoreConnection;
+}
+
+module.exports = connectToStores;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"object-assign":10}],29:[function(require,module,exports){
 "use strict";
 
 module.exports = makeFinalStore;
@@ -2391,7 +2501,7 @@ function makeFinalStore(alt) {
   return alt.createUnsavedStore(FinalStore);
 }
 
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 (function (global){
 "use strict";
 
