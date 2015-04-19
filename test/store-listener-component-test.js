@@ -502,5 +502,45 @@ export default {
       assert.isDefined(strong, 'component exists')
       assert(strong.props.x === 1337, 'and we have props from TestStore')
     },
+
+    'nested components and context'() {
+      const flux = new Flux()
+
+      const View = React.createClass({
+        render() {
+          return <SubView />
+        }
+      })
+
+      const SubView = React.createClass({ render() {
+        return (
+          <AltContainer>
+            <InsideComponent />
+          </AltContainer>
+        )
+      } })
+
+      const InsideComponent = React.createClass({
+        render() {
+          return <span flux={this.props.flux} />
+        }
+      })
+
+
+      const App = React.createClass({
+        render() {
+          return (
+            <AltContainer flux={flux}>
+              <View />
+            </AltContainer>
+          )
+        }
+      })
+
+      const node = TestUtils.renderIntoDocument(<App />)
+      const span = TestUtils.findRenderedDOMComponentWithTag(node, 'span')
+
+      assert.instanceOf(span.props.flux, Flux)
+    },
   }
 }

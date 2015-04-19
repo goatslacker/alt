@@ -15,6 +15,15 @@ function mixinContainer(React) {
       flux: React.PropTypes.object
     },
 
+    childContextTypes: {
+      flux: React.PropTypes.object
+    },
+
+    getChildContext: function () {
+      var flux = this.props.flux || this.context.flux
+      return flux ? { flux: flux } : {}
+    },
+
     getInitialState: function () {
       if (this.props.stores && this.props.store) {
         throw new ReferenceError('Cannot define both store and stores')
