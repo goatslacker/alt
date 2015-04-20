@@ -46,8 +46,11 @@
     "coverage": "npm run build-test && istanbul cover node_modules/mocha/bin/_mocha -- -u exports -R spec --compilers js:babel/register --require babel/external-helpers test",
     "clean": "rimraf lib && rimraf utils",
     "lint": "eslint src mixins components",
+    "postinstall": "npm run build",
+    "posttest": "npm run build-alt",
     "prepublish": "npm run lint && npm run test && npm run build",
-    "test": "npm run build-test && npm run tests-node",
+    "pretest": "npm run build-test",
+    "test": "npm run tests-node",
     "test-browser": "browserify test/browser/index.js -t babelify --outfile test/browser/tests.js",
     "tests-node": "mocha -u exports -R spec --compilers js:babel/register --require babel/external-helpers test"
   },
