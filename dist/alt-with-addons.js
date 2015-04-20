@@ -50,13 +50,11 @@ var React = (typeof window !== "undefined" ? window.React : typeof global !== "u
 var mixinContainer = require("./mixinContainer");
 var assign = require("object-assign");
 
-var cloneWithProps = React.addons.cloneWithProps;
-
 var AltContainer = React.createClass(assign({
   displayName: "AltContainer",
 
   render: function render() {
-    return this.altRender(cloneWithProps, React.DOM.div);
+    return this.altRender(React.DOM.div);
   }
 }, mixinContainer(React)));
 
@@ -78,9 +76,20 @@ function getStateFromKey(actions, props) {
 }
 
 function mixinContainer(React) {
+  var cloneWithProps = React.addons.cloneWithProps;
+
   return {
     contextTypes: {
       flux: React.PropTypes.object
+    },
+
+    childContextTypes: {
+      flux: React.PropTypes.object
+    },
+
+    getChildContext: function getChildContext() {
+      var flux = this.props.flux || this.context.flux;
+      return flux ? { flux: flux } : {};
     },
 
     getInitialState: function getInitialState() {
@@ -192,7 +201,7 @@ function mixinContainer(React) {
       return this.props.shouldComponentUpdate ? this.props.shouldComponentUpdate(this.getProps()) : true;
     },
 
-    altRender: function altRender(cloneWithProps) {
+    altRender: function altRender(Node) {
       // Custom rendering function
       if (typeof this.props.render === "function") {
         return this.props.render(this.getProps());
@@ -204,13 +213,13 @@ function mixinContainer(React) {
 
       // Does not wrap child in a div if we don't have to.
       if (Array.isArray(children)) {
-        return React.createElement("div", null, children.map(function (child, i) {
+        return React.createElement(Node, null, children.map(function (child, i) {
           return cloneWithProps(child, assign({ key: i }, this.getProps()));
         }, this));
       } else if (children) {
         return cloneWithProps(children, this.getProps());
       } else {
-        return React.createElement("div", this.getProps());
+        return React.createElement(Node, this.getProps());
       }
     }
   };

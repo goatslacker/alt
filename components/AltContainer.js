@@ -41,13 +41,11 @@ var React = require('react/addons')
 var mixinContainer = require('./mixinContainer')
 var assign = require('object-assign')
 
-var cloneWithProps = React.addons.cloneWithProps
-
 var AltContainer = React.createClass(assign({
   displayName: 'AltContainer',
 
   render: function () {
-    return this.altRender(cloneWithProps, React.DOM.div)
+    return this.altRender(React.DOM.div)
   }
 }, mixinContainer(React)))
 

@@ -10,6 +10,8 @@ function getStateFromKey(actions, props) {
 }
 
 function mixinContainer(React) {
+  var cloneWithProps = React.addons.cloneWithProps
+
   return {
     contextTypes: {
       flux: React.PropTypes.object
@@ -143,7 +145,7 @@ function mixinContainer(React) {
         : true
     },
 
-    altRender: function (cloneWithProps) {
+    altRender: function (Node) {
       // Custom rendering function
       if (typeof this.props.render === 'function') {
         return this.props.render(this.getProps())
@@ -155,13 +157,13 @@ function mixinContainer(React) {
 
       // Does not wrap child in a div if we don't have to.
       if (Array.isArray(children)) {
-        return React.createElement('div', null, children.map(function (child, i) {
+        return React.createElement(Node, null, children.map(function (child, i) {
           return cloneWithProps(child, assign({ key: i }, this.getProps()))
         }, this))
       } else if (children) {
         return cloneWithProps(children, this.getProps())
       } else {
-        return React.createElement('div', this.getProps())
+        return React.createElement(Node, this.getProps())
       }
     }
   }
