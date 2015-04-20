@@ -73,9 +73,9 @@ function enhance(alt) {
       : makeImmutableObject(store, iden)
 
     alt._stateKey = 'state'
-    const store = alt.createStore(StoreModel, iden, ...args)
+    const immutableStore = alt.createStore(StoreModel, iden, ...args)
     alt._stateKey = stateKey
-    return store
+    return immutableStore
   }
 
   return alt
