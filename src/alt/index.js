@@ -83,7 +83,7 @@ class Alt {
     )
 
     if (typeof ActionsClass === 'function') {
-      assign(actions, utils.getInternalMethods(ActionsClass.prototype, true))
+      assign(actions, utils.getInternalMethods(ActionsClass, true))
       class ActionsGenerator extends ActionsClass {
         constructor(...args) {
           super(...args)
