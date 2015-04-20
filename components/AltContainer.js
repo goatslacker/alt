@@ -6,13 +6,13 @@
  * Using the `stores` prop.
  *
  * <AltContainer stores={{ FooStore: FooStore }}>
- *   children get this.props.FootStore.storeData
+ *   children get this.props.FooStore.storeData
  * </AltContainer>
  *
  * You can also pass in functions.
  *
  * <AltContainer stores={{ FooStore: function () { return { storeData: true } } }}>
- *   children get this.props.FootStore.storeData
+ *   children get this.props.FooStore.storeData
  * </AltContainer>
  *
  * Using the `store` prop.
