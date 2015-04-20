@@ -664,6 +664,7 @@ const tests = {
 
     class InnocentStore extends EvilStore {
       constructor() {
+        super()
         this.bindActions(myActions)
       }
 
@@ -1020,6 +1021,7 @@ const tests = {
 
     class Store extends StoreBase {
       constructor() {
+        super()
         this.exportPublicMethods({
           baseMethod: this.baseMethod
         })
