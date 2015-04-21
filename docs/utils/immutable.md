@@ -62,7 +62,7 @@ function TodoStore() {
 
 TodoStore.properties.addTodo = function (todo) {
   var id = String(Math.random());
-  this.setState(this.state.set('id', todo));
+  this.setState(this.state.set(id, todo));
 };
 
 TodoStore.displayName = 'TodoStore';
