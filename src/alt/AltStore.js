@@ -23,6 +23,7 @@ export default class AltStore {
     this[LIFECYCLE] = {}
     this[STATE_CONTAINER] = state || model
 
+    this._storeName = model._storeName
     this.boundListeners = model[ALL_LISTENERS]
     this.StoreModel = StoreModel
     if (typeof this.StoreModel === 'object') {
@@ -84,6 +85,12 @@ export default class AltStore {
       this[LIFECYCLE].unlisten()
     }
     this[EE].removeListener('change', cb)
+  }
+
+  prepare(state) {
+    const data = {}
+    data[this._storeName] = state
+    return this[ALT].serialize(data)
   }
 
   getState() {
