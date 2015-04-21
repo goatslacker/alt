@@ -181,7 +181,7 @@ class MyStore {
   }
 
   onUpdateProp1(newProp1) {
-    this.data = this.data.set(prop1: newProp1);
+    this.data = this.data.set('prop1', newProp1);
   }
 }
 
