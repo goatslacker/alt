@@ -1304,6 +1304,38 @@ const tests = {
 
     assert(store.getState().x === 1, 'action fires correctly')
   },
+
+  'setState emits a change if not dispatching'(done) {
+    const alt = new Alt()
+
+    const actions = alt.generateActions('fire')
+
+    const store = alt.createStore(class Store {
+      constructor() {
+        this.bindActions(actions)
+        this.test = false
+      }
+
+      fire() {
+        setTimeout(() => {
+          this.setState({
+            test: true
+          })
+        })
+        return false
+      }
+    })
+
+    assert(store.getState().test === false)
+
+    const unlisten = store.listen((state) => {
+      assert(state.test === true)
+      unlisten()
+      done()
+    })
+
+    actions.fire()
+  },
 }
 
 export default tests

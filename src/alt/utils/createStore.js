@@ -7,17 +7,12 @@ import {
   LIFECYCLE,
   LISTENERS,
   PUBLIC_METHODS,
-  STATE_CHANGED,
   STATE_CONTAINER
 } from '../symbols/symbols'
 
 function doSetState(store, storeInstance, state) {
   if (!state) {
     return
-  }
-
-  if (!store.alt.dispatcher.isDispatching()) {
-    throw new Error('You can only use setState while dispatching')
   }
 
   const nextState = typeof state === 'function'
@@ -28,7 +23,10 @@ function doSetState(store, storeInstance, state) {
     storeInstance[STATE_CONTAINER],
     nextState
   )
-  storeInstance[STATE_CHANGED] = true
+
+  if (!store.alt.dispatcher.isDispatching()) {
+    store.emitChange()
+  }
 }
 
 export function createStoreFromObject(alt, StoreModel, key) {
