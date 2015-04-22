@@ -5,7 +5,7 @@
 > To alter. Altered; Changed.
 
 [![NPM version](https://badge.fury.io/js/alt.svg)](http://badge.fury.io/js/alt)
-[![Build Status](https://secure.travis-ci.org/goatslacker/alt.svg)](http://travis-ci.org/goatslacker/alt)
+[![Build Status](https://secure.travis-ci.org/goatslacker/alt.svg?branch=master)](http://travis-ci.org/goatslacker/alt)
 [![Coverage Status](https://img.shields.io/coveralls/goatslacker/alt.svg?style=flat)](https://coveralls.io/r/goatslacker/alt)
 [![Dependency Status](https://david-dm.org/goatslacker/alt.svg)](https://david-dm.org/goatslacker/alt)
 [![Download Count](https://img.shields.io/npm/dm/alt.svg?style=flat)](https://www.npmjs.com/package/alt)
