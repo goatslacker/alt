@@ -103,9 +103,9 @@ class Store {
 ```js
 class Store {
   constructor() {
-    this.on('error', (err, actionName, payloadData, currentState) => {
-      if (actionName === MyActions.fire) {
-        logError(err, payloadData);
+    this.on('error', (err, payload, currentState) => {
+      if (payload.action === MyActions.fire) {
+        logError(err, payload.data);
       }
     });
 
@@ -122,15 +122,15 @@ class Store {
 
 ## beforeEach
 
-> (action: string, data: mixed, state: object): undefined
+> (payload: object, state: object): undefined
 
 This method gets called, if defined, before the payload hits the action. You can use this method to `waitFor` other stores, save previous state, or perform any bookeeping. The state passed in to `beforeEach` is the current state pre-action.
 
-`action` corresponds to the action name that is being called, `data` is the payload, `state` is the current store's state.
+`payload` is an object which contains the keys `action` for the action name and `data` for the data that you're dispatching; `state` is the current store's state.
 
 ## afterEach
 
-> (action: string, data: mixed, state: object): undefined
+> (payload: object, state: object): undefined
 
 This method gets called, if defined, after the payload hits the action and the store emits a change. You can use this method for bookeeping and as a companion to `beforeEach`. The state passed in to `afterEach` is the current state post-action.
 

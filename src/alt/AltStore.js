@@ -36,11 +36,7 @@ export default class AltStore {
     // Register dispatcher
     this.dispatchToken = alt.dispatcher.register((payload) => {
       if (model[LIFECYCLE].beforeEach) {
-        model[LIFECYCLE].beforeEach(
-          payload.action.toString(),
-          payload.data,
-          this[STATE_CONTAINER]
-        )
+        model[LIFECYCLE].beforeEach(payload, this[STATE_CONTAINER])
       } else if (typeof model.beforeEach === 'function') {
         deprecatedBeforeAfterEachWarning()
         model.beforeEach(
@@ -57,12 +53,7 @@ export default class AltStore {
           result = model[LISTENERS][payload.action](payload.data)
         } catch (e) {
           if (this[LIFECYCLE].error) {
-            this[LIFECYCLE].error(
-              e,
-              payload.action.toString(),
-              payload.data,
-              this[STATE_CONTAINER]
-            )
+            this[LIFECYCLE].error(e, payload, this[STATE_CONTAINER])
           } else {
             throw e
           }
@@ -76,11 +67,7 @@ export default class AltStore {
       }
 
       if (model[LIFECYCLE].afterEach) {
-        model[LIFECYCLE].afterEach(
-          payload.action.toString(),
-          payload.data,
-          this[STATE_CONTAINER]
-        )
+        model[LIFECYCLE].afterEach(payload, this[STATE_CONTAINER])
       } else if (typeof model.afterEach === 'function') {
         deprecatedBeforeAfterEachWarning()
         model.afterEach(
