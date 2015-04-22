@@ -115,9 +115,7 @@
         2,
         "always"
       ],
-      "func-names": [
-        0
-      ],
+      "func-names": 0,
       "func-style": [
         0,
         "expression"
@@ -148,18 +146,10 @@
           "capIsNew": true
         }
       ],
-      "new-parens": [
-        2
-      ],
-      "no-array-constructor": [
-        2
-      ],
-      "no-inline-comments": [
-        2
-      ],
-      "no-lonely-if": [
-        2
-      ],
+      "new-parens": 2,
+      "no-array-constructor": 2,
+      "no-inline-comments": 2,
+      "no-lonely-if": 2,
       "no-mixed-spaces-and-tabs": [
         2,
         "always"
@@ -170,46 +160,22 @@
           "max": 2
         }
       ],
-      "no-nested-ternary": [
-        2
-      ],
-      "no-new": [
-        0
-      ],
-      "no-new-object": [
-        2
-      ],
+      "no-nested-ternary": 2,
+      "no-new": 0,
+      "no-new-object": 2,
       "no-return-assign": 0,
-      "no-sequences": [
-        0
-      ],
+      "no-sequences": 0,
       "no-spaced-func": [
         2
       ],
-      "no-ternary": [
-        0
-      ],
-      "no-trailing-spaces": [
-        2
-      ],
-      "no-underscore-dangle": [
-        0
-      ],
-      "no-wrap-func": [
-        2
-      ],
-      "no-var": [
-        0
-      ],
-      "one-var": [
-        0
-      ],
-      "operator-assignment": [
-        0
-      ],
-      "padded-blocks": [
-        0
-      ],
+      "no-ternary": 0,
+      "no-trailing-spaces": 2,
+      "no-underscore-dangle": 0,
+      "no-wrap-func": 2,
+      "no-var": 0,
+      "one-var": 0,
+      "operator-assignment": 0,
+      "padded-blocks": 0,
       "quote-props": [
         2,
         "as-needed"

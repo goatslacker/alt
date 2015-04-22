@@ -6,6 +6,9 @@ export const ACTION_HANDLER = Symbol()
 // the action's uid symbol for listening
 export const ACTION_KEY = Symbol()
 
+// per instance registry of actions
+export const ACTIONS_REGISTRY = Symbol()
+
 // the action's name
 export const ACTION_UID = Symbol()
 
