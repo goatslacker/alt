@@ -105,9 +105,9 @@ This has many different use cases like:
 * Isomorphism. You save a snapshot that you send from the server to the client and then bootstrap back on the client.
 * Rolling back to previous stable states.
 
-There are also many [utils](/src//utils) available which interface well with alt:
+There are also many [utils](/src/utils) available which interface well with alt:
 
-* [DispatchRecorder](/src//utils/DispatcherRecorder.js) lets you record all your dispatches and replay them back at a later time.
+* [DispatchRecorder](/src/utils/DispatcherRecorder.js) lets you record all your dispatches and replay them back at a later time.
 * [FinalStore](/src/utils/makeFinalStore.js) is a Store that you can listen to that only emits when all your other stores have received all their data.
 * [IsomorphicRenderer](/src/utils/IsomorphicRenderer.js) a function that wraps your component to be isomorphic ready.
 * [ActionListener](/src/utils/ActionListeners.js) lets you listen to individual actions without having to create a store.
