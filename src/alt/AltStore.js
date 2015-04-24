@@ -11,14 +11,11 @@ const {
   STATE_CONTAINER
 } = Sym
 
-// alt container
-const ALT = Symbol()
 // event emitter instance
 const EE = Symbol()
 
 export default class AltStore {
   constructor(alt, model, state, StoreModel) {
-    this[ALT] = alt
     this[EE] = new EventEmitter()
     this[LIFECYCLE] = {}
     this[STATE_CONTAINER] = state || model
@@ -87,6 +84,6 @@ export default class AltStore {
   }
 
   getState() {
-    return this[ALT].getState(this[STATE_CONTAINER])
+    return this.StoreModel.config.getState(this[STATE_CONTAINER])
   }
 }
