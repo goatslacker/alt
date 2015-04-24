@@ -18,7 +18,7 @@
     "chai": "^2.1.0",
     "coveralls": "^2.11.2",
     "envify": "^3.4.0",
-    "eslint": "^0.18.0",
+    "eslint": "^0.20.0",
     "immutable": "^3.7.2",
     "iso": "^4.0.2",
     "istanbul": "^0.3.5",
@@ -46,8 +46,7 @@
     "build-test": "babel src/alt --out-dir lib -r && babel src/utils --out-dir utils -r",
     "coverage": "npm run build-test && istanbul cover node_modules/mocha/bin/_mocha -- -u exports -R spec --compilers js:babel/register --require babel-core/external-helpers test",
     "clean": "rimraf lib && rimraf utils",
-    "lint": "echo",
-    "_lint": "eslint src mixins components",
+    "lint": "eslint src mixins components",
     "posttest": "npm run build-alt",
     "prepublish": "npm run lint && npm run test && npm run build",
     "pretest": "npm run clean && npm run build-test",
@@ -221,7 +220,7 @@
         "after": true
       },
       "sort-vars": [
-        2,
+        0,
         {
           "ignoreCase": true
         }
