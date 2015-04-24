@@ -6,9 +6,9 @@ import getInternalMethods from './utils/getInternalMethods'
 import uid from './utils/uid'
 import { Dispatcher } from 'flux'
 import { warn } from './utils/warnings'
-import * as StoreUtils from './utils/createStore'
+import * as StoreUtils from './utils/StoreUtils'
 import * as Sym from './symbols/symbols'
-import * as StateFunctions from './utils/stateFunctions'
+import * as StateFunctions from './utils/StateFunctions'
 import createStoreConfig from './utils/createStoreConfig'
 
 const { createStoreFromObject, createStoreFromClass } = StoreUtils

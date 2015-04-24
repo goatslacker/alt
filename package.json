@@ -39,12 +39,12 @@
   "license": "MIT",
   "scripts": {
     "build": "npm run clean && npm run build-alt && npm run build-utils && npm run build-alt-browser && npm run build-alt-browser-with-addons",
-    "build-alt": "babel src/alt --out-dir lib",
-    "build-utils": "babel src/utils --out-dir utils",
+    "build-alt": "babel src/alt --out-dir lib --stage 0",
+    "build-utils": "babel src/utils --out-dir utils --stage 0",
     "build-alt-browser": "browserify src/alt -t [envify --NODE_ENV production ] -t babelify --outfile dist/alt.js --standalone Alt",
     "build-alt-browser-with-addons": "browserify src/alt/addons.js -t [envify --NODE_ENV production ] -t babelify -t browserify-shim --outfile dist/alt-with-addons.js --standalone Alt",
     "build-test": "babel src/alt --out-dir lib -r && babel src/utils --out-dir utils -r",
-    "coverage": "npm run build-test && istanbul cover node_modules/mocha/bin/_mocha -- -u exports -R spec --compilers js:babel/register --require babel-core/external-helpers test",
+    "coverage": "npm run build-test && istanbul cover node_modules/mocha/bin/_mocha -- -u exports -R spec --require ./test/babel --require babel-core/external-helpers test",
     "clean": "rimraf lib && rimraf utils",
     "lint": "eslint src mixins components",
     "posttest": "npm run build-alt",
@@ -52,7 +52,7 @@
     "pretest": "npm run clean && npm run build-test",
     "test": "npm run tests-node",
     "test-browser": "browserify test/browser/index.js -t babelify --outfile test/browser/tests.js",
-    "tests-node": "mocha -u exports -R spec --compilers js:babel/register --require babel-core/external-helpers test"
+    "tests-node": "mocha -u exports -R spec --require ./test/babel --require babel-core/external-helpers test"
   },
   "browserify-shim": {
     "react": "global:React",
