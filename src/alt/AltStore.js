@@ -2,14 +2,16 @@ import EventEmitter from 'eventemitter3'
 import assign from 'object-assign'
 import Symbol from 'es-symbol'
 import { warn, deprecatedBeforeAfterEachWarning } from './utils/warnings'
-import {
+import * as Sym from './symbols/symbols'
+
+const {
   ALL_LISTENERS,
   LIFECYCLE,
   LISTENERS,
   PUBLIC_METHODS,
   STATE_CHANGED,
   STATE_CONTAINER
-} from './symbols/symbols'
+} = Sym
 
 // alt container
 const ALT = Symbol()

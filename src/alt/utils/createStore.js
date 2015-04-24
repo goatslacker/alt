@@ -1,15 +1,18 @@
 import assign from 'object-assign'
 import AltStore from '../AltStore'
-import { StoreMixinListeners, StoreMixinEssentials } from './StoreMixins'
+import * as StoreMixins from './StoreMixins'
 import getInternalMethods from './getInternalMethods'
-import {
+import * as Sym from '../symbols/symbols'
+
+const { StoreMixinListeners, StoreMixinEssentials } = StoreMixins
+const {
   ALL_LISTENERS,
   LIFECYCLE,
   LISTENERS,
   PUBLIC_METHODS,
   STATE_CHANGED,
   STATE_CONTAINER
-} from '../symbols/symbols'
+} = Sym
 
 function doSetState(store, storeInstance, state) {
   if (!state) {
