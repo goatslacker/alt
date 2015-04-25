@@ -1,34 +1,32 @@
 import Alt from '../dist/alt-with-runtime'
 import Immutable from 'immutable'
-import ImmutableUtil from '../utils/ImmutableUtil'
+import immutable from '../utils/ImmutableUtil'
 import { assert } from 'chai'
 
 export default {
   'Immutable Stores': {
     'no name immutable'() {
       const alt = new Alt()
-      ImmutableUtil.enhance(alt)
-      const store = alt.createImmutableStore(function ImmutableStore() {
+      const store = alt.createStore(immutable(function () {
         this.state = Immutable.Map({})
-      })
+      }))
 
       assert(Object.keys(store.getState().toJS()).length === 0)
     },
 
     'normal stores'() {
       const alt = new Alt()
-      ImmutableUtil.enhance(alt)
 
       const action = alt.generateActions('addY')
 
-      const store1 = alt.createImmutableStore({
+      const store1 = alt.createStore(immutable({
         displayName: 'ImmutableStore',
         bindListeners: { addY: action.addY },
         state: Immutable.Map({ x: 1 }),
         addY() {
           this.setState(this.state.set('y', 2))
         }
-      })
+      }))
 
       const store2 = alt.createStore({
         displayName: 'MutableStore',
@@ -52,33 +50,30 @@ export default {
 
     'using list'() {
       const alt = new Alt()
-      ImmutableUtil.enhance(alt)
-      const store = alt.createImmutableStore({
+      const store = alt.createStore(immutable({
         state: Immutable.List([1, 2, 3])
-      }, 'ListImmutableStore')
+      }), 'ListImmutableStore')
 
       assert(store.getState().get(0) === 1)
     },
 
     'passing args to constructor'() {
       const alt = new Alt()
-      ImmutableUtil.enhance(alt)
 
-      const store = alt.createImmutableStore(function ImmutableStore(x) {
+      const store = alt.createStore(immutable(function ImmutableStore(x) {
         assert(x === 'hello world')
         this.state = Immutable.Map({ x: x })
-      }, 'MyImmutableStore', 'hello world')
+      }), 'MyImmutableStore', 'hello world')
 
       assert(store.getState().toJS().x === 'hello world')
     },
 
     'immutable stores as an object'() {
       const alt = new Alt()
-      ImmutableUtil.enhance(alt)
 
       const actions = alt.generateActions('fire')
 
-      const store = alt.createImmutableStore({
+      const store = alt.createStore(immutable({
         displayName: 'ImmutableStore',
 
         state: Immutable.Map({
@@ -92,7 +87,7 @@ export default {
         handleFoo: function (x) {
           this.setState(this.state.set('foo', x))
         }
-      })
+      }))
 
       assert.isUndefined(store.getState().toJS().foo, 'foo has not been defined')
       assert(store.getState().toJS().bar === 'hello', 'bar is part of state')
@@ -118,7 +113,6 @@ export default {
 
     'immutable stores as a constructor'() {
       const alt = new Alt()
-      ImmutableUtil.enhance(alt)
 
       const actions = alt.generateActions('fork')
 
@@ -138,7 +132,7 @@ export default {
 
       ImmutableStore.displayName = 'ImmutableStore'
 
-      const store = alt.createImmutableStore(ImmutableStore)
+      const store = alt.createStore(immutable(ImmutableStore))
 
       assert.isUndefined(store.getState().toJS().foo, 'foo has not been defined')
       assert(store.getState().toJS().bar === 'hello', 'bar is part of state')
@@ -160,10 +154,10 @@ export default {
 
     'immutable stores as a class'() {
       const alt = new Alt()
-      ImmutableUtil.enhance(alt)
 
       const actions = alt.generateActions('fork', 'rm')
 
+      @immutable
       class ImmutableStore {
         constructor() {
           this.bindListeners({
@@ -185,7 +179,7 @@ export default {
         }
       }
 
-      const store = alt.createImmutableStore(ImmutableStore, 'ImmutableStore')
+      const store = alt.createStore(ImmutableStore, 'ImmutableStore')
 
       assert.isUndefined(store.getState().toJS().foo, 'foo has not been defined')
 

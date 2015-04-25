@@ -22,7 +22,7 @@ function doSetState(store, storeInstance, state) {
     ? state(storeInstance[STATE_CONTAINER])
     : state
 
-  storeInstance[STATE_CONTAINER] = store.alt.setState(
+  storeInstance[STATE_CONTAINER] = storeInstance.StoreModel.config.setState(
     storeInstance[STATE_CONTAINER],
     nextState
   )
@@ -84,6 +84,7 @@ export function createStoreFromObject(alt, StoreModel, key) {
 
 export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
   let storeInstance
+  const { config } = StoreModel
 
   // Creating a class here so we don't overload the provided store's
   // prototype with the mixin behaviour and I'm extending from StoreModel
@@ -117,10 +118,8 @@ export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
     new AltStore(
       alt,
       store,
-      typeof alt._stateKey === 'string'
-        ? store[alt._stateKey]
-        : null,
-        StoreModel
+      store[alt.config.stateKey] || store[config.stateKey] || null,
+      StoreModel
     ),
     getInternalMethods(StoreModel)
   )

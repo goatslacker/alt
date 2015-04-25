@@ -1,15 +1,6 @@
 import Immutable from 'immutable'
-import Symbol from 'es-symbol'
 
-const IS_IMMUTABLE = Symbol()
-
-function makeImmutableObject(store, iden) {
-  if (iden) {
-    store.displayName = iden
-  }
-
-  store.state[IS_IMMUTABLE] = true
-
+function makeImmutableObject(store) {
   store.lifecycle = store.lifecycle || {}
 
   store.lifecycle.serialize = function () {
@@ -23,12 +14,10 @@ function makeImmutableObject(store, iden) {
   return store
 }
 
-function makeImmutableClass(Store, iden) {
+function makeImmutableClass(Store) {
   class ImmutableClass extends Store {
     constructor(...args) {
       super(...args)
-
-      this.state[IS_IMMUTABLE] = true
 
       this.on('serialize', function () {
         return this.getInstance().getState().toJS()
@@ -40,45 +29,29 @@ function makeImmutableClass(Store, iden) {
     }
   }
 
-  ImmutableClass.displayName = iden || Store.displayName || ''
+  ImmutableClass.displayName = Store.displayName || Store.name || ''
 
   return ImmutableClass
 }
 
-function enhance(alt) {
-  const stateKey = alt._stateKey
-  const altSetState = alt.setState
-  const altGetState = alt.getState
+function immutable(store) {
+  const StoreModel = typeof store === 'function'
+    ? makeImmutableClass(store)
+    : makeImmutableObject(store)
 
-  alt.setState = (currentState, nextState) => {
-    if (currentState[IS_IMMUTABLE]) {
-      nextState[IS_IMMUTABLE] = true
+  StoreModel.config = {
+    stateKey: 'state',
+
+    setState(currentState, nextState) {
       return nextState
-    } else {
-      return altSetState(currentState, nextState)
-    }
-  }
+    },
 
-  alt.getState = (currentState) => {
-    if (currentState[IS_IMMUTABLE]) {
+    getState(currentState) {
       return currentState
-    } else {
-      return altGetState(currentState)
     }
   }
 
-  alt.createImmutableStore = (store, iden, ...args) => {
-    const StoreModel = typeof store === 'function'
-      ? makeImmutableClass(store, iden)
-      : makeImmutableObject(store, iden)
-
-    alt._stateKey = 'state'
-    const immutableStore = alt.createStore(StoreModel, iden, ...args)
-    alt._stateKey = stateKey
-    return immutableStore
-  }
-
-  return alt
+  return StoreModel
 }
 
-export default { enhance }
+export default immutable
