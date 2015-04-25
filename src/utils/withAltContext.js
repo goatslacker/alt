@@ -1,17 +1,19 @@
 import React from 'react'
 
-export default function withAltContext(flux, Component) {
-  return React.createClass({
-    childContextTypes: {
-      flux: React.PropTypes.object
-    },
+export default function withAltContext(flux) {
+  return function (Component) {
+    return React.createClass({
+      childContextTypes: {
+        flux: React.PropTypes.object
+      },
 
-    getChildContext() {
-      return { flux }
-    },
+      getChildContext() {
+        return { flux }
+      },
 
-    render() {
-      return React.createElement(Component, this.props)
-    }
-  })
+      render() {
+        return React.createElement(Component, this.props)
+      }
+    })
+  }
 }

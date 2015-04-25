@@ -119,7 +119,13 @@ export default {
     'works with context'() {
       const flux = new Flux()
 
-      const ContextComponent = withAltContext(flux, AltContainer)
+      @withAltContext(flux)
+      class ContextComponent extends React.Component {
+        render() {
+          return <AltContainer />
+        }
+      }
+
       const tree = TestUtils.renderIntoDocument(<ContextComponent />)
 
       const contextComponent = TestUtils.findRenderedComponentWithType(
@@ -149,7 +155,7 @@ export default {
         }
       })
 
-      const WrappedComponent = withAltContext(flux, TestComponent)
+      const WrappedComponent = withAltContext(flux)(TestComponent)
 
       const node = TestUtils.renderIntoDocument(<WrappedComponent />)
       const span = TestUtils.findRenderedDOMComponentWithTag(node, 'span')
