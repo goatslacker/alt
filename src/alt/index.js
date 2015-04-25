@@ -4,6 +4,7 @@ import * as Sym from './symbols/symbols'
 import AltAction from './AltAction'
 import Symbol from 'es-symbol'
 import assign from 'object-assign'
+import createStoreConfig from './utils/createStoreConfig'
 import formatAsConstant from './utils/formatAsConstant'
 import getInternalMethods from './utils/getInternalMethods'
 import uid from './utils/uid'
@@ -29,19 +30,12 @@ const GlobalActionsNameRegistry = {}
 
 class Alt {
   constructor(config = {}) {
+    this.config = config
     this.serialize = config.serialize || JSON.stringify
     this.deserialize = config.deserialize || JSON.parse
-    this.setState = config.setState || assign
-    this.getState = config.getState || function (state) {
-      return Object.keys(state).reduce((obj, key) => {
-        obj[key] = state[key]
-        return obj
-      }, {})
-    }
     this.dispatcher = config.dispatcher || new Dispatcher()
     this.actions = {}
     this.stores = {}
-    this._stateKey = config.stateKey
     this[LAST_SNAPSHOT] = this[INIT_SNAPSHOT] = '{}'
   }
 
@@ -51,6 +45,8 @@ class Alt {
 
   createUnsavedStore(StoreModel, ...args) {
     const key = StoreModel.displayName || ''
+    createStoreConfig(this.config, StoreModel)
+
     return typeof StoreModel === 'object'
       ? createStoreFromObject(this, StoreModel, key)
       : createStoreFromClass(this, StoreModel, key, ...args)
@@ -58,6 +54,7 @@ class Alt {
 
   createStore(StoreModel, iden, ...args) {
     let key = iden || StoreModel.displayName || StoreModel.name || ''
+    createStoreConfig(this.config, StoreModel)
 
     if (this.stores[key] || !key) {
       if (this.stores[key]) {
