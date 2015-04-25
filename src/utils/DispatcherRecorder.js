@@ -28,10 +28,11 @@
 
 import Symbol from 'es-symbol'
 
-function DispatcherRecorder(alt) {
+function DispatcherRecorder(alt, maxEvents = Infinity) {
   this.alt = alt
   this.events = []
   this.dispatchToken = null
+  this.maxEvents = maxEvents
 }
 
 /**
@@ -45,7 +46,9 @@ DispatcherRecorder.prototype.record = function () {
   }
 
   this.dispatchToken = this.alt.dispatcher.register((payload) => {
-    this.events.push(payload)
+    if (this.events.length < this.maxEvents) {
+      this.events.push(payload)
+    }
   })
 
   return true

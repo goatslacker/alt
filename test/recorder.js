@@ -138,6 +138,16 @@ export default {
       assert.equal(store.getState().a, 'hello', 'store state is set')
       assert.equal(store.getState().b, 'world', 'store state is set')
       assert.equal(store.getState().c, 'it works', 'store state is set')
-    }
+    },
+
+    'recording only 1 event'() {
+      const recorder = new DispatcherRecorder(alt, 1)
+      recorder.record()
+      actions.a('hello')
+      actions.b('world')
+      actions.c('it works')
+      assert(recorder.events.length === 1)
+      recorder.stop()
+    },
   }
 }
