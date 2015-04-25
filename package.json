@@ -10,14 +10,15 @@
     "object-assign": "^2.0.0"
   },
   "devDependencies": {
-    "babel": "^4.7.16",
-    "babelify": "^5.0.4",
+    "babel": "^5.1.11",
+    "babel-core": "^5.1.11",
+    "babelify": "^6.0.2",
     "browserify": "^9.0.3",
     "browserify-shim": "^3.8.5",
     "chai": "^2.1.0",
     "coveralls": "^2.11.2",
     "envify": "^3.4.0",
-    "eslint": "^0.18.0",
+    "eslint": "^0.20.0",
     "immutable": "^3.7.2",
     "iso": "^4.0.2",
     "istanbul": "^0.3.5",
@@ -42,16 +43,16 @@
     "build-utils": "babel src/utils --out-dir utils",
     "build-alt-browser": "browserify src/alt -t [envify --NODE_ENV production ] -t babelify --outfile dist/alt.js --standalone Alt",
     "build-alt-browser-with-addons": "browserify src/alt/addons.js -t [envify --NODE_ENV production ] -t babelify -t browserify-shim --outfile dist/alt-with-addons.js --standalone Alt",
-    "build-test": "npm run clean && babel --external-helpers src/alt --out-dir lib && babel --external-helpers src/utils --out-dir utils",
-    "coverage": "npm run build-test && istanbul cover node_modules/mocha/bin/_mocha -- -u exports -R spec --compilers js:babel/register --require babel/external-helpers test",
+    "build-test": "babel src/alt --out-dir lib -r && babel src/utils --out-dir utils -r",
+    "coverage": "npm run build-test && istanbul cover node_modules/mocha/bin/_mocha -- -u exports -R spec --compilers js:babel/register --require babel-core/external-helpers test",
     "clean": "rimraf lib && rimraf utils",
     "lint": "eslint src mixins components",
     "posttest": "npm run build-alt",
     "prepublish": "npm run lint && npm run test && npm run build",
-    "pretest": "npm run build-test",
+    "pretest": "npm run clean && npm run build-test",
     "test": "npm run tests-node",
     "test-browser": "browserify test/browser/index.js -t babelify --outfile test/browser/tests.js",
-    "tests-node": "mocha -u exports -R spec --compilers js:babel/register --require babel/external-helpers test"
+    "tests-node": "mocha -u exports -R spec --compilers js:babel/register --require babel-core/external-helpers test"
   },
   "browserify-shim": {
     "react": "global:React",
@@ -219,7 +220,7 @@
         "after": true
       },
       "sort-vars": [
-        2,
+        0,
         {
           "ignoreCase": true
         }

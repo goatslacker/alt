@@ -1,4 +1,6 @@
-import { ACTION_HANDLER, ACTION_UID } from './symbols/symbols'
+import * as Sym from './symbols/symbols'
+
+const { ACTION_HANDLER, ACTION_UID } = Sym
 
 export default class AltAction {
   constructor(alt, name, action, actions) {

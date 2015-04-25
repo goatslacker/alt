@@ -1,10 +1,12 @@
 import assign from 'object-assign'
-import {
+import * as Sym from '../symbols/symbols'
+
+const {
   INIT_SNAPSHOT,
   LAST_SNAPSHOT,
   LIFECYCLE,
   STATE_CONTAINER
-} from '../symbols/symbols'
+} = Sym
 
 export function setAppState(instance, data, onStore) {
   const obj = instance.deserialize(data)

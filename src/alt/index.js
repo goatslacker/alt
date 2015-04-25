@@ -6,23 +6,24 @@ import getInternalMethods from './utils/getInternalMethods'
 import uid from './utils/uid'
 import { Dispatcher } from 'flux'
 import { warn } from './utils/warnings'
-import {
-  createStoreFromObject,
-  createStoreFromClass
-} from './utils/createStore'
-import {
+import * as StoreUtils from './utils/createStore'
+import * as Sym from './symbols/symbols'
+import * as StateFunctions from './utils/stateFunctions'
+
+const { createStoreFromObject, createStoreFromClass } = StoreUtils
+const {
   ACTION_HANDLER,
   ACTION_KEY,
   INIT_SNAPSHOT,
   LAST_SNAPSHOT,
   LIFECYCLE
-} from './symbols/symbols'
-import {
+} = Sym
+const {
   filterSnapshots,
   saveInitialSnapshot,
   setAppState,
   snapshot
-} from './utils/stateFunctions'
+} = StateFunctions
 
 const GlobalActionsNameRegistry = {}
 
