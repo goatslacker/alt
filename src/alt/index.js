@@ -1,3 +1,6 @@
+import * as StateFunctions from './utils/StateFunctions'
+import * as StoreUtils from './utils/StoreUtils'
+import * as Sym from './symbols/symbols'
 import AltAction from './AltAction'
 import Symbol from 'es-symbol'
 import assign from 'object-assign'
@@ -6,9 +9,6 @@ import getInternalMethods from './utils/getInternalMethods'
 import uid from './utils/uid'
 import { Dispatcher } from 'flux'
 import { warn } from './utils/warnings'
-import * as StoreUtils from './utils/createStore'
-import * as Sym from './symbols/symbols'
-import * as StateFunctions from './utils/stateFunctions'
 
 const { createStoreFromObject, createStoreFromClass } = StoreUtils
 const {

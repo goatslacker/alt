@@ -1064,7 +1064,6 @@ var ALL_LISTENERS = Sym.ALL_LISTENERS;
 var LIFECYCLE = Sym.LIFECYCLE;
 var LISTENERS = Sym.LISTENERS;
 var PUBLIC_METHODS = Sym.PUBLIC_METHODS;
-var STATE_CHANGED = Sym.STATE_CHANGED;
 var STATE_CONTAINER = Sym.STATE_CONTAINER;
 
 // alt container
@@ -1081,7 +1080,6 @@ var AltStore = (function () {
     this[ALT] = alt;
     this[EE] = new _EventEmitter2['default']();
     this[LIFECYCLE] = {};
-    this[STATE_CHANGED] = false;
     this[STATE_CONTAINER] = state || model;
 
     this.boundListeners = model[ALL_LISTENERS];
@@ -1096,7 +1094,7 @@ var AltStore = (function () {
     // Register dispatcher
     this.dispatchToken = alt.dispatcher.register(function (payload) {
       if (model[LIFECYCLE].beforeEach) {
-        model[LIFECYCLE].beforeEach(payload.action.toString(), payload.data, _this[STATE_CONTAINER]);
+        model[LIFECYCLE].beforeEach(payload, _this[STATE_CONTAINER]);
       } else if (typeof model.beforeEach === 'function') {
         _deprecatedBeforeAfterEachWarning.deprecatedBeforeAfterEachWarning();
         model.beforeEach(payload.action.toString(), payload.data, _this[STATE_CONTAINER]);
@@ -1109,21 +1107,19 @@ var AltStore = (function () {
           result = model[LISTENERS][payload.action](payload.data);
         } catch (e) {
           if (_this[LIFECYCLE].error) {
-            _this[LIFECYCLE].error(e, payload.action.toString(), payload.data, _this[STATE_CONTAINER]);
+            _this[LIFECYCLE].error(e, payload, _this[STATE_CONTAINER]);
           } else {
             throw e;
           }
         }
 
-        if (result !== false || _this[STATE_CHANGED]) {
+        if (result !== false) {
           _this.emitChange();
         }
-
-        _this[STATE_CHANGED] = false;
       }
 
       if (model[LIFECYCLE].afterEach) {
-        model[LIFECYCLE].afterEach(payload.action.toString(), payload.data, _this[STATE_CONTAINER]);
+        model[LIFECYCLE].afterEach(payload, _this[STATE_CONTAINER]);
       } else if (typeof model.afterEach === 'function') {
         _deprecatedBeforeAfterEachWarning.deprecatedBeforeAfterEachWarning();
         model.afterEach(payload.action.toString(), payload.data, _this[STATE_CONTAINER]);
@@ -1258,6 +1254,18 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
+var _import = require('./utils/StateFunctions');
+
+var StateFunctions = _interopRequireWildcard(_import);
+
+var _import2 = require('./utils/StoreUtils');
+
+var StoreUtils = _interopRequireWildcard(_import2);
+
+var _import3 = require('./symbols/symbols');
+
+var Sym = _interopRequireWildcard(_import3);
+
 var _AltAction = require('./AltAction');
 
 var _AltAction2 = _interopRequireWildcard(_AltAction);
@@ -1285,18 +1293,6 @@ var _uid2 = _interopRequireWildcard(_uid);
 var _Dispatcher = require('flux');
 
 var _warn = require('./utils/warnings');
-
-var _import = require('./utils/createStore');
-
-var StoreUtils = _interopRequireWildcard(_import);
-
-var _import2 = require('./symbols/symbols');
-
-var Sym = _interopRequireWildcard(_import2);
-
-var _import3 = require('./utils/stateFunctions');
-
-var StateFunctions = _interopRequireWildcard(_import3);
 
 var createStoreFromObject = StoreUtils.createStoreFromObject;
 var createStoreFromClass = StoreUtils.createStoreFromClass;
@@ -1569,7 +1565,7 @@ var Alt = (function () {
 exports['default'] = Alt;
 module.exports = exports['default'];
 
-},{"./AltAction":11,"./symbols/symbols":15,"./utils/createStore":17,"./utils/formatAsConstant":18,"./utils/getInternalMethods":19,"./utils/stateFunctions":20,"./utils/uid":21,"./utils/warnings":22,"es-symbol":5,"flux":7,"object-assign":10}],15:[function(require,module,exports){
+},{"./AltAction":11,"./symbols/symbols":15,"./utils/StateFunctions":16,"./utils/StoreUtils":18,"./utils/formatAsConstant":19,"./utils/getInternalMethods":20,"./utils/uid":21,"./utils/warnings":22,"es-symbol":5,"flux":7,"object-assign":10}],15:[function(require,module,exports){
 'use strict';
 
 var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
@@ -1618,15 +1614,88 @@ exports.LISTENERS = LISTENERS;
 var PUBLIC_METHODS = _Symbol2['default']();
 
 exports.PUBLIC_METHODS = PUBLIC_METHODS;
-// boolean if state has changed for emitting change event
-var STATE_CHANGED = _Symbol2['default']();
-
-exports.STATE_CHANGED = STATE_CHANGED;
 // contains all state
 var STATE_CONTAINER = _Symbol2['default']();
 exports.STATE_CONTAINER = STATE_CONTAINER;
 
 },{"es-symbol":5}],16:[function(require,module,exports){
+'use strict';
+
+var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports.setAppState = setAppState;
+exports.snapshot = snapshot;
+exports.saveInitialSnapshot = saveInitialSnapshot;
+exports.filterSnapshots = filterSnapshots;
+
+var _assign = require('object-assign');
+
+var _assign2 = _interopRequireWildcard(_assign);
+
+var _import = require('../symbols/symbols');
+
+var Sym = _interopRequireWildcard(_import);
+
+var INIT_SNAPSHOT = Sym.INIT_SNAPSHOT;
+var LAST_SNAPSHOT = Sym.LAST_SNAPSHOT;
+var LIFECYCLE = Sym.LIFECYCLE;
+var STATE_CONTAINER = Sym.STATE_CONTAINER;
+
+function setAppState(instance, data, onStore) {
+  var obj = instance.deserialize(data);
+  Object.keys(obj).forEach(function (key) {
+    var store = instance.stores[key];
+    if (store) {
+      if (store[LIFECYCLE].deserialize) {
+        obj[key] = store[LIFECYCLE].deserialize(obj[key]) || obj[key];
+      }
+      _assign2['default'](store[STATE_CONTAINER], obj[key]);
+      onStore(store);
+    }
+  });
+}
+
+function snapshot(instance) {
+  for (var _len = arguments.length, storeNames = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    storeNames[_key - 1] = arguments[_key];
+  }
+
+  var stores = storeNames.length ? storeNames : Object.keys(instance.stores);
+  return stores.reduce(function (obj, key) {
+    var store = instance.stores[key];
+    if (store[LIFECYCLE].snapshot) {
+      store[LIFECYCLE].snapshot();
+    }
+    var customSnapshot = store[LIFECYCLE].serialize && store[LIFECYCLE].serialize();
+    obj[key] = customSnapshot ? customSnapshot : store.getState();
+    return obj;
+  }, {});
+}
+
+function saveInitialSnapshot(instance, key) {
+  var state = instance.stores[key][STATE_CONTAINER];
+  var initial = instance.deserialize(instance[INIT_SNAPSHOT]);
+  initial[key] = state;
+  instance[INIT_SNAPSHOT] = instance.serialize(initial);
+  instance[LAST_SNAPSHOT] = instance[INIT_SNAPSHOT];
+}
+
+function filterSnapshots(instance, serializedSnapshot, storeNames) {
+  var stores = instance.deserialize(serializedSnapshot);
+  var storesToReset = storeNames.reduce(function (obj, name) {
+    if (!stores[name]) {
+      throw new ReferenceError('' + name + ' is not a valid store');
+    }
+    obj[name] = stores[name];
+    return obj;
+  }, {});
+  return instance.serialize(storesToReset);
+}
+
+},{"../symbols/symbols":15,"object-assign":10}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1747,7 +1816,7 @@ var StoreMixinListeners = {
 };
 exports.StoreMixinListeners = StoreMixinListeners;
 
-},{"../symbols/symbols":15}],17:[function(require,module,exports){
+},{"../symbols/symbols":15}],18:[function(require,module,exports){
 'use strict';
 
 var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
@@ -1792,7 +1861,6 @@ var ALL_LISTENERS = Sym.ALL_LISTENERS;
 var LIFECYCLE = Sym.LIFECYCLE;
 var LISTENERS = Sym.LISTENERS;
 var PUBLIC_METHODS = Sym.PUBLIC_METHODS;
-var STATE_CHANGED = Sym.STATE_CHANGED;
 var STATE_CONTAINER = Sym.STATE_CONTAINER;
 
 function doSetState(store, storeInstance, state) {
@@ -1800,14 +1868,13 @@ function doSetState(store, storeInstance, state) {
     return;
   }
 
-  if (!store.alt.dispatcher.isDispatching()) {
-    throw new Error('You can only use setState while dispatching');
-  }
-
   var nextState = typeof state === 'function' ? state(storeInstance[STATE_CONTAINER]) : state;
 
   storeInstance[STATE_CONTAINER] = store.alt.setState(storeInstance[STATE_CONTAINER], nextState);
-  storeInstance[STATE_CHANGED] = true;
+
+  if (!store.alt.dispatcher.isDispatching()) {
+    store.emitChange();
+  }
 }
 
 function createStoreFromObject(alt, StoreModel, key) {
@@ -1901,7 +1968,7 @@ function createStoreFromClass(alt, StoreModel, key) {
   return storeInstance;
 }
 
-},{"../AltStore":12,"../symbols/symbols":15,"./StoreMixins":16,"./getInternalMethods":19,"object-assign":10}],18:[function(require,module,exports){
+},{"../AltStore":12,"../symbols/symbols":15,"./StoreMixins":17,"./getInternalMethods":20,"object-assign":10}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1917,7 +1984,7 @@ function formatAsConstant(name) {
 
 module.exports = exports["default"];
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1944,84 +2011,7 @@ function getInternalMethods(obj, isProto) {
 
 module.exports = exports["default"];
 
-},{}],20:[function(require,module,exports){
-'use strict';
-
-var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-exports.setAppState = setAppState;
-exports.snapshot = snapshot;
-exports.saveInitialSnapshot = saveInitialSnapshot;
-exports.filterSnapshots = filterSnapshots;
-
-var _assign = require('object-assign');
-
-var _assign2 = _interopRequireWildcard(_assign);
-
-var _import = require('../symbols/symbols');
-
-var Sym = _interopRequireWildcard(_import);
-
-var INIT_SNAPSHOT = Sym.INIT_SNAPSHOT;
-var LAST_SNAPSHOT = Sym.LAST_SNAPSHOT;
-var LIFECYCLE = Sym.LIFECYCLE;
-var STATE_CONTAINER = Sym.STATE_CONTAINER;
-
-function setAppState(instance, data, onStore) {
-  var obj = instance.deserialize(data);
-  Object.keys(obj).forEach(function (key) {
-    var store = instance.stores[key];
-    if (store) {
-      if (store[LIFECYCLE].deserialize) {
-        obj[key] = store[LIFECYCLE].deserialize(obj[key]) || obj[key];
-      }
-      _assign2['default'](store[STATE_CONTAINER], obj[key]);
-      onStore(store);
-    }
-  });
-}
-
-function snapshot(instance) {
-  for (var _len = arguments.length, storeNames = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    storeNames[_key - 1] = arguments[_key];
-  }
-
-  var stores = storeNames.length ? storeNames : Object.keys(instance.stores);
-  return stores.reduce(function (obj, key) {
-    var store = instance.stores[key];
-    if (store[LIFECYCLE].snapshot) {
-      store[LIFECYCLE].snapshot();
-    }
-    var customSnapshot = store[LIFECYCLE].serialize && store[LIFECYCLE].serialize();
-    obj[key] = customSnapshot ? customSnapshot : store.getState();
-    return obj;
-  }, {});
-}
-
-function saveInitialSnapshot(instance, key) {
-  var state = instance.stores[key][STATE_CONTAINER];
-  var initial = instance.deserialize(instance[INIT_SNAPSHOT]);
-  initial[key] = state;
-  instance[INIT_SNAPSHOT] = instance.serialize(initial);
-  instance[LAST_SNAPSHOT] = instance[INIT_SNAPSHOT];
-}
-
-function filterSnapshots(instance, serializedSnapshot, storeNames) {
-  var stores = instance.deserialize(serializedSnapshot);
-  var storesToReset = storeNames.reduce(function (obj, name) {
-    if (!stores[name]) {
-      throw new ReferenceError('' + name + ' is not a valid store');
-    }
-    obj[name] = stores[name];
-    return obj;
-  }, {});
-  return instance.serialize(storesToReset);
-}
-
-},{"../symbols/symbols":15,"object-assign":10}],21:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
