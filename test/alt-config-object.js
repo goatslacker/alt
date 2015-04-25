@@ -63,5 +63,10 @@ export default {
 
     assert.deepEqual(snapshot, {MyStore: {wrapper: {number: 2, letter: 'a'}}})
     assert.deepEqual(alt.getStore('MyStore').getState(), {number: 2, letter: 'a'})
-  }
+  },
+
+  'custom transforms'() {
+    const alt = new Alt({ stateTransforms: [] })
+    assert.isArray(alt.stateTransforms)
+  },
 }

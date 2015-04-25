@@ -90,6 +90,10 @@ class MyStore {
 }
 ```
 
+#### stateTransforms
+
+This is an array of functions you can provide which will be executed every time `createStore` or `createUnsavedStore` is ran. It will iterate through the array applying each function to your store. This can be useful if you wish to perform any pre-processing or transformations to your store before it's created.
+
 #### setState
 
 > setState(currentState: object, nextState: object): object

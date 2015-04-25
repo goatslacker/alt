@@ -32,6 +32,10 @@ function doSetState(store, storeInstance, state) {
   }
 }
 
+export function transformStore(transforms, StoreModel) {
+  return transforms.reduce((Store, transform) => transform(Store), StoreModel)
+}
+
 export function createStoreFromObject(alt, StoreModel, key) {
   let storeInstance
 

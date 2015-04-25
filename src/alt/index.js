@@ -11,7 +11,11 @@ import * as Sym from './symbols/symbols'
 import * as StateFunctions from './utils/StateFunctions'
 import createStoreConfig from './utils/createStoreConfig'
 
-const { createStoreFromObject, createStoreFromClass } = StoreUtils
+const {
+  createStoreFromObject,
+  createStoreFromClass,
+  transformStore
+} = StoreUtils
 const {
   ACTION_HANDLER,
   ACTION_KEY,
@@ -36,6 +40,7 @@ class Alt {
     this.dispatcher = config.dispatcher || new Dispatcher()
     this.actions = {}
     this.stores = {}
+    this.storeTransforms = config.storeTransforms || []
     this[LAST_SNAPSHOT] = this[INIT_SNAPSHOT] = '{}'
   }
 
@@ -46,15 +51,17 @@ class Alt {
   createUnsavedStore(StoreModel, ...args) {
     const key = StoreModel.displayName || ''
     createStoreConfig(this.config, StoreModel)
+    const Store = transformStore(this.storeTransforms, StoreModel)
 
-    return typeof StoreModel === 'object'
-      ? createStoreFromObject(this, StoreModel, key)
-      : createStoreFromClass(this, StoreModel, key, ...args)
+    return typeof Store === 'object'
+      ? createStoreFromObject(this, Store, key)
+      : createStoreFromClass(this, Store, key, ...args)
   }
 
   createStore(StoreModel, iden, ...args) {
     let key = iden || StoreModel.displayName || StoreModel.name || ''
     createStoreConfig(this.config, StoreModel)
+    const Store = transformStore(this.storeTransforms, StoreModel)
 
     if (this.stores[key] || !key) {
       if (this.stores[key]) {
@@ -69,9 +76,9 @@ class Alt {
       key = uid(this.stores, key)
     }
 
-    const storeInstance = typeof StoreModel === 'object'
-      ? createStoreFromObject(this, StoreModel, key)
-      : createStoreFromClass(this, StoreModel, key, ...args)
+    const storeInstance = typeof Store === 'object'
+      ? createStoreFromObject(this, Store, key)
+      : createStoreFromClass(this, Store, key, ...args)
 
     this.stores[key] = storeInstance
     saveInitialSnapshot(this, key)
