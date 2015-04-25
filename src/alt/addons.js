@@ -4,7 +4,7 @@ import ActionListeners from '../utils/ActionListeners'
 import AltManager from '../utils/AltManager'
 import DispatcherRecorder from '../utils/DispatcherRecorder'
 
-import atomicTransactions from '../utils/atomicTransactions'
+import atomic from '../utils/atomic'
 import connectToStores from '../utils/connectToStores'
 import chromeDebug from '../utils/chromeDebug'
 import makeFinalStore from '../utils/makeFinalStore'
@@ -17,7 +17,7 @@ Alt.addons = {
   AltContainer,
   AltManager,
   DispatcherRecorder,
-  atomicTransactions,
+  atomic,
   chromeDebug,
   connectToStores,
   makeFinalStore,

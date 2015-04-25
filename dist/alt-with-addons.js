@@ -1054,8 +1054,6 @@ var _Symbol = require('es-symbol');
 
 var _Symbol2 = _interopRequireWildcard(_Symbol);
 
-var _deprecatedBeforeAfterEachWarning = require('./utils/warnings');
-
 var _import = require('./symbols/symbols');
 
 var Sym = _interopRequireWildcard(_import);
@@ -1066,8 +1064,6 @@ var LISTENERS = Sym.LISTENERS;
 var PUBLIC_METHODS = Sym.PUBLIC_METHODS;
 var STATE_CONTAINER = Sym.STATE_CONTAINER;
 
-// alt container
-var ALT = _Symbol2['default']();
 // event emitter instance
 var EE = _Symbol2['default']();
 
@@ -1077,7 +1073,6 @@ var AltStore = (function () {
 
     _classCallCheck(this, AltStore);
 
-    this[ALT] = alt;
     this[EE] = new _EventEmitter2['default']();
     this[LIFECYCLE] = {};
     this[STATE_CONTAINER] = state || model;
@@ -1095,9 +1090,6 @@ var AltStore = (function () {
     this.dispatchToken = alt.dispatcher.register(function (payload) {
       if (model[LIFECYCLE].beforeEach) {
         model[LIFECYCLE].beforeEach(payload, _this[STATE_CONTAINER]);
-      } else if (typeof model.beforeEach === 'function') {
-        _deprecatedBeforeAfterEachWarning.deprecatedBeforeAfterEachWarning();
-        model.beforeEach(payload.action.toString(), payload.data, _this[STATE_CONTAINER]);
       }
 
       if (model[LISTENERS][payload.action]) {
@@ -1120,9 +1112,6 @@ var AltStore = (function () {
 
       if (model[LIFECYCLE].afterEach) {
         model[LIFECYCLE].afterEach(payload, _this[STATE_CONTAINER]);
-      } else if (typeof model.afterEach === 'function') {
-        _deprecatedBeforeAfterEachWarning.deprecatedBeforeAfterEachWarning();
-        model.afterEach(payload.action.toString(), payload.data, _this[STATE_CONTAINER]);
       }
     });
 
@@ -1162,7 +1151,7 @@ var AltStore = (function () {
   }, {
     key: 'getState',
     value: function getState() {
-      return this[ALT].getState(this[STATE_CONTAINER]);
+      return this.StoreModel.config.getState(this[STATE_CONTAINER]);
     }
   }]);
 
@@ -1172,7 +1161,7 @@ var AltStore = (function () {
 exports['default'] = AltStore;
 module.exports = exports['default'];
 
-},{"./symbols/symbols":15,"./utils/warnings":22,"es-symbol":5,"eventemitter3":6,"object-assign":10}],13:[function(require,module,exports){
+},{"./symbols/symbols":15,"es-symbol":5,"eventemitter3":6,"object-assign":10}],13:[function(require,module,exports){
 'use strict';
 
 var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
@@ -1197,9 +1186,9 @@ var _DispatcherRecorder = require('../utils/DispatcherRecorder');
 
 var _DispatcherRecorder2 = _interopRequireWildcard(_DispatcherRecorder);
 
-var _atomicTransactions = require('../utils/atomicTransactions');
+var _atomic = require('../utils/atomic');
 
-var _atomicTransactions2 = _interopRequireWildcard(_atomicTransactions);
+var _atomic2 = _interopRequireWildcard(_atomic);
 
 var _connectToStores = require('../utils/connectToStores');
 
@@ -1226,7 +1215,7 @@ _Alt2['default'].addons = {
   AltContainer: _AltContainer2['default'],
   AltManager: _AltManager2['default'],
   DispatcherRecorder: _DispatcherRecorder2['default'],
-  atomicTransactions: _atomicTransactions2['default'],
+  atomic: _atomic2['default'],
   chromeDebug: _chromeDebug2['default'],
   connectToStores: _connectToStores2['default'],
   makeFinalStore: _makeFinalStore2['default'],
@@ -1235,7 +1224,7 @@ _Alt2['default'].addons = {
 exports['default'] = _Alt2['default'];
 module.exports = exports['default'];
 
-},{"../../AltContainer":1,"../utils/ActionListeners":23,"../utils/AltManager":24,"../utils/DispatcherRecorder":25,"../utils/atomicTransactions":26,"../utils/chromeDebug":27,"../utils/connectToStores":28,"../utils/makeFinalStore":29,"../utils/withAltContext":30,"./":14}],14:[function(require,module,exports){
+},{"../../AltContainer":1,"../utils/ActionListeners":24,"../utils/AltManager":25,"../utils/DispatcherRecorder":26,"../utils/atomic":27,"../utils/chromeDebug":28,"../utils/connectToStores":29,"../utils/makeFinalStore":30,"../utils/withAltContext":31,"./":14}],14:[function(require,module,exports){
 'use strict';
 
 var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
@@ -1253,18 +1242,6 @@ var _createClass = (function () { function defineProperties(target, props) { for
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
-
-var _import = require('./utils/StateFunctions');
-
-var StateFunctions = _interopRequireWildcard(_import);
-
-var _import2 = require('./utils/StoreUtils');
-
-var StoreUtils = _interopRequireWildcard(_import2);
-
-var _import3 = require('./symbols/symbols');
-
-var Sym = _interopRequireWildcard(_import3);
 
 var _AltAction = require('./AltAction');
 
@@ -1294,6 +1271,22 @@ var _Dispatcher = require('flux');
 
 var _warn = require('./utils/warnings');
 
+var _import = require('./utils/StoreUtils');
+
+var StoreUtils = _interopRequireWildcard(_import);
+
+var _import2 = require('./symbols/symbols');
+
+var Sym = _interopRequireWildcard(_import2);
+
+var _import3 = require('./utils/StateFunctions');
+
+var StateFunctions = _interopRequireWildcard(_import3);
+
+var _createStoreConfig = require('./utils/createStoreConfig');
+
+var _createStoreConfig2 = _interopRequireWildcard(_createStoreConfig);
+
 var createStoreFromObject = StoreUtils.createStoreFromObject;
 var createStoreFromClass = StoreUtils.createStoreFromClass;
 var ACTION_HANDLER = Sym.ACTION_HANDLER;
@@ -1314,19 +1307,12 @@ var Alt = (function () {
 
     _classCallCheck(this, Alt);
 
+    this.config = config;
     this.serialize = config.serialize || JSON.stringify;
     this.deserialize = config.deserialize || JSON.parse;
-    this.setState = config.setState || _assign2['default'];
-    this.getState = config.getState || function (state) {
-      return Object.keys(state).reduce(function (obj, key) {
-        obj[key] = state[key];
-        return obj;
-      }, {});
-    };
     this.dispatcher = config.dispatcher || new _Dispatcher.Dispatcher();
     this.actions = {};
     this.stores = {};
-    this._stateKey = config.stateKey;
     this[LAST_SNAPSHOT] = this[INIT_SNAPSHOT] = '{}';
   }
 
@@ -1343,6 +1329,8 @@ var Alt = (function () {
       }
 
       var key = StoreModel.displayName || '';
+      _createStoreConfig2['default'](this.config, StoreModel);
+
       return typeof StoreModel === 'object' ? createStoreFromObject(this, StoreModel, key) : createStoreFromClass.apply(undefined, [this, StoreModel, key].concat(args));
     }
   }, {
@@ -1353,6 +1341,7 @@ var Alt = (function () {
       }
 
       var key = iden || StoreModel.displayName || StoreModel.name || '';
+      _createStoreConfig2['default'](this.config, StoreModel);
 
       if (this.stores[key] || !key) {
         if (this.stores[key]) {
@@ -1565,7 +1554,7 @@ var Alt = (function () {
 exports['default'] = Alt;
 module.exports = exports['default'];
 
-},{"./AltAction":11,"./symbols/symbols":15,"./utils/StateFunctions":16,"./utils/StoreUtils":18,"./utils/formatAsConstant":19,"./utils/getInternalMethods":20,"./utils/uid":21,"./utils/warnings":22,"es-symbol":5,"flux":7,"object-assign":10}],15:[function(require,module,exports){
+},{"./AltAction":11,"./symbols/symbols":15,"./utils/StateFunctions":16,"./utils/StoreUtils":18,"./utils/createStoreConfig":19,"./utils/formatAsConstant":20,"./utils/getInternalMethods":21,"./utils/uid":22,"./utils/warnings":23,"es-symbol":5,"flux":7,"object-assign":10}],15:[function(require,module,exports){
 'use strict';
 
 var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
@@ -1870,7 +1859,7 @@ function doSetState(store, storeInstance, state) {
 
   var nextState = typeof state === 'function' ? state(storeInstance[STATE_CONTAINER]) : state;
 
-  storeInstance[STATE_CONTAINER] = store.alt.setState(storeInstance[STATE_CONTAINER], nextState);
+  storeInstance[STATE_CONTAINER] = storeInstance.StoreModel.config.setState(storeInstance[STATE_CONTAINER], nextState);
 
   if (!store.alt.dispatcher.isDispatching()) {
     store.emitChange();
@@ -1923,6 +1912,7 @@ function createStoreFromClass(alt, StoreModel, key) {
   }
 
   var storeInstance = undefined;
+  var config = StoreModel.config;
 
   // Creating a class here so we don't overload the provided store's
   // prototype with the mixin behaviour and I'm extending from StoreModel
@@ -1963,12 +1953,40 @@ function createStoreFromClass(alt, StoreModel, key) {
 
   var store = new (_bind.apply(Store, [null].concat(argsForClass)))();
 
-  storeInstance = _assign2['default'](new _AltStore2['default'](alt, store, typeof alt._stateKey === 'string' ? store[alt._stateKey] : null, StoreModel), _getInternalMethods2['default'](StoreModel));
+  storeInstance = _assign2['default'](new _AltStore2['default'](alt, store, store[alt.config.stateKey] || store[config.stateKey] || null, StoreModel), _getInternalMethods2['default'](StoreModel));
 
   return storeInstance;
 }
 
-},{"../AltStore":12,"../symbols/symbols":15,"./StoreMixins":17,"./getInternalMethods":20,"object-assign":10}],19:[function(require,module,exports){
+},{"../AltStore":12,"../symbols/symbols":15,"./StoreMixins":17,"./getInternalMethods":21,"object-assign":10}],19:[function(require,module,exports){
+'use strict';
+
+var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _assign = require('object-assign');
+
+var _assign2 = _interopRequireWildcard(_assign);
+
+function createStoreConfig(globalConfig, StoreModel) {
+  StoreModel.config = _assign2['default']({
+    getState: function getState(state) {
+      return Object.keys(state).reduce(function (obj, key) {
+        obj[key] = state[key];
+        return obj;
+      }, {});
+    },
+    setState: _assign2['default']
+  }, globalConfig, StoreModel.config);
+}
+
+exports['default'] = createStoreConfig;
+module.exports = exports['default'];
+
+},{"object-assign":10}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1984,7 +2002,7 @@ function formatAsConstant(name) {
 
 module.exports = exports["default"];
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2011,7 +2029,7 @@ function getInternalMethods(obj, isProto) {
 
 module.exports = exports["default"];
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2030,14 +2048,13 @@ function uid(container, name) {
 
 module.exports = exports["default"];
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 exports.warn = warn;
-exports.deprecatedBeforeAfterEachWarning = deprecatedBeforeAfterEachWarning;
 
 function warn(msg) {
   /* istanbul ignore else */
@@ -2046,11 +2063,7 @@ function warn(msg) {
   }
 }
 
-function deprecatedBeforeAfterEachWarning() {
-  warn('beforeEach/afterEach functions on the store are deprecated ' + 'use beforeEach/afterEach as a lifecycle method instead');
-}
-
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 'use strict';
 
 var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
@@ -2123,7 +2136,7 @@ ActionListeners.prototype.removeAllActionListeners = function () {
 exports['default'] = ActionListeners;
 module.exports = exports['default'];
 
-},{"es-symbol":5}],24:[function(require,module,exports){
+},{"es-symbol":5}],25:[function(require,module,exports){
 'use strict';
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
@@ -2235,7 +2248,7 @@ var AltManager = (function () {
 exports['default'] = AltManager;
 module.exports = exports['default'];
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 'use strict';
 
 var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
@@ -2382,7 +2395,7 @@ DispatcherRecorder.prototype.loadEvents = function (events) {
 exports['default'] = DispatcherRecorder;
 module.exports = exports['default'];
 
-},{"es-symbol":5}],26:[function(require,module,exports){
+},{"es-symbol":5}],27:[function(require,module,exports){
 'use strict';
 
 var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
@@ -2396,7 +2409,7 @@ var _inherits = function (subClass, superClass) { if (typeof superClass !== 'fun
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
-exports['default'] = atomicTransactions;
+exports['default'] = atomic;
 
 var _makeFinalStore = require('./makeFinalStore');
 
@@ -2430,7 +2443,7 @@ function makeAtomicObject(alt, StoreModel) {
   return StoreModel;
 }
 
-function atomicTransactions(alt) {
+function atomic(alt) {
   var finalStore = _makeFinalStore2['default'](alt);
 
   finalStore.listen(function () {
@@ -2444,7 +2457,7 @@ function atomicTransactions(alt) {
 
 module.exports = exports['default'];
 
-},{"./makeFinalStore":29}],27:[function(require,module,exports){
+},{"./makeFinalStore":30}],28:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2459,7 +2472,7 @@ function chromeDebug(alt) {
 
 module.exports = exports['default'];
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -2574,7 +2587,7 @@ exports['default'] = connectToStores;
 module.exports = exports['default'];
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"object-assign":10}],29:[function(require,module,exports){
+},{"object-assign":10}],30:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2620,12 +2633,12 @@ function FinalStore() {
 }
 
 function makeFinalStore(alt) {
-  return alt.createUnsavedStore(FinalStore);
+  return alt.FinalStore ? alt.FinalStore : alt.FinalStore = alt.createUnsavedStore(FinalStore);
 }
 
 module.exports = exports["default"];
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 (function (global){
 'use strict';
 
