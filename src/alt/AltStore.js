@@ -87,12 +87,6 @@ export default class AltStore {
     this[EE].removeListener('change', cb)
   }
 
-  prepare(state) {
-    const data = {}
-    data[this._storeName] = state
-    return this[ALT].serialize(data)
-  }
-
   getState() {
     return this[ALT].getState(this[STATE_CONTAINER])
   }

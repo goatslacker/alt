@@ -1338,6 +1338,21 @@ const tests = {
 
     actions.fire()
   },
+
+  'prepare a payload for bootstrap'() {
+    const serialized = alt.prepare(myStore, { a: 1, b: 2 })
+    const parsed = JSON.parse(serialized)
+
+    assert.isString(serialized)
+    assert.isObject(parsed.MyStore)
+    assert(parsed.MyStore.a === 1)
+    assert(parsed.MyStore.b === 2)
+    assert.isUndefined(parsed.MyStore.c)
+
+    assert.throws(() => {
+      alt.prepare({}, { x: 0 })
+    }, ReferenceError)
+  },
 }
 
 export default tests

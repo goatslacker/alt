@@ -185,6 +185,15 @@ class Alt {
     })
   }
 
+  prepare(store, payload) {
+    const data = {}
+    if (!store._storeName) {
+      throw new ReferenceError('Store provided does not have a name')
+    }
+    data[store._storeName] = payload
+    return this.serialize(data)
+  }
+
   // Instance type methods for injecting alt into your application as context
 
   addActions(name, ActionsClass, ...args) {
