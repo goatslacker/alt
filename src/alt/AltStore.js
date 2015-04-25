@@ -1,7 +1,6 @@
 import EventEmitter from 'eventemitter3'
 import assign from 'object-assign'
 import Symbol from 'es-symbol'
-import { deprecatedBeforeAfterEachWarning } from './utils/warnings'
 import * as Sym from './symbols/symbols'
 
 const {
@@ -37,13 +36,6 @@ export default class AltStore {
     this.dispatchToken = alt.dispatcher.register((payload) => {
       if (model[LIFECYCLE].beforeEach) {
         model[LIFECYCLE].beforeEach(payload, this[STATE_CONTAINER])
-      } else if (typeof model.beforeEach === 'function') {
-        deprecatedBeforeAfterEachWarning()
-        model.beforeEach(
-          payload.action.toString(),
-          payload.data,
-          this[STATE_CONTAINER]
-        )
       }
 
       if (model[LISTENERS][payload.action]) {
@@ -66,13 +58,6 @@ export default class AltStore {
 
       if (model[LIFECYCLE].afterEach) {
         model[LIFECYCLE].afterEach(payload, this[STATE_CONTAINER])
-      } else if (typeof model.afterEach === 'function') {
-        deprecatedBeforeAfterEachWarning()
-        model.afterEach(
-          payload.action.toString(),
-          payload.data,
-          this[STATE_CONTAINER]
-        )
       }
     })
 

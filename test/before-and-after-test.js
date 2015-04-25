@@ -1,5 +1,6 @@
-import Alt from '../dist/alt-with-runtime'
+import Alt from '../'
 import { assert } from 'chai'
+
 import sinon from 'sinon'
 
 const alt = new Alt()
@@ -85,28 +86,5 @@ export default {
       assert.ok(beforeValue === 1, 'before has current state')
       assert.ok(afterValue === 2, 'after has next state')
     },
-
-    'deprecated warning'() {
-      console.warn = sinon.spy()
-
-      class Foo {
-        constructor() {
-          this.bindListeners({
-            change: action.fire
-          })
-        }
-        beforeEach() { }
-        afterEach() { }
-        change() { }
-      }
-
-      assert(console.warn.callCount === 0)
-
-      alt.createStore(Foo)
-
-      action.fire()
-
-      assert.ok(console.warn.calledTwice)
-    }
   }
 }

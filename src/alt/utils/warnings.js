@@ -4,10 +4,3 @@ export function warn(msg) {
     console.warn(new ReferenceError(msg))
   }
 }
-
-export function deprecatedBeforeAfterEachWarning() {
-  warn(
-    'beforeEach/afterEach functions on the store are deprecated ' +
-    'use beforeEach/afterEach as a lifecycle method instead'
-  )
-}
