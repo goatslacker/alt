@@ -94,18 +94,6 @@ class MyStore {
 
 This is an array of functions you can provide which will be executed every time `createStore` or `createUnsavedStore` is ran. It will iterate through the array applying each function to your store. This can be useful if you wish to perform any pre-processing or transformations to your store before it's created.
 
-#### setState
-
-> setState(currentState: object, nextState: object): object
-
-`setState` is used internally by Alt to set the state. You can override this to provide your own setState implementation. Internally, setState is an alias for `Object.assign`. `setState` must return an object.
-
-#### getState
-
-> getState(currentState: object): mixed
-
-`getState` receives the current state and returns a copy of it. You can override this function to provide your own implementation.
-
 ## Instances
 
 Alternatively, you can [create instances](/docs/altInstances/) of the entire alt universe including stores.

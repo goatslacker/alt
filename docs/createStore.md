@@ -13,6 +13,39 @@ This is a function that takes in a class of your store and returns back the sing
 
 # StoreModel
 
+## StoreModel.config
+
+The config object on your store classes allow you to configure your stores for specific behavior.
+
+Available configuration options:
+
+#### setState
+
+> setState(currentState: object, nextState: object): object
+
+`setState` is used internally by Alt to set the state. You can override this to provide your own setState implementation. Internally, setState is an alias for `Object.assign`. `setState` must return an object.
+
+#### getState
+
+> getState(currentState: object): mixed
+
+`getState` receives the current state and returns a copy of it. You can override this function to provide your own implementation.
+
+#### stateKey
+
+`stateKey` is a string that controls where state should be defined at this particular store's level. For example:
+
+```js
+class TodoStore {
+  static config = {
+    stateKey: 'state'
+  }
+  constructor() {
+    this.state = { todos: {} }
+  }
+}
+```
+
 ## StoreModel#constructor
 
 > (alt: Alt): StoreModel
