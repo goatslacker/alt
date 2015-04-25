@@ -4,6 +4,7 @@ import { assert } from 'chai'
 import sinon from 'sinon'
 
 const alt = new Alt()
+const FinalStore = makeFinalStore(alt)
 
 export default {
   'FinalStore': {
@@ -68,6 +69,11 @@ export default {
 
       assert.ok(stateListen.calledOnce, 'final store called once')
       assert(stateListen.args[0][0].payload.data === 27, 'the payload was received')
+    },
+
+    'making another final store returns the right store'() {
+      const store = makeFinalStore(alt)
+      assert(store === FinalStore)
     },
   }
 }
