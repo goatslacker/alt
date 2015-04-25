@@ -19,7 +19,7 @@ function makeAtomicObject(alt, StoreModel) {
   return StoreModel
 }
 
-export default function atomicTransactions(alt) {
+export default function atomic(alt) {
   var finalStore = makeFinalStore(alt)
 
   finalStore.listen(() => alt.takeSnapshot())

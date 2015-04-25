@@ -1,10 +1,10 @@
 import { assert } from 'chai'
 import Alt from '../dist/alt-with-runtime'
-import atomicTransactions from '../utils/atomicTransactions'
+import atomic from '../utils/atomic'
 
 const alt = new Alt()
 
-const atom = atomicTransactions(alt)
+const atom = atomic(alt)
 
 const actions = alt.generateActions('fire')
 
@@ -40,6 +40,7 @@ const store2 = alt.createStore(atom({
   }
 }))
 
+@atomic(alt)
 class Store3 {
   constructor() {
     this.bindListeners({ fire: actions.fire })
@@ -51,7 +52,7 @@ class Store3 {
   }
 }
 
-const store3 = alt.createStore(atom(Store3), 'Store3')
+const store3 = alt.createStore(Store3, 'Store3')
 
 class Store4 {
   constructor() {
