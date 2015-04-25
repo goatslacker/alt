@@ -66,7 +66,7 @@ export default {
   },
 
   'custom transforms'() {
-    const alt = new Alt({ stateTransforms: [] })
-    assert.isArray(alt.stateTransforms)
+    const alt = new Alt({ storeTransforms: [] })
+    assert.isArray(alt.storeTransforms)
   },
 }
