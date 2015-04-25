@@ -15,44 +15,54 @@ We will focus on Facebook's [Immutable](http://facebook.github.io/immutable-js/)
 
 Alt has first-class support for immutable data structures via the ImmutableUtil.
 
-Getting started is simple, you'll require the utility and pass your alt instance to it.
+Getting started is simple, you'll require the utility and pass your pre-wrapped stores to it.
 
 ```js
 var alt = new Alt();
-var ImmutableUtil = require('alt/utils/ImmutableUtil');
-
-ImmutableUtil.enhance(alt);
+var immutable = require('alt/utils/ImmutableUtil');
 ```
 
-Alt will be modified to support Immutable stores and gain a new method `alt.createImmutableStore`.
-
-> createImmutableStore(store: object | function, iden: string?, ...args: mixed): AltStore
+If you're using babel with ES7 Stage 1 [decorator](https://github.com/wycats/javascript-decorators) support then this is sweet.
 
 ```js
+@immutable
+class TodoStore {
+  static displayName = 'TodoStore'
 
+  constructor() {
+    this.state = {
+      todos: Immutable.Map({})
+    };
+  }
+}
+
+alt.createStore(TodoStore);
+```
+
+If you don't wish to use ES7 decorators then no problem, they're just sugar for function calls. You can just pass your store into the immutable function.
+
+```js
 function TodoStore() {
   this.state = {
-    todos: Immutable.Map({});
+    todos: Immutable.Map({})
   };
 }
 TodoStore.displayName = 'TodoStore';
 
-alt.createImmutableStore(TodoStore);
+alt.createStore(immutable(TodoStore));
 ```
 
-`createImmutableStore` behaves just like `createStore` except that it supports immutablejs data structures. A few things to notice about this approach:
+A few things to note about immutable stores about this approach:
 
 * You use `this.state` to create your state rather than assigning directly to instance properties.
 * You specify your own Immutable data structure you wish to use. In this example we're using Map.
-
-`createImmutableStore` accepts both an object or a class/function and the rest of the arguments mimick that of `createStore`.
 
 Using your ImmutableStore is a bit different from using a regular store:
 
 ```js
 function TodoStore() {
   this.state = {
-    todos: Immutable.Map({});
+    todos: Immutable.Map({})
   };
 
   this.bindListeners({
@@ -67,7 +77,7 @@ TodoStore.properties.addTodo = function (todo) {
 
 TodoStore.displayName = 'TodoStore';
 
-var todoStore = alt.createImmutableStore(TodoStore);
+var todoStore = alt.createStore(immutable(TodoStore));
 ```
 
 * You'll be using `setState` in order to modify state within the store.
