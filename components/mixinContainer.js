@@ -1,6 +1,10 @@
 var Subscribe = require('../mixins/Subscribe')
 var assign = require('object-assign')
 
+function id(it) {
+  return it
+}
+
 function getStateFromStore(store, props) {
   return typeof store === 'function' ? store(props).value : store.getState()
 }
@@ -133,10 +137,13 @@ function mixinContainer(React) {
 
     getProps: function () {
       var flux = this.props.flux || this.context.flux
-      return assign(
+      var transform = typeof this.props.transform === 'function'
+        ? this.props.transform
+        : id
+      return transform(assign(
         flux ? { flux: flux } : {},
         this.state
-      )
+      ))
     },
 
     shouldComponentUpdate: function () {

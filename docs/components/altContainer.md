@@ -243,6 +243,24 @@ const flux = new Flux();
 
 Header, Body, and Footer will have the `flux` context passed down.
 
+## `transform`
+
+If you don't like the way `AltContainer` passing the props, you can give it a `transform` function.
+
+```js
+<AltContainer
+  stores={{ BlogStore }}
+  actions={{ BlogActions }}
+  transform={({ BlogStore, BlogActions }) => {
+    var posts = BlogStore.posts.slice(0, 42);
+    var makePost =
+      text => BlogActions.makePost(`${text} So long, and thanks for all the fish.`);
+    return { posts, makePost };
+  }}>
+  <Foobar />
+</AltContainer>
+```
+
 ## `shouldComponentUpdate`
 
 `shouldComponentUpdate` prop allows you to fine-tune your performance needs for AltContainer only rendering when absolutely necessary.
