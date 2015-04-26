@@ -147,7 +147,7 @@ class Alt {
   }
 
   takeSnapshot(...storeNames) {
-    const state = snapshot(this, ...storeNames)
+    const state = snapshot(this, storeNames)
     assign(this[LAST_SNAPSHOT], state)
     return this.serialize(state)
   }

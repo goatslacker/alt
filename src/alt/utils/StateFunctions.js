@@ -22,7 +22,7 @@ export function setAppState(instance, data, onStore) {
   })
 }
 
-export function snapshot(instance, ...storeNames) {
+export function snapshot(instance, storeNames = []) {
   const stores = storeNames.length ? storeNames : Object.keys(instance.stores)
   return stores.reduce((obj, storeHandle) => {
     const storeName = storeHandle.displayName || storeHandle
