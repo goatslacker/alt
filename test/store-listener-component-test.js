@@ -40,26 +40,6 @@ const Store2 = alt.createStore({
   }
 })
 
-const transformMock = function transformMock(it) {
-  /**
-   * Due to the behavior of React.render on multiple children, one can't rely on
-   * the count of the mock.
-   *
-   * In the following case, React will render the node as a node with a chlid:
-   * `<div />`, then render it as a node with a child: `<span />`, then render
-   * it as a node with three children: `<span />`, `<strong />` and `<em />`.
-   *
-   * <AltContainer>
-   *   <span />
-   *   <strong />
-   *   <em />
-   * </AltContainer>
-   */
-  transformMock.lastCall = Array.prototype.slice.call(arguments)
-  return it
-}
-transformMock.lastCall = []
-
 class Flux extends Alt {
   constructor() {
     super()
@@ -93,8 +73,6 @@ export default {
     },
 
     afterEach() {
-      transformMock.lastCall = []
-
       delete global.document
       delete global.window
       delete global.navigator
@@ -236,9 +214,9 @@ export default {
       const div  = TestUtils.scryRenderedDOMComponentsWithTag(node, 'div')[0]
       const span = TestUtils.findRenderedDOMComponentWithTag(node, 'span')
 
-      assert.equal(div.props.flx, flux)
+      assert(div.props.flx === flux)
       assert.isUndefined(span.props.flx)
-      assert.equal(span.props.flux, flux)
+      assert(span.props.flux === flux)
     },
 
     'children get the state via props'() {
@@ -253,18 +231,6 @@ export default {
       const span = TestUtils.findRenderedDOMComponentWithTag(node, 'span')
 
       assert(span.props.TestStore.x === 'foobar')
-    },
-
-    'children props work with the transform function'() {
-      const node = TestUtils.renderIntoDocument(
-        <AltContainer stores={{ TestStore }} transform={transformMock}>
-          <span />
-        </AltContainer>
-      )
-
-      const span = TestUtils.findRenderedDOMComponentWithTag(node, 'span')
-
-      assert(span.props.TestStore === transformMock.lastCall[0].TestStore)
     },
 
     'many children get state via props'() {
