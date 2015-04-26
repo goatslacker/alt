@@ -30,7 +30,7 @@ const {
   snapshot
 } = StateFunctions
 
-const GlobalActionsNameRegistry = {}
+const ACTIONS_REGISTRY = Symbol()
 
 class Alt {
   constructor(config = {}) {
@@ -41,6 +41,7 @@ class Alt {
     this.actions = {}
     this.stores = {}
     this.storeTransforms = config.storeTransforms || []
+    this[ACTIONS_REGISTRY] = {}
     this[LAST_SNAPSHOT] = this[INIT_SNAPSHOT] = '{}'
   }
 
@@ -93,8 +94,8 @@ class Alt {
   }
 
   createAction(name, implementation, obj) {
-    const actionId = uid(GlobalActionsNameRegistry, name)
-    GlobalActionsNameRegistry[actionId] = 1
+    const actionId = uid(this[ACTIONS_REGISTRY], name)
+    this[ACTIONS_REGISTRY][actionId] = 1
     const actionName = Symbol.for(actionId)
 
     // Wrap the action so we can provide a dispatch method
