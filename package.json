@@ -19,6 +19,7 @@
     "coveralls": "^2.11.2",
     "envify": "^3.4.0",
     "eslint": "^0.20.0",
+    "ghooks": "^0.3.2",
     "immutable": "^3.7.2",
     "iso": "^4.0.2",
     "istanbul": "^0.3.5",
@@ -66,6 +67,11 @@
     "react",
     "unidirectional"
   ],
+  "config": {
+    "ghooks": {
+      "pre-push": "npm run lint"
+    }
+  },
   "eslintConfig": {
     "env": {
       "node": true,
