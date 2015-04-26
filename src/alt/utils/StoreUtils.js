@@ -80,7 +80,8 @@ export function createStoreFromObject(alt, StoreModel, key) {
   // create the instance and assign the public methods to the instance
   storeInstance = assign(
     new AltStore(alt, StoreProto, StoreProto.state, StoreModel),
-    StoreProto.publicMethods
+    StoreProto.publicMethods,
+    { displayName: key }
   )
 
   return storeInstance
@@ -125,7 +126,8 @@ export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
       store[alt.config.stateKey] || store[config.stateKey] || null,
       StoreModel
     ),
-    getInternalMethods(StoreModel)
+    getInternalMethods(StoreModel),
+    { displayName: key }
   )
 
   return storeInstance

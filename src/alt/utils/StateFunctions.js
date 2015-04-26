@@ -44,12 +44,13 @@ export function saveInitialSnapshot(instance, key) {
   instance[LAST_SNAPSHOT][key] = state
 }
 
-export function filterSnapshots(instance, snapshot, storeNames) {
-  return storeNames.reduce((obj, storeName) => {
-    if (!snapshot[storeName]) {
+export function filterSnapshots(instance, state, stores) {
+  return stores.reduce((obj, store) => {
+    const storeName = store.displayName || store
+    if (!state[storeName]) {
       throw new ReferenceError(`${storeName} is not a valid store`)
     }
-    obj[storeName] = snapshot[storeName]
+    obj[storeName] = state[storeName]
     return obj
   }, {})
 }
