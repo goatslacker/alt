@@ -37,21 +37,19 @@ export function snapshot(instance, ...storeNames) {
 }
 
 export function saveInitialSnapshot(instance, key) {
-  const state = instance.stores[key][STATE_CONTAINER]
-  const initial = instance.deserialize(instance[INIT_SNAPSHOT])
-  initial[key] = state
-  instance[INIT_SNAPSHOT] = instance.serialize(initial)
-  instance[LAST_SNAPSHOT] = instance[INIT_SNAPSHOT]
+  const state = instance.deserialize(
+    instance.serialize(instance.stores[key][STATE_CONTAINER])
+  )
+  instance[INIT_SNAPSHOT][key] = state
+  instance[LAST_SNAPSHOT][key] = state
 }
 
-export function filterSnapshots(instance, serializedSnapshot, storeNames) {
-  const stores = instance.deserialize(serializedSnapshot)
-  const storesToReset = storeNames.reduce((obj, name) => {
-    if (!stores[name]) {
-      throw new ReferenceError(`${name} is not a valid store`)
+export function filterSnapshots(instance, snapshot, storeNames) {
+  return storeNames.reduce((obj, storeName) => {
+    if (!snapshot[storeName]) {
+      throw new ReferenceError(`${storeName} is not a valid store`)
     }
-    obj[name] = stores[name]
+    obj[storeName] = snapshot[storeName]
     return obj
   }, {})
-  return instance.serialize(storesToReset)
 }
