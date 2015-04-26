@@ -46,6 +46,37 @@ class TodoStore {
 }
 ```
 
+#### serialize
+
+`serialize` is also called before the store's state is serialized. You may optionally return an object, which will be used directly as the snapshot data for the store. If you do not return anything, the default, [`MyStore#getState()`](stores.md#storegetstate) is used for the snapshot data. See the [serialization](serialization.md) for an example.
+
+```js
+class TodoStore {
+  static config = {
+    serialize: function(data) {
+      // do something here
+      // optional return of data to be used in snapshot
+      // return mySnapshotData
+    }
+  }
+}
+```
+
+#### deserialize
+
+`deserialize` is called before the store's state is deserialized. This occurs whenever the store's state is being set to an existing snapshot/bootstrap data. Here you can perform any final tasks you need to before the snapshot/bootstrap data is set on the store such as mapping the data to model objects, or converting data an external source like a JSON API into a format the store expects. Deserialize takes in a parameter that is an object of snapshot/bootstrap data and must return the data to be set to the store's state. If nothing is returned, then the data from the snapshot is set to the store's state. See the [serialization](serialization.md) for an example.
+
+```js
+class TodoStore {
+  static config = {
+    deserialize: function(data) {
+      // do something here
+      return modifiedData
+    }
+  }
+}
+```
+
 ## StoreModel#constructor
 
 > (alt: Alt): StoreModel
