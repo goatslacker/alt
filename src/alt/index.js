@@ -92,6 +92,12 @@ class Alt {
     })
   }
 
+  generateAction(name) {
+    return this.createAction(name, function (x) {
+      this.dispatch(x)
+    })
+  }
+
   createAction(name, implementation, obj) {
     const actionId = uid(GlobalActionsNameRegistry, name)
     GlobalActionsNameRegistry[actionId] = 1

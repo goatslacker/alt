@@ -1292,19 +1292,26 @@ const tests = {
       this.dispatch(x)
     })
 
+    const action2 = alt.generateAction('hello')
+
     const store = alt.createStore({
       state: { x: 0 },
       bindListeners: {
-        hello: action
+        hello: [action, action2]
       },
       hello(x) { this.state.x = x }
     })
 
     assert.isFunction(action, 'action was created')
+    assert.isFunction(action2, 'action was generated')
 
     action(1)
 
     assert(store.getState().x === 1, 'action fires correctly')
+
+    action2(2)
+
+    assert(store.getState().x === 2, 'action fires correctly')
   },
 
   'setState emits a change if not dispatching'(done) {
