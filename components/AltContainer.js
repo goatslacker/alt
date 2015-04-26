@@ -35,6 +35,23 @@
  *   }}
  * />
  *
+ * Using the `transform` prop.
+ *
+ * <AltContainer
+ *   stores={{ FooStore: FooStore, BarStore: BarStore }}
+ *   transform={function(stores) {
+ *     var FooStore = stores.FooStore;
+ *     var BarStore = stores.BarStore;
+ *     var products =
+ *       FooStore.products
+ *         .slice(0, 10)
+ *         .concat(BarStore.products);
+ *     return { products: products };
+ *   }}
+ * >
+ *   children get this.props.products
+ * </AltContainer>
+ *
  * Full docs available at http://goatslacker.github.io/alt/
  */
 var React = require('react/addons')

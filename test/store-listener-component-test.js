@@ -189,6 +189,36 @@ export default {
       assert.instanceOf(span.props.flux, Flux)
     },
 
+    'flux prop works with the transform function'() {
+      const flux = new Flux()
+
+      const TestComponent = React.createClass({
+        render() {
+          return (
+            <AltContainer transform={({ flux }) => { return { flx: flux } }}>
+              <div>
+                <div>
+                  <AltContainer>
+                    <span />
+                  </AltContainer>
+                </div>
+              </div>
+            </AltContainer>
+          )
+        }
+      })
+
+      const WrappedComponent = withAltContext(flux)(TestComponent);
+
+      const node = TestUtils.renderIntoDocument(<WrappedComponent />)
+      const div  = TestUtils.scryRenderedDOMComponentsWithTag(node, 'div')[0]
+      const span = TestUtils.findRenderedDOMComponentWithTag(node, 'span')
+
+      assert(div.props.flx === flux)
+      assert.isUndefined(span.props.flx)
+      assert(span.props.flux === flux)
+    },
+
     'children get the state via props'() {
       const node = TestUtils.renderIntoDocument(
         <AltContainer stores={{ TestStore }}>
