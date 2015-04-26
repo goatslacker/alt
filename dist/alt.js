@@ -997,40 +997,36 @@ function setAppState(instance, data, onStore) {
 }
 
 function snapshot(instance) {
-  for (var _len = arguments.length, storeNames = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    storeNames[_key - 1] = arguments[_key];
-  }
+  var storeNames = arguments[1] === undefined ? [] : arguments[1];
 
   var stores = storeNames.length ? storeNames : Object.keys(instance.stores);
-  return stores.reduce(function (obj, key) {
-    var store = instance.stores[key];
+  return stores.reduce(function (obj, storeHandle) {
+    var storeName = storeHandle.displayName || storeHandle;
+    var store = instance.stores[storeName];
     if (store[LIFECYCLE].snapshot) {
       store[LIFECYCLE].snapshot();
     }
     var customSnapshot = store[LIFECYCLE].serialize && store[LIFECYCLE].serialize();
-    obj[key] = customSnapshot ? customSnapshot : store.getState();
+    obj[storeName] = customSnapshot ? customSnapshot : store.getState();
     return obj;
   }, {});
 }
 
 function saveInitialSnapshot(instance, key) {
-  var state = instance.stores[key][STATE_CONTAINER];
-  var initial = instance.deserialize(instance[INIT_SNAPSHOT]);
-  initial[key] = state;
-  instance[INIT_SNAPSHOT] = instance.serialize(initial);
-  instance[LAST_SNAPSHOT] = instance[INIT_SNAPSHOT];
+  var state = instance.deserialize(instance.serialize(instance.stores[key][STATE_CONTAINER]));
+  instance[INIT_SNAPSHOT][key] = state;
+  instance[LAST_SNAPSHOT][key] = state;
 }
 
-function filterSnapshots(instance, serializedSnapshot, storeNames) {
-  var stores = instance.deserialize(serializedSnapshot);
-  var storesToReset = storeNames.reduce(function (obj, name) {
-    if (!stores[name]) {
-      throw new ReferenceError('' + name + ' is not a valid store');
+function filterSnapshots(instance, state, stores) {
+  return stores.reduce(function (obj, store) {
+    var storeName = store.displayName || store;
+    if (!state[storeName]) {
+      throw new ReferenceError('' + storeName + ' is not a valid store');
     }
-    obj[name] = stores[name];
+    obj[storeName] = state[storeName];
     return obj;
   }, {});
-  return instance.serialize(storesToReset);
 }
 
 },{"../symbols/symbols":9,"object-assign":6}],11:[function(require,module,exports){
@@ -1170,6 +1166,7 @@ var _inherits = function (subClass, superClass) { if (typeof superClass !== 'fun
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
+exports.transformStore = transformStore;
 exports.createStoreFromObject = createStoreFromObject;
 exports.createStoreFromClass = createStoreFromClass;
 
@@ -1215,6 +1212,12 @@ function doSetState(store, storeInstance, state) {
   }
 }
 
+function transformStore(transforms, StoreModel) {
+  return transforms.reduce(function (Store, transform) {
+    return transform(Store);
+  }, StoreModel);
+}
+
 function createStoreFromObject(alt, StoreModel, key) {
   var storeInstance = undefined;
 
@@ -1250,7 +1253,7 @@ function createStoreFromObject(alt, StoreModel, key) {
   }
 
   // create the instance and assign the public methods to the instance
-  storeInstance = _assign2['default'](new _AltStore2['default'](alt, StoreProto, StoreProto.state, StoreModel), StoreProto.publicMethods);
+  storeInstance = _assign2['default'](new _AltStore2['default'](alt, StoreProto, StoreProto.state, StoreModel), StoreProto.publicMethods, { displayName: key });
 
   return storeInstance;
 }
@@ -1302,7 +1305,7 @@ function createStoreFromClass(alt, StoreModel, key) {
 
   var store = new (_bind.apply(Store, [null].concat(argsForClass)))();
 
-  storeInstance = _assign2['default'](new _AltStore2['default'](alt, store, store[alt.config.stateKey] || store[config.stateKey] || null, StoreModel), _getInternalMethods2['default'](StoreModel));
+  storeInstance = _assign2['default'](new _AltStore2['default'](alt, store, store[alt.config.stateKey] || store[config.stateKey] || null, StoreModel), _getInternalMethods2['default'](StoreModel), { displayName: key });
 
   return storeInstance;
 }
@@ -1477,6 +1480,7 @@ var _createStoreConfig2 = _interopRequireWildcard(_createStoreConfig);
 
 var createStoreFromObject = StoreUtils.createStoreFromObject;
 var createStoreFromClass = StoreUtils.createStoreFromClass;
+var transformStore = StoreUtils.transformStore;
 var ACTION_HANDLER = Sym.ACTION_HANDLER;
 var ACTION_KEY = Sym.ACTION_KEY;
 var INIT_SNAPSHOT = Sym.INIT_SNAPSHOT;
@@ -1487,7 +1491,7 @@ var saveInitialSnapshot = StateFunctions.saveInitialSnapshot;
 var setAppState = StateFunctions.setAppState;
 var snapshot = StateFunctions.snapshot;
 
-var GlobalActionsNameRegistry = {};
+var ACTIONS_REGISTRY = _Symbol2['default']();
 
 var Alt = (function () {
   function Alt() {
@@ -1501,7 +1505,10 @@ var Alt = (function () {
     this.dispatcher = config.dispatcher || new _Dispatcher.Dispatcher();
     this.actions = {};
     this.stores = {};
-    this[LAST_SNAPSHOT] = this[INIT_SNAPSHOT] = '{}';
+    this.storeTransforms = config.storeTransforms || [];
+    this[ACTIONS_REGISTRY] = {};
+    this[INIT_SNAPSHOT] = {};
+    this[LAST_SNAPSHOT] = {};
   }
 
   _createClass(Alt, [{
@@ -1518,8 +1525,9 @@ var Alt = (function () {
 
       var key = StoreModel.displayName || '';
       _createStoreConfig2['default'](this.config, StoreModel);
+      var Store = transformStore(this.storeTransforms, StoreModel);
 
-      return typeof StoreModel === 'object' ? createStoreFromObject(this, StoreModel, key) : createStoreFromClass.apply(undefined, [this, StoreModel, key].concat(args));
+      return typeof Store === 'object' ? createStoreFromObject(this, Store, key) : createStoreFromClass.apply(undefined, [this, Store, key].concat(args));
     }
   }, {
     key: 'createStore',
@@ -1530,6 +1538,7 @@ var Alt = (function () {
 
       var key = iden || StoreModel.displayName || StoreModel.name || '';
       _createStoreConfig2['default'](this.config, StoreModel);
+      var Store = transformStore(this.storeTransforms, StoreModel);
 
       if (this.stores[key] || !key) {
         if (this.stores[key]) {
@@ -1541,7 +1550,7 @@ var Alt = (function () {
         key = _uid2['default'](this.stores, key);
       }
 
-      var storeInstance = typeof StoreModel === 'object' ? createStoreFromObject(this, StoreModel, key) : createStoreFromClass.apply(undefined, [this, StoreModel, key].concat(args));
+      var storeInstance = typeof Store === 'object' ? createStoreFromObject(this, Store, key) : createStoreFromClass.apply(undefined, [this, Store, key].concat(args));
 
       this.stores[key] = storeInstance;
       saveInitialSnapshot(this, key);
@@ -1562,8 +1571,8 @@ var Alt = (function () {
   }, {
     key: 'createAction',
     value: function createAction(name, implementation, obj) {
-      var actionId = _uid2['default'](GlobalActionsNameRegistry, name);
-      GlobalActionsNameRegistry[actionId] = 1;
+      var actionId = _uid2['default'](this[ACTIONS_REGISTRY], name);
+      this[ACTIONS_REGISTRY][actionId] = 1;
       var actionName = _Symbol2['default']['for'](actionId);
 
       // Wrap the action so we can provide a dispatch method
@@ -1656,14 +1665,14 @@ var Alt = (function () {
         storeNames[_key9] = arguments[_key9];
       }
 
-      var state = snapshot.apply(undefined, [this].concat(storeNames));
-      this[LAST_SNAPSHOT] = this.serialize(_assign2['default'](this.deserialize(this[LAST_SNAPSHOT]), state));
+      var state = snapshot(this, storeNames);
+      _assign2['default'](this[LAST_SNAPSHOT], state);
       return this.serialize(state);
     }
   }, {
     key: 'rollback',
     value: function rollback() {
-      setAppState(this, this[LAST_SNAPSHOT], function (store) {
+      setAppState(this, this.serialize(this[LAST_SNAPSHOT]), function (store) {
         if (store[LIFECYCLE].rollback) {
           store[LIFECYCLE].rollback();
         }
@@ -1679,7 +1688,7 @@ var Alt = (function () {
 
       var initialSnapshot = storeNames.length ? filterSnapshots(this, this[INIT_SNAPSHOT], storeNames) : this[INIT_SNAPSHOT];
 
-      setAppState(this, initialSnapshot, function (store) {
+      setAppState(this, this.serialize(initialSnapshot), function (store) {
         if (store[LIFECYCLE].init) {
           store[LIFECYCLE].init();
         }
