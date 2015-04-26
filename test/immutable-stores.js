@@ -108,6 +108,7 @@ export default {
         ImmutableStore: { foo: 'bar' }
       }))
 
+      console.log(store.getState())
       assert(store.getState().toJS().foo === 'bar', 'foo has been set through bootstrap')
     },
 
