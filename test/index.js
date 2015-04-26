@@ -497,6 +497,10 @@ const tests = {
     const snapshot = alt.takeSnapshot('MyStore', 'AltSecondStore')
     assert.deepEqual(Object.keys(JSON.parse(snapshot)), ['MyStore', 'AltSecondStore'], 'the snapshot includes specified stores')
     assert.isFalse(Object.keys(JSON.parse(snapshot)).includes('LifeCycleStore'), 'the snapshot does not include unspecified stores')
+
+    const snapshot2 = alt.takeSnapshot(myStore, secondStore)
+    assert.deepEqual(Object.keys(JSON.parse(snapshot2)), ['MyStore', 'AltSecondStore'], 'the snapshot includes specified stores')
+    assert.isFalse(Object.keys(JSON.parse(snapshot2)).includes('LifeCycleStore'), 'the snapshot does not include unspecified stores')
   },
 
   'serializing/deserializing snapshot/bootstrap data'(){
@@ -793,6 +797,10 @@ const tests = {
     alt.recycle('MyStore')
     assert(myStore.getState().name === 'first', 'I can recycle specific stores')
     assert(secondStore.getState().name === 'butterfly', 'and other stores will not be recycled')
+
+    myActions.updateName('butterfly')
+    alt.recycle(myStore)
+    assert(myStore.getState().name === 'first', 'I can recycle specific stores')
   },
 
   'recycling invalid stores'() {

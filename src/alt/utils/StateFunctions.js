@@ -24,14 +24,15 @@ export function setAppState(instance, data, onStore) {
 
 export function snapshot(instance, ...storeNames) {
   const stores = storeNames.length ? storeNames : Object.keys(instance.stores)
-  return stores.reduce((obj, key) => {
-    const store = instance.stores[key]
+  return stores.reduce((obj, storeHandle) => {
+    const storeName = storeHandle.displayName || storeHandle
+    const store = instance.stores[storeName]
     if (store[LIFECYCLE].snapshot) {
       store[LIFECYCLE].snapshot()
     }
     const customSnapshot = store[LIFECYCLE].serialize &&
       store[LIFECYCLE].serialize()
-    obj[key] = customSnapshot ? customSnapshot : store.getState()
+    obj[storeName] = customSnapshot ? customSnapshot : store.getState()
     return obj
   }, {})
 }
