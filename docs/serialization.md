@@ -15,9 +15,9 @@ In the example below, we will show how this technique can be used to `onSerializ
 
 `onSerialize` provides a hook to transform the store data (via an optional return value) to be saved to an alt snapshot. If a return value is provided than it becomes the value of the store in the snapshot. For example, if the store name was `MyStore` and `onSerialize` returned `{firstName: 'Cereal', lastName: 'Eyes'}`, the snapshot would contain the data `{...'MyStore': {'firstName': 'Cereal', 'lastName': 'Eyes'}...}`. If there is no return value, the default, [`MyStore#getState()`](stores.md#storegetstate) is used for the snapshot data.
 
-## DeonSerialize
+## onDeserialize
 
-`onDeserialize` provides a hook to transform snapshot/bootstrap data into a form acceptable to the store for use within the application. The return value of this function becomes the state of the store. If there is no return value, the state of the store from the snapshot is used verbatim. For example, if the `onDeserialize` received the data `{queryParams: 'val=2&val2=23'}`, we might transform the data into `{val: 2, val2: 23}` and return it to set the store data such that `myStore.val === 2` and `myStore.val2 === 23`. DeonSerialize can be useful for converting data from an external source such as a JSON API into the format the store expects.
+`onDeserialize` provides a hook to transform snapshot/bootstrap data into a form acceptable to the store for use within the application. The return value of this function becomes the state of the store. If there is no return value, the state of the store from the snapshot is used verbatim. For example, if the `onDeserialize` received the data `{queryParams: 'val=2&val2=23'}`, we might transform the data into `{val: 2, val2: 23}` and return it to set the store data such that `myStore.val === 2` and `myStore.val2 === 23`. onDeserialize can be useful for converting data from an external source such as a JSON API into the format the store expects.
 
 ## Example
 
