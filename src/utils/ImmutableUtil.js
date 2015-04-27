@@ -23,22 +23,10 @@ function immutable(store) {
 
   StoreModel.config = {
     stateKey: 'state',
-
-    setState(currentState, nextState) {
-      return nextState
-    },
-
-    getState(currentState) {
-      return currentState
-    },
-
-    onSerialize: (state) => {
-      return state.toJS()
-    },
-
-    onDeserialize: (data) => {
-      return Immutable.fromJS(data)
-    }
+    setState: (currentState, nextState) => nextState,
+    getState: (currentState) => currentState,
+    onSerialize: (state) => state.toJS(),
+    onDeserialize: (data) => Immutable.fromJS(data)
   }
 
   return StoreModel
