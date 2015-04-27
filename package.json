@@ -179,6 +179,7 @@
       "no-new-object": [
         2
       ],
+      "no-return-assign": 0,
       "no-sequences": [
         0
       ],

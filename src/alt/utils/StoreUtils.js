@@ -18,11 +18,14 @@ function doSetState(store, storeInstance, state) {
     return
   }
 
+  const { config } = storeInstance.StoreModel
+
   const nextState = typeof state === 'function'
     ? state(storeInstance[STATE_CONTAINER])
     : state
 
-  storeInstance[STATE_CONTAINER] = storeInstance.StoreModel.config.setState(
+  storeInstance[STATE_CONTAINER] = config.setState.call(
+    store,
     storeInstance[STATE_CONTAINER],
     nextState
   )

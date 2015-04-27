@@ -17,23 +17,29 @@ export default {
     'normal stores'() {
       const alt = new Alt()
 
-      const action = alt.generateActions('addY')
+      const action = alt.generateActions('addY', 'addX')
 
       const store1 = alt.createStore(immutable({
         displayName: 'ImmutableStore',
-        bindListeners: { addY: action.addY },
+        bindListeners: { addY: action.addY, addX: action.addX },
         state: Immutable.Map({ x: 1 }),
         addY() {
           this.setState(this.state.set('y', 2))
+        },
+        addX() {
+          this.setState(this.state.set('x', 5))
         }
       }))
 
       const store2 = alt.createStore({
         displayName: 'MutableStore',
-        bindListeners: { addY: action.addY },
+        bindListeners: { addY: action.addY, addX: action.addX },
         state: { x: 1 },
         addY() {
           this.setState({ y: 2 })
+        },
+        addX() {
+          this.setState({ x: 5 })
         }
       })
 
@@ -41,11 +47,81 @@ export default {
       assert(store2.getState().x === 1)
 
       action.addY()
+      assert(store1.getState().toJS().x === 1, 'store1 x was not replaced')
+      assert(store2.getState().x === 1, 'store2 x was not replaced')
+      assert(store1.getState().toJS().y === 2, 'new y exists in store1')
+      assert(store2.getState().y === 2, 'new y exists in store2')
 
-      assert(store1.getState().toJS().x === 1)
-      assert(store2.getState().x === 1, 'store2 state was not replaced')
-      assert(store1.getState().toJS().y === 2)
-      assert(store2.getState().y === 2, 'new state exists')
+      action.addX()
+      assert(store1.getState().toJS().x === 5, 'new x exists in store1')
+      assert(store2.getState().x === 5, 'new x exists in store2')
+
+      assert(store1.getState().toJS().y === 2, 'store1 y was not replaced')
+      assert(store2.getState().y === 2, 'store2 y was not replaced')
+
+      // fire it again to make sure state is not blown away
+      action.addY()
+
+      assert(store1.getState().toJS().x === 5, 'store1 x remains 5')
+      assert(store2.getState().x === 5, 'store2 state remains 5')
+      assert(store1.getState().toJS().y === 2, 'store1 y value has been updated')
+      assert(store2.getState().y === 2, 'store2 y value has been updated')
+    },
+
+    'nested immutable structures'() {
+      const alt = new Alt()
+
+      const actions = alt.generateActions('replaceMap', 'replaceList', 'updateBar')
+
+      @immutable
+      class ImmutableStore {
+        constructor() {
+          this.bindListeners({
+            handleUpdateBar: actions.updateBar,
+            handleReplaceMap: actions.replaceMap,
+            handleReplaceList: actions.replaceList
+          })
+
+          this.state = Immutable.Map({
+            bar: 'hello',
+            list: Immutable.List([]),
+            map: Immutable.Map({})
+          })
+        }
+
+        handleUpdateBar(x) {
+          this.setState(this.state.set('bar', x))
+        }
+
+        handleReplaceMap(x) {
+          this.setState(this.state.set('map', Immutable.fromJS(x).toMap()))
+        }
+
+        handleReplaceList(x) {
+          this.setState(this.state.set('list', Immutable.fromJS(x).toList()))
+        }
+      }
+
+      const store = alt.createStore(ImmutableStore, 'ImmutableStore')
+
+      assert(store.getState().get('bar') === 'hello', 'bar is initially `hello`')
+      assert(store.getState().get('map').count() === 0, 'map is initially zero')
+      assert(store.getState().get('list').count() === 0, 'list is initially zero')
+
+      actions.replaceMap({a: 1, b: 2})
+      assert(store.getState().get('bar') === 'hello', 'bar is still `hello` after replacing map')
+      assert(store.getState().get('list').count() === 0, 'list still has zero items after replacing map')
+      assert(store.getState().get('map').count() === 2, 'map has 2 items in it now after replacing map')
+
+      actions.replaceList([1, 2, 3, 4])
+      assert(store.getState().get('bar') === 'hello', 'bar is still `hello` after replacing list')
+      assert(store.getState().get('list').count() === 4, 'list has 4 items now after replacing list')
+      assert(store.getState().get('map').count() === 2, 'map still has 2 items in it after replacing list')
+
+      actions.updateBar('world')
+      assert(store.getState().get('bar') === 'world', 'bar is now `world` after updating bar')
+      assert(store.getState().get('list').count() === 4, 'list still has 4 items  after updating bar')
+      assert(store.getState().get('map').count() === 2, 'map still has 2 items in it after updating bar')
     },
 
     'using list'() {

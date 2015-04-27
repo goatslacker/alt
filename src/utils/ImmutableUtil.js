@@ -1,32 +1,24 @@
 import Immutable from 'immutable'
 
-function makeImmutableObject(store) {
-  return store
-}
-
-function makeImmutableClass(Store) {
-  class ImmutableClass extends Store {
-    constructor(...args) {
-      super(...args)
-    }
-  }
-
-  ImmutableClass.displayName = Store.displayName || Store.name || ''
-
-  return ImmutableClass
-}
-
-function immutable(store) {
-  const StoreModel = typeof store === 'function'
-    ? makeImmutableClass(store)
-    : makeImmutableObject(store)
-
+function immutable(StoreModel) {
   StoreModel.config = {
     stateKey: 'state',
-    setState: (currentState, nextState) => nextState,
-    getState: (currentState) => currentState,
-    onSerialize: (state) => state.toJS(),
-    onDeserialize: (data) => Immutable.fromJS(data)
+
+    setState(currentState, nextState) {
+      return (this.state = nextState)
+    },
+
+    getState(currentState) {
+      return currentState
+    },
+
+    onSerialize(state) {
+      return state.toJS()
+    },
+
+    onDeserialize(data) {
+      return Immutable.fromJS(data)
+    }
   }
 
   return StoreModel

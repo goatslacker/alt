@@ -1099,6 +1099,7 @@ var AltStore = (function () {
     this[LIFECYCLE] = {};
     this[STATE_CONTAINER] = state || model;
 
+    this._storeName = model._storeName;
     this.boundListeners = model[ALL_LISTENERS];
     this.StoreModel = StoreModel;
     if (typeof this.StoreModel === 'object') {
@@ -1173,7 +1174,7 @@ var AltStore = (function () {
   }, {
     key: 'getState',
     value: function getState() {
-      return this.StoreModel.config.getState(this[STATE_CONTAINER]);
+      return this.StoreModel.config.getState.call(this, this[STATE_CONTAINER]);
     }
   }]);
 
@@ -1544,6 +1545,16 @@ var Alt = (function () {
       });
     }
   }, {
+    key: 'prepare',
+    value: function prepare(store, payload) {
+      var data = {};
+      if (!store._storeName) {
+        throw new ReferenceError('Store provided does not have a name');
+      }
+      data[store._storeName] = payload;
+      return this.serialize(data);
+    }
+  }, {
     key: 'addActions',
 
     // Instance type methods for injecting alt into your application as context
@@ -1666,8 +1677,10 @@ function setAppState(instance, data, onStore) {
   Object.keys(obj).forEach(function (key) {
     var store = instance.stores[key];
     if (store) {
-      if (store[LIFECYCLE].deserialize) {
-        obj[key] = store[LIFECYCLE].deserialize(obj[key]) || obj[key];
+      var config = store.StoreModel.config;
+
+      if (config.onDeserialize) {
+        obj[key] = config.onDeserialize(obj[key]) || obj[key];
       }
       _assign2['default'](store[STATE_CONTAINER], obj[key]);
       onStore(store);
@@ -1682,10 +1695,12 @@ function snapshot(instance) {
   return stores.reduce(function (obj, storeHandle) {
     var storeName = storeHandle.displayName || storeHandle;
     var store = instance.stores[storeName];
+    var config = store.StoreModel.config;
+
     if (store[LIFECYCLE].snapshot) {
       store[LIFECYCLE].snapshot();
     }
-    var customSnapshot = store[LIFECYCLE].serialize && store[LIFECYCLE].serialize();
+    var customSnapshot = config.onSerialize && config.onSerialize(store[STATE_CONTAINER]);
     obj[storeName] = customSnapshot ? customSnapshot : store.getState();
     return obj;
   }, {});
@@ -1882,9 +1897,11 @@ function doSetState(store, storeInstance, state) {
     return;
   }
 
+  var config = storeInstance.StoreModel.config;
+
   var nextState = typeof state === 'function' ? state(storeInstance[STATE_CONTAINER]) : state;
 
-  storeInstance[STATE_CONTAINER] = storeInstance.StoreModel.config.setState(storeInstance[STATE_CONTAINER], nextState);
+  storeInstance[STATE_CONTAINER] = config.setState.call(store, storeInstance[STATE_CONTAINER], nextState);
 
   if (!store.alt.dispatcher.isDispatching()) {
     store.emitChange();
