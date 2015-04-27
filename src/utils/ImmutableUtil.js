@@ -32,11 +32,11 @@ function immutable(store) {
       return currentState
     },
 
-    serializeData: (state) => {
+    onSerialize: (state) => {
       return state.toJS()
     },
 
-    deserializeData: (data) => {
+    onDeserialize: (data) => {
       return Immutable.fromJS(data)
     }
   }
