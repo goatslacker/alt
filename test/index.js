@@ -209,11 +209,13 @@ const secondStore = alt.createStore(SecondStore, 'AltSecondStore')
 
 class LifeCycleStore {
   static config = {
-    serialize: (state) => {
+    serializeData: (state) => {
       state.serialized = true
+      return state;
     },
-    deserialize: (data) => {
+    deserializeData: (data) => {
       data.deserialized = true
+      return data;
     }
   }
 
@@ -291,13 +293,13 @@ class Model {
 
 class InterceptSnapshotStore {
   static config = {
-    serialize: (state) => {
+    serializeData: (state) => {
       return {
         modelData: state.modelData.data,
         anotherVal: state.anotherVal
       }
     },
-    deserialize: (data) => {
+    deserializeData: (data) => {
       const obj = {
         modelData: new Model({x: data.modelData.x, y: data.modelData.y}),
         anotherVal: data.anotherVal

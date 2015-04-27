@@ -14,8 +14,8 @@ export function setAppState(instance, data, onStore) {
     const store = instance.stores[key]
     if (store) {
       const { config } = store.StoreModel
-      if (config.deserialize) {
-        obj[key] = config.deserialize(obj[key]) || obj[key]
+      if (config.deserializeData) {
+        obj[key] = config.deserializeData(obj[key]) || obj[key]
       }
       assign(store[STATE_CONTAINER], obj[key])
       onStore(store)
@@ -32,8 +32,8 @@ export function snapshot(instance, storeNames = []) {
     if (store[LIFECYCLE].snapshot) {
       store[LIFECYCLE].snapshot()
     }
-    const customSnapshot = config.serialize &&
-      config.serialize(store[STATE_CONTAINER])
+    const customSnapshot = config.serializeData &&
+      config.serializeData(store[STATE_CONTAINER])
     obj[storeName] = customSnapshot ? customSnapshot : store.getState()
     return obj
   }, {})
