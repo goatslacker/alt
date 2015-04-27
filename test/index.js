@@ -208,6 +208,17 @@ class SecondStore {
 const secondStore = alt.createStore(SecondStore, 'AltSecondStore')
 
 class LifeCycleStore {
+  static config = {
+    onSerialize: (state) => {
+      state.serialized = true
+      return state;
+    },
+    onDeserialize: (data) => {
+      data.deserialized = true
+      return data;
+    }
+  }
+
   constructor() {
     this.bootstrapped = false
     this.init = false
@@ -231,14 +242,8 @@ class LifeCycleStore {
     this.on('snapshot', () => {
       this.snapshotted = true
     })
-    this.on('serialize', () => {
-      this.serialized = true
-    })
     this.on('rollback', () => {
       this.rollback = true
-    })
-    this.on('deserialize', (data) => {
-      data.deserialized = true
     })
   }
 
@@ -287,27 +292,28 @@ class Model {
 }
 
 class InterceptSnapshotStore {
+  static config = {
+    onSerialize: (state) => {
+      return {
+        modelData: state.modelData.data,
+        anotherVal: state.anotherVal
+      }
+    },
+    onDeserialize: (data) => {
+      const obj = {
+        modelData: new Model({x: data.modelData.x, y: data.modelData.y}),
+        anotherVal: data.anotherVal
+      }
+      return obj
+    }
+  }
+
   constructor() {
     this.bindAction(myActions.updateAnotherVal, this.onUpdateAnotherVal)
 
     this.modelData = new Model({x: 2, y: 3})
     this.anotherVal = 5
     this.privateVal = 10
-
-    this.on('serialize', () => {
-      return {
-        modelData: this.modelData.data,
-        anotherVal: this.anotherVal
-      }
-    })
-
-    this.on('deserialize', (data) => {
-      const obj = {
-        modelData: new Model({x: data.modelData.x, y: data.modelData.y}),
-        anotherVal: data.anotherVal
-      }
-      return obj
-    })
   }
 
   onUpdateAnotherVal(newVal) {

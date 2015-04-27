@@ -1,16 +1,6 @@
 import Immutable from 'immutable'
 
 function makeImmutableObject(store) {
-  store.lifecycle = store.lifecycle || {}
-
-  store.lifecycle.serialize = function () {
-    return this.getInstance().getState().toJS()
-  }
-
-  store.lifecycle.deserialize = function (obj) {
-    return Immutable.fromJS(obj)
-  }
-
   return store
 }
 
@@ -18,14 +8,6 @@ function makeImmutableClass(Store) {
   class ImmutableClass extends Store {
     constructor(...args) {
       super(...args)
-
-      this.on('serialize', function () {
-        return this.getInstance().getState().toJS()
-      })
-
-      this.on('deserialize', function (obj) {
-        return Immutable.fromJS(obj)
-      })
     }
   }
 
@@ -41,14 +23,10 @@ function immutable(store) {
 
   StoreModel.config = {
     stateKey: 'state',
-
-    setState(currentState, nextState) {
-      return nextState
-    },
-
-    getState(currentState) {
-      return currentState
-    }
+    setState: (currentState, nextState) => nextState,
+    getState: (currentState) => currentState,
+    onSerialize: (state) => state.toJS(),
+    onDeserialize: (data) => Immutable.fromJS(data)
   }
 
   return StoreModel
