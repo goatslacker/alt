@@ -1403,7 +1403,7 @@ var Alt = (function () {
   }, {
     key: 'createAction',
     value: function createAction(name, implementation, obj) {
-      var actionId = _uid2['default'](this[ACTIONS_REGISTRY], name);
+      var actionId = _uid2['default'](this[ACTIONS_REGISTRY], 'Alt.' + name);
       this[ACTIONS_REGISTRY][actionId] = 1;
       var actionName = _Symbol2['default']['for'](actionId);
 

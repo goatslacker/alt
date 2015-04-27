@@ -95,7 +95,7 @@ class Alt {
   }
 
   createAction(name, implementation, obj) {
-    const actionId = uid(this[ACTIONS_REGISTRY], name)
+    const actionId = uid(this[ACTIONS_REGISTRY], `Alt.${name}`)
     this[ACTIONS_REGISTRY][actionId] = 1
     const actionName = Symbol.for(actionId)
 
