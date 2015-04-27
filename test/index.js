@@ -211,11 +211,10 @@ class LifeCycleStore {
   static config = {
     onSerialize: (state) => {
       state.serialized = true
-      return state;
+      return state
     },
     onDeserialize: (data) => {
       data.deserialized = true
-      return data;
     }
   }
 
