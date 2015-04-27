@@ -85,6 +85,6 @@ export default class AltStore {
   }
 
   getState() {
-    return this.StoreModel.config.getState(this[STATE_CONTAINER])
+    return this.StoreModel.config.getState.call(this, this[STATE_CONTAINER])
   }
 }
