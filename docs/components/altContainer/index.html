@@ -215,19 +215,28 @@
 
 <p>Will pass the state from <code>BlogStore</code> (<code>BlogStore.getState()</code>) into the <code>&lt;div /&gt;</code> as <code>this.props.BlogPosts</code>. <code>CommentsStore</code> will be available in <code>this.props.Comments</code>, etc.</p>
 
-<p>You can pass in a custom function as the value in order to control what each prop will represent. Say you have multiple getters on a store and only want to pass a subset of the state rather than the whole state.</p>
+<p>You can pass in a custom function as the value in order to control what each prop will represent. Say you have multiple getters on a store and only want to pass a subset of the state rather than the whole state. These functions must return a special object in order to let AltContainer know which store they’ll listen to.</p>
 
 <pre><code class="language-js">&lt;AltContainer
   stores={
     {
       post: function (props) {
-        return BlogStore.getPostFor(props.blogId);
+        return {
+          store: BlogStore,
+          value: BlogStore.getPostFor(props.blogId)
+        };
       },
       comments: function (props) {
-        return CommentsStore.getCommentsFor(props.blogId)
+        return {
+          store: CommentsStore,
+          value: CommentsStore.getCommentsFor(props.blogId)
+        };
       },
       shares: function (props) {
-        return ShareStore.getSharesFor(props.blogId)
+        return {
+          store: ShareStore,
+          value: ShareStore.getSharesFor(props.blogId)
+        };
       }
     }
   }
@@ -235,6 +244,33 @@
   &lt;BlogPost /&gt;
 &lt;/AltContainer&gt;
 </code></pre>
+
+<p>If you pass an Array to <code>stores</code> the stores described will only be listened to.</p>
+
+<pre><code class="language-js">&lt;AltContainer stores={[BlogStore]}&gt;
+  &lt;BlogPost /&gt;
+&lt;/AltContainer&gt;
+</code></pre>
+
+<p>The example above will only listen to BlogStore and re-render BlogPost when state changes in BlogStore. You can combine this with <code>inject</code> for full control of what gets added and listened to.</p>
+
+<h2 id="inject"><code>inject</code></h2>
+
+<p>This allows you to inject anything into your children. Functions defined inside inject are evaluated and their results passed down via props.</p>
+
+<pre><code class="language-js">&lt;AltContainer
+  stores={[BlogStore]}
+  inject={ {
+    className: 'blog-post',
+    blogId: function (props) {
+      return BlogStore.getState().id
+    }
+  } }&gt;
+  &lt;BlogPost /&gt;
+&lt;/AltContainer&gt;
+</code></pre>
+
+<p>The above example will pass the <code>className</code> of blog-post to BlogPost component. BlogPost wil also receive <code>blogId</code> as a prop which will be evaluated whenever BlogStore changes.</p>
 
 <h2 id="store"><code>store</code></h2>
 
@@ -259,7 +295,10 @@
 
 <pre><code class="language-js">
 function blogStoreFetcher(props) {
-  return BlogStore.getPostFor(props.blogId);
+  return {
+    store: BlogStore,
+    value: BlogStore.getPostFor(props.blogId)
+  };
 }
 
 &lt;AltContainer store={blogStoreFetcher}&gt;
@@ -287,7 +326,7 @@ function blogStoreFetcher(props) {
 
 <pre><code class="language-js">&lt;AltContainer
   store={BlogStore}
-  actions=
+  actions={ { MyActions: BlogActions } }
 /&gt;
   &lt;BlogPost className="my-awesome-post" /&gt;
 &lt;/AltContainer&gt;
@@ -354,6 +393,23 @@ function blogStoreFetcher(props) {
 
 <p>Header, Body, and Footer will have the <code>flux</code> context passed down.</p>
 
+<h2 id="transform"><code>transform</code></h2>
+
+<p>If you don’t like the way <code>AltContainer</code> passing the props, you can give it a <code>transform</code> function.</p>
+
+<pre><code class="language-js">&lt;AltContainer
+  stores=
+  actions=
+  transform={({ BlogStore, BlogActions }) =&gt; {
+    var posts = BlogStore.posts.slice(0, 42);
+    var makePost =
+      text =&gt; BlogActions.makePost(`${text} So long, and thanks for all the fish.`);
+    return { posts, makePost };
+  }}&gt;
+  &lt;Foobar /&gt;
+&lt;/AltContainer&gt;
+</code></pre>
+
 <h2 id="shouldcomponentupdate"><code>shouldComponentUpdate</code></h2>
 
 <p><code>shouldComponentUpdate</code> prop allows you to fine-tune your performance needs for AltContainer only rendering when absolutely necessary.</p>
@@ -368,6 +424,15 @@ function blogStoreFetcher(props) {
 </code></pre>
 
 <p>In this example, Header, Body, and Footer will not re-render because we’re returning false.</p>
+
+<h2 id="component"><code>component</code></h2>
+
+<p>With this prop you can define which component you want to render within your AltContainer. If you have a single component and you’re using required propTypes then this is a legitimate way of rendering the components without getting a warning about invalid propTypes from React due to cloneWithProps.</p>
+
+<pre><code class="language-js">&lt;AltContainer component={Body} /&gt;
+</code></pre>
+
+<p>This example renders Body inside of the AltContainer.</p>
 
           </div>
         </div>

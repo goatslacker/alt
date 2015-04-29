@@ -6,11 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Getting Started</title>
+  <title>Alt and ES5</title>
   <meta name="description" content="A library for managing data within JavaScript applications. Alt is a pure flux implementation that is small, terse, well tested, extremely flexible, and forward thinking.
 ">
 
-  <link rel="canonical" href="http://alt.js.org/guide/">
+  <link rel="canonical" href="http://alt.js.org/guides/es5/">
   <link rel="alternate" type="application/rss+xml" title="Alt" href="http://alt.js.org/feed.xml" />
 
   <link type="text/css" rel="stylesheet" href="http://alt.js.org/assets/bootstrap-navbar.css" />
@@ -122,23 +122,7 @@
   </li>
   
   <li>
-    <a href="http://alt.js.org/guide/actions/">Creating Actions</a>
-  </li>
-  
-  <li>
-    <a href="http://alt.js.org/guide/store/">Creating a Store</a>
-  </li>
-  
-  <li>
-    <a href="http://alt.js.org/guide/view/">Using your View</a>
-  </li>
-  
-  <li>
-    <a href="http://alt.js.org/guide/async/">Fetching Data</a>
-  </li>
-  
-  <li>
-    <a href="http://alt.js.org/guide/wait-for/">Data Dependencies</a>
+    <a href="http://alt.js.org/guides/es5/">Using Alt with ES5</a>
   </li>
   
 </ul>
@@ -146,55 +130,177 @@
         </div>
         <div class="col c10">
           <div class="sp-horiz-md">
-            <h1 id="getting-started">Getting Started</h1>
+            <h1 id="plain-javascript">Plain JavaScript</h1>
 
-<p>Alt is a library that facilitates the managing of state within your JavaScript applications. It is modeled after flux.</p>
+<p>While alt examples encourage ES6 and alt was built with ES6 in mind it is perfectly valid to use plain old JavaScript instead. This guide will focus on a few examples of how you can use alt without the new ES6 hotness.</p>
 
-<h2 id="what-is-flux">What is flux?</h2>
+<h2 id="creating-actions">Creating Actions</h2>
 
-<p>Flux is an application architecture for building complex user interfaces. It eschews MVC in favor of unidirectional data flow. What this means is that data enters through a single place (your actions) and then flow outward through their state manager (the store) and finally onto the view. The view can then restart the flow by calling other actions in response to user input.</p>
+<p>There are quite a few ways to create actions. If they don’t process any data and just dispatch a single argument through you can generate them based off of strings. You can create them using constructors and prototypes, or you can use a plain old JS object.</p>
 
-<h2 id="setup">Setup</h2>
-
-<p>For this tutorial I’ll be assuming you’re familiar with <a href="https://facebook.github.io/react/">React</a>, <a href="http://www.commonjs.org/">CommonJS</a>, <a href="https://es5.github.io/">ES5 JavaScript</a>, and a subset of <a href="https://people.mozilla.org/~jorendorff/es6-draft.html">ES6</a> specifically the one that works with react’s transform. I’ll also assume you’re on a modern browser or a node environment. Alt is not restricted to only React or CommonJS, you may download a browser build of alt <a href="https://raw.githubusercontent.com/goatslacker/alt/master/dist/alt-browser.js">here</a>.</p>
-
-<h2 id="installing">Installing</h2>
-
-<p>If you’re using a package manager like npm or bower then go ahead and install alt.</p>
-
-<pre><code class="language-bash">npm install alt
+<pre><code class="language-js">var foodActions = alt.generateActions('addItem');
 </code></pre>
 
-<h2 id="folder-structure">Folder structure</h2>
+<p>which is the equivalent to</p>
 
-<p>A typical folder structure would look like this</p>
-
-<pre><code class="language-txt">your_project
-|--actions/
-|  |--MyActions.js
-|--stores/
-|  |--MyStore.js
-|--components/
-|  |--MyComponent.jsx
-|--alt.js
-|--app.js
+<pre><code class="language-js">var foodActions = alt.createActions(function () {
+  this.addItem = function (item) {
+    this.dispatch(item);
+  };
+});
 </code></pre>
 
-<h2 id="creating-your-first-alt">Creating your first alt</h2>
+<p>or</p>
 
-<p>For this guide we’ll be creating a very simple application which has a list of travel destinations and allows you to favorite which ones you’re interested in. Let’s get started.</p>
-
-<p>We’ll be creating an instance of alt, this instantiates a <a href="http://facebook.github.io/flux/docs/dispatcher.html#content">Flux dispatcher</a> for you and gives you methods to create your actions and stores. We’ll be referring back to this file throughout this guide.</p>
-
-<p>In the root of your project, create a new file called <code>alt.js</code>.</p>
-
-<pre><code class="language-js">var Alt = require('alt');
-var alt = new Alt();
-
-module.exports = alt;
+<pre><code class="language-js">var foodActions = alt.createActions({
+  addItem: function (item) {
+    this.dispatch(item);
+  }
+});
 </code></pre>
 
-<p><a href="/guides/actions">Continue to next step…</a></p>
+<h2 id="creating-stores">Creating Stores</h2>
+
+<p>You can use constructors and prototypes to create a store, or use an object.</p>
+
+<pre><code class="language-js">function FoodStore() {
+  this.foods = [];
+
+  this.bindListeners({
+    addItem: foodActions.addItem
+  });
+}
+
+FoodStore.prototype.addItem = function (item) {
+  this.foods.push(item);
+};
+
+FoodStore.displayName = 'FoodStore';
+
+var foodStore = alt.createStore(FoodStore);
+</code></pre>
+
+<p>which can also be written as an Object:</p>
+
+<pre><code class="language-js">var FoodStore = alt.createStore({
+  displayName: 'FoodStore',
+
+  bindListeners: {
+    addItem: foodActions.addItem
+  },
+
+  state: {
+    foods: []
+  },
+
+  addItem: function (item) {
+    var foods = this.state.foods;
+    foods.push(item);
+    this.setState({
+      foods: foods
+    });
+  }
+});
+</code></pre>
+
+<p>The interesting thing about the Object pattern is that you can use the old ES3 Module pattern to create your stores:</p>
+
+<pre><code class="language-js">function FoodStore(initialFood) {
+  var foods = [];
+  for (var i = 0; i &lt; initialFood.length; i += 1) {
+    if (initialFood !== 'banana') {
+      foods.push(initialFood);
+    }
+  }
+
+  return {
+    displayName: 'FoodStore',
+
+    bindListeners: {
+      addItem: foodActions.addItem
+    },
+
+    state: {
+      foods: foods
+    },
+
+    addItem: function (item) {
+      var foods = this.state.foods;
+      foods.push(item);
+      this.setState({
+        foods: foods
+      });
+    }
+  };
+}
+
+var foodStore = alt.createStore(
+  FoodStore(['banana', 'strawberry', 'mango', 'orange'])
+);
+</code></pre>
+
+<h2 id="instances">Instances</h2>
+
+<p>You can even create instances of alt if you prefer that over singletons. You would use JavaScript’s prototypal inheritance to achieve this.</p>
+
+<pre><code class="language-js">// Actions
+var FoodActionsObject = {
+  addItem: function (item) {
+    this.dispatch(item);
+  }
+};
+
+// Creating a store, notice how we inject the actions
+function FoodStore(FoodActions) {
+  return {
+    state: {
+      foods: []
+    },
+
+    bindListeners: {
+      addItem: FoodActions.addItem
+    },
+
+    addItem: function (item) {
+      var foods = this.state.foods;
+      foods.push(item);
+      this.setState({
+        foods: foods
+      });
+    }
+  };
+}
+
+// The flux class
+function Flux() {
+  // super()
+  Alt.apply(this, arguments);
+
+  this.addActions('FoodActions', FoodActionsObject);
+  this.addStore('FoodStore', FoodStore(this.getActions('FoodActions')));
+}
+
+// ES5 based inheritance
+Flux.prototype = Object.create(Alt.prototype, {
+  constructor: {
+    value: Flux,
+    enumerable: false,
+    writable: true,
+    configurable: true
+  }
+});
+
+Flux.__proto__ = Alt
+
+// using it
+var flux = new Flux();
+
+// use flux like you normally would
+flux.getActions('FoodActions').addItem('celery');
+console.log(
+  flux.getStore('FoodStore').getState()
+);
+</code></pre>
 
           </div>
         </div>

@@ -172,17 +172,17 @@
           <div class="sp-horiz-md">
             <h1 id="serialization">Serialization</h1>
 
-<p>The <a href="/docs/lifecycleListeners#serialize">serialize</a> and <a href="/docs/lifecycleListeners#deserialize">deserialize</a> lifecycle listener methods can be utilized separately or together to transform the store data being saved in a snapshot or the snapshot/bootstrap data being set to a store. Though they do not have to be used together, you can picture the parity between the two methods. You can transform the shape of your store data created in the snapshot with <code>serialize</code>, which might be to get your data in a format ready to be consumed by other services and use <code>deserialize</code> to transform this data back into the format that your store recognizes.</p>
+<p>The <a href="/docs/createStore#onSerialize">onSerialize</a> and <a href="/docs/createStore#onDeserialize">onDeserialize</a> store config methods can be utilized separately or together to transform the store data being saved in a snapshot or the snapshot/bootstrap data being set to a store. Though they do not have to be used together, you can picture the parity between the two methods. You can transform the shape of your store data created in the snapshot with <code>onSerialize</code>, which might be to get your data in a format ready to be consumed by other services and use <code>onDeserialize</code> to transform this data back into the format that your store recognizes.</p>
 
-<p>In the example below, we will show how this technique can be used to <code>serialize</code> complex model data being used by the store into a simpler structure for the store’s snapshot, and repopulate our store models with the simple structure from the bootstrap/snapshot data with <code>deserialize</code>.</p>
+<p>In the example below, we will show how this technique can be used to <code>onSerialize</code> complex model data being used by the store into a simpler structure for the store’s snapshot, and repopulate our store models with the simple structure from the bootstrap/snapshot data with <code>onDeserialize</code>.</p>
 
-<h2 id="serialize">Serialize</h2>
+<h2 id="onserialize">onSerialize</h2>
 
-<p><code>serialize</code> provides a hook to transform the store data (via an optional return value) to be saved to an alt snapshot. If a return value is provided than it becomes the value of the store in the snapshot. For example, if the store name was <code>MyStore</code> and <code>serialize</code> returned <code>{firstName: 'Cereal', lastName: 'Eyes'}</code>, the snapshot would contain the data <code>{...'MyStore': {'firstName': 'Cereal', 'lastName': 'Eyes'}...}</code>. If there is no return value, the default, <a href="/docs/stores#storegetstate"><code>MyStore#getState()</code></a> is used for the snapshot data.</p>
+<p><code>onSerialize</code> provides a hook to transform the store data (via an optional return value) to be saved to an alt snapshot. If a return value is provided than it becomes the value of the store in the snapshot. For example, if the store name was <code>MyStore</code> and <code>onSerialize</code> returned <code>{firstName: 'Cereal', lastName: 'Eyes'}</code>, the snapshot would contain the data <code>{...'MyStore': {'firstName': 'Cereal', 'lastName': 'Eyes'}...}</code>. If there is no return value, the default, <a href="/docs/stores#storegetstate"><code>MyStore#getState()</code></a> is used for the snapshot data.</p>
 
-<h2 id="deserialize">Deserialize</h2>
+<h2 id="ondeserialize">onDeserialize</h2>
 
-<p><code>deserialize</code> provides a hook to transform snapshot/bootstrap data into a form acceptable to the store for use within the application. The return value of this function becomes the state of the store. If there is no return value, the state of the store from the snapshot is used verbatim. For example, if the <code>deserialize</code> received the data <code>{queryParams: 'val=2&amp;val2=23'}</code>, we might transform the data into <code>{val: 2, val2: 23}</code> and return it to set the store data such that <code>myStore.val === 2</code> and <code>myStore.val2 === 23</code>. Deserialize can be useful for converting data from an external source such as a JSON API into the format the store expects.</p>
+<p><code>onDeserialize</code> provides a hook to transform snapshot/bootstrap data into a form acceptable to the store for use within the application. The return value of this function becomes the state of the store. If there is no return value, the state of the store from the snapshot is used verbatim. For example, if the <code>onDeserialize</code> received the data <code>{queryParams: 'val=2&amp;val2=23'}</code>, we might transform the data into <code>{val: 2, val2: 23}</code> and return it to set the store data such that <code>myStore.val === 2</code> and <code>myStore.val2 === 23</code>. onDeserialize can be useful for converting data from an external source such as a JSON API into the format the store expects.</p>
 
 <h2 id="example">Example</h2>
 
@@ -213,6 +213,27 @@ class MyModel {
 
 // our store
 class MyStore {
+  static config = {
+    onSerialize: (state) =&gt; {
+      return {
+        // provides product and sum data from the model getters in addition to x and y
+        // this data would not be included by the default serialization (getState)
+        myModel: state.myModel.data,
+        // change property name in snapshot
+        newValKeyName: state.anotherVal
+      }
+    },
+    onDeserialize: (data) =&gt; {
+      const modifiedData = {
+        // need to take POJO and move data into the model our store expects
+        myModel: new MyModel({x: data.myModel.x, y: data.myModel.y}),
+        // change the property name back to what our store expects
+        anotherVal: data.newValKeyName
+      }
+      return modifiedData
+    }
+  }
+
   constructor() {
 
     // our model is being used by the store
@@ -221,26 +242,6 @@ class MyStore {
     this.anotherVal = 5
     // we don't want to save this data in the snapshot
     this.semiPrivateVal = 10
-
-    this.on('serialize', () =&gt; {
-      return {
-        // provides product and sum data from the model getters in addition to x and y
-        // this data would not be included by the default serialization (getState)
-        myModel: this.myModel.data,
-        // change property name in snapshot
-        newValKeyName: this.anotherVal
-      }
-    })
-
-    this.on('deserialize', (data) =&gt; {
-      const modifiedData = {
-        // need to take POJO and move data into the model our store expects
-        myModel: new MyModel({x: data.myModel.x, y: data.myModel.y}),
-        // change the property name back to what our store expects
-        anotherVal: data.newValKeyName
-      }
-      return modifiedData
-    })
   }
 
   static getMyModelData() {

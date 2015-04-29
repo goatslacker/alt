@@ -173,16 +173,23 @@
             <h1 id="takesnapshot">takeSnapshot</h1>
 
 <blockquote>
-  <p>(…storeNames: ?string): string</p>
+  <table>
+    <tbody>
+      <tr>
+        <td>(…storeNames: ?string</td>
+        <td>AltStore): string</td>
+      </tr>
+    </tbody>
+  </table>
 </blockquote>
 
-<p>Take snapshot provides you with the entire application’s state serialized to JSON, by default, but you may also pass in store names to take a snapshot of a subset of the application’s state.</p>
+<p>Take snapshot provides you with the entire application’s state serialized to JSON, by default, but you may also pass in stores to take a snapshot of a subset of the application’s state.</p>
 
 <p>Snapshots are a core component of alt. The idea is that at any given point in time you can <code>takeSnapshot</code> and have your entire application’s state<br />
 serialized for persistence, transferring, logging, or debugging.</p>
 
 <pre><code class="language-js">var snapshot = alt.takeSnapshot();
-var partialSnapshot = alt.takeSnapshot('Store1', 'Store3');
+var partialSnapshot = alt.takeSnapshot(Store1, Store3);
 </code></pre>
 
           </div>

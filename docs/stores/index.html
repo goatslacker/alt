@@ -190,10 +190,10 @@
 <h2 id="storelisten">Store#listen</h2>
 
 <blockquote>
-  <p>(handler: function): undefined</p>
+  <p>(handler: function): function</p>
 </blockquote>
 
-<p>The listen method takes a function which will be called when the store emits a change. A change event is emitted automatically whenever a dispatch completes unless you return <code>false</code> from the action handler method defined in the StoreModel.</p>
+<p>The listen method takes a function which will be called when the store emits a change. A change event is emitted automatically whenever a dispatch completes unless you return <code>false</code> from the action handler method defined in the StoreModel. The <code>listen</code> method returns a function that you can use to unsubscribe to store updates.</p>
 
 <pre><code class="language-js">MyStore.listen(function (state) {
   assert.deepEqual(MyStore.getState(), state);

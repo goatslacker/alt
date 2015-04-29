@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Alt and ImmutableJS</title>
+  <meta name="description" content="A library for managing data within JavaScript applications. Alt is a pure flux implementation that is small, terse, well tested, extremely flexible, and forward thinking.
+">
+
+  <link rel="canonical" href="http://alt.js.org/docs/utils/immutable">
+  <link rel="alternate" type="application/rss+xml" title="Alt" href="http://alt.js.org/feed.xml" />
+
+  <link type="text/css" rel="stylesheet" href="http://alt.js.org/assets/bootstrap-navbar.css" />
+  <link type="text/css" rel="stylesheet" href="http://alt.js.org/assets/lotus.min.css" />
+  <link type="text/css" rel="stylesheet" href="http://alt.js.org/assets/prism.min.css" />
+  <link type="text/css" rel="stylesheet" href="http://alt.js.org/assets/styles.css" />
+</head>
+
+
+  <body>
+
+    
+<nav class="navbar navbar-default sp-horiz-lg">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="http://alt.js.org/"><img src="http://alt.js.org/assets/alt.png" alt="Alt" width="40" /></a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <a href="http://alt.js.org/guide/">Getting Started</a>
+        </li>
+        <li class="dropdown">
+          <a href='#' class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">API Documentation <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li>
+              <a href="http://alt.js.org/docs/">Welcome</a>
+            </li>
+            
+            <li>
+              <a href="http://alt.js.org/docs/createActions">Creating Actions</a>
+            </li>
+            
+            <li>
+              <a href="http://alt.js.org/docs/actions">Actions</a>
+            </li>
+            
+            <li>
+              <a href="http://alt.js.org/docs/createStore">Creating Stores</a>
+            </li>
+            
+            <li>
+              <a href="http://alt.js.org/docs/stores">Stores</a>
+            </li>
+            
+            <li>
+              <a href="http://alt.js.org/docs/lifecycleListeners">Lifecycle Listeners</a>
+            </li>
+            
+            <li>
+              <a href="http://alt.js.org/docs/bootstrap">Bootstrap</a>
+            </li>
+            
+            <li>
+              <a href="http://alt.js.org/docs/takeSnapshot">Take Snapshot</a>
+            </li>
+            
+            <li>
+              <a href="http://alt.js.org/docs/flush">Flush</a>
+            </li>
+            
+            <li>
+              <a href="http://alt.js.org/docs/recycle">Recycle</a>
+            </li>
+            
+            <li>
+              <a href="http://alt.js.org/docs/rollback">Rollback</a>
+            </li>
+            
+            <li>
+              <a href="http://alt.js.org/docs/altInstances">Alt Instances</a>
+            </li>
+            
+            <li>
+              <a href="http://alt.js.org/docs/components/altContainer">AltContainer</a>
+            </li>
+            
+          </ul>
+        </li>
+        <li>
+          <a href="http://alt.js.org/blog/">Blog</a>
+        </li>
+        <li>
+          <a href="https://gitter.im/goatslacker/alt">Support</a>
+        </li>
+        <li>
+          <a href="https://github.com/goatslacker/alt">GitHub</a>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+
+    <div class="main sp-vert-md sp-horiz-lg">
+      <div class="row">
+        <div class="col c2">
+          <ul class="sidenav">
+  
+  <li>
+    <a href="http://alt.js.org/docs/createActions">Creating Actions</a>
+  </li>
+  
+  <li>
+    <a href="http://alt.js.org/docs/actions">Actions</a>
+  </li>
+  
+  <li>
+    <a href="http://alt.js.org/docs/createStore">Creating Stores</a>
+  </li>
+  
+  <li>
+    <a href="http://alt.js.org/docs/stores">Stores</a>
+  </li>
+  
+  <li>
+    <a href="http://alt.js.org/docs/lifecycleListeners">Lifecycle Listeners</a>
+  </li>
+  
+  <li>
+    <a href="http://alt.js.org/docs/bootstrap">Bootstrap</a>
+  </li>
+  
+  <li>
+    <a href="http://alt.js.org/docs/takeSnapshot">Take Snapshot</a>
+  </li>
+  
+  <li>
+    <a href="http://alt.js.org/docs/flush">Flush</a>
+  </li>
+  
+  <li>
+    <a href="http://alt.js.org/docs/recycle">Recycle</a>
+  </li>
+  
+  <li>
+    <a href="http://alt.js.org/docs/rollback">Rollback</a>
+  </li>
+  
+  <li>
+    <a href="http://alt.js.org/docs/altInstances">Alt Instances</a>
+  </li>
+  
+  <li>
+    <a href="http://alt.js.org/docs/components/altContainer">AltContainer</a>
+  </li>
+  
+</ul>
+
+        </div>
+        <div class="col c10">
+          <div class="sp-horiz-md">
+            <h1 id="using-immutable-data-structures">Using Immutable Data Structures</h1>
+
+<p>With React’s virtual DOM, immutable data structures make a lot of sense to make diffing more efficient, and immutable data structures have the additional benefit of preventing views from updating store data in a Flux architecture. For reasons like this, it makes a lot of sense to incorporate immutable data structures into your alt app, and where they come into play primarily is in your stores.</p>
+
+<p>We will focus on Facebook’s <a href="http://facebook.github.io/immutable-js/">Immutable</a> library.</p>
+
+<h2 id="alt-3s-immutable">Alt &lt;3s Immutable</h2>
+
+<p>Alt has first-class support for immutable data structures via the ImmutableUtil.</p>
+
+<p>Getting started is simple, you’ll require the utility and pass your pre-wrapped stores to it.</p>
+
+<pre><code class="language-js">var alt = new Alt();
+var immutable = require('alt/utils/ImmutableUtil');
+</code></pre>
+
+<p>If you’re using babel with ES7 Stage 1 <a href="https://github.com/wycats/javascript-decorators">decorator</a> support then this is sweet.</p>
+
+<pre><code class="language-js">@immutable
+class TodoStore {
+  static displayName = 'TodoStore'
+
+  constructor() {
+    this.state = {
+      todos: Immutable.Map({})
+    };
+  }
+}
+
+alt.createStore(TodoStore);
+</code></pre>
+
+<p>If you don’t wish to use ES7 decorators then no problem, they’re just sugar for function calls. You can just pass your store into the immutable function.</p>
+
+<pre><code class="language-js">function TodoStore() {
+  this.state = {
+    todos: Immutable.Map({})
+  };
+}
+TodoStore.displayName = 'TodoStore';
+
+alt.createStore(immutable(TodoStore));
+</code></pre>
+
+<p>A few things to note about immutable stores about this approach:</p>
+
+<ul>
+  <li>You use <code>this.state</code> to create your state rather than assigning directly to instance properties.</li>
+  <li>You specify your own Immutable data structure you wish to use. In this example we’re using Map.</li>
+</ul>
+
+<p>Using your ImmutableStore is a bit different from using a regular store:</p>
+
+<pre><code class="language-js">function TodoStore() {
+  this.state = {
+    todos: Immutable.Map({})
+  };
+
+  this.bindListeners({
+    addTodo: TodoActions.addTodo
+  });
+}
+
+TodoStore.properties.addTodo = function (todo) {
+  var id = String(Math.random());
+  this.setState(this.state.set(id, todo));
+};
+
+TodoStore.displayName = 'TodoStore';
+
+var todoStore = alt.createStore(immutable(TodoStore));
+</code></pre>
+
+<ul>
+  <li>You’ll be using <code>setState</code> in order to modify state within the store.</li>
+  <li>You can access the immutable object by using the accessor of <code>this.state</code>. In this example we’re using Map’s <code>set</code> method to set a new key and value.</li>
+</ul>
+
+<pre><code class="language-js">todoStore.getState() // Immutable.Map
+</code></pre>
+
+<p><code>getState</code> will return the Immutable object. This means if you’re using React you can use something like <code>===</code> in <code>shouldComponentUpdate</code> to get the performance benefits.</p>
+
+<p>If you wish to convert your structure to a JS object/from a JS object you can use Immutable’s <code>toJS()</code> and <code>fromJS()</code> methods.</p>
+
+<p>Last but not least, snapshots and bootstrapping just works when you’re using this util. The data structures are serialized and deserialized automatically.</p>
+
+<h2 id="manually-using-immutablejs-in-your-stores">Manually using ImmutableJS in your Stores</h2>
+
+<h4 id="record"><code>Record</code></h4>
+
+<p>One of the easiest ways to start getting some of the benefits of immutable is to take advantage of Immutable’s <a href="http://facebook.github.io/immutable-js/docs/#/Record"><code>Record</code></a> types. This method will result in the smallest changes for existing projects. You can read more about them on Facebook’s docs, but the best thing about Records is that they enable you to access values the same way you would from a normal JS object (<code>object.prop</code>). This means no changes to the view code using the immutable data and our changes only occur in store methods that return data to the view.</p>
+
+<p>Here is an example of how a Record can be used:</p>
+
+<pre><code class="language-js">// MyStore.js
+import {Record} from 'immutable';
+
+class MyStore {
+  constructor() {
+    this.data = {
+      prop1: 1,
+      prop2: 2
+    };
+  }
+
+  getImmutState() {
+    var ObjectRecord = Record(this.getState());
+    return new ObjectRecord();
+  }
+}
+
+// MyComponent.js
+import {Component} from 'react';
+import MyStore from 'stores/MyStore';
+
+class MyComponent extends Component {
+  render() {
+    var storeData = MyStore.getImmutState();
+    return (
+      &lt;div&gt;Prop1: {storeData.prop1}&lt;/div&gt;
+    );
+  }
+}
+</code></pre>
+
+<h4 id="fromjs"><code>fromJS</code></h4>
+
+<p>Immutable has a nice helper, <a href="http://facebook.github.io/immutable-js/docs/#/fromJS"><code>fromJS</code></a> that allows us to convert JS object/arrays to immutable <a href="http://facebook.github.io/immutable-js/docs/#/Map"><code>Map</code>s</a> and <a href="http://facebook.github.io/immutable-js/docs/#/List"><code>List</code>s</a>. This is an easy way to convert plain JS store data to immutable data structures before sending to the view. Unlike the “Record method” described above, you must remember to use getters to access data within these immutable objects.</p>
+
+<p>Here is an example of using <code>fromJS</code> to return immutable data:</p>
+
+<pre><code class="language-js">// MyStore.js
+import Immutable from 'immutable';
+
+class MyStore {
+  constructor() {
+    this.data = {
+      prop1: 1,
+      prop2: 2
+    };
+  }
+
+  getImmutState() {
+    return Immutable.fromJS(this.getState());
+  }
+}
+
+// MyComponent.js
+import {Component} from 'react';
+import MyStore from 'stores/MyStore';
+
+class MyComponent extends Component {
+  render() {
+    var storeData = MyStore.getImmutState().get('data');
+    return (
+      &lt;div&gt;Prop1: {storeData.get('prop1')}&lt;/div&gt;
+    );
+  }
+}
+</code></pre>
+
+<h3 id="using-immutable-data-in-storeseverywhere">Using Immutable Data in Stores/Everywhere</h3>
+
+<p>You can also use Immutable’s data structures in your stores or throughout your app. You just need to remember that you need to use getters to access the data in your views or wherever you are reading it.</p>
+
+<p>Immutable provides many nice data structures like <a href="http://facebook.github.io/immutable-js/docs/#/Map"><code>Map</code></a>, <a href="http://facebook.github.io/immutable-js/docs/#/List"><code>List</code></a>, <a href="http://facebook.github.io/immutable-js/docs/#/Set"><code>Set</code></a>, etc.</p>
+
+<p>Here is a basic example of using immutable data structures in your stores, rather than just returning immutable data structures to the view from them.</p>
+
+<pre><code class="language-js">// MyStore.js
+import {Map} from 'immutable';
+
+class MyStore {
+  constructor() {
+    this.data = new Map({
+      prop1: 1,
+      prop2: 2
+    });
+  }
+
+  onUpdateProp1(newProp1) {
+    this.data = this.data.set('prop1', newProp1);
+  }
+}
+
+// MyComponent.js
+import {Component} from 'react';
+import MyStore from 'stores/MyStore';
+
+class MyComponent extends Component {
+  render() {
+    var storeData = MyStore.getState().get('data');
+    return (
+      &lt;div&gt;Prop1: {storeData.get('prop1')}&lt;/div&gt;
+    );
+  }
+}
+</code></pre>
+
+<h3 id="serializingdeserializing-immutable-data">Serializing/Deserializing Immutable Data</h3>
+
+<p>If you are using immutable data and plan on taking advantage of alt’s <a href="/docs/../takeSnapshot">snapshot</a> and <a href="/docs/../bootstrap">bootstrap</a> capabilities you must ensure that <a href="/docs/../lifecycleListeners#serialize">serialize</a> and <a href="/docs/../lifecycleListeners#deserialize">deserialize</a> handle the immutable data.</p>
+
+<p>Serialize returns the data from the store to be used in a snapshot so the immutable getters will need to be used to return a plain JS object to be serialized.</p>
+
+<p>Deserialize takes bootstrap data and uses it to set the state of the store. This means in order for your store to function as you initially set it up, the bootstrapped data must be converted back to immutable data structures.</p>
+
+<p>Example serialize/deserialize with immutable data structures:</p>
+
+<pre><code class="language-js">// MyStore.js
+import Immutable, {Map} from 'immutable';
+
+class MyStore {
+  constructor() {
+
+    this.on('serialize', () =&gt; {
+      return {
+        data: this.data.toJS()
+      };
+    });
+
+    this.on('deserialize', (data) =&gt; {
+      return Immutable.fromJS({
+        prop1: data.prop1,
+        prop2: data.prop2
+      });
+    });
+
+    this.data = new Map({
+      prop1: 1,
+      prop2: 2
+    });
+  }
+}
+</code></pre>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/prism/0.0.1/prism.min.js"></script>
+<script type="text/javascript">
+  // Alias for javascript so syntax highlighting works fine
+  Prism.languages.js = Prism.languages.javascript;
+</script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.2.min.js" ></script>
+<script type="text/javascript" src="http://alt.js.org/assets/bootstrap-navbar.min.js"></script>
+
+<footer class="sp-vert-md">
+  <a href="https://www.npmjs.com/package/alt"><img src="https://img.shields.io/npm/v/alt.png?style=flat-square" alt="npm version" /></a>
+  <a href="https://gitter.im/goatslacker/alt"><img src="https://img.shields.io/badge/gitter-join%20chat-ff7d29.svg?style=flat-square" alt="Gitter Chat" /></a>
+</footer>
+
+
+  </body>
+
+</html>

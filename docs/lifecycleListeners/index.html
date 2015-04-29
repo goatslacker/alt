@@ -200,35 +200,6 @@
 }
 </code></pre>
 
-<h2 id="serialize">Serialize</h2>
-
-<p><code>serialize</code> is also called before the store’s state is serialized. You may optionally return an object, which will be used directly as the snapshot data for the store. If you do not return anything, the default, <a href="/docs/stores#storegetstate"><code>MyStore#getState()</code></a> is used for the snapshot data.</p>
-
-<pre><code class="language-js">class Store {
-  constructor() {
-    this.on('serialize', () =&gt; {
-      // do something here
-      // optional return of data to be used in snapshot
-      // return mySnapshotData
-    });
-  }
-}
-</code></pre>
-
-<h2 id="deserialize">Deserialize</h2>
-
-<p><code>deserialize</code> is called before the store’s state is deserialized. This occurs whenever the store’s state is being set to an existing snapshot/bootstrap data. Here you can perform any final tasks you need to before the snapshot/bootstrap data is set on the store such as mapping the data to model objects, or converting data an external source like a JSON API into a format the store expects. Deserialize takes in a parameter that is an object of snapshot/bootstrap data and must return the data to be set to the store’s state. If nothing is returned, then the data from the snapshot is set to the store’s state. See the <a href="/docs/serialization">serialization</a> for an example.</p>
-
-<pre><code class="language-js">class Store {
-  constructor() {
-    this.on('deserialize', (data) =&gt; {
-      // do something here
-      return modifiedData
-    });
-  }
-}
-</code></pre>
-
 <h2 id="init">Init</h2>
 
 <p><code>init</code> is called when the store is initialized as well as whenever a store is recycled.</p>
@@ -261,9 +232,9 @@
 
 <pre><code class="language-js">class Store {
   constructor() {
-    this.on('error', (err, actionName, payloadData, currentState) =&gt; {
-      if (actionName === MyActions.fire) {
-        logError(err, payloadData);
+    this.on('error', (err, payload, currentState) =&gt; {
+      if (payload.action === MyActions.fire) {
+        logError(err, payload.data);
       }
     });
 
@@ -277,6 +248,32 @@
   }
 }
 </code></pre>
+
+<h2 id="beforeeach">beforeEach</h2>
+
+<blockquote>
+  <p>(payload: object, state: object): undefined</p>
+</blockquote>
+
+<p>This method gets called, if defined, before the payload hits the action. You can use this method to <code>waitFor</code> other stores, save previous state, or perform any bookeeping. The state passed in to <code>beforeEach</code> is the current state pre-action.</p>
+
+<p><code>payload</code> is an object which contains the keys <code>action</code> for the action name and <code>data</code> for the data that you’re dispatching; <code>state</code> is the current store’s state.</p>
+
+<h2 id="aftereach">afterEach</h2>
+
+<blockquote>
+  <p>(payload: object, state: object): undefined</p>
+</blockquote>
+
+<p>This method gets called, if defined, after the payload hits the action and the store emits a change. You can use this method for bookeeping and as a companion to <code>beforeEach</code>. The state passed in to <code>afterEach</code> is the current state post-action.</p>
+
+<h2 id="unlisten">unlisten</h2>
+
+<blockquote>
+  <p>(): undefined</p>
+</blockquote>
+
+<p><code>unlisten</code> is called when you call unlisten on your store subscription. You can use this method to perform any teardown type tasks.</p>
 
           </div>
         </div>
