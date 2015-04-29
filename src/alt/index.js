@@ -1,36 +1,33 @@
-import AltAction from './AltAction'
-import Symbol from 'es-symbol'
 import assign from 'object-assign'
-import formatAsConstant from './utils/formatAsConstant'
-import getInternalMethods from './utils/getInternalMethods'
-import uid from './utils/uid'
 import { Dispatcher } from 'flux'
-import { warn } from './utils/warnings'
-import * as StoreUtils from './utils/StoreUtils'
-import * as Sym from './symbols/symbols'
-import * as StateFunctions from './utils/StateFunctions'
-import createStoreConfig from './utils/createStoreConfig'
 
-const {
-  createStoreFromObject,
-  createStoreFromClass,
-  transformStore
-} = StoreUtils
-const {
-  ACTION_HANDLER,
-  ACTION_KEY,
-  INIT_SNAPSHOT,
-  LAST_SNAPSHOT,
-  LIFECYCLE
-} = Sym
-const {
+import makeAction from './utils/makeAction'
+import {
   filterSnapshots,
   saveInitialSnapshot,
   setAppState,
   snapshot
-} = StateFunctions
-
-const ACTIONS_REGISTRY = Symbol()
+} from './utils/StateFunctions'
+import {
+  createStoreConfig,
+  createStoreFromObject,
+  createStoreFromClass,
+  transformStore
+} from './utils/StoreUtils'
+import {
+  ACTION_KEY,
+  ACTIONS_REGISTRY,
+  INIT_SNAPSHOT,
+  LAST_SNAPSHOT,
+  LIFECYCLE
+} from './symbols/symbols'
+import {
+  dispatchIdentity,
+  formatAsConstant,
+  getInternalMethods,
+  uid,
+  warn
+} from './utils/AltUtils'
 
 class Alt {
   constructor(config = {}) {
@@ -38,7 +35,7 @@ class Alt {
     this.serialize = config.serialize || JSON.stringify
     this.deserialize = config.deserialize || JSON.parse
     this.dispatcher = config.dispatcher || new Dispatcher()
-    this.actions = {}
+    this.actions = { global: {} }
     this.stores = {}
     this.storeTransforms = config.storeTransforms || []
     this[ACTIONS_REGISTRY] = {}
@@ -89,32 +86,23 @@ class Alt {
   }
 
   generateActions(...actionNames) {
-    return this.createActions(function () {
-      this.generateActions(...actionNames)
-    })
+    const actions = { name: 'global' }
+    return this.createActions(actionNames.reduce((obj, action) => {
+      obj[action] = dispatchIdentity
+      return obj
+    }, actions))
   }
 
   createAction(name, implementation, obj) {
-    const actionId = uid(this[ACTIONS_REGISTRY], `Alt.${name}`)
-    this[ACTIONS_REGISTRY][actionId] = 1
-    const actionName = Symbol.for(actionId)
-
-    // Wrap the action so we can provide a dispatch method
-    const newAction = new AltAction(this, actionName, implementation, obj)
-
-    const action = newAction[ACTION_HANDLER]
-    action.defer = (...args) => {
-      setTimeout(() => {
-        newAction[ACTION_HANDLER].apply(null, args)
-      })
-    }
-    action[ACTION_KEY] = actionName
-    return action
+    return makeAction(this, 'global', name, implementation, obj)
   }
 
   createActions(ActionsClass, exportObj = {}, ...argsForConstructor) {
     const actions = {}
-    const key = ActionsClass.displayName || ActionsClass.name || ''
+    const key = uid(
+      this[ACTIONS_REGISTRY],
+      ActionsClass.displayName || ActionsClass.name || 'Unknown'
+    )
 
     if (typeof ActionsClass === 'function') {
       assign(actions, getInternalMethods(ActionsClass.prototype, true))
@@ -125,10 +113,7 @@ class Alt {
 
         generateActions(...actionNames) {
           actionNames.forEach((actionName) => {
-            // This is a function so we can later bind this to AltAction
-            actions[actionName] = function (x, ...a) {
-              this.dispatch(a.length ? [x].concat(a) : x)
-            }
+            actions[actionName] = dispatchIdentity
           })
         }
       }
@@ -138,10 +123,26 @@ class Alt {
       assign(actions, ActionsClass)
     }
 
+    this.actions[key] = this.actions[key] || {}
+
     return Object.keys(actions).reduce((obj, action) => {
-      obj[action] = this.createAction(`${key}#${action}`, actions[action], obj)
+      if (typeof actions[action] !== 'function') {
+        return obj
+      }
+
+      // create the action
+      obj[action] = makeAction(
+        this,
+        key,
+        action,
+        actions[action],
+        obj
+      )
+
+      // generate a constant
       const constant = formatAsConstant(action)
       obj[constant] = obj[action][ACTION_KEY]
+
       return obj
     }, exportObj)
   }
