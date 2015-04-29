@@ -1,6 +1,6 @@
-import uid from './uid'
 import * as Sym from '../symbols/symbols'
 import AltAction from '../AltAction'
+import { uid } from './AltUtils'
 
 const { ACTION_KEY, ACTION_HANDLER, ACTIONS_REGISTRY } = Sym
 

@@ -1,39 +1,33 @@
-import Symbol from 'es-symbol'
 import assign from 'object-assign'
-import formatAsConstant from './utils/formatAsConstant'
-import getInternalMethods from './utils/getInternalMethods'
-import makeAction from './utils/makeAction'
-import uid from './utils/uid'
 import { Dispatcher } from 'flux'
-import { warn } from './utils/warnings'
-import * as StoreUtils from './utils/StoreUtils'
-import * as Sym from './symbols/symbols'
-import * as StateFunctions from './utils/StateFunctions'
-import createStoreConfig from './utils/createStoreConfig'
 
-const {
+import makeAction from './utils/makeAction'
+import {
+  filterSnapshots,
+  saveInitialSnapshot,
+  setAppState,
+  snapshot
+} from './utils/StateFunctions'
+import {
+  createStoreConfig,
   createStoreFromObject,
   createStoreFromClass,
   transformStore
-} = StoreUtils
-const {
-  ACTION_HANDLER,
+} from './utils/StoreUtils'
+import {
   ACTION_KEY,
   ACTIONS_REGISTRY,
   INIT_SNAPSHOT,
   LAST_SNAPSHOT,
   LIFECYCLE
-} = Sym
-const {
-  filterSnapshots,
-  saveInitialSnapshot,
-  setAppState,
-  snapshot
-} = StateFunctions
-
-function dispatchIdentity(x, ...a) {
-  this.dispatch(a.length ? [x].concat(a) : x)
-}
+} from './symbols/symbols'
+import {
+  dispatchIdentity,
+  formatAsConstant,
+  getInternalMethods,
+  uid,
+  warn
+} from './utils/AltUtils'
 
 class Alt {
   constructor(config = {}) {

@@ -1,17 +1,18 @@
 import assign from 'object-assign'
-import AltStore from '../AltStore'
-import * as StoreMixins from './StoreMixins'
-import getInternalMethods from './getInternalMethods'
-import * as Sym from '../symbols/symbols'
 
-const { StoreMixinListeners, StoreMixinEssentials } = StoreMixins
-const {
+import AltStore from '../AltStore'
+import { getInternalMethods } from './AltUtils'
+import {
+  StoreMixinEssentials,
+  StoreMixinListeners
+} from './StoreMixins'
+import {
   ALL_LISTENERS,
   LIFECYCLE,
   LISTENERS,
   PUBLIC_METHODS,
   STATE_CONTAINER
-} = Sym
+} from '../symbols/symbols'
 
 function doSetState(store, storeInstance, state) {
   if (!state) {
@@ -33,6 +34,18 @@ function doSetState(store, storeInstance, state) {
   if (!store.alt.dispatcher.isDispatching()) {
     store.emitChange()
   }
+}
+
+export function createStoreConfig(globalConfig, StoreModel) {
+  StoreModel.config = assign({
+    getState(state) {
+      return Object.keys(state).reduce((obj, key) => {
+        obj[key] = state[key]
+        return obj
+      }, {})
+    },
+    setState: assign
+  }, globalConfig, StoreModel.config)
 }
 
 export function transformStore(transforms, StoreModel) {
