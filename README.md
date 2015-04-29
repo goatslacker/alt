@@ -380,8 +380,6 @@ class LocationStore {
 var locationStore = alt.createStore(LocationStore)
 ```
 
-Constants are automagically generated for you so feel free to use them to bind your actions or use the method itself, whatever reads better in your opinion.
-
 #### Listening To Multiple Actions
 
 ```js
