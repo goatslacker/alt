@@ -1,4 +1,5 @@
 import * as Sym from '../symbols/symbols'
+import Symbol from 'es-symbol'
 import AltAction from '../AltAction'
 import { uid } from './AltUtils'
 

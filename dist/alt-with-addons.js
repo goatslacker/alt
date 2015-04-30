@@ -1735,9 +1735,15 @@ function filterSnapshots(instance, state, stores) {
 },{"../symbols/symbols":15,"object-assign":10}],18:[function(require,module,exports){
 'use strict';
 
+var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
+
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
+
+var _Symbol = require('es-symbol');
+
+var _Symbol2 = _interopRequireWildcard(_Symbol);
 
 var _ACTION_KEY$ALL_LISTENERS$LIFECYCLE$LISTENERS$PUBLIC_METHODS = require('../symbols/symbols');
 
@@ -1798,7 +1804,7 @@ var StoreMixinListeners = {
     // You can pass in the constant or the function itself
     var key = symbol[_ACTION_KEY$ALL_LISTENERS$LIFECYCLE$LISTENERS$PUBLIC_METHODS.ACTION_KEY] ? symbol[_ACTION_KEY$ALL_LISTENERS$LIFECYCLE$LISTENERS$PUBLIC_METHODS.ACTION_KEY] : symbol;
     this[_ACTION_KEY$ALL_LISTENERS$LIFECYCLE$LISTENERS$PUBLIC_METHODS.LISTENERS][key] = handler.bind(this);
-    this[_ACTION_KEY$ALL_LISTENERS$LIFECYCLE$LISTENERS$PUBLIC_METHODS.ALL_LISTENERS].push(Symbol.keyFor(key));
+    this[_ACTION_KEY$ALL_LISTENERS$LIFECYCLE$LISTENERS$PUBLIC_METHODS.ALL_LISTENERS].push(_Symbol2['default'].keyFor(key));
   },
 
   bindActions: function bindActions(actions) {
@@ -1853,7 +1859,7 @@ var StoreMixinListeners = {
 };
 exports.StoreMixinListeners = StoreMixinListeners;
 
-},{"../symbols/symbols":15}],19:[function(require,module,exports){
+},{"../symbols/symbols":15,"es-symbol":5}],19:[function(require,module,exports){
 'use strict';
 
 var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };
@@ -2028,6 +2034,10 @@ var _import = require('../symbols/symbols');
 
 var Sym = _interopRequireWildcard(_import);
 
+var _Symbol = require('es-symbol');
+
+var _Symbol2 = _interopRequireWildcard(_Symbol);
+
 var _AltAction = require('../AltAction');
 
 var _AltAction2 = _interopRequireWildcard(_AltAction);
@@ -2042,7 +2052,7 @@ function makeAction(alt, namespace, name, implementation, obj) {
   // make sure each Symbol is unique
   var actionId = _uid.uid(alt[ACTIONS_REGISTRY], '' + namespace + '.' + name);
   alt[ACTIONS_REGISTRY][actionId] = 1;
-  var actionSymbol = Symbol['for']('alt/' + actionId);
+  var actionSymbol = _Symbol2['default']['for']('alt/' + actionId);
 
   // Wrap the action so we can provide a dispatch method
   var newAction = new _AltAction2['default'](alt, actionSymbol, implementation, obj);
@@ -2070,7 +2080,7 @@ function makeAction(alt, namespace, name, implementation, obj) {
 
 module.exports = exports['default'];
 
-},{"../AltAction":11,"../symbols/symbols":15,"./AltUtils":16}],21:[function(require,module,exports){
+},{"../AltAction":11,"../symbols/symbols":15,"./AltUtils":16,"es-symbol":5}],21:[function(require,module,exports){
 'use strict';
 
 var _interopRequireWildcard = function (obj) { return obj && obj.__esModule ? obj : { 'default': obj }; };

@@ -1,3 +1,4 @@
+import Symbol from 'es-symbol'
 import {
   ACTION_KEY,
   ALL_LISTENERS,
