@@ -73,7 +73,7 @@ var AltManagerMixin = {
     if (!this.action) {
       props.alt.addActions(actionName, Action)
       this.action = props.alt.getActions(actionName)
-      this.store = props.alt.createStore(Store)
+      this.store = props.alt.createStore(Store, null, props.alt)
       if (this.onNewAlt) {
         this.onNewAlt(this.store.getState(), props)
       }
