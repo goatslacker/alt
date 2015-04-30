@@ -49,15 +49,6 @@ module.exports = {
     libraryTarget: 'umd',
     library: 'alt'
   },
-  externals: [
-    {
-      "react": {
-        root: "React",
-        commonjs2: "react",
-        commonjs: "react",
-        amd: "react"
-      }
-    }
-  ],
+  externals: [ /^react(\/.*)?$/ ],
   plugins: getPlugins(production)
 };
