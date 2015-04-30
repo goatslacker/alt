@@ -744,7 +744,7 @@ const tests = {
       onUpdateName(name1, name2) { }
     }
 
-    assert.throw(() => alt.createStore(MethodsAreUnary1), TypeError, /Action handler in store .* was defined with 2 parameters/)
+    assert.throw(() => alt.createStore(MethodsAreUnary1), TypeError, /Action handler in store .* was defined with two parameters/)
 
     class MethodsAreUnary2 {
       constructor() {
@@ -754,7 +754,7 @@ const tests = {
       onUpdateName(name1, name2) { }
     }
 
-    assert.throw(() => alt.createStore(MethodsAreUnary2), TypeError, /Action handler in store .* was defined with 2 parameters/)
+    assert.throw(() => alt.createStore(MethodsAreUnary2), TypeError, /Action handler in store .* was defined with two parameters/)
   },
 
   'cancelling emit'() {
