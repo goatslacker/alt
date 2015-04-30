@@ -1,18 +1,9 @@
 import assign from 'object-assign'
 
-import AltStore from '../AltStore'
-import { getInternalMethods } from './AltUtils'
-import {
-  StoreMixinEssentials,
-  StoreMixinListeners
-} from './StoreMixins'
-import {
-  ALL_LISTENERS,
-  LIFECYCLE,
-  LISTENERS,
-  PUBLIC_METHODS,
-  STATE_CONTAINER
-} from '../symbols/symbols'
+import * as Sym from '../symbols/symbols'
+import * as utils from '../utils/AltUtils'
+import AltStore from './AltStore'
+import StoreMixin from './StoreMixin'
 
 function doSetState(store, storeInstance, state) {
   if (!state) {
@@ -22,18 +13,31 @@ function doSetState(store, storeInstance, state) {
   const { config } = storeInstance.StoreModel
 
   const nextState = typeof state === 'function'
-    ? state(storeInstance[STATE_CONTAINER])
+    ? state(storeInstance[Sym.STATE_CONTAINER])
     : state
 
-  storeInstance[STATE_CONTAINER] = config.setState.call(
+  storeInstance[Sym.STATE_CONTAINER] = config.setState.call(
     store,
-    storeInstance[STATE_CONTAINER],
+    storeInstance[Sym.STATE_CONTAINER],
     nextState
   )
 
   if (!store.alt.dispatcher.isDispatching()) {
     store.emitChange()
   }
+}
+
+function createPrototype(proto, alt, key, extras) {
+  proto[Sym.ALL_LISTENERS] = []
+  proto[Sym.LIFECYCLE] = {}
+  proto[Sym.LISTENERS] = {}
+  proto[Sym.PUBLIC_METHODS] = {}
+
+  return assign(proto, StoreMixin, {
+    _storeName: key,
+    alt: alt,
+    dispatcher: alt.dispatcher
+  }, extras)
 }
 
 export function createStoreConfig(globalConfig, StoreModel) {
@@ -55,27 +59,19 @@ export function transformStore(transforms, StoreModel) {
 export function createStoreFromObject(alt, StoreModel, key) {
   let storeInstance
 
-  const StoreProto = {}
-  StoreProto[ALL_LISTENERS] = []
-  StoreProto[LIFECYCLE] = {}
-  StoreProto[LISTENERS] = {}
-
-  assign(StoreProto, {
-    _storeName: key,
-    alt,
-    dispatcher: alt.dispatcher,
+  const StoreProto = createPrototype({}, alt, key, assign({
     getInstance() {
       return storeInstance
     },
     setState(nextState) {
       doSetState(this, storeInstance, nextState)
     }
-  }, StoreMixinListeners, StoreMixinEssentials, StoreModel)
+  }, StoreModel))
 
   // bind the store listeners
   /* istanbul ignore else */
   if (StoreProto.bindListeners) {
-    StoreMixinListeners.bindListeners.call(
+    StoreMixin.bindListeners.call(
       StoreProto,
       StoreProto.bindListeners
     )
@@ -85,7 +81,7 @@ export function createStoreFromObject(alt, StoreModel, key) {
   /* istanbul ignore else */
   if (StoreProto.lifecycle) {
     Object.keys(StoreProto.lifecycle).forEach((event) => {
-      StoreMixinListeners.on.call(
+      StoreMixin.on.call(
         StoreProto,
         event,
         StoreProto.lifecycle[event]
@@ -116,10 +112,7 @@ export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
     }
   }
 
-  assign(Store.prototype, StoreMixinListeners, StoreMixinEssentials, {
-    _storeName: key,
-    alt: alt,
-    dispatcher: alt.dispatcher,
+  createPrototype(Store.prototype, alt, key, {
     getInstance() {
       return storeInstance
     },
@@ -127,11 +120,6 @@ export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
       doSetState(this, storeInstance, nextState)
     }
   })
-
-  Store.prototype[ALL_LISTENERS] = []
-  Store.prototype[LIFECYCLE] = {}
-  Store.prototype[LISTENERS] = {}
-  Store.prototype[PUBLIC_METHODS] = {}
 
   const store = new Store(...argsForClass)
 
@@ -142,7 +130,7 @@ export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
       store[alt.config.stateKey] || store[config.stateKey] || null,
       StoreModel
     ),
-    getInternalMethods(StoreModel),
+    utils.getInternalMethods(StoreModel),
     { displayName: key }
   )
 
