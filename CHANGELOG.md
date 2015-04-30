@@ -2,12 +2,6 @@
 
 ## 0.16.1
 
-### Fixed
-
-- Missing Symbol imports [commit](https://github.com/goatslacker/alt/commit/6c98652)
-
-## 0.16.0
-
 This release is a pretty big one and it also marks Alt's first breaking changes.
 
 ### Breaking Changes
