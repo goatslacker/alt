@@ -68,7 +68,7 @@ module.exports = React.createClass({
 
   componentDidMount: function() {
     // we load San Francisco, CA on page load as an example
-    AppActions.addLocation('San Francisco, CA');
+    AppActions.addLocation('San Francisco, CA, USA');
   },
 
   _onClickSubmit: function(e) {
