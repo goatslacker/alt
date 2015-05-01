@@ -72,7 +72,7 @@ end
 def clean_and_copy_guide
   system 'rm -rf guides/'
   system 'cp -r ../guides .'
-  format_markdown_links('guides')
+  format_markdown_links('guide')
 end
 
 def format_markdown_links(dir)
