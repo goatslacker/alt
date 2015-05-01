@@ -15,7 +15,7 @@ Flux is an application architecture for building complex user interfaces. It esc
 
 ## Setup
 
-For this tutorial I'll be assuming you're familiar with [React](https://facebook.github.io/react/), [CommonJS](http://www.commonjs.org/), [ES5 JavaScript](https://es5.github.io/), and a subset of [ES6](https://people.mozilla.org/~jorendorff/es6-draft.html) specifically the one that works with react's transform. I'll also assume you're on a modern browser or a node environment. Alt is not restricted to only React or CommonJS, you may download a browser build of alt [here](https://raw.githubusercontent.com/goatslacker/alt/master/dist/alt-browser.js).
+For this tutorial I'll be assuming you're familiar with [React](https://facebook.github.io/react/), [CommonJS](http://www.commonjs.org/), [ES5 JavaScript](https://es5.github.io/), and a subset of [ES6](https://people.mozilla.org/~jorendorff/es6-draft.html) specifically the one that works with react's transform. I'll also assume you're on a modern browser or a node environment. Alt is not restricted to only React or CommonJS, you may download a browser build of alt [here](https://cdn.rawgit.com/goatslacker/alt/master/dist/alt.js).
 
 ## Installing
 
