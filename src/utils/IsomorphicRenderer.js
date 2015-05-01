@@ -29,7 +29,9 @@ import Iso from 'iso'
 import React from 'react'
 
 export default function IsomorphicRenderer(alt, App) {
+  /*eslint-disable */
   if (typeof window === 'undefined') {
+    /*eslint-enable */
     return () => {
       const app = React.renderToString(React.createElement(App))
       const markup = Iso.render(app, alt.takeSnapshot())

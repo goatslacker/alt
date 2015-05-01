@@ -13,13 +13,14 @@ export const StoreMixinEssentials = {
       throw new ReferenceError('Dispatch tokens not provided')
     }
 
+    let sourcesArray = sources
     if (arguments.length === 1) {
-      sources = Array.isArray(sources) ? sources : [sources]
+      sourcesArray = Array.isArray(sourcesArray) ? sourcesArray : [sourcesArray]
     } else {
-      sources = Array.prototype.slice.call(arguments)
+      sourcesArray = Array.prototype.slice.call(arguments)
     }
 
-    let tokens = sources.map((source) => {
+    let tokens = sourcesArray.map((source) => {
       return source.dispatchToken || source
     })
 
