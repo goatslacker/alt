@@ -220,4 +220,5 @@ class Alt {
   }
 }
 
+export { Dispatcher }
 export default Alt
