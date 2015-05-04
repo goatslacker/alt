@@ -749,11 +749,12 @@ var ACTION_HANDLER = Sym.ACTION_HANDLER;
 var ACTION_UID = Sym.ACTION_UID;
 
 var AltAction = (function () {
-  function AltAction(alt, name, action, actions) {
+  function AltAction(alt, name, action, actions, actionDetails) {
     _classCallCheck(this, AltAction);
 
     this[ACTION_UID] = name;
     this[ACTION_HANDLER] = action.bind(this);
+    this.actionDetails = actionDetails;
     this.actions = actions;
     this.alt = alt;
   }
@@ -761,7 +762,7 @@ var AltAction = (function () {
   _createClass(AltAction, [{
     key: 'dispatch',
     value: function dispatch(data) {
-      this.alt.dispatch(this[ACTION_UID], data);
+      this.alt.dispatch(this[ACTION_UID], data, this.actionDetails);
     }
   }]);
 
@@ -1118,13 +1119,14 @@ var StoreMixinEssentials = {
       throw new ReferenceError('Dispatch tokens not provided');
     }
 
+    var sourcesArray = sources;
     if (arguments.length === 1) {
-      sources = Array.isArray(sources) ? sources : [sources];
+      sourcesArray = Array.isArray(sourcesArray) ? sourcesArray : [sourcesArray];
     } else {
-      sources = Array.prototype.slice.call(arguments);
+      sourcesArray = Array.prototype.slice.call(arguments);
     }
 
-    var tokens = sources.map(function (source) {
+    var tokens = sourcesArray.map(function (source) {
       return source.dispatchToken || source;
     });
 
@@ -1419,8 +1421,15 @@ function makeAction(alt, namespace, name, implementation, obj) {
   alt[ACTIONS_REGISTRY][actionId] = 1;
   var actionSymbol = _Symbol2['default']['for']('alt/' + actionId);
 
+  var data = {
+    namespace: namespace,
+    name: name,
+    id: actionId,
+    symbol: actionSymbol
+  };
+
   // Wrap the action so we can provide a dispatch method
-  var newAction = new _AltAction2['default'](alt, actionSymbol, implementation, obj);
+  var newAction = new _AltAction2['default'](alt, actionSymbol, implementation, obj, data);
 
   // the action itself
   var action = newAction[ACTION_HANDLER];
@@ -1434,6 +1443,7 @@ function makeAction(alt, namespace, name, implementation, obj) {
     });
   };
   action[ACTION_KEY] = actionSymbol;
+  action.data = data;
 
   // ensure each reference is unique in the namespace
   var container = alt.actions[namespace];
@@ -1502,8 +1512,8 @@ var Alt = (function () {
 
   _createClass(Alt, [{
     key: 'dispatch',
-    value: function dispatch(action, data) {
-      this.dispatcher.dispatch({ action: action, data: data });
+    value: function dispatch(action, data, details) {
+      this.dispatcher.dispatch({ action: action, data: data, details: details });
     }
   }, {
     key: 'createUnsavedStore',
