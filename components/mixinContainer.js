@@ -25,12 +25,12 @@ function mixinContainer(React) {
       flux: React.PropTypes.object
     },
 
-    getChildContext: function() {
+    getChildContext: function () {
       var flux = this.props.flux || this.context.flux
       return flux ? { flux: flux } : {}
     },
 
-    getInitialState: function() {
+    getInitialState: function () {
       if (this.props.stores && this.props.store) {
         throw new ReferenceError('Cannot define both store and stores')
       }
@@ -38,21 +38,21 @@ function mixinContainer(React) {
       return this.reduceState(this.props)
     },
 
-    componentWillReceiveProps: function(nextProps) {
+    componentWillReceiveProps: function (nextProps) {
       this.destroySubscriptions()
       this.setState(this.reduceState(nextProps))
       this.registerStores(nextProps)
     },
 
-    componentDidMount: function() {
+    componentDidMount: function () {
       this.registerStores(this.props)
     },
 
-    componentWillUnmount: function() {
+    componentWillUnmount: function () {
       this.destroySubscriptions()
     },
 
-    registerStores: function(props) {
+    registerStores: function (props) {
       var stores = props.stores
       Subscribe.create(this)
 
@@ -60,22 +60,22 @@ function mixinContainer(React) {
         this.addSubscription(props.store)
       } else if (props.stores) {
         if (Array.isArray(stores)) {
-          stores.forEach(function(store) {
+          stores.forEach(function (store) {
             this.addSubscription(store)
           }, this)
         } else {
-          Object.keys(stores).forEach(function(formatter) {
+          Object.keys(stores).forEach(function (formatter) {
             this.addSubscription(stores[formatter])
           }, this)
         }
       }
     },
 
-    destroySubscriptions: function() {
+    destroySubscriptions: function () {
       Subscribe.destroy(this)
     },
 
-    getStateFromStores: function(props) {
+    getStateFromStores: function (props) {
       var stores = props.stores
       if (props.store) {
         return getStateFromStore(props.store, props)
@@ -83,7 +83,7 @@ function mixinContainer(React) {
         // If you pass in an array of stores then we are just listening to them
         // it should be an object then the state is added to the key specified
         if (!Array.isArray(stores)) {
-          return Object.keys(stores).reduce(function(obj, key) {
+          return Object.keys(stores).reduce(function (obj, key) {
             obj[key] = getStateFromStore(stores[key], props)
             return obj
           }, {})
@@ -93,7 +93,7 @@ function mixinContainer(React) {
       }
     },
 
-    getStateFromActions: function(props) {
+    getStateFromActions: function (props) {
       if (props.actions) {
         return getStateFromKey(props.actions, props)
       } else {
@@ -101,9 +101,9 @@ function mixinContainer(React) {
       }
     },
 
-    getInjected: function(props) {
+    getInjected: function (props) {
       if (props.inject) {
-        return Object.keys(props.inject).reduce(function(obj, key) {
+        return Object.keys(props.inject).reduce(function (obj, key) {
           obj[key] = getStateFromKey(props.inject[key], props)
           return obj
         }, {})
@@ -112,7 +112,7 @@ function mixinContainer(React) {
       }
     },
 
-    reduceState: function(props) {
+    reduceState: function (props) {
       return assign(
         {},
         this.getStateFromStores(props),
@@ -121,7 +121,7 @@ function mixinContainer(React) {
       )
     },
 
-    addSubscription: function(store) {
+    addSubscription: function (store) {
       if (typeof store === 'function') {
         Subscribe.add(this, store(this.props).store, this.altSetState)
       } else {
@@ -129,11 +129,11 @@ function mixinContainer(React) {
       }
     },
 
-    altSetState: function() {
+    altSetState: function () {
       this.setState(this.reduceState(this.props))
     },
 
-    getProps: function() {
+    getProps: function () {
       var flux = this.props.flux || this.context.flux
       var transform = typeof this.props.transform === 'function'
         ? this.props.transform
@@ -144,13 +144,13 @@ function mixinContainer(React) {
       ))
     },
 
-    shouldComponentUpdate: function() {
+    shouldComponentUpdate: function () {
       return this.props.shouldComponentUpdate
         ? this.props.shouldComponentUpdate(this.getProps())
         : true
     },
 
-    altRender: function(Node) {
+    altRender: function (Node) {
       var children = this.props.children
       // Custom rendering function
       if (typeof this.props.render === 'function') {
@@ -161,7 +161,7 @@ function mixinContainer(React) {
 
       // Does not wrap child in a div if we don't have to.
       if (Array.isArray(children)) {
-        return React.createElement(Node, null, children.map(function(child, i) {
+        return React.createElement(Node, null, children.map(function (child, i) {
           return cloneWithProps(child, assign({ key: i }, this.getProps()))
         }, this))
       } else if (children) {

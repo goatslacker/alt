@@ -10,7 +10,7 @@ var assign = require('object-assign')
 var AltNativeContainer = React.createClass(assign({
   displayName: 'AltNativeContainer',
 
-  render: function() {
+  render: function () {
     return this.altRender(React.View)
   }
 }, mixinContainer(React)))

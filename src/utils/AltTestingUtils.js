@@ -1,5 +1,5 @@
 import assign from 'object-assign'
-const noop = function() { }
+const noop = function () { }
 
 const AltTestingUtils = {
   createStoreSpy: (alt) => {

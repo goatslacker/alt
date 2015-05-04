@@ -40,7 +40,7 @@ function DispatcherRecorder(alt, maxEvents = Infinity) {
  * in progress.
  * record(): boolean
  */
-DispatcherRecorder.prototype.record = function() {
+DispatcherRecorder.prototype.record = function () {
   if (this.dispatchToken) {
     return false
   }
@@ -58,7 +58,7 @@ DispatcherRecorder.prototype.record = function() {
  * Stops the recording in progress.
  * stop(): undefined
  */
-DispatcherRecorder.prototype.stop = function() {
+DispatcherRecorder.prototype.stop = function () {
   this.alt.dispatcher.unregister(this.dispatchToken)
   this.dispatchToken = null
 }
@@ -67,7 +67,7 @@ DispatcherRecorder.prototype.stop = function() {
  * Clear all events from memory.
  * clear(): undefined
  */
-DispatcherRecorder.prototype.clear = function() {
+DispatcherRecorder.prototype.clear = function () {
   this.events = []
 }
 
@@ -75,7 +75,7 @@ DispatcherRecorder.prototype.clear = function() {
  * (As|S)ynchronously replay all events that were recorded.
  * replay(replayTime: ?number, done: ?function): undefined
  */
-DispatcherRecorder.prototype.replay = function(replayTime, done) {
+DispatcherRecorder.prototype.replay = function (replayTime, done) {
   const alt = this.alt
 
   if (replayTime === void 0) {
@@ -93,7 +93,7 @@ DispatcherRecorder.prototype.replay = function(replayTime, done) {
     }
   }
 
-  let next = done || function() { }
+  let next = done || function () { }
   let i = this.events.length - 1
   while (i >= 0) {
     let event = this.events[i]
@@ -109,7 +109,7 @@ DispatcherRecorder.prototype.replay = function(replayTime, done) {
  * a separate recorder.
  * serializeEvents(): string
  */
-DispatcherRecorder.prototype.serializeEvents = function() {
+DispatcherRecorder.prototype.serializeEvents = function () {
   const events = this.events.map((event) => {
     return {
       action: Symbol.keyFor(event.action),
@@ -123,7 +123,7 @@ DispatcherRecorder.prototype.serializeEvents = function() {
  * Load serialized events into the recorder and overwrite the current events
  * loadEvents(events: string): undefined
  */
-DispatcherRecorder.prototype.loadEvents = function(events) {
+DispatcherRecorder.prototype.loadEvents = function (events) {
   const parsedEvents = JSON.parse(events)
   this.events = parsedEvents.map((event) => {
     return {

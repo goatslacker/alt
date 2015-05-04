@@ -29,7 +29,7 @@ function ActionListeners(alt) {
  * addActionListener(symAction: symbol, handler: function): number
  * Adds a listener to a specified action and returns the dispatch token.
  */
-ActionListeners.prototype.addActionListener = function(symAction, handler) {
+ActionListeners.prototype.addActionListener = function (symAction, handler) {
   const id = this.dispatcher.register((payload) => {
     /* istanbul ignore else */
     if (symAction === payload.action) {
@@ -44,7 +44,7 @@ ActionListeners.prototype.addActionListener = function(symAction, handler) {
  * removeActionListener(id: number): undefined
  * Removes the specified dispatch registration.
  */
-ActionListeners.prototype.removeActionListener = function(id) {
+ActionListeners.prototype.removeActionListener = function (id) {
   delete this[ALT_LISTENERS][id]
   this.dispatcher.unregister(id)
 }
@@ -52,7 +52,7 @@ ActionListeners.prototype.removeActionListener = function(id) {
 /**
  * Remove all listeners.
  */
-ActionListeners.prototype.removeAllActionListeners = function() {
+ActionListeners.prototype.removeAllActionListeners = function () {
   Object.keys(this[ALT_LISTENERS]).forEach(
     this.removeActionListener.bind(this)
   )

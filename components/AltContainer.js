@@ -61,7 +61,7 @@ var assign = require('object-assign')
 var AltContainer = React.createClass(assign({
   displayName: 'AltContainer',
 
-  render: function() {
+  render: function () {
     return this.altRender('div')
   }
 }, mixinContainer(React)))
