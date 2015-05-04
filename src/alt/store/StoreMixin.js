@@ -1,5 +1,7 @@
 import Symbol from 'es-symbol'
+
 import * as Sym from '../symbols/symbols'
+import * as fn from '../../utils/functions'
 
 const StoreMixin = {
   waitFor(...sources) {
@@ -20,8 +22,8 @@ const StoreMixin = {
   },
 
   exportPublicMethods(methods) {
-    eachObject((methodName, value) => {
-      if (typeof value !== 'function') {
+    fn.eachObject((methodName, value) => {
+      if (!fn.isFunction(value)) {
         throw new TypeError('exportPublicMethods expects a function')
       }
 
@@ -44,7 +46,7 @@ const StoreMixin = {
     if (!symbol) {
       throw new ReferenceError('Invalid action reference passed in')
     }
-    if (typeof handler !== 'function') {
+    if (!fn.isFunction(handler)) {
       throw new TypeError('bindAction expects a function')
     }
 
@@ -64,7 +66,7 @@ const StoreMixin = {
   },
 
   bindActions(actions) {
-    eachObject((action, symbol) => {
+    fn.eachObject((action, symbol) => {
       const matchFirstCharacter = /./
       const assumedEventHandler = action.replace(matchFirstCharacter, (x) => {
         return `on${x[0].toUpperCase()}`
@@ -92,7 +94,7 @@ const StoreMixin = {
   },
 
   bindListeners(obj) {
-    eachObject((methodName, symbol) => {
+    fn.eachObject((methodName, symbol) => {
       const listener = this[methodName]
 
       if (!listener) {

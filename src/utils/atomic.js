@@ -1,4 +1,5 @@
 import makeFinalStore from './makeFinalStore'
+import { isFunction } from './functions'
 
 function makeAtomicClass(alt, StoreModel) {
   class AtomicClass extends StoreModel {
@@ -25,7 +26,7 @@ export default function atomic(alt) {
   finalStore.listen(() => alt.takeSnapshot())
 
   return (StoreModel) => {
-    return typeof StoreModel === 'function'
+    return isFunction(StoreModel)
       ? makeAtomicClass(alt, StoreModel)
       : makeAtomicObject(alt, StoreModel)
   }

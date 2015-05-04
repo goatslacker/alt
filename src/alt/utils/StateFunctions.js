@@ -1,4 +1,4 @@
-import { assign, eachObject } from './AltUtils'
+import { assign, eachObject } from '../../utils/functions'
 import * as Sym from '../symbols/symbols'
 
 import * as Sym from '../symbols/symbols'

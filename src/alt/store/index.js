@@ -2,6 +2,7 @@ import EventEmitter from 'eventemitter3'
 
 import * as Sym from '../symbols/symbols'
 import * as utils from '../utils/AltUtils'
+import * as fn from '../../utils/functions'
 import AltStore from './AltStore'
 import StoreMixin from './StoreMixin'
 
@@ -12,7 +13,7 @@ function doSetState(store, storeInstance, state) {
 
   const { config } = storeInstance.StoreModel
 
-  const nextState = typeof state === 'function'
+  const nextState = fn.isFunction(state)
     ? state(storeInstance[Sym.STATE_CONTAINER])
     : state
 
@@ -33,7 +34,7 @@ function createPrototype(proto, alt, key, extras) {
   proto[Sym.LISTENERS] = {}
   proto[Sym.PUBLIC_METHODS] = {}
 
-  return assign(proto, StoreMixin, {
+  return fn.assign(proto, StoreMixin, {
     _storeName: key,
     alt: alt,
     dispatcher: alt.dispatcher
@@ -41,11 +42,11 @@ function createPrototype(proto, alt, key, extras) {
 }
 
 export function createStoreConfig(globalConfig, StoreModel) {
-  StoreModel.config = assign({
+  StoreModel.config = fn.assign({
     getState(state) {
-      return assign({}, state)
+      return fn.assign({}, state)
     },
-    setState: assign
+    setState: fn.assign
   }, globalConfig, StoreModel.config)
 }
 
@@ -56,7 +57,7 @@ export function transformStore(transforms, StoreModel) {
 export function createStoreFromObject(alt, StoreModel, key) {
   let storeInstance
 
-  const StoreProto = createPrototype({}, alt, key, assign({
+  const StoreProto = createPrototype({}, alt, key, fn.assign({
     getInstance() {
       return storeInstance
     },
@@ -77,13 +78,13 @@ export function createStoreFromObject(alt, StoreModel, key) {
   // bind the lifecycle events
   /* istanbul ignore else */
   if (StoreProto.lifecycle) {
-    eachObject((eventName, event) => {
+    fn.eachObject((eventName, event) => {
       StoreMixinListeners.on.call(StoreProto, eventName, event)
     }, [StoreProto.lifecycle])
   }
 
-  // create the instance and assign the public methods to the instance
-  storeInstance = assign(
+  // create the instance and fn.assign the public methods to the instance
+  storeInstance = fn.assign(
     new AltStore(alt, StoreProto, StoreProto.state, StoreModel),
     StoreProto.publicMethods,
     { displayName: key }
@@ -120,7 +121,7 @@ export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
     store.bindListeners(config.bindListeners)
   }
 
-  storeInstance = assign(
+  storeInstance = fn.assign(
     new AltStore(
       alt,
       store,

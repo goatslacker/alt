@@ -1,8 +1,8 @@
 import EventEmitter from 'eventemitter3'
-import assign from 'object-assign'
 import Symbol from 'es-symbol'
 
 import * as Sym from '../symbols/symbols'
+import * as fn from '../utils/functions'
 
 // event emitter instance
 const EE = Symbol()
@@ -17,7 +17,7 @@ class AltStore {
     this.boundListeners = model[Sym.ALL_LISTENERS]
     this.StoreModel = StoreModel
 
-    assign(this, model[Sym.PUBLIC_METHODS])
+    fn.assign(this, model[Sym.PUBLIC_METHODS])
 
     // Register dispatcher
     this.dispatchToken = alt.dispatcher.register((payload) => {

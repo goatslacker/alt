@@ -1,4 +1,4 @@
-import assign from 'object-assign'
+import { assign } from './functions'
 import makeFinalStore from './makeFinalStore'
 
 function timetravel(alt, options = {}) {

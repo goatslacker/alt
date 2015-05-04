@@ -42,16 +42,3 @@ export function formatAsConstant(name) {
 export function dispatchIdentity(x, ...a) {
   this.dispatch(a.length ? [x].concat(a) : x)
 }
-
-export function eachObject(f, o) {
-  o.forEach((from) => {
-    Object.keys(Object(from)).forEach((key) => {
-      f(key, from[key])
-    })
-  })
-}
-
-export function assign(target, ...source) {
-  eachObject((key, value) => target[key] = value, source)
-  return target
-}
