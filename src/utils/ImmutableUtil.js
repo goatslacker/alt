@@ -5,7 +5,8 @@ function immutable(StoreModel) {
     stateKey: 'state',
 
     setState(currentState, nextState) {
-      return (this.state = nextState)
+      this.state = nextState
+      return this.state
     },
 
     getState(currentState) {

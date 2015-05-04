@@ -47,7 +47,6 @@ import React from 'react'
 import assign from 'object-assign'
 
 function connectToStores(Component) {
-
   // Check for required static methods.
   if (typeof Component.getStores !== 'function') {
     throw new Error('connectToStores() expects the wrapped component to have a static getStores() method')

@@ -25,7 +25,8 @@
 function FinalStore() {
   this.dispatcher.register((payload) => {
     const stores = Object.keys(this.alt.stores).reduce((arr, store) => {
-      return arr.push(this.alt.stores[store].dispatchToken), arr
+      arr.push(this.alt.stores[store].dispatchToken)
+      return arr
     }, [])
 
     this.waitFor(stores)

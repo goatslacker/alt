@@ -53,13 +53,12 @@ function mixinContainer(React) {
     },
 
     registerStores: function (props) {
+      var stores = props.stores
       Subscribe.create(this)
 
       if (props.store) {
         this.addSubscription(props.store)
       } else if (props.stores) {
-        var stores = props.stores
-
         if (Array.isArray(stores)) {
           stores.forEach(function (store) {
             this.addSubscription(store)
@@ -77,11 +76,10 @@ function mixinContainer(React) {
     },
 
     getStateFromStores: function (props) {
+      var stores = props.stores
       if (props.store) {
         return getStateFromStore(props.store, props)
       } else if (props.stores) {
-        var stores = props.stores
-
         // If you pass in an array of stores then we are just listening to them
         // it should be an object then the state is added to the key specified
         if (!Array.isArray(stores)) {
@@ -153,14 +151,13 @@ function mixinContainer(React) {
     },
 
     altRender: function (Node) {
+      var children = this.props.children
       // Custom rendering function
       if (typeof this.props.render === 'function') {
         return this.props.render(this.getProps())
       } else if (this.props.component) {
         return React.createElement(this.props.component, this.getProps())
       }
-
-      var children = this.props.children
 
       // Does not wrap child in a div if we don't have to.
       if (Array.isArray(children)) {
