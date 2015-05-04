@@ -1,5 +1,5 @@
-import EventEmitter from 'eventemitter3'
 import assign from 'object-assign'
+import emitter from 'contra.emitter'
 import Symbol from 'es-symbol'
 import * as Sym from './symbols/symbols'
 
@@ -16,7 +16,7 @@ const EE = Symbol()
 
 export default class AltStore {
   constructor(alt, model, state, StoreModel) {
-    this[EE] = new EventEmitter()
+    this[EE] = emitter()
     this[LIFECYCLE] = {}
     this[STATE_CONTAINER] = state || model
 
@@ -81,7 +81,7 @@ export default class AltStore {
     if (this[LIFECYCLE].unlisten) {
       this[LIFECYCLE].unlisten()
     }
-    this[EE].removeListener('change', cb)
+    this[EE].off('change', cb)
   }
 
   getState() {
