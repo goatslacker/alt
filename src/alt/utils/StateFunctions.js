@@ -1,21 +1,21 @@
-import { assign } from './AltUtils'
+import { assign, eachObject } from './AltUtils'
 import * as Sym from '../symbols/symbols'
 
 import * as Sym from '../symbols/symbols'
 
 export function setAppState(instance, data, onStore) {
   const obj = instance.deserialize(data)
-  Object.keys(obj).forEach((key) => {
+  eachObject((key, value) => {
     const store = instance.stores[key]
     if (store) {
       const { config } = store.StoreModel
       if (config.onDeserialize) {
-        obj[key] = config.onDeserialize(obj[key]) || obj[key]
+        obj[key] = config.onDeserialize(value) || value
       }
       assign(store[Sym.STATE_CONTAINER], obj[key])
       onStore(store)
     }
-  })
+  }, [obj])
 }
 
 export function snapshot(instance, storeNames = []) {

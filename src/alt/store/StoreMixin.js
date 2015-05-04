@@ -20,13 +20,13 @@ const StoreMixin = {
   },
 
   exportPublicMethods(methods) {
-    Object.keys(methods).forEach((methodName) => {
-      if (typeof methods[methodName] !== 'function') {
+    eachObject((methodName, value) => {
+      if (typeof value !== 'function') {
         throw new TypeError('exportPublicMethods expects a function')
       }
 
-      this[Sym.PUBLIC_METHODS][methodName] = methods[methodName]
-    })
+      this[Sym.PUBLIC_METHODS][methodName] = value
+    }, [methods])
   },
 
   emitChange() {
@@ -64,8 +64,7 @@ const StoreMixin = {
   },
 
   bindActions(actions) {
-    Object.keys(actions).forEach((action) => {
-      const symbol = actions[action]
+    eachObject((action, symbol) => {
       const matchFirstCharacter = /./
       const assumedEventHandler = action.replace(matchFirstCharacter, (x) => {
         return `on${x[0].toUpperCase()}`
@@ -89,12 +88,11 @@ const StoreMixin = {
       if (handler) {
         this.bindAction(symbol, handler)
       }
-    })
+    }, [actions])
   },
 
   bindListeners(obj) {
-    Object.keys(obj).forEach((methodName) => {
-      const symbol = obj[methodName]
+    eachObject((methodName, symbol) => {
       const listener = this[methodName]
 
       if (!listener) {
@@ -110,7 +108,7 @@ const StoreMixin = {
       } else {
         this.bindAction(symbol, listener)
       }
-    })
+    }, [obj])
   }
 }
 
