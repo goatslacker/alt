@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.16.2
+
+### Added
+
+* Now passing more information through the dispatch about the action invoked. [commit](https://github.com/goatslacker/alt/commit/05398a6)
+
 ## 0.16.1
 
 This release is a pretty big one and it also marks Alt's first breaking changes.
