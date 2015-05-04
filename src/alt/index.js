@@ -1,4 +1,3 @@
-import assign from 'object-assign'
 import { Dispatcher } from 'flux'
 
 import * as StateFunctions from './utils/StateFunctions'

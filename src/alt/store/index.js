@@ -1,4 +1,3 @@
-import assign from 'object-assign'
 import EventEmitter from 'eventemitter3'
 
 import * as Sym from '../symbols/symbols'
@@ -44,10 +43,7 @@ function createPrototype(proto, alt, key, extras) {
 export function createStoreConfig(globalConfig, StoreModel) {
   StoreModel.config = assign({
     getState(state) {
-      return Object.keys(state).reduce((obj, key) => {
-        obj[key] = state[key]
-        return obj
-      }, {})
+      return assign({}, state)
     },
     setState: assign
   }, globalConfig, StoreModel.config)

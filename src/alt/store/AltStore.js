@@ -16,9 +16,6 @@ class AltStore {
     this._storeName = model._storeName
     this.boundListeners = model[Sym.ALL_LISTENERS]
     this.StoreModel = StoreModel
-    if (typeof this.StoreModel === 'object') {
-      this.StoreModel.state = assign({}, StoreModel.state)
-    }
 
     assign(this, model[Sym.PUBLIC_METHODS])
 

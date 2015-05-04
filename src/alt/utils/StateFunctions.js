@@ -1,4 +1,5 @@
-import assign from 'object-assign'
+import { assign } from './AltUtils'
+import * as Sym from '../symbols/symbols'
 
 import * as Sym from '../symbols/symbols'
 
