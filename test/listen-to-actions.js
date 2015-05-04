@@ -6,6 +6,8 @@ import ActionListeners from '../utils/ActionListeners'
 const alt = new Alt()
 
 class MyActions {
+  static displayName = 'ActionListenerActions'
+
   constructor() {
     this.generateActions('updateName')
   }
@@ -17,8 +19,10 @@ const listener = new ActionListeners(alt)
 
 export default {
   'listen to actions globally'() {
-    const id = listener.addActionListener(myActions.UPDATE_NAME, (name) => {
+    const id = listener.addActionListener(myActions.UPDATE_NAME, (name, details) => {
       assert(name === 'yes', 'proper data was passed in')
+      assert(details.namespace === 'ActionListenerActions')
+      assert(details.name === 'updateName')
     })
 
     assert.isString(id, 'the dispatcher id is returned for the listener')

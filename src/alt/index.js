@@ -43,8 +43,8 @@ class Alt {
     this[LAST_SNAPSHOT] = {}
   }
 
-  dispatch(action, data) {
-    this.dispatcher.dispatch({ action, data })
+  dispatch(action, data, details) {
+    this.dispatcher.dispatch({ action, data, details })
   }
 
   createUnsavedStore(StoreModel, ...args) {

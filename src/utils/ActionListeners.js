@@ -33,7 +33,7 @@ ActionListeners.prototype.addActionListener = function (symAction, handler) {
   const id = this.dispatcher.register((payload) => {
     /* istanbul ignore else */
     if (symAction === payload.action) {
-      handler(payload.data)
+      handler(payload.data, payload.details)
     }
   })
   this[ALT_LISTENERS][id] = true

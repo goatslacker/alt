@@ -11,8 +11,15 @@ export default function makeAction(alt, namespace, name, implementation, obj) {
   alt[ACTIONS_REGISTRY][actionId] = 1
   const actionSymbol = Symbol.for(`alt/${actionId}`)
 
+  const data = {
+    namespace,
+    name,
+    id: actionId,
+    symbol: actionSymbol
+  }
+
   // Wrap the action so we can provide a dispatch method
-  const newAction = new AltAction(alt, actionSymbol, implementation, obj)
+  const newAction = new AltAction(alt, actionSymbol, implementation, obj, data)
 
   // the action itself
   const action = newAction[ACTION_HANDLER]
@@ -22,6 +29,7 @@ export default function makeAction(alt, namespace, name, implementation, obj) {
     })
   }
   action[ACTION_KEY] = actionSymbol
+  action.data = data
 
   // ensure each reference is unique in the namespace
   const container = alt.actions[namespace]
