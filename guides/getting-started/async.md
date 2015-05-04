@@ -7,7 +7,7 @@ permalink: /guide/async/
 
 # Fetching Data
 
-The age old debate, where should async go? There is no right answer right now and don't feel bad if you're putting it in actions or in stores. In this tutorial we'll be calling async from the actions and the data fetching will exist in a new folder `utils`. This tutorial will handle fetching the data and failure states.
+The age old debate, where should async go? There is no right answer right now and don't feel bad if you're putting it in actions or in stores. In this tutorial, we'll be calling async from the actions and the data fetching will exist in a new folder `utils`. This tutorial will handle fetching the data and failure states.
 
 So we create `utils/LocationsFetcher.js`. We can use something like [fetch](https://github.com/github/fetch) to fetch some data from a server, but for the purposes of this tutorial we'll just simulate an XHR with good ol' `setTimeout` and `Promise` so we copy fetch's API.
 
@@ -52,7 +52,7 @@ var LocationsFetcher = {
 };
 ```
 
-Next, wel'll need to change the actions to use this new method we created. We will add an action called `fetchLocations` which will fetch the locations and then call `updateLocations` when it successfully completes. A new action is also added, `locationsFailed` which deals with the locations not being available. Add these methods to the class.
+Next, we'll need to change the actions to use this new method we created. We will add an action called `fetchLocations` which will fetch the locations and then call `updateLocations` when it successfully completes. A new action is also added, `locationsFailed` which deals with the locations not being available. Add these methods to the class.
 
 `actions/LocationActions.js`
 
