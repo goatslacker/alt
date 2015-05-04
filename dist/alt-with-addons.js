@@ -136,13 +136,12 @@ function mixinContainer(React) {
     },
 
     registerStores: function registerStores(props) {
+      var stores = props.stores;
       Subscribe.create(this);
 
       if (props.store) {
         this.addSubscription(props.store);
       } else if (props.stores) {
-        var stores = props.stores;
-
         if (Array.isArray(stores)) {
           stores.forEach(function (store) {
             this.addSubscription(store);
@@ -160,11 +159,10 @@ function mixinContainer(React) {
     },
 
     getStateFromStores: function getStateFromStores(props) {
+      var stores = props.stores;
       if (props.store) {
         return getStateFromStore(props.store, props);
       } else if (props.stores) {
-        var stores = props.stores;
-
         // If you pass in an array of stores then we are just listening to them
         // it should be an object then the state is added to the key specified
         if (!Array.isArray(stores)) {
@@ -224,14 +222,13 @@ function mixinContainer(React) {
     },
 
     altRender: function altRender(Node) {
+      var children = this.props.children;
       // Custom rendering function
       if (typeof this.props.render === 'function') {
         return this.props.render(this.getProps());
       } else if (this.props.component) {
         return React.createElement(this.props.component, this.getProps());
       }
-
-      var children = this.props.children;
 
       // Does not wrap child in a div if we don't have to.
       if (Array.isArray(children)) {
@@ -1029,11 +1026,12 @@ var ACTION_HANDLER = Sym.ACTION_HANDLER;
 var ACTION_UID = Sym.ACTION_UID;
 
 var AltAction = (function () {
-  function AltAction(alt, name, action, actions) {
+  function AltAction(alt, name, action, actions, actionDetails) {
     _classCallCheck(this, AltAction);
 
     this[ACTION_UID] = name;
     this[ACTION_HANDLER] = action.bind(this);
+    this.actionDetails = actionDetails;
     this.actions = actions;
     this.alt = alt;
   }
@@ -1041,7 +1039,7 @@ var AltAction = (function () {
   _createClass(AltAction, [{
     key: 'dispatch',
     value: function dispatch(data) {
-      this.alt.dispatch(this[ACTION_UID], data);
+      this.alt.dispatch(this[ACTION_UID], data, this.actionDetails);
     }
   }]);
 
@@ -1242,7 +1240,8 @@ _Alt2['default'].addons = {
   chromeDebug: _chromeDebug2['default'],
   connectToStores: _connectToStores2['default'],
   makeFinalStore: _makeFinalStore2['default'],
-  withAltContext: _withAltContext2['default'] };
+  withAltContext: _withAltContext2['default']
+};
 
 exports['default'] = _Alt2['default'];
 module.exports = exports['default'];
@@ -1304,8 +1303,8 @@ var Alt = (function () {
 
   _createClass(Alt, [{
     key: 'dispatch',
-    value: function dispatch(action, data) {
-      this.dispatcher.dispatch({ action: action, data: data });
+    value: function dispatch(action, data, details) {
+      this.dispatcher.dispatch({ action: action, data: data, details: details });
     }
   }, {
     key: 'createUnsavedStore',
@@ -1753,13 +1752,14 @@ var StoreMixinEssentials = {
       throw new ReferenceError('Dispatch tokens not provided');
     }
 
+    var sourcesArray = sources;
     if (arguments.length === 1) {
-      sources = Array.isArray(sources) ? sources : [sources];
+      sourcesArray = Array.isArray(sourcesArray) ? sourcesArray : [sourcesArray];
     } else {
-      sources = Array.prototype.slice.call(arguments);
+      sourcesArray = Array.prototype.slice.call(arguments);
     }
 
-    var tokens = sources.map(function (source) {
+    var tokens = sourcesArray.map(function (source) {
       return source.dispatchToken || source;
     });
 
@@ -2054,8 +2054,15 @@ function makeAction(alt, namespace, name, implementation, obj) {
   alt[ACTIONS_REGISTRY][actionId] = 1;
   var actionSymbol = _Symbol2['default']['for']('alt/' + actionId);
 
+  var data = {
+    namespace: namespace,
+    name: name,
+    id: actionId,
+    symbol: actionSymbol
+  };
+
   // Wrap the action so we can provide a dispatch method
-  var newAction = new _AltAction2['default'](alt, actionSymbol, implementation, obj);
+  var newAction = new _AltAction2['default'](alt, actionSymbol, implementation, obj, data);
 
   // the action itself
   var action = newAction[ACTION_HANDLER];
@@ -2069,6 +2076,7 @@ function makeAction(alt, namespace, name, implementation, obj) {
     });
   };
   action[ACTION_KEY] = actionSymbol;
+  action.data = data;
 
   // ensure each reference is unique in the namespace
   var container = alt.actions[namespace];
@@ -2126,7 +2134,7 @@ ActionListeners.prototype.addActionListener = function (symAction, handler) {
   var id = this.dispatcher.register(function (payload) {
     /* istanbul ignore else */
     if (symAction === payload.action) {
-      handler(payload.data);
+      handler(payload.data, payload.details);
     }
   });
   this[ALT_LISTENERS][id] = true;
@@ -2557,7 +2565,6 @@ var _assign = require('object-assign');
 var _assign2 = _interopRequireWildcard(_assign);
 
 function connectToStores(Component) {
-
   // Check for required static methods.
   if (typeof Component.getStores !== 'function') {
     throw new Error('connectToStores() expects the wrapped component to have a static getStores() method');
@@ -2645,7 +2652,8 @@ function FinalStore() {
 
   this.dispatcher.register(function (payload) {
     var stores = Object.keys(_this.alt.stores).reduce(function (arr, store) {
-      return (arr.push(_this.alt.stores[store].dispatchToken), arr);
+      arr.push(_this.alt.stores[store].dispatchToken);
+      return arr;
     }, []);
 
     _this.waitFor(stores);
