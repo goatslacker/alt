@@ -5,7 +5,7 @@
  */
 var React = require('react-native')
 var mixinContainer = require('./mixinContainer')
-var assign = require('object-assign')
+var assign = require('../utils/functions').assign
 
 var AltNativeContainer = React.createClass(assign({
   displayName: 'AltNativeContainer',

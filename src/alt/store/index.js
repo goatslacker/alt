@@ -79,7 +79,7 @@ export function createStoreFromObject(alt, StoreModel, key) {
   /* istanbul ignore else */
   if (StoreProto.lifecycle) {
     fn.eachObject((eventName, event) => {
-      StoreMixinListeners.on.call(StoreProto, eventName, event)
+      StoreMixin.on.call(StoreProto, eventName, event)
     }, [StoreProto.lifecycle])
   }
 

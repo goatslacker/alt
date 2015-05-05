@@ -2,7 +2,7 @@ import EventEmitter from 'eventemitter3'
 import Symbol from 'es-symbol'
 
 import * as Sym from '../symbols/symbols'
-import * as fn from '../utils/functions'
+import * as fn from '../../utils/functions'
 
 // event emitter instance
 const EE = Symbol()

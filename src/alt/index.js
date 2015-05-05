@@ -31,8 +31,8 @@ class Alt {
     const Store = store.transformStore(this.storeTransforms, StoreModel)
 
     return fn.isFunction(Store)
-      ? createStoreFromClass(this, Store, key, ...args)
-      : createStoreFromObject(this, Store, key)
+      ? store.createStoreFromClass(this, Store, key, ...args)
+      : store.createStoreFromObject(this, Store, key)
   }
 
   createStore(StoreModel, iden, ...args) {
@@ -54,8 +54,8 @@ class Alt {
     }
 
     const storeInstance = fn.isFunction(Store)
-      ? createStoreFromClass(this, Store, key, ...args)
-      : createStoreFromObject(this, Store, key)
+      ? store.createStoreFromClass(this, Store, key, ...args)
+      : store.createStoreFromObject(this, Store, key)
 
     this.stores[key] = storeInstance
     StateFunctions.saveInitialSnapshot(this, key)
@@ -83,7 +83,7 @@ class Alt {
     )
 
     if (fn.isFunction(ActionsClass)) {
-      fn.assign(actions, getInternalMethods(ActionsClass, true))
+      fn.assign(actions, utils.getInternalMethods(ActionsClass, true))
       class ActionsGenerator extends ActionsClass {
         constructor(...args) {
           super(...args)
@@ -118,8 +118,8 @@ class Alt {
       )
 
       // generate a constant
-      const constant = formatAsConstant(actionName)
-      exportObj[constant] = exportObj[actionName]Sym.[ACTION_KEY]
+      const constant = utils.formatAsConstant(actionName)
+      exportObj[constant] = exportObj[actionName][Sym.ACTION_KEY]
     }, [actions])
     return exportObj
   }
