@@ -22,7 +22,6 @@
     // possible errors
     "comma-dangle": [2, "never"],
     "no-cond-assign": [2, "always"],
-    "no-console": 1,
     "no-debugger": 1,
     "no-alert": 1,
     "no-constant-condition": 1,
@@ -128,6 +127,7 @@
       "spaced-line-comment": 2,
 
     /* custom rules */
+    "no-console": 0,
     "space-before-function-paren": [2, {
       "named": "never",
       "anonymous": "always"
