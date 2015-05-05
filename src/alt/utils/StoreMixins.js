@@ -8,19 +8,17 @@ import {
 } from '../symbols/symbols'
 
 export const StoreMixinEssentials = {
-  waitFor(sources) {
-    if (!sources) {
+  waitFor(...sources) {
+    if (!sources.length) {
       throw new ReferenceError('Dispatch tokens not provided')
     }
 
     let sourcesArray = sources
-    if (arguments.length === 1) {
-      sourcesArray = Array.isArray(sourcesArray) ? sourcesArray : [sourcesArray]
-    } else {
-      sourcesArray = Array.prototype.slice.call(arguments)
+    if (sources.length === 1) {
+      sourcesArray = Array.isArray(sources[0]) ? sources[0] : sources
     }
 
-    let tokens = sourcesArray.map((source) => {
+    const tokens = sourcesArray.map((source) => {
       return source.dispatchToken || source
     })
 

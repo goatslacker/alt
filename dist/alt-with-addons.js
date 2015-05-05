@@ -1747,16 +1747,18 @@ var _Symbol2 = _interopRequireWildcard(_Symbol);
 var _ACTION_KEY$ALL_LISTENERS$LIFECYCLE$LISTENERS$PUBLIC_METHODS = require('../symbols/symbols');
 
 var StoreMixinEssentials = {
-  waitFor: function waitFor(sources) {
-    if (!sources) {
+  waitFor: function waitFor() {
+    for (var _len = arguments.length, sources = Array(_len), _key = 0; _key < _len; _key++) {
+      sources[_key] = arguments[_key];
+    }
+
+    if (!sources.length) {
       throw new ReferenceError('Dispatch tokens not provided');
     }
 
     var sourcesArray = sources;
-    if (arguments.length === 1) {
-      sourcesArray = Array.isArray(sourcesArray) ? sourcesArray : [sourcesArray];
-    } else {
-      sourcesArray = Array.prototype.slice.call(arguments);
+    if (sources.length === 1) {
+      sourcesArray = Array.isArray(sources[0]) ? sources[0] : sources;
     }
 
     var tokens = sourcesArray.map(function (source) {
