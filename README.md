@@ -17,7 +17,7 @@
 * Isomorphic and works with react-native.
 * Actively maintained and being used in production.
 * Extremely [flexible](#flexibility) and unopinionated in how you use flux. Create traditional singletons or use dependency injection.
-* It is [terse](https://github.com/goatslacker/alt#flux-minus-the-boilerplate). No boilerplate.
+* It is terse. No boilerplate.
 
 ### What does it look like?
 
@@ -70,7 +70,29 @@ class TodoStore {
 export default alt.createStore(TodoStore, 'TodoStore');
 ```
 
-## Principles of Flux
+## In the Wild
+
+### Examples
+
+* [Airbnb Airpal](https://github.com/airbnb/airpal/tree/master/src/main/resources/assets)
+* [Alt Notify](https://github.com/sourcescript/alt-notify)
+* [Chrome Devtool](https://github.com/goatslacker/alt-devtool)
+* [Example Tests](https://github.com/jdlehman/alt-example-tests)
+* [Github Example](https://github.com/RookieOne/react-alt-github-example)
+* [Isomorphic Alt](https://github.com/patrickkim/iso-alt)
+* [React Router Example](https://github.com/lostpebble/alt-react-router-example)
+* [React Router Loopback](https://github.com/bkniffler/react-router-alt-loopback)
+* [React Weather](https://github.com/sapegin/react-weather)
+* [Shopping Cart](https://github.com/voronianski/flux-comparison/tree/master/alt)
+* [Todo](https://github.com/benstokoe/alt-todo)
+* [Typeahead](https://github.com/timtyrrell/alt-typeahead)
+
+### Boilerplates
+
+* [Isomorphic Flux Boilerplate](https://github.com/iam4x/isomorphic-flux-boilerplate)
+* [React + Webpack + Node](https://github.com/choonkending/react-webpack-node)
+
+## Pure Flux + More
 
 * Unidirectional data flow
 * Stores have no setters
@@ -78,24 +100,7 @@ export default alt.createStore(TodoStore, 'TodoStore');
 * Single central dispatcher
 * All Stores receive the dispatch
 
-Read more about the [Principles of Flux](https://medium.com/@goatslacker/principles-of-flux-ea872bc20772).
-
-## Flux minus the boilerplate
-
-* No [JS "constants"](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/constants/ChatConstants.js).
-* No [static string tossing](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/dispatcher/ChatAppDispatcher.js#L39).
-* No [massive switch statements](https://github.com/facebook/flux/blob/master/examples/flux-chat/js/stores/MessageStore.js#L111).
-
-There is no giant switch statement you have to write in your store and this is because alt removes the burden of constants from the developer.
-This has the wonderful side effect of making the custom dispatcher logic unnecessary, thus removing the dispatcher from the equation.
-
-Make no mistake, there is still a single dispatcher through which actions flow on their merry way to the store, in fact, you still get the benefit of being able to hook into the dispatcher to listen to all the global events for debugging, fun, or misery.
-The dispatcher is just a part of alt and something you don't necessarily have to write custom code for.
-
-These removals make the code terse and easy to follow, there is less indirection and the learning curve to grok is much lower.
-Think I'm lying? [Check out an example](#differences-example).
-
-## Flux enhanced
+Read about the [Principles of Flux](https://medium.com/@goatslacker/principles-of-flux-ea872bc20772).
 
 One really cool aspect of alt is that you can save snapshots of the entire application's state at any given point in time.
 This has many different use cases like:
@@ -107,12 +112,16 @@ This has many different use cases like:
 
 There are also many [utils](/src/utils) available which interface well with alt:
 
-* [DispatchRecorder](/src/utils/DispatcherRecorder.js) lets you record all your dispatches and replay them back at a later time.
-* [FinalStore](/src/utils/makeFinalStore.js) is a Store that you can listen to that only emits when all your other stores have received all their data.
-* [IsomorphicRenderer](/src/utils/IsomorphicRenderer.js) a function that wraps your component to be isomorphic ready.
 * [ActionListener](/src/utils/ActionListeners.js) lets you listen to individual actions without having to create a store.
-
-Last but not least, alt is meant to work with ES6. That is we're betting you'll be writing your stores and actions as classes. This part isn't necessary but you really should write some ES6 anyways because it's nice.
+* [AltContainer](/components/AltContainer.js) a higher-order container component that is your swiss army knife for React.
+* [atomic](/src/utils/atomic.js) enables your stores for atomic transactions.
+* [connectToStores](/src/utils/connectToStores.js) a higher-order function that wraps your React components for store listening.
+* [decorators](/src/utils/decorators.js) a collection of useful ES7 decorators for working with alt.
+* [DispatchRecorder](/src/utils/DispatcherRecorder.js) lets you record all your dispatches and replay them back at a later time.
+* [ImmutableUtil](/src/utils/ImmutableUtil.js) makes working with immutable-js easy.
+* [IsomorphicRenderer](/src/utils/IsomorphicRenderer.js) a function that wraps your component to be isomorphic ready.
+* [TimeTravel](/src/utils/TimeTravel.js) enhances your stores so they are able to travel through different states in time.
+* [FinalStore](/src/utils/makeFinalStore.js) is a Store that you can listen to that only emits when all your other stores have received all their data.
 
 ## Topical Guide
 
