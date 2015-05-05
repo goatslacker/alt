@@ -1020,7 +1020,7 @@ var AltAction = (function () {
   _createClass(AltAction, [{
     key: 'dispatch',
     value: function dispatch(data) {
-      this.alt.dispatch(this[Sym.ACTION_UID], data, this.actionDetails);
+      return this.alt.dispatch(this[Sym.ACTION_UID], data, this.actionDetails);
     }
   }]);
 
@@ -1134,7 +1134,7 @@ var Alt = (function () {
   _createClass(Alt, [{
     key: 'dispatch',
     value: function dispatch(action, data, details) {
-      this.dispatcher.dispatch({ action: action, data: data, details: details });
+      return this.dispatcher.dispatch({ action: action, data: data, details: details });
     }
   }, {
     key: 'createUnsavedStore',
@@ -1395,6 +1395,10 @@ var fn = _interopRequireWildcard(_utilsFunctions);
 // event emitter instance
 var EE = (0, _esSymbol2['default'])();
 
+function isPromise(obj) {
+  return obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
+}
+
 var AltStore = (function () {
   function AltStore(alt, model, state, StoreModel) {
     var _this = this;
@@ -1415,9 +1419,8 @@ var AltStore = (function () {
     this.dispatchToken = alt.dispatcher.register(function (payload) {
       _this[Sym.LIFECYCLE].emit('beforeEach', payload, _this[Sym.STATE_CONTAINER]);
 
+      var result = false;
       if (model[Sym.LISTENERS][payload.action]) {
-        var result = false;
-
         try {
           result = model[Sym.LISTENERS][payload.action](payload.data);
         } catch (e) {
@@ -1429,11 +1432,17 @@ var AltStore = (function () {
         }
 
         if (result !== false) {
-          _this.emitChange();
+          if (isPromise(result)) {
+            result.then(_this.emitChange.bind(_this));
+          } else {
+            _this.emitChange();
+          }
         }
       }
 
       _this[Sym.LIFECYCLE].emit('afterEach', payload, _this[Sym.STATE_CONTAINER]);
+
+      return result;
     });
 
     this[Sym.LIFECYCLE].emit('init');
@@ -1996,13 +2005,17 @@ function setAppState(instance, data, onStore) {
   fn.eachObject(function (key, value) {
     var store = instance.stores[key];
     if (store) {
-      var config = store.StoreModel.config;
+      (function () {
+        var config = store.StoreModel.config;
 
-      if (config.onDeserialize) {
-        obj[key] = config.onDeserialize(value) || value;
-      }
-      fn.assign(store[Sym.STATE_CONTAINER], obj[key]);
-      onStore(store);
+        var state = store[Sym.STATE_CONTAINER];
+        if (config.onDeserialize) obj[key] = config.onDeserialize(value) || value;
+        fn.eachObject(function (k) {
+          return delete state[k];
+        }, [state]);
+        fn.assign(state, obj[key]);
+        onStore(store);
+      })();
     }
   }, [obj]);
 }

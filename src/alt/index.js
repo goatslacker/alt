@@ -22,7 +22,7 @@ class Alt {
   }
 
   dispatch(action, data, details) {
-    this.dispatcher.dispatch({ action, data, details })
+    return this.dispatcher.dispatch({ action, data, details })
   }
 
   createUnsavedStore(StoreModel, ...args) {

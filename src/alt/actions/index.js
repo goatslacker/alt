@@ -13,7 +13,7 @@ class AltAction {
   }
 
   dispatch(data) {
-    this.alt.dispatch(this[Sym.ACTION_UID], data, this.actionDetails)
+    return this.alt.dispatch(this[Sym.ACTION_UID], data, this.actionDetails)
   }
 }
 
