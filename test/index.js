@@ -501,11 +501,11 @@ const tests = {
   'specifying stores to snapshot'() {
     const snapshot = alt.takeSnapshot('MyStore', 'AltSecondStore')
     assert.deepEqual(Object.keys(JSON.parse(snapshot)), ['MyStore', 'AltSecondStore'], 'the snapshot includes specified stores')
-    assert.isFalse(Object.keys(JSON.parse(snapshot)).includes('LifeCycleStore'), 'the snapshot does not include unspecified stores')
+    assert(Object.keys(JSON.parse(snapshot)).indexOf('LifeCycleStore') === -1, 'the snapshot does not include unspecified stores')
 
     const snapshot2 = alt.takeSnapshot(myStore, secondStore)
     assert.deepEqual(Object.keys(JSON.parse(snapshot2)), ['MyStore', 'AltSecondStore'], 'the snapshot includes specified stores')
-    assert.isFalse(Object.keys(JSON.parse(snapshot2)).includes('LifeCycleStore'), 'the snapshot does not include unspecified stores')
+    assert(Object.keys(JSON.parse(snapshot2)).indexOf('LifeCycleStore') === -1, 'the snapshot does not include unspecified stores')
   },
 
   'serializing/deserializing snapshot/bootstrap data'(){
