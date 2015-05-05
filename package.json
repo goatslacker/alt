@@ -10,8 +10,8 @@
     "object-assign": "^2.0.0"
   },
   "devDependencies": {
-    "babel": "^5.1.11",
-    "babel-core": "^5.1.11",
+    "babel": "^5.2.13",
+    "babel-core": "^5.2.13",
     "babelify": "^6.0.2",
     "browserify": "^9.0.3",
     "browserify-shim": "^3.8.5",
@@ -45,7 +45,7 @@
     "build-alt-browser": "browserify src/alt -t [envify --NODE_ENV production ] -t babelify --outfile dist/alt.js --standalone Alt",
     "build-alt-browser-with-addons": "browserify src/alt/addons.js -t [envify --NODE_ENV production ] -t babelify -t browserify-shim --outfile dist/alt-with-addons.js --standalone Alt",
     "build-test": "babel src/alt --out-dir lib -r --stage 0 && babel src/utils --out-dir utils -r --stage 0",
-    "coverage": "npm run build-test && istanbul cover node_modules/mocha/bin/_mocha -- -u exports -R spec --require ./test/babel --require babel-core/external-helpers test",
+    "coverage": "npm run build-test && istanbul cover node_modules/mocha/bin/_mocha -- -u exports -R spec --require ./test/babel test",
     "clean": "rimraf lib && rimraf utils",
     "lint": "eslint src components",
     "posttest": "npm run build-alt",
@@ -53,7 +53,7 @@
     "pretest": "npm run clean && npm run build-test",
     "test": "npm run tests-node",
     "test-browser": "browserify test/browser/index.js -t babelify --outfile test/browser/tests.js",
-    "tests-node": "mocha -u exports -R spec --require ./test/babel --require babel-core/external-helpers test"
+    "tests-node": "mocha -u exports -R spec --require ./test/babel test"
   },
   "browserify-shim": {
     "react": "global:React",
