@@ -121,6 +121,10 @@ export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
     store.bindListeners(config.bindListeners)
   }
 
+  if (config.datasource) {
+    store.exportAsync(config.datasource)
+  }
+
   storeInstance = fn.assign(
     new AltStore(
       alt,

@@ -21,6 +21,39 @@ const StoreMixin = {
     this.dispatcher.waitFor(tokens)
   },
 
+  exportAsync(asyncMethods) {
+    const toExport = Object.keys(asyncMethods).reduce((publicMethods, methodName) => {
+      const asyncSpec = asyncMethods[methodName]
+
+      const validHandlers = ['success', 'error', 'loading']
+      validHandlers.forEach((handler) => {
+        if (asyncSpec[handler] && !asyncSpec[handler][ACTION_KEY]) {
+          throw new Error(`${handler} handler must be an action function`)
+        }
+      })
+
+      publicMethods[methodName] = (...args) => {
+        const state = this.getInstance().getState()
+        const value = asyncSpec.cache(state, ...args)
+
+        // if we don't have it in cache then fetch it
+        if (!value) {
+          if (asyncSpec.loading) asyncSpec.loading()
+          asyncSpec.fetch(state, ...args)
+            .then(asyncSpec.success)
+            .catch(asyncSpec.error)
+        } else {
+          // otherwise emit the change now
+          this.emitChange()
+        }
+      }
+
+      return publicMethods
+    }, {})
+
+    this.exportPublicMethods(toExport)
+  },
+
   exportPublicMethods(methods) {
     fn.eachObject((methodName, value) => {
       if (!fn.isFunction(value)) {
