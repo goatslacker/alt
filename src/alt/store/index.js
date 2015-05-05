@@ -1,4 +1,5 @@
 import assign from 'object-assign'
+import EventEmitter from 'eventemitter3'
 
 import * as Sym from '../symbols/symbols'
 import * as utils from '../utils/AltUtils'
@@ -29,7 +30,7 @@ function doSetState(store, storeInstance, state) {
 
 function createPrototype(proto, alt, key, extras) {
   proto[Sym.ALL_LISTENERS] = []
-  proto[Sym.LIFECYCLE] = {}
+  proto[Sym.LIFECYCLE] = new EventEmitter()
   proto[Sym.LISTENERS] = {}
   proto[Sym.PUBLIC_METHODS] = {}
 

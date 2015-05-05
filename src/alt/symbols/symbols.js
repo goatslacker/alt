@@ -15,6 +15,9 @@ export const ACTION_UID = Symbol()
 // store all of a store's listeners
 export const ALL_LISTENERS = Symbol()
 
+// are we handling our own errors
+export const HANDLING_ERRORS = Symbol()
+
 // initial snapshot
 export const INIT_SNAPSHOT = Symbol()
 

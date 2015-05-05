@@ -136,9 +136,7 @@ class Alt {
       this,
       this.serialize(this[Sym.LAST_SNAPSHOT]),
       storeInst => {
-        if (storeInst[Sym.LIFECYCLE].rollback) {
-          storeInst[Sym.LIFECYCLE].rollback()
-        }
+        storeInst[Sym.LIFECYCLE].emit('rollback')
         storeInst.emitChange()
       }
     )
@@ -157,9 +155,7 @@ class Alt {
       this,
       this.serialize(initialSnapshot),
       (storeInst) => {
-        if (storeInst[Sym.LIFECYCLE].init) {
-          storeInst[Sym.LIFECYCLE].init()
-        }
+        storeInst[Sym.LIFECYCLE].emit('init')
         storeInst.emitChange()
       }
     )
@@ -173,9 +169,7 @@ class Alt {
 
   bootstrap(data) {
     StateFunctions.setAppState(this, data, (storeInst) => {
-      if (storeInst[Sym.LIFECYCLE].bootstrap) {
-        storeInst[Sym.LIFECYCLE].bootstrap()
-      }
+      storeInst[Sym.LIFECYCLE].emit('bootstrap')
       storeInst.emitChange()
     })
   }
