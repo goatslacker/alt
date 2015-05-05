@@ -1,3 +1,5 @@
+import assign from 'object-assign'
+
 class ReactComponent {
   setState(state) {
     this.state = state
@@ -52,7 +54,7 @@ class ReactComponent {
       let defaultProps = component.getDefaultProps
         ? component.getDefaultProps()
         : {}
-      component.props = Object.assign({}, defaultProps, props)
+      component.props = assign({}, defaultProps, props)
 
       component.state = component.getInitialState
         ? component.getInitialState()
