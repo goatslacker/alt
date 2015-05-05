@@ -4,7 +4,7 @@
   "description": "A flux implementation",
   "main": "lib",
   "dependencies": {
-    "contra.emitter": "1.1.0",
+    "contra.emitter": "1.1.1",
     "es-symbol": "1.1.1",
     "flux": "2.0.3",
     "object-assign": "^2.0.0"
