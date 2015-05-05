@@ -34,7 +34,10 @@ const StoreMixin = {
   },
 
   on(lifecycleEvent, handler) {
-    this[Sym.LIFECYCLE][lifecycleEvent] = handler.bind(this)
+    if (lifecycleEvent === 'error') {
+      this[Sym.HANDLING_ERRORS] = true
+    }
+    this[Sym.LIFECYCLE].on(lifecycleEvent, handler.bind(this))
   },
 
   bindAction(symbol, handler) {

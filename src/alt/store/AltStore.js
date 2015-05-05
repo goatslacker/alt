@@ -10,7 +10,7 @@ const EE = Symbol()
 class AltStore {
   constructor(alt, model, state, StoreModel) {
     this[EE] = new EventEmitter()
-    this[Sym.LIFECYCLE] = {}
+    this[Sym.LIFECYCLE] = model[Sym.LIFECYCLE]
     this[Sym.STATE_CONTAINER] = state || model
 
     this._storeName = model._storeName
@@ -20,14 +20,15 @@ class AltStore {
       this.StoreModel.state = assign({}, StoreModel.state)
     }
 
-    assign(this[Sym.LIFECYCLE], model[Sym.LIFECYCLE])
     assign(this, model[Sym.PUBLIC_METHODS])
 
     // Register dispatcher
     this.dispatchToken = alt.dispatcher.register((payload) => {
-      if (model[Sym.LIFECYCLE].beforeEach) {
-        model[Sym.LIFECYCLE].beforeEach(payload, this[Sym.STATE_CONTAINER])
-      }
+      this[Sym.LIFECYCLE].emit(
+        'beforeEach',
+        payload,
+        this[Sym.STATE_CONTAINER]
+      )
 
       if (model[Sym.LISTENERS][payload.action]) {
         let result = false
@@ -35,8 +36,13 @@ class AltStore {
         try {
           result = model[Sym.LISTENERS][payload.action](payload.data)
         } catch (e) {
-          if (this[Sym.LIFECYCLE].error) {
-            this[Sym.LIFECYCLE].error(e, payload, this[Sym.STATE_CONTAINER])
+          if (model[Sym.HANDLING_ERRORS]) {
+            this[Sym.LIFECYCLE].emit(
+              'error',
+              e,
+              payload,
+              this[Sym.STATE_CONTAINER]
+            )
           } else {
             throw e
           }
@@ -47,14 +53,14 @@ class AltStore {
         }
       }
 
-      if (model[Sym.LIFECYCLE].afterEach) {
-        model[Sym.LIFECYCLE].afterEach(payload, this[Sym.STATE_CONTAINER])
-      }
+      this[Sym.LIFECYCLE].emit(
+        'afterEach',
+        payload,
+        this[Sym.STATE_CONTAINER]
+      )
     })
 
-    if (this[Sym.LIFECYCLE].init) {
-      this[Sym.LIFECYCLE].init()
-    }
+    this[Sym.LIFECYCLE].emit('init')
   }
 
   getEventEmitter() {
@@ -71,9 +77,7 @@ class AltStore {
   }
 
   unlisten(cb) {
-    if (this[Sym.LIFECYCLE].unlisten) {
-      this[Sym.LIFECYCLE].unlisten()
-    }
+    this[Sym.LIFECYCLE].emit('unlisten')
     this[EE].removeListener('change', cb)
   }
 
