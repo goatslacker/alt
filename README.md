@@ -46,12 +46,12 @@ Store
 
 ```js
 import alt from './alt';
-import TodoActions from './TodoActions'
+import todoActions from './TodoActions'
 
 class TodoStore {
   constructor() {
     this.bindListeners({
-      updateTodo: TodoActions.updateTodo
+      updateTodo: todoActions.updateTodo
     });
 
     this.todos = {};
