@@ -1,33 +1,11 @@
 import assign from 'object-assign'
 import { Dispatcher } from 'flux'
 
-import makeAction from './utils/makeAction'
-import {
-  filterSnapshots,
-  saveInitialSnapshot,
-  setAppState,
-  snapshot
-} from './utils/StateFunctions'
-import {
-  createStoreConfig,
-  createStoreFromObject,
-  createStoreFromClass,
-  transformStore
-} from './utils/StoreUtils'
-import {
-  ACTION_KEY,
-  ACTIONS_REGISTRY,
-  INIT_SNAPSHOT,
-  LAST_SNAPSHOT,
-  LIFECYCLE
-} from './symbols/symbols'
-import {
-  dispatchIdentity,
-  formatAsConstant,
-  getInternalMethods,
-  uid,
-  warn
-} from './utils/AltUtils'
+import * as StateFunctions from './utils/StateFunctions'
+import * as Sym from './symbols/symbols'
+import * as store from './store'
+import * as utils from './utils/AltUtils'
+import makeAction from './actions'
 
 class Alt {
   constructor(config = {}) {
@@ -38,9 +16,9 @@ class Alt {
     this.actions = { global: {} }
     this.stores = {}
     this.storeTransforms = config.storeTransforms || []
-    this[ACTIONS_REGISTRY] = {}
-    this[INIT_SNAPSHOT] = {}
-    this[LAST_SNAPSHOT] = {}
+    this[Sym.ACTIONS_REGISTRY] = {}
+    this[Sym.INIT_SNAPSHOT] = {}
+    this[Sym.LAST_SNAPSHOT] = {}
   }
 
   dispatch(action, data, details) {
@@ -49,38 +27,38 @@ class Alt {
 
   createUnsavedStore(StoreModel, ...args) {
     const key = StoreModel.displayName || ''
-    createStoreConfig(this.config, StoreModel)
-    const Store = transformStore(this.storeTransforms, StoreModel)
+    store.createStoreConfig(this.config, StoreModel)
+    const Store = store.transformStore(this.storeTransforms, StoreModel)
 
     return typeof Store === 'object'
-      ? createStoreFromObject(this, Store, key)
-      : createStoreFromClass(this, Store, key, ...args)
+      ? store.createStoreFromObject(this, Store, key)
+      : store.createStoreFromClass(this, Store, key, ...args)
   }
 
   createStore(StoreModel, iden, ...args) {
     let key = iden || StoreModel.displayName || StoreModel.name || ''
-    createStoreConfig(this.config, StoreModel)
-    const Store = transformStore(this.storeTransforms, StoreModel)
+    store.createStoreConfig(this.config, StoreModel)
+    const Store = store.transformStore(this.storeTransforms, StoreModel)
 
     if (this.stores[key] || !key) {
       if (this.stores[key]) {
-        warn(
+        utils.warn(
           `A store named ${key} already exists, double check your store ` +
           `names or pass in your own custom identifier for each store`
         )
       } else {
-        warn('Store name was not specified')
+        utils.warn('Store name was not specified')
       }
 
-      key = uid(this.stores, key)
+      key = utils.uid(this.stores, key)
     }
 
     const storeInstance = typeof Store === 'object'
-      ? createStoreFromObject(this, Store, key)
-      : createStoreFromClass(this, Store, key, ...args)
+      ? store.createStoreFromObject(this, Store, key)
+      : store.createStoreFromClass(this, Store, key, ...args)
 
     this.stores[key] = storeInstance
-    saveInitialSnapshot(this, key)
+    StateFunctions.saveInitialSnapshot(this, key)
 
     return storeInstance
   }
@@ -88,7 +66,7 @@ class Alt {
   generateActions(...actionNames) {
     const actions = { name: 'global' }
     return this.createActions(actionNames.reduce((obj, action) => {
-      obj[action] = dispatchIdentity
+      obj[action] = utils.dispatchIdentity
       return obj
     }, actions))
   }
@@ -99,13 +77,13 @@ class Alt {
 
   createActions(ActionsClass, exportObj = {}, ...argsForConstructor) {
     const actions = {}
-    const key = uid(
-      this[ACTIONS_REGISTRY],
+    const key = utils.uid(
+      this[Sym.ACTIONS_REGISTRY],
       ActionsClass.displayName || ActionsClass.name || 'Unknown'
     )
 
     if (typeof ActionsClass === 'function') {
-      assign(actions, getInternalMethods(ActionsClass.prototype, true))
+      assign(actions, utils.getInternalMethods(ActionsClass.prototype, true))
       class ActionsGenerator extends ActionsClass {
         constructor(...args) {
           super(...args)
@@ -113,7 +91,7 @@ class Alt {
 
         generateActions(...actionNames) {
           actionNames.forEach((actionName) => {
-            actions[actionName] = dispatchIdentity
+            actions[actionName] = utils.dispatchIdentity
           })
         }
       }
@@ -140,62 +118,74 @@ class Alt {
       )
 
       // generate a constant
-      const constant = formatAsConstant(action)
-      obj[constant] = obj[action][ACTION_KEY]
+      const constant = utils.formatAsConstant(action)
+      obj[constant] = obj[action][Sym.ACTION_KEY]
 
       return obj
     }, exportObj)
   }
 
   takeSnapshot(...storeNames) {
-    const state = snapshot(this, storeNames)
-    assign(this[LAST_SNAPSHOT], state)
+    const state = StateFunctions.snapshot(this, storeNames)
+    assign(this[Sym.LAST_SNAPSHOT], state)
     return this.serialize(state)
   }
 
   rollback() {
-    setAppState(this, this.serialize(this[LAST_SNAPSHOT]), (store) => {
-      if (store[LIFECYCLE].rollback) {
-        store[LIFECYCLE].rollback()
+    StateFunctions.setAppState(
+      this,
+      this.serialize(this[Sym.LAST_SNAPSHOT]),
+      storeInst => {
+        if (storeInst[Sym.LIFECYCLE].rollback) {
+          storeInst[Sym.LIFECYCLE].rollback()
+        }
+        storeInst.emitChange()
       }
-      store.emitChange()
-    })
+    )
   }
 
   recycle(...storeNames) {
     const initialSnapshot = storeNames.length
-      ? filterSnapshots(this, this[INIT_SNAPSHOT], storeNames)
-      : this[INIT_SNAPSHOT]
+      ? StateFunctions.filterSnapshots(
+          this,
+          this[Sym.INIT_SNAPSHOT],
+          storeNames
+        )
+      : this[Sym.INIT_SNAPSHOT]
 
-    setAppState(this, this.serialize(initialSnapshot), (store) => {
-      if (store[LIFECYCLE].init) {
-        store[LIFECYCLE].init()
+    StateFunctions.setAppState(
+      this,
+      this.serialize(initialSnapshot),
+      (storeInst) => {
+        if (storeInst[Sym.LIFECYCLE].init) {
+          storeInst[Sym.LIFECYCLE].init()
+        }
+        storeInst.emitChange()
       }
-      store.emitChange()
-    })
+    )
   }
 
   flush() {
-    const state = this.serialize(snapshot(this))
+    const state = this.serialize(StateFunctions.snapshot(this))
     this.recycle()
     return state
   }
 
   bootstrap(data) {
-    setAppState(this, data, (store) => {
-      if (store[LIFECYCLE].bootstrap) {
-        store[LIFECYCLE].bootstrap()
+    StateFunctions.setAppState(this, data, (storeInst) => {
+      if (storeInst[Sym.LIFECYCLE].bootstrap) {
+        storeInst[Sym.LIFECYCLE].bootstrap()
       }
-      store.emitChange()
+      storeInst.emitChange()
     })
   }
 
-  prepare(store, payload) {
+  prepare(storeInst, payload) {
     const data = {}
-    if (!store._storeName) {
+    if (!storeInst.displayName) {
       throw new ReferenceError('Store provided does not have a name')
     }
-    data[store._storeName] = payload
+    data[storeInst.displayName] = payload
     return this.serialize(data)
   }
 

@@ -1,12 +1,6 @@
 import assign from 'object-assign'
-import * as Sym from '../symbols/symbols'
 
-const {
-  INIT_SNAPSHOT,
-  LAST_SNAPSHOT,
-  LIFECYCLE,
-  STATE_CONTAINER
-} = Sym
+import * as Sym from '../symbols/symbols'
 
 export function setAppState(instance, data, onStore) {
   const obj = instance.deserialize(data)
@@ -17,7 +11,7 @@ export function setAppState(instance, data, onStore) {
       if (config.onDeserialize) {
         obj[key] = config.onDeserialize(obj[key]) || obj[key]
       }
-      assign(store[STATE_CONTAINER], obj[key])
+      assign(store[Sym.STATE_CONTAINER], obj[key])
       onStore(store)
     }
   })
@@ -29,11 +23,11 @@ export function snapshot(instance, storeNames = []) {
     const storeName = storeHandle.displayName || storeHandle
     const store = instance.stores[storeName]
     const { config } = store.StoreModel
-    if (store[LIFECYCLE].snapshot) {
-      store[LIFECYCLE].snapshot()
+    if (store[Sym.LIFECYCLE].snapshot) {
+      store[Sym.LIFECYCLE].snapshot()
     }
     const customSnapshot = config.onSerialize &&
-      config.onSerialize(store[STATE_CONTAINER])
+      config.onSerialize(store[Sym.STATE_CONTAINER])
     obj[storeName] = customSnapshot ? customSnapshot : store.getState()
     return obj
   }, {})
@@ -41,10 +35,10 @@ export function snapshot(instance, storeNames = []) {
 
 export function saveInitialSnapshot(instance, key) {
   const state = instance.deserialize(
-    instance.serialize(instance.stores[key][STATE_CONTAINER])
+    instance.serialize(instance.stores[key][Sym.STATE_CONTAINER])
   )
-  instance[INIT_SNAPSHOT][key] = state
-  instance[LAST_SNAPSHOT][key] = state
+  instance[Sym.INIT_SNAPSHOT][key] = state
+  instance[Sym.LAST_SNAPSHOT][key] = state
 }
 
 export function filterSnapshots(instance, state, stores) {

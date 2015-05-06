@@ -1,13 +1,6 @@
-import Symbol from 'es-symbol'
-import {
-  ACTION_KEY,
-  ALL_LISTENERS,
-  LIFECYCLE,
-  LISTENERS,
-  PUBLIC_METHODS
-} from '../symbols/symbols'
+import * as Sym from '../symbols/symbols'
 
-export const StoreMixinEssentials = {
+const StoreMixin = {
   waitFor(...sources) {
     if (!sources.length) {
       throw new ReferenceError('Dispatch tokens not provided')
@@ -31,18 +24,16 @@ export const StoreMixinEssentials = {
         throw new TypeError('exportPublicMethods expects a function')
       }
 
-      this[PUBLIC_METHODS][methodName] = methods[methodName]
+      this[Sym.PUBLIC_METHODS][methodName] = methods[methodName]
     })
   },
 
   emitChange() {
     this.getInstance().emitChange()
-  }
-}
+  },
 
-export const StoreMixinListeners = {
   on(lifecycleEvent, handler) {
-    this[LIFECYCLE][lifecycleEvent] = handler.bind(this)
+    this[Sym.LIFECYCLE][lifecycleEvent] = handler.bind(this)
   },
 
   bindAction(symbol, handler) {
@@ -56,16 +47,16 @@ export const StoreMixinListeners = {
     if (handler.length > 1) {
       throw new TypeError(
         `Action handler in store ${this._storeName} for ` +
-        `${(symbol[ACTION_KEY] || symbol).toString()} was defined with 2 ` +
-        `parameters. Only a single parameter is passed through the ` +
+        `${(symbol[Sym.ACTION_KEY] || symbol).toString()} was defined with ` +
+        `two parameters. Only a single parameter is passed through the ` +
         `dispatcher, did you mean to pass in an Object instead?`
       )
     }
 
     // You can pass in the constant or the function itself
-    const key = symbol[ACTION_KEY] ? symbol[ACTION_KEY] : symbol
-    this[LISTENERS][key] = handler.bind(this)
-    this[ALL_LISTENERS].push(Symbol.keyFor(key))
+    const key = symbol[Sym.ACTION_KEY] ? symbol[Sym.ACTION_KEY] : symbol
+    this[Sym.LISTENERS][key] = handler.bind(this)
+    this[Sym.ALL_LISTENERS].push(Symbol.keyFor(key))
   },
 
   bindActions(actions) {
@@ -117,5 +108,6 @@ export const StoreMixinListeners = {
       }
     })
   }
-
 }
+
+export default StoreMixin
