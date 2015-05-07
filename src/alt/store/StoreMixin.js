@@ -1,3 +1,4 @@
+import Symbol from 'es-symbol'
 import * as Sym from '../symbols/symbols'
 
 const StoreMixin = {
