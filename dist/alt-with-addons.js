@@ -660,7 +660,7 @@ module.exports = EventEmitter;
 
 },{}],7:[function(require,module,exports){
 /**
- * Copyright (c) 2014, Facebook, Inc.
+ * Copyright (c) 2014-2015, Facebook, Inc.
  * All rights reserved.
  *
  * This source code is licensed under the BSD-style license found in the
@@ -1374,9 +1374,7 @@ var Alt = (function () {
     key: 'rollback',
     value: function rollback() {
       StateFunctions.setAppState(this, this.serialize(this[Sym.LAST_SNAPSHOT]), function (storeInst) {
-        if (storeInst[Sym.LIFECYCLE].rollback) {
-          storeInst[Sym.LIFECYCLE].rollback();
-        }
+        storeInst[Sym.LIFECYCLE].emit('rollback');
         storeInst.emitChange();
       });
     }
@@ -1390,9 +1388,7 @@ var Alt = (function () {
       var initialSnapshot = storeNames.length ? StateFunctions.filterSnapshots(this, this[Sym.INIT_SNAPSHOT], storeNames) : this[Sym.INIT_SNAPSHOT];
 
       StateFunctions.setAppState(this, this.serialize(initialSnapshot), function (storeInst) {
-        if (storeInst[Sym.LIFECYCLE].init) {
-          storeInst[Sym.LIFECYCLE].init();
-        }
+        storeInst[Sym.LIFECYCLE].emit('init');
         storeInst.emitChange();
       });
     }
@@ -1407,9 +1403,7 @@ var Alt = (function () {
     key: 'bootstrap',
     value: function bootstrap(data) {
       StateFunctions.setAppState(this, data, function (storeInst) {
-        if (storeInst[Sym.LIFECYCLE].bootstrap) {
-          storeInst[Sym.LIFECYCLE].bootstrap();
-        }
+        storeInst[Sym.LIFECYCLE].emit('bootstrap');
         storeInst.emitChange();
       });
     }
@@ -1503,7 +1497,7 @@ var AltStore = (function () {
     _classCallCheck(this, AltStore);
 
     this[EE] = new _eventemitter32['default']();
-    this[Sym.LIFECYCLE] = {};
+    this[Sym.LIFECYCLE] = model[Sym.LIFECYCLE];
     this[Sym.STATE_CONTAINER] = state || model;
 
     this._storeName = model._storeName;
@@ -1513,14 +1507,11 @@ var AltStore = (function () {
       this.StoreModel.state = _objectAssign2['default']({}, StoreModel.state);
     }
 
-    _objectAssign2['default'](this[Sym.LIFECYCLE], model[Sym.LIFECYCLE]);
     _objectAssign2['default'](this, model[Sym.PUBLIC_METHODS]);
 
     // Register dispatcher
     this.dispatchToken = alt.dispatcher.register(function (payload) {
-      if (model[Sym.LIFECYCLE].beforeEach) {
-        model[Sym.LIFECYCLE].beforeEach(payload, _this[Sym.STATE_CONTAINER]);
-      }
+      _this[Sym.LIFECYCLE].emit('beforeEach', payload, _this[Sym.STATE_CONTAINER]);
 
       if (model[Sym.LISTENERS][payload.action]) {
         var result = false;
@@ -1528,8 +1519,8 @@ var AltStore = (function () {
         try {
           result = model[Sym.LISTENERS][payload.action](payload.data);
         } catch (e) {
-          if (_this[Sym.LIFECYCLE].error) {
-            _this[Sym.LIFECYCLE].error(e, payload, _this[Sym.STATE_CONTAINER]);
+          if (model[Sym.HANDLING_ERRORS]) {
+            _this[Sym.LIFECYCLE].emit('error', e, payload, _this[Sym.STATE_CONTAINER]);
           } else {
             throw e;
           }
@@ -1540,14 +1531,10 @@ var AltStore = (function () {
         }
       }
 
-      if (model[Sym.LIFECYCLE].afterEach) {
-        model[Sym.LIFECYCLE].afterEach(payload, _this[Sym.STATE_CONTAINER]);
-      }
+      _this[Sym.LIFECYCLE].emit('afterEach', payload, _this[Sym.STATE_CONTAINER]);
     });
 
-    if (this[Sym.LIFECYCLE].init) {
-      this[Sym.LIFECYCLE].init();
-    }
+    this[Sym.LIFECYCLE].emit('init');
   }
 
   _createClass(AltStore, [{
@@ -1573,9 +1560,7 @@ var AltStore = (function () {
   }, {
     key: 'unlisten',
     value: function unlisten(cb) {
-      if (this[Sym.LIFECYCLE].unlisten) {
-        this[Sym.LIFECYCLE].unlisten();
-      }
+      this[Sym.LIFECYCLE].emit('unlisten');
       this[EE].removeListener('change', cb);
     }
   }, {
@@ -1599,6 +1584,12 @@ Object.defineProperty(exports, '__esModule', {
 });
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _esSymbol = require('es-symbol');
+
+var _esSymbol2 = _interopRequireDefault(_esSymbol);
 
 var _symbolsSymbols = require('../symbols/symbols');
 
@@ -1643,7 +1634,10 @@ var StoreMixin = {
   },
 
   on: function on(lifecycleEvent, handler) {
-    this[Sym.LIFECYCLE][lifecycleEvent] = handler.bind(this);
+    if (lifecycleEvent === 'error') {
+      this[Sym.HANDLING_ERRORS] = true;
+    }
+    this[Sym.LIFECYCLE].on(lifecycleEvent, handler.bind(this));
   },
 
   bindAction: function bindAction(symbol, handler) {
@@ -1661,7 +1655,7 @@ var StoreMixin = {
     // You can pass in the constant or the function itself
     var key = symbol[Sym.ACTION_KEY] ? symbol[Sym.ACTION_KEY] : symbol;
     this[Sym.LISTENERS][key] = handler.bind(this);
-    this[Sym.ALL_LISTENERS].push(Symbol.keyFor(key));
+    this[Sym.ALL_LISTENERS].push(_esSymbol2['default'].keyFor(key));
   },
 
   bindActions: function bindActions(actions) {
@@ -1717,7 +1711,7 @@ var StoreMixin = {
 exports['default'] = StoreMixin;
 module.exports = exports['default'];
 
-},{"../symbols/symbols":17}],16:[function(require,module,exports){
+},{"../symbols/symbols":17,"es-symbol":5}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1745,6 +1739,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
 var _objectAssign = require('object-assign');
 
 var _objectAssign2 = _interopRequireDefault(_objectAssign);
+
+var _eventemitter3 = require('eventemitter3');
+
+var _eventemitter32 = _interopRequireDefault(_eventemitter3);
 
 var _symbolsSymbols = require('../symbols/symbols');
 
@@ -1780,7 +1778,7 @@ function doSetState(store, storeInstance, state) {
 
 function createPrototype(proto, alt, key, extras) {
   proto[Sym.ALL_LISTENERS] = [];
-  proto[Sym.LIFECYCLE] = {};
+  proto[Sym.LIFECYCLE] = new _eventemitter32['default']();
   proto[Sym.LISTENERS] = {};
   proto[Sym.PUBLIC_METHODS] = {};
 
@@ -1889,7 +1887,7 @@ function createStoreFromClass(alt, StoreModel, key) {
   return storeInstance;
 }
 
-},{"../symbols/symbols":17,"../utils/AltUtils":18,"./AltStore":14,"./StoreMixin":15,"object-assign":10}],17:[function(require,module,exports){
+},{"../symbols/symbols":17,"../utils/AltUtils":18,"./AltStore":14,"./StoreMixin":15,"eventemitter3":6,"object-assign":10}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1922,6 +1920,10 @@ exports.ACTION_UID = ACTION_UID;
 var ALL_LISTENERS = _esSymbol2['default']();
 
 exports.ALL_LISTENERS = ALL_LISTENERS;
+// are we handling our own errors
+var HANDLING_ERRORS = _esSymbol2['default']();
+
+exports.HANDLING_ERRORS = HANDLING_ERRORS;
 // initial snapshot
 var INIT_SNAPSHOT = _esSymbol2['default']();
 
@@ -2054,9 +2056,7 @@ function snapshot(instance) {
     var store = instance.stores[storeName];
     var config = store.StoreModel.config;
 
-    if (store[Sym.LIFECYCLE].snapshot) {
-      store[Sym.LIFECYCLE].snapshot();
-    }
+    store[Sym.LIFECYCLE].emit('snapshot');
     var customSnapshot = config.onSerialize && config.onSerialize(store[Sym.STATE_CONTAINER]);
     obj[storeName] = customSnapshot ? customSnapshot : store.getState();
     return obj;
