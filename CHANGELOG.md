@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.16.3
+
+### Dependencies
+
+* Updates es-symbol.
+
 ## 0.16.2
 
 ### Added
