@@ -4,8 +4,9 @@ function NoopClass() { }
 const builtIns = Object.getOwnPropertyNames(NoopClass)
 const builtInProto = Object.getOwnPropertyNames(NoopClass.prototype)
 
-export function getInternalMethods(obj, isProto) {
+export function getInternalMethods(Obj, isProto) {
   const excluded = isProto ? builtInProto : builtIns
+  const obj = isProto ? Obj.prototype : Obj
   return Object.getOwnPropertyNames(obj).reduce((value, m) => {
     if (excluded.indexOf(m) !== -1) {
       return value

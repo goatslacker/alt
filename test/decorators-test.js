@@ -1,6 +1,6 @@
 import { assert } from 'chai'
 import Alt from '../'
-import { createActions, createStore } from '../utils/decorators'
+import { createActions, createStore, bind, expose } from '../utils/decorators'
 
 const alt = new Alt()
 
@@ -50,6 +50,40 @@ export default {
       }
 
       assert.isFunction(Actions.foo)
+    },
+
+    'decorating action listening and public methods'() {
+      const TodoActions = alt.generateActions('addTodo')
+
+      @createStore(alt)
+      class TodoStore {
+        static displayName = 'TodoStore'
+
+        constructor() {
+          this.todos = {}
+          this.id = 0
+        }
+
+        uid() {
+          return this.id++
+        }
+
+        @bind(TodoActions.addTodo)
+        addTodo(todo) {
+          this.todos[this.uid()] = todo
+        }
+
+        @expose
+        getTodo(id) {
+          return this.getState().todos[id]
+        }
+      }
+
+      TodoActions.addTodo('hello')
+
+      assert(TodoStore.getState().id === 1)
+      assert.isFunction(TodoStore.getTodo)
+      assert(TodoStore.getTodo(0) === 'hello')
     },
   }
 }
