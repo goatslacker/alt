@@ -1523,9 +1523,10 @@ var StoreMixin = {
     this.dispatcher.waitFor(tokens);
   },
 
-  exportPublicMethods: function exportPublicMethods(methods) {
+  exportAsync: function exportAsync(asyncMethods) {
     var _this = this;
 
+<<<<<<< HEAD
     fn.eachObject(function (methodName, value) {
       if (!fn.isFunction(value)) {
         throw new TypeError('exportPublicMethods expects a function');
@@ -1533,6 +1534,52 @@ var StoreMixin = {
 
       _this[Sym.PUBLIC_METHODS][methodName] = value;
     }, [methods]);
+=======
+    var toExport = Object.keys(asyncMethods).reduce(function (publicMethods, methodName) {
+      var asyncSpec = asyncMethods[methodName];
+
+      var validHandlers = ['success', 'error', 'loading'];
+      validHandlers.forEach(function (handler) {
+        if (asyncSpec[handler] && !asyncSpec[handler][Sym.ACTION_KEY]) {
+          throw new Error('' + handler + ' handler must be an action function');
+        }
+      });
+
+      publicMethods[methodName] = function () {
+        for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+          args[_key2] = arguments[_key2];
+        }
+
+        var state = _this.getInstance().getState();
+        var value = asyncSpec.cache.apply(asyncSpec, [state].concat(args));
+
+        // if we don't have it in cache then fetch it
+        if (!value) {
+          if (asyncSpec.loading) asyncSpec.loading();
+          asyncSpec.fetch.apply(asyncSpec, [state].concat(args)).then(asyncSpec.success)['catch'](asyncSpec.error);
+        } else {
+          // otherwise emit the change now
+          _this.emitChange();
+        }
+      };
+
+      return publicMethods;
+    }, {});
+
+    this.exportPublicMethods(toExport);
+  },
+
+  exportPublicMethods: function exportPublicMethods(methods) {
+    var _this2 = this;
+
+    Object.keys(methods).forEach(function (methodName) {
+      if (typeof methods[methodName] !== 'function') {
+        throw new TypeError('exportPublicMethods expects a function');
+      }
+
+      _this2[Sym.PUBLIC_METHODS][methodName] = methods[methodName];
+    });
+>>>>>>> Update build
   },
 
   emitChange: function emitChange() {
@@ -1565,7 +1612,7 @@ var StoreMixin = {
   },
 
   bindActions: function bindActions(actions) {
-    var _this2 = this;
+    var _this3 = this;
 
     fn.eachObject(function (action, symbol) {
       var matchFirstCharacter = /./;
@@ -1574,39 +1621,45 @@ var StoreMixin = {
       });
       var handler = null;
 
-      if (_this2[action] && _this2[assumedEventHandler]) {
+      if (_this3[action] && _this3[assumedEventHandler]) {
         // If you have both action and onAction
         throw new ReferenceError('You have multiple action handlers bound to an action: ' + ('' + action + ' and ' + assumedEventHandler));
-      } else if (_this2[action]) {
+      } else if (_this3[action]) {
         // action
-        handler = _this2[action];
-      } else if (_this2[assumedEventHandler]) {
+        handler = _this3[action];
+      } else if (_this3[assumedEventHandler]) {
         // onAction
-        handler = _this2[assumedEventHandler];
+        handler = _this3[assumedEventHandler];
       }
 
       if (handler) {
-        _this2.bindAction(symbol, handler);
+        _this3.bindAction(symbol, handler);
       }
     }, [actions]);
   },
 
   bindListeners: function bindListeners(obj) {
-    var _this3 = this;
+    var _this4 = this;
 
+<<<<<<< HEAD
     fn.eachObject(function (methodName, symbol) {
       var listener = _this3[methodName];
+=======
+    Object.keys(obj).forEach(function (methodName) {
+      var symbol = obj[methodName];
+      var listener = _this4[methodName];
+>>>>>>> Update build
 
       if (!listener) {
-        throw new ReferenceError('' + methodName + ' defined but does not exist in ' + _this3._storeName);
+        throw new ReferenceError('' + methodName + ' defined but does not exist in ' + _this4._storeName);
       }
 
       if (Array.isArray(symbol)) {
         symbol.forEach(function (action) {
-          _this3.bindAction(action, listener);
+          _this4.bindAction(action, listener);
         });
       } else {
-        _this3.bindAction(symbol, listener);
+        _this4.bindAction(symbol, listener);
       }
     }, [obj]);
   }
@@ -1781,7 +1834,15 @@ function createStoreFromClass(alt, StoreModel, key) {
     store.bindListeners(config.bindListeners);
   }
 
+<<<<<<< HEAD
   storeInstance = fn.assign(new _AltStore2['default'](alt, store, store[alt.config.stateKey] || store[config.stateKey] || null, StoreModel), utils.getInternalMethods(StoreModel), config.publicMethods, { displayName: key });
+=======
+  if (config.datasource) {
+    store.exportAsync(config.datasource);
+  }
+
+  storeInstance = _objectAssign2['default'](new _AltStore2['default'](alt, store, store[alt.config.stateKey] || store[config.stateKey] || null, StoreModel), utils.getInternalMethods(StoreModel), config.publicMethods, { displayName: key });
+>>>>>>> Update build
 
   return storeInstance;
 }

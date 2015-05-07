@@ -27,7 +27,7 @@ const StoreMixin = {
 
       const validHandlers = ['success', 'error', 'loading']
       validHandlers.forEach((handler) => {
-        if (asyncSpec[handler] && !asyncSpec[handler][ACTION_KEY]) {
+        if (asyncSpec[handler] && !asyncSpec[handler][Sym.ACTION_KEY]) {
           throw new Error(`${handler} handler must be an action function`)
         }
       })
