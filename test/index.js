@@ -707,7 +707,7 @@ const tests = {
     class StoreWithInvalidExportType {
       constructor() {
         this.foo = 'bar'
-        this.exportPublicMethods('foo')
+        this.exportPublicMethods({ foo: 'foo' })
       }
     }
 
