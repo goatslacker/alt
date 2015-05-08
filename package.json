@@ -1,6 +1,6 @@
 {
   "name": "alt",
-  "version": "0.16.3",
+  "version": "0.16.4",
   "description": "A flux implementation",
   "main": "lib",
   "dependencies": {
