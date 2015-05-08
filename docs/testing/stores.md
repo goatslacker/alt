@@ -21,6 +21,8 @@ The best way to demonstrate testing stores is with an example.
 
 ## Example
 
+You can also download and run this [example](https://github.com/jdlehman/alt-example-tests).
+
 ### Store
 
 ```javascript
