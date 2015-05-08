@@ -9,7 +9,7 @@ permalink: /blog/
 
   <div class="txt-center">
     <h1 class="txt-light">Posts</h1>
-    <p class="txt-light">subscribe <a href="{{ "/feed.xml" | prepend: site.url }}">via RSS</a></p>
+    <p class="txt-light">subscribe <a href="/feed.xml">via RSS</a></p>
   </div>
 
   <ul>
@@ -18,7 +18,7 @@ permalink: /blog/
         <div class="post">
           <span>{{ post.date | date: "%b %-d, %Y" }}</span>
           <h2>
-            <a class="post-link" href="{{ post.url | prepend: site.url }}">{{ post.title }}</a>
+            <a class="post-link" href="{{ post.url }}">{{ post.title }}</a>
           </h2>
         </div>
       </li>

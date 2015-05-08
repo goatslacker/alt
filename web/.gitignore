@@ -1,5 +1,6 @@
 .sass-cache
 .bundle
+.ruby-version
 _site
 docs
 guide

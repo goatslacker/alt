@@ -8,29 +8,29 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="{{ site.url }}/"><img src="{{ "/assets/alt.png" | prepend: site.url }}" alt="Alt" width="40" /></a>
+      <a class="navbar-brand" href="/"><img src="/assets/alt.png" alt="Alt" width="40" /></a>
     </div>
 
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav navbar-right">
         <li>
-          <a href="{{ "/guide/" | prepend: site.url }}">Getting Started</a>
+          <a href="/guide/">Getting Started</a>
         </li>
         <li class="dropdown">
           <a href='#' class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">API Documentation <span class="caret"></span></a>
           <ul class="dropdown-menu" role="menu">
             <li>
-              <a href="{{ "/docs/" | prepend: site.url }}">Alt</a>
+              <a href="/docs/">Alt</a>
             </li>
             {% for item in site.sidenav %}
             <li>
-              <a href="{{ item.url | prepend: site.url }}">{{ item.title }}</a>
+              <a href="{{ item.url }}">{{ item.title }}</a>
             </li>
             {% endfor %}
           </ul>
         </li>
         <li>
-          <a href="{{ "/blog/" | prepend: site.url }}">Blog</a>
+          <a href="/blog/">Blog</a>
         </li>
         <li>
           <a href="https://gitter.im/goatslacker/alt">Support</a>

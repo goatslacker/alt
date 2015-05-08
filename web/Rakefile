@@ -12,20 +12,24 @@ GITHUB_REPONAME = 'alt'
 GITHUB_BRANCH = 'gh-pages'
 GITHUB_USER = 'goatslacker'
 
+# rake clean
+desc 'Serve and watch the site'
+task :watch => [:clean] do
+  system 'jekyll serve --watch'
+end
+
 # rake build
 desc 'Build the site'
-task :build do
-  clean_and_copy_docs
-  clean_and_copy_guide
+task :build => [:clean] do
   system 'jekyll build'
 end
 
 # rake watch
 desc 'Serve and watch the site'
-task :watch do
+task :clean do
+  system 'rm -rf _site/'
   clean_and_copy_docs
   clean_and_copy_guide
-  system 'jekyll serve --watch'
 end
 
 
@@ -38,7 +42,6 @@ task :deploy, [:commit_message] => [:build] do |t, args|
   sha = `git log`.match(/[a-z0-9]{40}/)[0]
 
   Dir.mktmpdir do |tmp|
-    clean_and_copy_docs
     pwd = Dir.pwd
     Dir.chdir tmp
 
@@ -70,21 +73,27 @@ def clean_and_copy_docs
 end
 
 def clean_and_copy_guide
+  system 'rm -rf guide/'
   system 'rm -rf guides/'
-  system 'cp -r ../guides .'
+  system 'mkdir guide'
+  system 'mkdir guides'
+  system 'cp -r ../guides/getting-started/* guide'
+  system 'cp -r ../guides/es5 guides'
   format_markdown_links('guide')
+  format_markdown_links('guides')
 end
 
 def format_markdown_links(dir)
   site = YAML.load_file('_config.yml')
 
   Dir[dir + '/**/*.md'].each do |file|
+    full_dir = File.dirname(file)
     temp_file = Tempfile.new('tmp')
     begin
       File.open(file, 'r') do |file|
         file.each_line do |line|
-          line.scan(/(?<all>(?<name>\[.+?\])\((?<link>.+?).md(?<hash>#.+?)?\))/).each do |all, name, link, hash|
-            line.gsub!(all, "#{name}(#{site['baseurl']}/#{dir}/#{link}#{hash})")
+          line.scan(/(?<all>(?<name>\[.+?\])\((?<link>.+?)\.md(?<hash>#.+?)?\))/).each do |all, name, link, hash|
+            line.gsub!(all, "#{name}(/#{full_dir}/#{link}#{hash})")
           end
 
           temp_file.puts line
