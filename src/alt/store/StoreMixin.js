@@ -1,5 +1,7 @@
 import Symbol from 'es-symbol'
+
 import * as Sym from '../symbols/symbols'
+import * as fn from '../../utils/functions'
 
 const StoreMixin = {
   waitFor(...sources) {
@@ -20,13 +22,13 @@ const StoreMixin = {
   },
 
   exportPublicMethods(methods) {
-    Object.keys(methods).forEach((methodName) => {
-      if (typeof methods[methodName] !== 'function') {
+    fn.eachObject((methodName, value) => {
+      if (!fn.isFunction(value)) {
         throw new TypeError('exportPublicMethods expects a function')
       }
 
-      this[Sym.PUBLIC_METHODS][methodName] = methods[methodName]
-    })
+      this[Sym.PUBLIC_METHODS][methodName] = value
+    }, [methods])
   },
 
   emitChange() {
@@ -44,7 +46,7 @@ const StoreMixin = {
     if (!symbol) {
       throw new ReferenceError('Invalid action reference passed in')
     }
-    if (typeof handler !== 'function') {
+    if (!fn.isFunction(handler)) {
       throw new TypeError('bindAction expects a function')
     }
 
@@ -64,8 +66,7 @@ const StoreMixin = {
   },
 
   bindActions(actions) {
-    Object.keys(actions).forEach((action) => {
-      const symbol = actions[action]
+    fn.eachObject((action, symbol) => {
       const matchFirstCharacter = /./
       const assumedEventHandler = action.replace(matchFirstCharacter, (x) => {
         return `on${x[0].toUpperCase()}`
@@ -89,12 +90,11 @@ const StoreMixin = {
       if (handler) {
         this.bindAction(symbol, handler)
       }
-    })
+    }, [actions])
   },
 
   bindListeners(obj) {
-    Object.keys(obj).forEach((methodName) => {
-      const symbol = obj[methodName]
+    fn.eachObject((methodName, symbol) => {
       const listener = this[methodName]
 
       if (!listener) {
@@ -110,7 +110,7 @@ const StoreMixin = {
       } else {
         this.bindAction(symbol, listener)
       }
-    })
+    }, [obj])
   }
 }
 

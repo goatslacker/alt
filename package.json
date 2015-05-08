@@ -5,9 +5,8 @@
   "main": "lib",
   "dependencies": {
     "es-symbol": "1.1.2",
-    "eventemitter3": "^0.1.6",
-    "flux": "^2.0.1",
-    "object-assign": "^2.0.0"
+    "eventemitter3": "0.1.6",
+    "flux": "2.0.3"
   },
   "devDependencies": {
     "babel": "^5.2.13",

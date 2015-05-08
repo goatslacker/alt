@@ -1,8 +1,8 @@
-import assign from 'object-assign'
 import { Dispatcher } from 'flux'
 
 import * as StateFunctions from './utils/StateFunctions'
 import * as Sym from './symbols/symbols'
+import * as fn from '../utils/functions'
 import * as store from './store'
 import * as utils from './utils/AltUtils'
 import makeAction from './actions'
@@ -30,9 +30,9 @@ class Alt {
     store.createStoreConfig(this.config, StoreModel)
     const Store = store.transformStore(this.storeTransforms, StoreModel)
 
-    return typeof Store === 'object'
-      ? store.createStoreFromObject(this, Store, key)
-      : store.createStoreFromClass(this, Store, key, ...args)
+    return fn.isFunction(Store)
+      ? store.createStoreFromClass(this, Store, key, ...args)
+      : store.createStoreFromObject(this, Store, key)
   }
 
   createStore(StoreModel, iden, ...args) {
@@ -53,9 +53,9 @@ class Alt {
       key = utils.uid(this.stores, key)
     }
 
-    const storeInstance = typeof Store === 'object'
-      ? store.createStoreFromObject(this, Store, key)
-      : store.createStoreFromClass(this, Store, key, ...args)
+    const storeInstance = fn.isFunction(Store)
+      ? store.createStoreFromClass(this, Store, key, ...args)
+      : store.createStoreFromObject(this, Store, key)
 
     this.stores[key] = storeInstance
     StateFunctions.saveInitialSnapshot(this, key)
@@ -82,8 +82,8 @@ class Alt {
       ActionsClass.displayName || ActionsClass.name || 'Unknown'
     )
 
-    if (typeof ActionsClass === 'function') {
-      assign(actions, utils.getInternalMethods(ActionsClass, true))
+    if (fn.isFunction(ActionsClass)) {
+      fn.assign(actions, utils.getInternalMethods(ActionsClass, true))
       class ActionsGenerator extends ActionsClass {
         constructor(...args) {
           super(...args)
@@ -96,38 +96,37 @@ class Alt {
         }
       }
 
-      assign(actions, new ActionsGenerator(...argsForConstructor))
+      fn.assign(actions, new ActionsGenerator(...argsForConstructor))
     } else {
-      assign(actions, ActionsClass)
+      fn.assign(actions, ActionsClass)
     }
 
     this.actions[key] = this.actions[key] || {}
 
-    return Object.keys(actions).reduce((obj, action) => {
-      if (typeof actions[action] !== 'function') {
-        return obj
+    fn.eachObject((actionName, action) => {
+      if (!fn.isFunction(action)) {
+        return
       }
 
       // create the action
-      obj[action] = makeAction(
+      exportObj[actionName] = makeAction(
         this,
         key,
+        actionName,
         action,
-        actions[action],
-        obj
+        exportObj
       )
 
       // generate a constant
-      const constant = utils.formatAsConstant(action)
-      obj[constant] = obj[action][Sym.ACTION_KEY]
-
-      return obj
-    }, exportObj)
+      const constant = utils.formatAsConstant(actionName)
+      exportObj[constant] = exportObj[actionName][Sym.ACTION_KEY]
+    }, [actions])
+    return exportObj
   }
 
   takeSnapshot(...storeNames) {
     const state = StateFunctions.snapshot(this, storeNames)
-    assign(this[Sym.LAST_SNAPSHOT], state)
+    fn.assign(this[Sym.LAST_SNAPSHOT], state)
     return this.serialize(state)
   }
 

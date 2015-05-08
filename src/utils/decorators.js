@@ -1,4 +1,4 @@
-import assign from 'object-assign'
+import { assign } from './functions'
 
 /* istanbul ignore next */
 function NoopClass() { }

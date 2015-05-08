@@ -1,5 +1,5 @@
 var Subscribe = require('../mixins/Subscribe')
-var assign = require('object-assign')
+var assign = require('../utils/functions').assign
 
 function id(it) {
   return it

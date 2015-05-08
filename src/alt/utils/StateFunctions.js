@@ -1,20 +1,19 @@
-import assign from 'object-assign'
-
 import * as Sym from '../symbols/symbols'
+import * as fn from '../../utils/functions'
 
 export function setAppState(instance, data, onStore) {
   const obj = instance.deserialize(data)
-  Object.keys(obj).forEach((key) => {
+  fn.eachObject((key, value) => {
     const store = instance.stores[key]
     if (store) {
       const { config } = store.StoreModel
       if (config.onDeserialize) {
-        obj[key] = config.onDeserialize(obj[key]) || obj[key]
+        obj[key] = config.onDeserialize(value) || value
       }
-      assign(store[Sym.STATE_CONTAINER], obj[key])
+      fn.assign(store[Sym.STATE_CONTAINER], obj[key])
       onStore(store)
     }
-  })
+  }, [obj])
 }
 
 export function snapshot(instance, storeNames = []) {

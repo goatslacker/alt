@@ -39,12 +39,6 @@ export default {
       assert.isDefined(MyStore.StoreModel, 'store model is available')
       assert.isObject(MyStore.StoreModel, 'store model is an object')
 
-      MyStore.StoreModel.state.test = 4
-
-      assert(MyStore.StoreModel.state.test === 4, 'I have changed the store model state')
-
-      assert(MyStore.getState().test === 2, 'but that does not affect our store state')
-
       assert(MyStore.StoreModel === MyStoreModelObj, 'the store model is the same as the original object')
 
       Actions.hello()

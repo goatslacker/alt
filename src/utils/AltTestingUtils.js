@@ -1,4 +1,5 @@
-import assign from 'object-assign'
+import { assign } from './functions'
+
 const noop = function () { }
 
 const AltTestingUtils = {
