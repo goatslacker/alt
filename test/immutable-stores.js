@@ -9,7 +9,7 @@ export default {
       const alt = new Alt()
       const store = alt.createStore(immutable(function () {
         this.state = Immutable.Map({})
-      }))
+      }), 'nonameimmutable')
 
       assert(Object.keys(store.getState().toJS()).length === 0)
     },
