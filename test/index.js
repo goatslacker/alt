@@ -1306,6 +1306,7 @@ const tests = {
     })
 
     const store = alt.createStore({
+      displayName: 'just testing',
       state: { x: 0 },
       bindListeners: {
         hello: action
