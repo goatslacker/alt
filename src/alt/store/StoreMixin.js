@@ -22,6 +22,8 @@ const StoreMixin = {
   },
 
   exportAsync(asyncMethods) {
+    let isLoading = false
+
     const toExport = Object.keys(asyncMethods).reduce((publicMethods, methodName) => {
       const asyncSpec = asyncMethods[methodName]
 
@@ -34,12 +36,17 @@ const StoreMixin = {
 
       publicMethods[methodName] = (...args) => {
         const state = this.getInstance().getState()
-        const value = asyncSpec.cache(state, ...args)
+        const value = asyncSpec.cache && asyncSpec.cache(state, ...args)
 
         // if we don't have it in cache then fetch it
         if (!value) {
+          isLoading = true
           if (asyncSpec.loading) asyncSpec.loading()
           asyncSpec.fetch(state, ...args)
+            .then(v => {
+              isLoading = false
+              return v
+            })
             .then(asyncSpec.success)
             .catch(asyncSpec.error)
         } else {
@@ -52,6 +59,7 @@ const StoreMixin = {
     }, {})
 
     this.exportPublicMethods(toExport)
+    this.exportPublicMethods({ isLoading: _ => isLoading })
   },
 
   exportPublicMethods(methods) {

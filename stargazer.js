@@ -63,5 +63,6 @@ class StargazerStore {
   }
 }
 
-StargazerStore.listen((state) => console.log('CHANGED', state.users.length))
+StargazerStore.listen((state) => console.log('CHANGED', state.users.length, StargazerStore.isLoading()))
 StargazerStore.fetchUsers()
+console.log('loading?', StargazerStore.isLoading())
