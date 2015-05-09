@@ -12,12 +12,12 @@ const StargazerActions = alt.generateActions(
 
 const StargazerSource = {
   fetchUsers: {
-    fetch(state) {
+    remote(state) {
       const url = `https://api.github.com/repos/${state.user}/${state.repo}/stargazers`
       return axios({ url }).then(response => response.data)
     },
 
-    cache(state) {
+    local(state) {
       return state.users.length ? state.users : null
     },
 

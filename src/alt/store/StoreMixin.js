@@ -36,19 +36,21 @@ const StoreMixin = {
 
       publicMethods[methodName] = (...args) => {
         const state = this.getInstance().getState()
-        const value = asyncSpec.cache && asyncSpec.cache(state, ...args)
+        const value = asyncSpec.local && asyncSpec.local(state, ...args)
 
         // if we don't have it in cache then fetch it
         if (!value) {
           isLoading = true
           if (asyncSpec.loading) asyncSpec.loading()
-          asyncSpec.fetch(state, ...args)
-            .then(v => {
+          asyncSpec.remote(state, ...args)
+            .then((v) => {
               isLoading = false
-              return v
+              return asyncSpec.success(v)
             })
-            .then(asyncSpec.success)
-            .catch(asyncSpec.error)
+            .catch((v) => {
+              isLoading = false
+              return asyncSpec.error(v)
+            })
         } else {
           // otherwise emit the change now
           this.emitChange()
@@ -59,7 +61,7 @@ const StoreMixin = {
     }, {})
 
     this.exportPublicMethods(toExport)
-    this.exportPublicMethods({ isLoading: _ => isLoading })
+    this.exportPublicMethods({ isLoading: () => isLoading })
   },
 
   exportPublicMethods(methods) {
