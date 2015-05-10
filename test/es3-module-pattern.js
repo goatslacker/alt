@@ -45,7 +45,7 @@ export default {
 
     'store method exists'() {
       const storePrototype = Object.getPrototypeOf(myStore)
-      const assertMethods = ['constructor', 'getEventEmitter', 'emitChange', 'listen', 'unlisten', 'getState']
+      const assertMethods = ['constructor', 'emitChange', 'listen', 'unlisten', 'getState']
       assert.deepEqual(Object.getOwnPropertyNames(storePrototype), assertMethods, 'methods exist for store')
       assert.isUndefined(myStore.addListener, 'event emitter methods not present')
       assert.isUndefined(myStore.removeListener, 'event emitter methods not present')
@@ -89,7 +89,7 @@ export default {
 
     'set state'() {
       const TestStore = {
-        state: { hello: null, inst: null },
+        state: { hello: null },
 
         bindListeners: {
           handleFire: actions.FIRE
@@ -97,7 +97,6 @@ export default {
 
         handleFire(data) {
           this.setState({
-            inst: this.getInstance().getEventEmitter(),
             hello: data
           })
 
@@ -107,12 +106,10 @@ export default {
 
       const store = alt.createStore(TestStore)
       assert.isNull(store.getState().hello, 'store state property has not been set yet')
-      assert.isNull(store.getState().inst, 'store state property has not been set yet')
 
       actions.fire('world')
 
       assert(store.getState().hello === 'world', 'store state was set using setState')
-      assert(store.getState().inst === store.getEventEmitter(), 'get instance works')
     },
 
     'set state in lifecycle'() {

@@ -1,5 +1,3 @@
-import EventEmitter from 'eventemitter3'
-
 import * as Sym from '../symbols/symbols'
 import * as utils from '../utils/AltUtils'
 import * as fn from '../../utils/functions'
@@ -30,7 +28,7 @@ function doSetState(store, storeInstance, state) {
 
 function createPrototype(proto, alt, key, extras) {
   proto[Sym.ALL_LISTENERS] = []
-  proto[Sym.LIFECYCLE] = new EventEmitter()
+  proto[Sym.LIFECYCLE] = {}
   proto[Sym.LISTENERS] = {}
   proto[Sym.PUBLIC_METHODS] = {}
 
