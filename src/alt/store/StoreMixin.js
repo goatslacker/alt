@@ -1,4 +1,4 @@
-import Symbol from 'es-symbol'
+//import Symbol from 'es-symbol'
 
 import * as Sym from '../symbols/symbols'
 import { events } from '../utils/AltUtils'

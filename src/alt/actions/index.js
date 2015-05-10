@@ -1,4 +1,4 @@
-import Symbol from 'es-symbol'
+//import Symbol from 'es-symbol'
 
 import * as Sym from '../symbols/symbols'
 import * as utils from '../utils/AltUtils'

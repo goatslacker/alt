@@ -1,4 +1,4 @@
-import Symbol from 'es-symbol'
+//import Symbol from 'es-symbol'
 
 // action creator handler
 export const ACTION_HANDLER = Symbol()
