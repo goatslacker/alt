@@ -137,7 +137,7 @@ class Alt {
       this,
       this.serialize(this[Sym.LAST_SNAPSHOT]),
       storeInst => {
-        storeInst[Sym.LIFECYCLE].emit('rollback')
+        storeInst[Sym.LIFECYCLE].rollback.emit()
         storeInst.emitChange()
       }
     )
@@ -156,7 +156,7 @@ class Alt {
       this,
       this.serialize(initialSnapshot),
       (storeInst) => {
-        storeInst[Sym.LIFECYCLE].emit('init')
+        storeInst[Sym.LIFECYCLE].init.emit()
         storeInst.emitChange()
       }
     )
@@ -170,7 +170,7 @@ class Alt {
 
   bootstrap(data) {
     StateFunctions.setAppState(this, data, (storeInst) => {
-      storeInst[Sym.LIFECYCLE].emit('bootstrap')
+      storeInst[Sym.LIFECYCLE].bootstrap.emit()
       storeInst.emitChange()
     })
   }
