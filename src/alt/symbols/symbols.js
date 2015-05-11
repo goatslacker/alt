@@ -1,8 +1,5 @@
 import Symbol from 'es-symbol'
 
-// action creator handler
-export const ACTION_HANDLER = Symbol()
-
 // the action's uid symbol for listening
 export const ACTION_KEY = Symbol()
 
