@@ -1,15 +1,15 @@
-//import Symbol from 'es-symbol'
+import Symbol from 'es-symbol'
 
 import * as Sym from '../symbols/symbols'
 import * as fn from '../../utils/functions'
-import { events } from '../utils/AltUtils'
+import transmitter from 'transmitter'
 
 // event emitter instance
 const EE = Symbol()
 
 class AltStore {
   constructor(alt, model, state, StoreModel) {
-    this[EE] = events()
+    this[EE] = transmitter()
     this[Sym.LIFECYCLE] = model[Sym.LIFECYCLE]
     this[Sym.STATE_CONTAINER] = state || model
 
@@ -58,20 +58,15 @@ class AltStore {
   }
 
   emitChange() {
-    this[EE].emit(this[Sym.STATE_CONTAINER])
+    this[EE].push(this[Sym.STATE_CONTAINER])
   }
 
-  listen(cb) {
-    const dispose = this[EE].subscribe(cb).dispose
+  subscribe(cb) {
+    const { dispose } = this[EE].subscribe(cb)
     return () => {
-      this[Sym.LIFECYCLE].unlisten.emit()
+      this[Sym.LIFECYCLE].unlisten.push()
       dispose()
     }
-  }
-
-  unlisten(cb) {
-    this[Sym.LIFECYCLE].unlisten.emit()
-    this[EE].rm(cb)
   }
 
   getState() {

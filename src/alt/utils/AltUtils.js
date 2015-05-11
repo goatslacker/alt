@@ -42,28 +42,3 @@ export function formatAsConstant(name) {
 export function dispatchIdentity(x, ...a) {
   this.dispatch(a.length ? [x].concat(a) : x)
 }
-
-export function events() {
-  const subscriptions = {}
-
-  const rm = (name, onChange) => {
-    const id = subscriptions[name].indexOf(onChange)
-    if (id >= 0) subscriptions[name].splice(id, 1)
-  }
-
-  return {
-    subscribe(name, onChange) {
-      subscriptions[name] = subscriptions[name] || []
-      const id = subscriptions[name].push(onChange)
-      const dispose = () => rm(onChange)
-      return { dispose }
-    },
-
-    emit(name, state) {
-      subscriptions[name].forEach(subscription => subscription(state))
-    },
-
-    rm
-  }
-}
-
