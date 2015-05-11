@@ -1,7 +1,6 @@
-//import Symbol from 'es-symbol'
+import Symbol from 'es-symbol'
 
 import * as Sym from '../symbols/symbols'
-import { events } from '../utils/AltUtils'
 import * as fn from '../../utils/functions'
 
 const StoreMixin = {
@@ -101,10 +100,7 @@ const StoreMixin = {
 
   on(lifecycleEvent, handler) {
     if (lifecycleEvent === 'error') this[Sym.HANDLING_ERRORS] = true
-    this[Sym.LIFECYCLE][lifecycleEvent] = (
-      this[Sym.LIFECYCLE][lifecycleEvent] || events()
-    )
-    return this[Sym.LIFECYCLE].subscribe(handler.bind(this))
+    return this[Sym.LIFECYCLE][lifecycleEvent].subscribe(handler.bind(this))
   },
 
   bindAction(symbol, handler) {
