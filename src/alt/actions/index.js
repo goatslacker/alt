@@ -4,8 +4,8 @@ import * as Sym from '../symbols/symbols'
 import * as utils from '../utils/AltUtils'
 
 class AltAction {
-  constructor(alt, name, action, actions, actionDetails) {
-    this[Sym.ACTION_UID] = name
+  constructor(alt, id, action, actions, actionDetails) {
+    this.id = id
     this._dispatch = action.bind(this)
     this.actions = actions
     this.actionDetails = actionDetails
@@ -13,7 +13,7 @@ class AltAction {
   }
 
   dispatch(data) {
-    this.alt.dispatch(this[Sym.ACTION_UID], data, this.actionDetails)
+    this.alt.dispatch(this.id, data, this.actionDetails)
   }
 }
 
