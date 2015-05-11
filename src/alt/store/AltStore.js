@@ -33,7 +33,7 @@ class AltStore {
           result = model[Sym.LISTENERS][payload.action](payload.data)
         } catch (e) {
           if (model[Sym.HANDLING_ERRORS]) {
-            this[Sym.LIFECYCLE].error.emit({
+            this[Sym.LIFECYCLE].error.push({
               error: e,
               payload,
               state: this[Sym.STATE_CONTAINER]
@@ -48,13 +48,13 @@ class AltStore {
         }
       }
 
-      this[Sym.LIFECYCLE].afterEach.emit({
+      this[Sym.LIFECYCLE].afterEach.push({
         payload,
         state :this[Sym.STATE_CONTAINER]
       })
     })
 
-    this[Sym.LIFECYCLE].init.emit()
+    this[Sym.LIFECYCLE].init.push()
   }
 
   emitChange() {
