@@ -119,7 +119,7 @@ class Alt {
 
       // generate a constant
       const constant = utils.formatAsConstant(actionName)
-      exportObj[constant] = exportObj[actionName][Sym.ACTION_KEY]
+      exportObj[constant] = exportObj[actionName].id
     }, [actions])
     return exportObj
   }
