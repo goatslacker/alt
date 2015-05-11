@@ -17,8 +17,8 @@ class Alt {
     this.stores = {}
     this.storeTransforms = config.storeTransforms || []
     this[Sym.ACTIONS_REGISTRY] = {}
-    this[Sym.INIT_SNAPSHOT] = {}
-    this[Sym.LAST_SNAPSHOT] = {}
+    this.$_initSnapshot = {}
+    this.$_lastSnapshot = {}
   }
 
   dispatch(action, data, details) {
@@ -126,14 +126,14 @@ class Alt {
 
   takeSnapshot(...storeNames) {
     const state = StateFunctions.snapshot(this, storeNames)
-    fn.assign(this[Sym.LAST_SNAPSHOT], state)
+    fn.assign(this.$_lastSnapshot, state)
     return this.serialize(state)
   }
 
   rollback() {
     StateFunctions.setAppState(
       this,
-      this.serialize(this[Sym.LAST_SNAPSHOT]),
+      this.serialize(this.$_lastSnapshot),
       storeInst => {
         storeInst[Sym.LIFECYCLE].rollback.push()
         storeInst.emitChange()
@@ -145,10 +145,10 @@ class Alt {
     const initialSnapshot = storeNames.length
       ? StateFunctions.filterSnapshots(
           this,
-          this[Sym.INIT_SNAPSHOT],
+          this.$_initSnapshot,
           storeNames
         )
-      : this[Sym.INIT_SNAPSHOT]
+      : this.$_initSnapshot
 
     StateFunctions.setAppState(
       this,
