@@ -10,14 +10,8 @@ function addMeta(description, decoration) {
   return description
 }
 
-export function createActions(alt, ...args) {
-  return function (Actions) {
-    return alt.createActions(Actions, {}, ...args)
-  }
-}
-
-export function createStore(alt, ...args) {
-  return function (Store) {
+export function decorate(context) {
+  return (Store) => {
     const proto = Store.prototype
     const publicMethods = {}
     const bindListeners = {}
@@ -31,8 +25,10 @@ export function createStore(alt, ...args) {
       }
 
       /* istanbul ignore else */
-      if (meta.action) {
-        bindListeners[name] = meta.action
+      if (meta.actions) {
+        bindListeners[name] = meta.actions
+      } else if (meta.actionsWithContext) {
+        bindListeners[name] = meta.actionsWithContext(context)
       } else if (meta.publicMethod) {
         publicMethods[name] = proto[name]
       }
@@ -43,13 +39,31 @@ export function createStore(alt, ...args) {
       publicMethods
     }, Store.config)
 
-    return alt.createStore(Store, undefined, ...args)
+    return Store
+  }
+}
+
+export function createActions(alt, ...args) {
+  return function (Actions) {
+    return alt.createActions(Actions, {}, ...args)
+  }
+}
+
+export function createStore(alt, ...args) {
+  return function (Store) {
+    return alt.createStore(decorate(alt)(Store), undefined, ...args)
   }
 }
 
 export function bind(...actionIds) {
   return (obj, name, description) => {
-    return addMeta(description, { action: actionIds })
+    return addMeta(description, { actions: actionIds })
+  }
+}
+
+export function bindWithContext(fn) {
+  return (obj, name, description) => {
+    return addMeta(description, { actionsWithContext: fn })
   }
 }
 
