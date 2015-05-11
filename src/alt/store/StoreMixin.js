@@ -115,14 +115,14 @@ const StoreMixin = {
     if (handler.length > 1) {
       throw new TypeError(
         `Action handler in store ${this._storeName} for ` +
-        `${(symbol[Sym.ACTION_KEY] || symbol).toString()} was defined with ` +
+        `${(symbol.id || symbol).toString()} was defined with ` +
         `two parameters. Only a single parameter is passed through the ` +
         `dispatcher, did you mean to pass in an Object instead?`
       )
     }
 
     // You can pass in the constant or the function itself
-    const key = symbol[Sym.ACTION_KEY] ? symbol[Sym.ACTION_KEY] : symbol
+    const key = symbol.id ? symbol.id : symbol
     this[Sym.LISTENERS][key] = handler.bind(this)
     this[Sym.ALL_LISTENERS].push(Symbol.keyFor(key))
   },

@@ -1,8 +1,5 @@
 import Symbol from 'es-symbol'
 
-// the action's uid symbol for listening
-export const ACTION_KEY = Symbol()
-
 // per instance registry of actions
 export const ACTIONS_REGISTRY = Symbol()
 
