@@ -6,7 +6,7 @@ import * as utils from '../utils/AltUtils'
 class AltAction {
   constructor(alt, name, action, actions, actionDetails) {
     this[Sym.ACTION_UID] = name
-    this[Sym.ACTION_HANDLER] = action.bind(this)
+    this._dispatch = action.bind(this)
     this.actions = actions
     this.actionDetails = actionDetails
     this.alt = alt
@@ -34,10 +34,21 @@ export default function makeAction(alt, namespace, name, implementation, obj) {
   const newAction = new AltAction(alt, actionSymbol, implementation, obj, data)
 
   // the action itself
-  const action = newAction[Sym.ACTION_HANDLER]
+  const action = (...args) => {
+    newAction.dispatched = false
+    const result = newAction._dispatch(...args)
+    if (!newAction.dispatched && result !== undefined) {
+      if (fn.isFunction(result)) {
+        result(dispatch)
+      } else {
+        dispatch(result)
+      }
+    }
+    return result
+  }
   action.defer = (...args) => {
     setTimeout(() => {
-      newAction[Sym.ACTION_HANDLER].apply(null, args)
+      newAction._dispatch.apply(null, args)
     })
   }
   action[Sym.ACTION_KEY] = actionSymbol
