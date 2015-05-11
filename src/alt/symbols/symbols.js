@@ -3,9 +3,6 @@ import Symbol from 'es-symbol'
 // per instance registry of actions
 export const ACTIONS_REGISTRY = Symbol()
 
-// the action's name
-export const ACTION_UID = Symbol()
-
 // store all of a store's listeners
 export const ALL_LISTENERS = Symbol()
 
