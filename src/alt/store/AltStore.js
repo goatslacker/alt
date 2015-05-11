@@ -21,7 +21,7 @@ class AltStore {
 
     // Register dispatcher
     this.dispatchToken = alt.dispatcher.register((payload) => {
-      this[Sym.LIFECYCLE].beforeEach({
+      this[Sym.LIFECYCLE].beforeEach.push({
         payload,
         state: this[Sym.STATE_CONTAINER]
       })
