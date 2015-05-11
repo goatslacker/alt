@@ -56,7 +56,7 @@ export default function makeAction(alt, namespace, name, implementation, obj) {
       newAction._dispatch.apply(null, args)
     })
   }
-  action[Sym.ACTION_KEY] = actionSymbol
+  action.id = actionSymbol
   action.data = data
 
   // ensure each reference is unique in the namespace
