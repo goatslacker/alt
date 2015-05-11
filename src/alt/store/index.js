@@ -1,3 +1,5 @@
+import transmitter from 'transmitter'
+
 import * as Sym from '../symbols/symbols'
 import * as utils from '../utils/AltUtils'
 import * as fn from '../../utils/functions'
@@ -28,7 +30,19 @@ function doSetState(store, storeInstance, state) {
 
 function createPrototype(proto, alt, key, extras) {
   proto[Sym.ALL_LISTENERS] = []
-  proto[Sym.LIFECYCLE] = {}
+  proto[Sym.LIFECYCLE] = [
+    'afterEach',
+    'beforeEach',
+    'bootstrap',
+    'error',
+    'init',
+    'rollback',
+    'snapshot',
+    'unlisten',
+  ].reduce((obj, name) => {
+    obj[name] = transmitter()
+    return obj
+  }, {})
   proto[Sym.LISTENERS] = {}
   proto[Sym.PUBLIC_METHODS] = {}
 
