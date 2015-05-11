@@ -61,7 +61,7 @@ class AltStore {
     this[EE].push(this[Sym.STATE_CONTAINER])
   }
 
-  subscribe(cb) {
+  listen(cb) {
     const { dispose } = this[EE].subscribe(cb)
     return () => {
       this[Sym.LIFECYCLE].unlisten.push()
