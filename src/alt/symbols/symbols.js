@@ -9,12 +9,6 @@ export const ALL_LISTENERS = Symbol()
 // are we handling our own errors
 export const HANDLING_ERRORS = Symbol()
 
-// initial snapshot
-export const INIT_SNAPSHOT = Symbol()
-
-// last snapshot
-export const LAST_SNAPSHOT = Symbol()
-
 // all lifecycle listeners
 export const LIFECYCLE = Symbol()
 

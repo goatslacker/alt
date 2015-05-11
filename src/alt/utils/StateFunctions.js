@@ -34,8 +34,8 @@ export function saveInitialSnapshot(instance, key) {
   const state = instance.deserialize(
     instance.serialize(instance.stores[key][Sym.STATE_CONTAINER])
   )
-  instance[Sym.INIT_SNAPSHOT][key] = state
-  instance[Sym.LAST_SNAPSHOT][key] = state
+  instance.$_initSnapshot[key] = state
+  instance.$_lastSnapshot[key] = state
 }
 
 export function filterSnapshots(instance, state, stores) {
