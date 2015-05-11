@@ -51,11 +51,11 @@ export default {
     'args passed in'() {
       action.fire(2)
 
-      assert.ok(beforeEach.args[0].length === 2, '2 args are passed')
-      assert.ok(afterEach.args[0].length === 2, '2 args are passed')
+      assert.ok(beforeEach.args[0].length === 1, '1 arg is passed')
+      assert.ok(afterEach.args[0].length === 1, '1 arg is passed')
 
-      assert.ok(beforeEach.args[0][0].data === 2, 'before has payload')
-      assert.ok(afterEach.args[0][0].data === 2, 'after has payload')
+      assert.ok(beforeEach.args[0][0].payload.data === 2, 'before has payload')
+      assert.ok(afterEach.args[0][0].payload.data === 2, 'after has payload')
     },
 
     'before and after get state'() {
@@ -69,10 +69,10 @@ export default {
           change: action.fire
         },
         lifecycle: {
-          beforeEach(x, state) {
+          beforeEach({ state }) {
             beforeValue = state.a
           },
-          afterEach(x, state) {
+          afterEach({ state }) {
             afterValue = state.a
           }
         },
