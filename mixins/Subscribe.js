@@ -8,14 +8,11 @@ var Subscribe = {
   },
 
   add: function (context, store, handler) {
-    context[MIXIN_REGISTRY].push({ store: store, handler: handler })
-    store.listen(handler)
+    context[MIXIN_REGISTRY].push(store.listen(handler))
   },
 
   destroy: function (context) {
-    context[MIXIN_REGISTRY].forEach(function (x) {
-      x.store.unlisten(x.handler)
-    })
+    context[MIXIN_REGISTRY].forEach(function (f) { f() })
     context[MIXIN_REGISTRY] = []
   },
 

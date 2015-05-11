@@ -21,10 +21,7 @@ class AltStore {
     const output = model.output || (x => x)
 
     this.emitChange = () => {
-      this[EE].emit(
-        'change',
-        output.call(model, this[Sym.STATE_CONTAINER])
-      )
+      this[EE].push(output(alt, this[Sym.STATE_CONTAINER]))
     }
 
     const handleDispatch = (f, payload) => {
@@ -50,7 +47,7 @@ class AltStore {
     this.dispatchToken = alt.dispatcher.register((payload) => {
       this.preventDefault = false
 
-      this[Sym.LIFECYCLE].beforeEach.emit({
+      this[Sym.LIFECYCLE].beforeEach.push({
         payload,
         state: this[Sym.STATE_CONTAINER]
       })
