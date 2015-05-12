@@ -52,7 +52,7 @@ class AltStore {
         state: this[Sym.STATE_CONTAINER]
       })
 
-      const actionHandler = model[Sym.LISTENERS][payload.action] ||
+      const actionHandler = model.actionListeners[payload.action] ||
         model.otherwise
 
       if (actionHandler) {
