@@ -35,7 +35,7 @@ const StoreMixin = {
 
       const validHandlers = ['success', 'error', 'loading']
       validHandlers.forEach((handler) => {
-        if (spec[handler] && !spec[handler][Sym.ACTION_KEY]) {
+        if (spec[handler] && !spec[handler].id) {
           throw new Error(`${handler} handler must be an action function`)
         }
       })
