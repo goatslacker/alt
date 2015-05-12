@@ -9,9 +9,6 @@ export const ALL_LISTENERS = Symbol()
 // are we handling our own errors
 export const HANDLING_ERRORS = Symbol()
 
-// all lifecycle listeners
-export const LIFECYCLE = Symbol()
-
 // store action listeners
 export const LISTENERS = Symbol()
 

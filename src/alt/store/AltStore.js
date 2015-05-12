@@ -10,7 +10,7 @@ const EE = Symbol()
 class AltStore {
   constructor(alt, model, state, StoreModel) {
     this[EE] = transmitter()
-    this[Sym.LIFECYCLE] = model[Sym.LIFECYCLE]
+    this.lifecycle = model.lifecycleEvents
     this[Sym.STATE_CONTAINER] = state || model
 
     this._storeName = model._storeName
@@ -21,7 +21,7 @@ class AltStore {
 
     // Register dispatcher
     this.dispatchToken = alt.dispatcher.register((payload) => {
-      this[Sym.LIFECYCLE].beforeEach.push({
+      this.lifecycle.beforeEach.push({
         payload,
         state: this[Sym.STATE_CONTAINER]
       })
@@ -33,7 +33,7 @@ class AltStore {
           result = model[Sym.LISTENERS][payload.action](payload.data)
         } catch (e) {
           if (model[Sym.HANDLING_ERRORS]) {
-            this[Sym.LIFECYCLE].error.push({
+            this.lifecycle.error.push({
               error: e,
               payload,
               state: this[Sym.STATE_CONTAINER]
@@ -48,13 +48,13 @@ class AltStore {
         }
       }
 
-      this[Sym.LIFECYCLE].afterEach.push({
+      this.lifecycle.afterEach.push({
         payload,
         state :this[Sym.STATE_CONTAINER]
       })
     })
 
-    this[Sym.LIFECYCLE].init.push()
+    this.lifecycle.init.push()
   }
 
   emitChange() {
@@ -64,7 +64,7 @@ class AltStore {
   listen(cb) {
     const { dispose } = this[EE].subscribe(cb)
     return () => {
-      this[Sym.LIFECYCLE].unlisten.push()
+      this.lifecycle.unlisten.push()
       dispose()
     }
   }
