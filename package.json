@@ -4,7 +4,8 @@
   "description": "A flux implementation",
   "main": "lib",
   "dependencies": {
-    "flux": "2.0.3"
+    "flux": "2.0.3",
+    "transmitter": "1.0.1"
   },
   "devDependencies": {
     "alt-search-docs": "1.0.6",
