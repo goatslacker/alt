@@ -1,23 +1,21 @@
 'use strict'
-var Symbol = require('es-symbol')
-var MIXIN_REGISTRY = Symbol('alt store listeners')
 
 var Subscribe = {
   create: function (context) {
-    context[MIXIN_REGISTRY] = context[MIXIN_REGISTRY] || []
+    context._AltMixinRegistry = context._AltMixinRegistry || []
   },
 
   add: function (context, store, handler) {
-    context[MIXIN_REGISTRY].push(store.listen(handler))
+    context._AltMixinRegistry.push(store.listen(handler))
   },
 
   destroy: function (context) {
-    context[MIXIN_REGISTRY].forEach(function (f) { f() })
-    context[MIXIN_REGISTRY] = []
+    context._AltMixinRegistry.forEach(function (f) { f() })
+    context._AltMixinRegistry = []
   },
 
   listeners: function (context) {
-    return context[MIXIN_REGISTRY]
+    return context._AltMixinRegistry
   }
 }
 
