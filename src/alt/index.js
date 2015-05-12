@@ -16,7 +16,7 @@ class Alt {
     this.actions = { global: {} }
     this.stores = {}
     this.storeTransforms = config.storeTransforms || []
-    this[Sym.ACTIONS_REGISTRY] = {}
+    this._actionsRegistry = {}
     this._initSnapshot = {}
     this._lastSnapshot = {}
   }
@@ -78,7 +78,7 @@ class Alt {
   createActions(ActionsClass, exportObj = {}, ...argsForConstructor) {
     const actions = {}
     const key = utils.uid(
-      this[Sym.ACTIONS_REGISTRY],
+      this._actionsRegistry,
       ActionsClass.displayName || ActionsClass.name || 'Unknown'
     )
 

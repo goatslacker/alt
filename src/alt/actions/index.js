@@ -19,8 +19,8 @@ class AltAction {
 
 export default function makeAction(alt, namespace, name, implementation, obj) {
   // make sure each Symbol is unique
-  const actionId = utils.uid(alt[Sym.ACTIONS_REGISTRY], `${namespace}.${name}`)
-  alt[Sym.ACTIONS_REGISTRY][actionId] = 1
+  const actionId = utils.uid(alt._actionsRegistry, `${namespace}.${name}`)
+  alt._actionsRegistry[actionId] = 1
   const actionSymbol = Symbol.for(`alt/${actionId}`)
 
   const data = {
