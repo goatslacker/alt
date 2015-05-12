@@ -14,7 +14,7 @@ class AltStore {
     this[Sym.STATE_CONTAINER] = state || model
 
     this._storeName = model._storeName
-    this.boundListeners = model[Sym.ALL_LISTENERS]
+    this.boundListeners = model.boundListeners
     this.StoreModel = StoreModel
 
     fn.assign(this, model.publicMethods)
