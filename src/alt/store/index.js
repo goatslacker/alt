@@ -43,7 +43,7 @@ function createPrototype(proto, alt, key, extras) {
     obj[name] = transmitter()
     return obj
   }, {})
-  proto[Sym.LISTENERS] = {}
+  proto.actionListeners = {}
   proto.publicMethods = {}
 
   return fn.assign(proto, StoreMixin, {
