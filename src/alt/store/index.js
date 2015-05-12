@@ -134,7 +134,7 @@ export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
     new AltStore(
       alt,
       store,
-      store[alt.config.stateKey] || store[config.stateKey] || null,
+      typeof store.state === 'object' ? store.state : null,
       StoreModel
     ),
     utils.getInternalMethods(StoreModel),

@@ -25,7 +25,6 @@ export default {
     'decorate store creation with args'() {
       @createStore(alt, 1, 2, 3)
       class StoreArgs {
-        static config = { stateKey: 'state' }
         constructor(one, two, three) {
           this.state = { one, two, three }
         }
