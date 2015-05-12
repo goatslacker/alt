@@ -28,7 +28,7 @@ class AltStore {
       try {
         return f()
       } catch (e) {
-        if (model[Sym.HANDLING_ERRORS]) {
+        if (model.handlesOwnErrors) {
           this.lifecycle.error.push({
             error: e,
             payload,
