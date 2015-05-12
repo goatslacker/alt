@@ -14,12 +14,12 @@ function doSetState(store, storeInstance, state) {
   const { config } = storeInstance.StoreModel
 
   const nextState = fn.isFunction(state)
-    ? state(storeInstance[Sym.STATE_CONTAINER])
+    ? state(storeInstance.state)
     : state
 
-  storeInstance[Sym.STATE_CONTAINER] = config.setState.call(
+  storeInstance.state = config.setState.call(
     store,
-    storeInstance[Sym.STATE_CONTAINER],
+    storeInstance.state,
     nextState
   )
 

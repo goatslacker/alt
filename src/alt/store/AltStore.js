@@ -11,7 +11,7 @@ class AltStore {
   constructor(alt, model, state, StoreModel) {
     this[EE] = transmitter()
     this.lifecycle = model.lifecycleEvents
-    this[Sym.STATE_CONTAINER] = state || model
+    this.state = state || model
 
     this._storeName = model._storeName
     this.boundListeners = model.boundListeners
@@ -23,7 +23,7 @@ class AltStore {
     this.dispatchToken = alt.dispatcher.register((payload) => {
       this.lifecycle.beforeEach.push({
         payload,
-        state: this[Sym.STATE_CONTAINER]
+        state: this.state
       })
 
       if (model.actionListeners[payload.action]) {
@@ -36,7 +36,7 @@ class AltStore {
             this.lifecycle.error.push({
               error: e,
               payload,
-              state: this[Sym.STATE_CONTAINER]
+              state: this.state
             })
           } else {
             throw e
@@ -50,7 +50,7 @@ class AltStore {
 
       this.lifecycle.afterEach.push({
         payload,
-        state :this[Sym.STATE_CONTAINER]
+        state :this.state
       })
     })
 
@@ -58,7 +58,7 @@ class AltStore {
   }
 
   emitChange() {
-    this[EE].push(this[Sym.STATE_CONTAINER])
+    this[EE].push(this.state)
   }
 
   listen(cb) {
@@ -70,10 +70,7 @@ class AltStore {
   }
 
   getState() {
-    return this.StoreModel.config.getState.call(
-      this,
-      this[Sym.STATE_CONTAINER]
-    )
+    return this.StoreModel.config.getState.call(this, this.state)
   }
 }
 
