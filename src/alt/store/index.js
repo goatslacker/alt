@@ -29,7 +29,7 @@ function doSetState(store, storeInstance, state) {
 }
 
 function createPrototype(proto, alt, key, extras) {
-  proto[Sym.ALL_LISTENERS] = []
+  proto.boundListeners = []
   proto.lifecycleEvents = [
     'afterEach',
     'beforeEach',
