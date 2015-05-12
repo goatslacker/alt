@@ -1,6 +1,6 @@
 import Symbol from 'es-symbol'
 
-import * as Sym from '../symbols/symbols'
+import * as fn from '../../utils/functions'
 import * as utils from '../utils/AltUtils'
 
 class AltAction {
