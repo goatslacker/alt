@@ -62,6 +62,7 @@ function connectToStores(Component) {
     },
 
     componentDidMount() {
+      const stores = Component.getStores(this.props)
       this.storeListeners = stores.map((store) => {
         return store.listen(this.onChange)
       })

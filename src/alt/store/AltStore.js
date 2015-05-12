@@ -44,7 +44,7 @@ class AltStore {
 
       this.lifecycle.afterEach.push({
         payload,
-        state :this.state
+        state: this.state
       })
     })
 

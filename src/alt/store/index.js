@@ -37,7 +37,7 @@ function createPrototype(proto, alt, key, extras) {
     'init',
     'rollback',
     'snapshot',
-    'unlisten',
+    'unlisten'
   ].reduce((obj, name) => {
     obj[name] = transmitter()
     return obj
