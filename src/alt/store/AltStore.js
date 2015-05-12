@@ -41,7 +41,7 @@ class AltStore {
       }
     }
 
-    fn.assign(this, model[Sym.PUBLIC_METHODS])
+    fn.assign(this, model.publicMethods)
 
     // Register dispatcher
     this.dispatchToken = alt.dispatcher.register((payload) => {

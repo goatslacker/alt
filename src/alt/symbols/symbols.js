@@ -12,8 +12,5 @@ export const HANDLING_ERRORS = Symbol()
 // store action listeners
 export const LISTENERS = Symbol()
 
-// public methods
-export const PUBLIC_METHODS = Symbol()
-
 // contains all state
 export const STATE_CONTAINER = Symbol()
