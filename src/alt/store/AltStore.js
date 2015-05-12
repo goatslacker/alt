@@ -1,14 +1,9 @@
-import Symbol from 'es-symbol'
-
 import * as fn from '../../utils/functions'
 import transmitter from 'transmitter'
 
-// event emitter instance
-const EE = Symbol()
-
 class AltStore {
   constructor(alt, model, state, StoreModel) {
-    this[EE] = transmitter()
+    this.transmitter = transmitter()
     this.lifecycle = model.lifecycleEvents
     this.state = state || model
 
@@ -57,11 +52,11 @@ class AltStore {
   }
 
   emitChange() {
-    this[EE].push(this.state)
+    this.transmitter.push(this.state)
   }
 
   listen(cb) {
-    const { dispose } = this[EE].subscribe(cb)
+    const { dispose } = this.transmitter.subscribe(cb)
     return () => {
       this.lifecycle.unlisten.push()
       dispose()

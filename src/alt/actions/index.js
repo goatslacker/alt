@@ -1,5 +1,3 @@
-import Symbol from 'es-symbol'
-
 import * as utils from '../utils/AltUtils'
 
 class AltAction {
@@ -17,20 +15,13 @@ class AltAction {
 }
 
 export default function makeAction(alt, namespace, name, implementation, obj) {
-  // make sure each Symbol is unique
-  const actionId = utils.uid(alt._actionsRegistry, `${namespace}.${name}`)
-  alt._actionsRegistry[actionId] = 1
-  const actionSymbol = Symbol.for(`alt/${actionId}`)
+  const id = utils.uid(alt._actionsRegistry, `${namespace}.${name}`)
+  alt._actionsRegistry[id] = 1
 
-  const data = {
-    namespace,
-    name,
-    id: actionId,
-    symbol: actionSymbol
-  }
+  const data = { id, namespace, name }
 
   // Wrap the action so we can provide a dispatch method
-  const newAction = new AltAction(alt, actionSymbol, implementation, obj, data)
+  const newAction = new AltAction(alt, id, implementation, obj, data)
 
   // the action itself
   const action = newAction._dispatch
@@ -39,13 +30,13 @@ export default function makeAction(alt, namespace, name, implementation, obj) {
       newAction._dispatch.apply(null, args)
     })
   }
-  action.id = actionSymbol
+  action.id = id
   action.data = data
 
   // ensure each reference is unique in the namespace
   const container = alt.actions[namespace]
-  const id = utils.uid(container, name)
-  container[id] = action
+  const namespaceId = utils.uid(container, name)
+  container[namespaceId] = action
 
   return action
 }

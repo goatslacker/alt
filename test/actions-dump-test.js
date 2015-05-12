@@ -1,6 +1,5 @@
 import Alt from '../'
 import { assert } from 'chai'
-import Symbol from 'es-symbol'
 
 const alt = new Alt()
 
