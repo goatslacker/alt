@@ -126,5 +126,21 @@ export default {
       const store = alt.createStore(TestStore)
       assert(store.getState().test === 'i am here', 'setting state on lifecycle')
     },
+
+    'get instance works'() {
+      const TestStore = {
+        state: { test: null },
+        bindListeners: {
+          handleFire: actions.FIRE
+        },
+        handleFire() {
+          this.setState({ test: this.getInstance() })
+        }
+      }
+
+      const store = alt.createStore(TestStore)
+      actions.fire()
+      assert(store.getState().test === store)
+    },
   }
 }
