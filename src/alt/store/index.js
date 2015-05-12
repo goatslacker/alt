@@ -45,6 +45,7 @@ function createPrototype(proto, alt, key, extras) {
   }, {})
   proto.actionListeners = {}
   proto.publicMethods = {}
+  proto.handlesOwnErrors = false
 
   return fn.assign(proto, StoreMixin, {
     _storeName: key,

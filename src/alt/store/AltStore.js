@@ -32,7 +32,7 @@ class AltStore {
         try {
           result = model.actionListeners[payload.action](payload.data)
         } catch (e) {
-          if (model[Sym.HANDLING_ERRORS]) {
+          if (model.handlesOwnErrors) {
             this.lifecycle.error.push({
               error: e,
               payload,
