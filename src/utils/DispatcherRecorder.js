@@ -26,8 +26,6 @@
  * ```
  */
 
-import Symbol from 'es-symbol'
-
 function DispatcherRecorder(alt, maxEvents = Infinity) {
   this.alt = alt
   this.events = []
@@ -112,7 +110,7 @@ DispatcherRecorder.prototype.replay = function (replayTime, done) {
 DispatcherRecorder.prototype.serializeEvents = function () {
   const events = this.events.map((event) => {
     return {
-      action: Symbol.keyFor(event.action),
+      action: event.action,
       data: event.data
     }
   })
@@ -127,7 +125,7 @@ DispatcherRecorder.prototype.loadEvents = function (events) {
   const parsedEvents = JSON.parse(events)
   this.events = parsedEvents.map((event) => {
     return {
-      action: Symbol.for(event.action),
+      action: event.action,
       data: event.data
     }
   })
