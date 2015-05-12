@@ -15,7 +15,7 @@ class AltStore {
 
     this.preventDefault = false
     this._storeName = model._storeName
-    this.boundListeners = model[Sym.ALL_LISTENERS]
+    this.boundListeners = model.boundListeners
     this.StoreModel = StoreModel
 
     const output = model.output || (x => x)

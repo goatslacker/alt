@@ -123,7 +123,7 @@ const StoreMixin = {
     // You can pass in the constant or the function itself
     const key = symbol.id ? symbol.id : symbol
     this[Sym.LISTENERS][key] = handler.bind(this)
-    this[Sym.ALL_LISTENERS].push(Symbol.keyFor(key))
+    this.boundListeners.push(Symbol.keyFor(key))
   },
 
   bindActions(actions) {
