@@ -69,5 +69,24 @@ export default {
         myStore.boundListeners.indexOf(Actions.TWO) > -1
       )
     },
+
+    'dispatching actions'() {
+      const alt = new Alt()
+
+      const one = alt.generateActions('one')
+      const two = alt.generateActions('one')
+
+      const store = alt.createStore(function Store() {
+        this.bindAction(one.one, function (x) {
+          assert(x === 1)
+        })
+        this.bindAction(two.one, function (x) {
+          assert(x === 2)
+        })
+      })
+
+      alt.dispatch('global.one', 1)
+      alt.dispatch('global.one1', 2)
+    },
   }
 }
