@@ -44,7 +44,7 @@ function createPrototype(proto, alt, key, extras) {
     return obj
   }, {})
   proto[Sym.LISTENERS] = {}
-  proto[Sym.PUBLIC_METHODS] = {}
+  proto.publicMethods = {}
 
   return fn.assign(proto, StoreMixin, {
     _storeName: key,

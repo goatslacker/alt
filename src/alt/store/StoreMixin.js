@@ -90,7 +90,7 @@ const StoreMixin = {
         throw new TypeError('exportPublicMethods expects a function')
       }
 
-      this[Sym.PUBLIC_METHODS][methodName] = value
+      this.publicMethods[methodName] = value
     }, [methods])
   },
 
