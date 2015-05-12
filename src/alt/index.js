@@ -2,7 +2,6 @@
 import { Dispatcher } from 'flux'
 
 import * as StateFunctions from './utils/StateFunctions'
-import * as Sym from './symbols/symbols'
 import * as fn from '../utils/functions'
 import * as store from './store'
 import * as utils from './utils/AltUtils'
