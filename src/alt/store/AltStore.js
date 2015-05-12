@@ -26,11 +26,11 @@ class AltStore {
         state: this[Sym.STATE_CONTAINER]
       })
 
-      if (model[Sym.LISTENERS][payload.action]) {
+      if (model.actionListeners[payload.action]) {
         let result = false
 
         try {
-          result = model[Sym.LISTENERS][payload.action](payload.data)
+          result = model.actionListeners[payload.action](payload.data)
         } catch (e) {
           if (model[Sym.HANDLING_ERRORS]) {
             this.lifecycle.error.push({
