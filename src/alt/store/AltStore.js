@@ -11,7 +11,7 @@ class AltStore {
   constructor(alt, model, state, StoreModel) {
     this[EE] = transmitter()
     this.lifecycle = model.lifecycleEvents
-    this[Sym.STATE_CONTAINER] = state || model
+    this.state = state || model
 
     this.preventDefault = false
     this._storeName = model._storeName
@@ -20,9 +20,7 @@ class AltStore {
 
     const output = model.output || (x => x)
 
-    this.emitChange = () => {
-      this[EE].push(output(alt, this[Sym.STATE_CONTAINER]))
-    }
+    this.emitChange = () => this[EE].push(output(alt, this.state))
 
     const handleDispatch = (f, payload) => {
       try {
@@ -32,7 +30,7 @@ class AltStore {
           this.lifecycle.error.push({
             error: e,
             payload,
-            state: this[Sym.STATE_CONTAINER]
+            state: this.state
           })
           return false
         } else {
@@ -49,7 +47,7 @@ class AltStore {
 
       this.lifecycle.beforeEach.push({
         payload,
-        state: this[Sym.STATE_CONTAINER]
+        state: this.state
       })
 
       const actionHandler = model.actionListeners[payload.action] ||
@@ -76,7 +74,7 @@ class AltStore {
 
       this.lifecycle.afterEach.push({
         payload,
-        state: this[Sym.STATE_CONTAINER]
+        state: this.state
       })
     })
 
@@ -98,10 +96,7 @@ class AltStore {
   }
 
   getState() {
-    return this.StoreModel.config.getState.call(
-      this,
-      this[Sym.STATE_CONTAINER]
-    )
+    return this.StoreModel.config.getState.call(this, this.state)
   }
 }
 

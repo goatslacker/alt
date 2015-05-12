@@ -7,10 +7,10 @@ export function setAppState(instance, data, onStore) {
     const store = instance.stores[key]
     if (store) {
       const { config } = store.StoreModel
-      if (config.onDeserialize) {
-        obj[key] = config.onDeserialize(value) || value
-      }
-      fn.assign(store[Sym.STATE_CONTAINER], obj[key])
+      const state = store.state
+      if (config.onDeserialize) obj[key] = config.onDeserialize(value) || value
+      fn.eachObject(k => delete state[k], [state])
+      fn.assign(state, obj[key])
       onStore(store)
     }
   }, [obj])
@@ -24,7 +24,7 @@ export function snapshot(instance, storeNames = []) {
     const { config } = store.StoreModel
     store.lifecycle.snapshot.push()
     const customSnapshot = config.onSerialize &&
-      config.onSerialize(store[Sym.STATE_CONTAINER])
+      config.onSerialize(store.state)
     obj[storeName] = customSnapshot ? customSnapshot : store.getState()
     return obj
   }, {})
@@ -32,7 +32,7 @@ export function snapshot(instance, storeNames = []) {
 
 export function saveInitialSnapshot(instance, key) {
   const state = instance.deserialize(
-    instance.serialize(instance.stores[key][Sym.STATE_CONTAINER])
+    instance.serialize(instance.stores[key].state)
   )
   instance._initSnapshot[key] = state
   instance._lastSnapshot[key] = state
