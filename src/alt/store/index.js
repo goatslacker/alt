@@ -1,6 +1,5 @@
 import transmitter from 'transmitter'
 
-import * as Sym from '../symbols/symbols'
 import * as utils from '../utils/AltUtils'
 import * as fn from '../../utils/functions'
 import AltStore from './AltStore'
