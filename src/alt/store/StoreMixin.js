@@ -100,7 +100,7 @@ const StoreMixin = {
   },
 
   on(lifecycleEvent, handler) {
-    if (lifecycleEvent === 'error') this[Sym.HANDLING_ERRORS] = true
+    if (lifecycleEvent === 'error') this.handlesOwnErrors = true
     return this.lifecycleEvents[lifecycleEvent].subscribe(handler.bind(this))
   },
 
