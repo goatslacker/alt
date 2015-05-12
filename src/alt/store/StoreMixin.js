@@ -1,5 +1,3 @@
-import Symbol from 'es-symbol'
-
 import * as fn from '../../utils/functions'
 
 const StoreMixin = {
@@ -123,7 +121,7 @@ const StoreMixin = {
     // You can pass in the constant or the function itself
     const key = symbol.id ? symbol.id : symbol
     this.actionListeners[key] = handler.bind(this)
-    this.boundListeners.push(Symbol.keyFor(key))
+    this.boundListeners.push(key)
   },
 
   bindActions(actions) {
