@@ -78,7 +78,7 @@ var AltContainer = React.createClass(assign({
 module.exports = AltContainer;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../utils/functions":28,"./mixinContainer":3}],3:[function(require,module,exports){
+},{"../utils/functions":27,"./mixinContainer":3}],3:[function(require,module,exports){
 'use strict';
 
 var Subscribe = require('../mixins/Subscribe');
@@ -246,7 +246,7 @@ function mixinContainer(React) {
 
 module.exports = mixinContainer;
 
-},{"../mixins/Subscribe":4,"../utils/functions":28}],4:[function(require,module,exports){
+},{"../mixins/Subscribe":4,"../utils/functions":27}],4:[function(require,module,exports){
 'use strict';
 var Symbol = require('es-symbol');
 var MIXIN_REGISTRY = Symbol('alt store listeners');
@@ -376,13 +376,13 @@ defProps(xSymbol, {
 
   // 19.4.2.5
   keyFor: defValue(function (sym) {
-    if (!isSymbol(sym)) {
+    if (supportsAccessors && !isSymbol(sym)) {
       throw new TypeError("" + sym + " is not a symbol");
     }
 
     for (var key in globalSymbolRegistryList) {
       if (globalSymbolRegistryList[key] === sym) {
-        return globalSymbolRegistryList[key].__description__;
+        return supportsAccessors ? globalSymbolRegistryList[key].__description__ : globalSymbolRegistryList[key].substr(7, globalSymbolRegistryList[key].length - 8);
       }
     }
   })
@@ -1067,71 +1067,7 @@ function makeAction(alt, namespace, name, implementation, obj) {
 
 module.exports = exports['default'];
 
-},{"../symbols/symbols":16,"../utils/AltUtils":17,"es-symbol":5}],11:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-var _ = require('./');
-
-var _2 = _interopRequireDefault(_);
-
-var _utilsActionListeners = require('../utils/ActionListeners');
-
-var _utilsActionListeners2 = _interopRequireDefault(_utilsActionListeners);
-
-var _utilsAltManager = require('../utils/AltManager');
-
-var _utilsAltManager2 = _interopRequireDefault(_utilsAltManager);
-
-var _utilsDispatcherRecorder = require('../utils/DispatcherRecorder');
-
-var _utilsDispatcherRecorder2 = _interopRequireDefault(_utilsDispatcherRecorder);
-
-var _utilsAtomic = require('../utils/atomic');
-
-var _utilsAtomic2 = _interopRequireDefault(_utilsAtomic);
-
-var _utilsConnectToStores = require('../utils/connectToStores');
-
-var _utilsConnectToStores2 = _interopRequireDefault(_utilsConnectToStores);
-
-var _utilsChromeDebug = require('../utils/chromeDebug');
-
-var _utilsChromeDebug2 = _interopRequireDefault(_utilsChromeDebug);
-
-var _utilsMakeFinalStore = require('../utils/makeFinalStore');
-
-var _utilsMakeFinalStore2 = _interopRequireDefault(_utilsMakeFinalStore);
-
-var _utilsWithAltContext = require('../utils/withAltContext');
-
-var _utilsWithAltContext2 = _interopRequireDefault(_utilsWithAltContext);
-
-var _AltContainer = require('../../AltContainer');
-
-var _AltContainer2 = _interopRequireDefault(_AltContainer);
-
-_2['default'].addons = {
-  ActionListeners: _utilsActionListeners2['default'],
-  AltContainer: _AltContainer2['default'],
-  AltManager: _utilsAltManager2['default'],
-  DispatcherRecorder: _utilsDispatcherRecorder2['default'],
-  atomic: _utilsAtomic2['default'],
-  chromeDebug: _utilsChromeDebug2['default'],
-  connectToStores: _utilsConnectToStores2['default'],
-  makeFinalStore: _utilsMakeFinalStore2['default'],
-  withAltContext: _utilsWithAltContext2['default']
-};
-
-exports['default'] = _2['default'];
-module.exports = exports['default'];
-
-},{"../../AltContainer":1,"../utils/ActionListeners":19,"../utils/AltManager":20,"../utils/DispatcherRecorder":21,"../utils/atomic":22,"../utils/chromeDebug":23,"../utils/connectToStores":24,"../utils/makeFinalStore":26,"../utils/withAltContext":27,"./":12}],12:[function(require,module,exports){
+},{"../symbols/symbols":15,"../utils/AltUtils":16,"es-symbol":5}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1139,9 +1075,7 @@ Object.defineProperty(exports, '__esModule', {
 });
 var _bind = Function.prototype.bind;
 
-var _get = function get(_x3, _x4, _x5) { var _again = true; _function: while (_again) { desc = parent = getter = undefined; _again = false; var object = _x3,
-    property = _x4,
-    receiver = _x5; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x3 = parent; _x4 = property; _x5 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x3, _x4, _x5) { var _again = true; _function: while (_again) { var object = _x3, property = _x4, receiver = _x5; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x3 = parent; _x4 = property; _x5 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
@@ -1259,16 +1193,16 @@ var Alt = (function () {
   }, {
     key: 'createAction',
     value: function createAction(name, implementation, obj) {
-      return _actions2['default'](this, 'global', name, implementation, obj);
+      return (0, _actions2['default'])(this, 'global', name, implementation, obj);
     }
   }, {
     key: 'createActions',
     value: function createActions(ActionsClass) {
-      var _this2 = this;
-
       for (var _len4 = arguments.length, argsForConstructor = Array(_len4 > 2 ? _len4 - 2 : 0), _key4 = 2; _key4 < _len4; _key4++) {
         argsForConstructor[_key4 - 2] = arguments[_key4];
       }
+
+      var _this = this;
 
       var exportObj = arguments[1] === undefined ? {} : arguments[1];
 
@@ -1322,7 +1256,7 @@ var Alt = (function () {
         }
 
         // create the action
-        exportObj[actionName] = _actions2['default'](_this2, key, actionName, action, exportObj);
+        exportObj[actionName] = (0, _actions2['default'])(_this, key, actionName, action, exportObj);
 
         // generate a constant
         var constant = utils.formatAsConstant(actionName);
@@ -1427,7 +1361,7 @@ var Alt = (function () {
 exports['default'] = Alt;
 module.exports = exports['default'];
 
-},{"../utils/functions":25,"./actions":10,"./store":15,"./symbols/symbols":16,"./utils/AltUtils":17,"./utils/StateFunctions":18,"flux":7}],13:[function(require,module,exports){
+},{"../utils/functions":24,"./actions":10,"./store":14,"./symbols/symbols":15,"./utils/AltUtils":16,"./utils/StateFunctions":17,"flux":7}],12:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1459,7 +1393,7 @@ var _utilsFunctions = require('../../utils/functions');
 var fn = _interopRequireWildcard(_utilsFunctions);
 
 // event emitter instance
-var EE = _esSymbol2['default']();
+var EE = (0, _esSymbol2['default'])();
 
 var AltStore = (function () {
   function AltStore(alt, model, state, StoreModel) {
@@ -1544,7 +1478,7 @@ var AltStore = (function () {
 exports['default'] = AltStore;
 module.exports = exports['default'];
 
-},{"../../utils/functions":25,"../symbols/symbols":16,"es-symbol":5,"eventemitter3":6}],14:[function(require,module,exports){
+},{"../../utils/functions":24,"../symbols/symbols":15,"es-symbol":5,"eventemitter3":6}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1681,7 +1615,7 @@ var StoreMixin = {
 exports['default'] = StoreMixin;
 module.exports = exports['default'];
 
-},{"../../utils/functions":25,"../symbols/symbols":16,"es-symbol":5}],15:[function(require,module,exports){
+},{"../../utils/functions":24,"../symbols/symbols":15,"es-symbol":5}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1689,9 +1623,7 @@ Object.defineProperty(exports, '__esModule', {
 });
 var _bind = Function.prototype.bind;
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { desc = parent = getter = undefined; _again = false; var object = _x,
-    property = _x2,
-    receiver = _x3; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 exports.createStoreConfig = createStoreConfig;
 exports.transformStore = transformStore;
@@ -1854,7 +1786,7 @@ function createStoreFromClass(alt, StoreModel, key) {
   return storeInstance;
 }
 
-},{"../../utils/functions":25,"../symbols/symbols":16,"../utils/AltUtils":17,"./AltStore":13,"./StoreMixin":14,"eventemitter3":6}],16:[function(require,module,exports){
+},{"../../utils/functions":24,"../symbols/symbols":15,"../utils/AltUtils":16,"./AltStore":12,"./StoreMixin":13,"eventemitter3":6}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1868,54 +1800,54 @@ var _esSymbol = require('es-symbol');
 var _esSymbol2 = _interopRequireDefault(_esSymbol);
 
 // action creator handler
-var ACTION_HANDLER = _esSymbol2['default']();
+var ACTION_HANDLER = (0, _esSymbol2['default'])();
 
 exports.ACTION_HANDLER = ACTION_HANDLER;
 // the action's uid symbol for listening
-var ACTION_KEY = _esSymbol2['default']();
+var ACTION_KEY = (0, _esSymbol2['default'])();
 
 exports.ACTION_KEY = ACTION_KEY;
 // per instance registry of actions
-var ACTIONS_REGISTRY = _esSymbol2['default']();
+var ACTIONS_REGISTRY = (0, _esSymbol2['default'])();
 
 exports.ACTIONS_REGISTRY = ACTIONS_REGISTRY;
 // the action's name
-var ACTION_UID = _esSymbol2['default']();
+var ACTION_UID = (0, _esSymbol2['default'])();
 
 exports.ACTION_UID = ACTION_UID;
 // store all of a store's listeners
-var ALL_LISTENERS = _esSymbol2['default']();
+var ALL_LISTENERS = (0, _esSymbol2['default'])();
 
 exports.ALL_LISTENERS = ALL_LISTENERS;
 // are we handling our own errors
-var HANDLING_ERRORS = _esSymbol2['default']();
+var HANDLING_ERRORS = (0, _esSymbol2['default'])();
 
 exports.HANDLING_ERRORS = HANDLING_ERRORS;
 // initial snapshot
-var INIT_SNAPSHOT = _esSymbol2['default']();
+var INIT_SNAPSHOT = (0, _esSymbol2['default'])();
 
 exports.INIT_SNAPSHOT = INIT_SNAPSHOT;
 // last snapshot
-var LAST_SNAPSHOT = _esSymbol2['default']();
+var LAST_SNAPSHOT = (0, _esSymbol2['default'])();
 
 exports.LAST_SNAPSHOT = LAST_SNAPSHOT;
 // all lifecycle listeners
-var LIFECYCLE = _esSymbol2['default']();
+var LIFECYCLE = (0, _esSymbol2['default'])();
 
 exports.LIFECYCLE = LIFECYCLE;
 // store action listeners
-var LISTENERS = _esSymbol2['default']();
+var LISTENERS = (0, _esSymbol2['default'])();
 
 exports.LISTENERS = LISTENERS;
 // public methods
-var PUBLIC_METHODS = _esSymbol2['default']();
+var PUBLIC_METHODS = (0, _esSymbol2['default'])();
 
 exports.PUBLIC_METHODS = PUBLIC_METHODS;
 // contains all state
-var STATE_CONTAINER = _esSymbol2['default']();
+var STATE_CONTAINER = (0, _esSymbol2['default'])();
 exports.STATE_CONTAINER = STATE_CONTAINER;
 
-},{"es-symbol":5}],17:[function(require,module,exports){
+},{"es-symbol":5}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1975,7 +1907,7 @@ function dispatchIdentity(x) {
   this.dispatch(a.length ? [x].concat(a) : x);
 }
 
-},{}],18:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2045,15 +1977,7 @@ function filterSnapshots(instance, state, stores) {
   }, {});
 }
 
-},{"../../utils/functions":25,"../symbols/symbols":16}],19:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
+},{"../../utils/functions":24,"../symbols/symbols":15}],18:[function(require,module,exports){
 /**
  * ActionListeners(alt: AltInstance): ActionListenersInstance
  *
@@ -2073,11 +1997,19 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
  * ```
  */
 
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
 var _esSymbol = require('es-symbol');
 
 var _esSymbol2 = _interopRequireDefault(_esSymbol);
 
-var ALT_LISTENERS = _esSymbol2['default']('global dispatcher listeners');
+var ALT_LISTENERS = (0, _esSymbol2['default'])('global dispatcher listeners');
 
 function ActionListeners(alt) {
   this.dispatcher = alt.dispatcher;
@@ -2119,7 +2051,7 @@ ActionListeners.prototype.removeAllActionListeners = function () {
 exports['default'] = ActionListeners;
 module.exports = exports['default'];
 
-},{"es-symbol":5}],20:[function(require,module,exports){
+},{"es-symbol":5}],19:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2232,15 +2164,7 @@ var AltManager = (function () {
 exports['default'] = AltManager;
 module.exports = exports['default'];
 
-},{}],21:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
+},{}],20:[function(require,module,exports){
 /**
  * DispatcherRecorder(alt: AltInstance): DispatcherInstance
  *
@@ -2268,6 +2192,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
  * recorder.replay();
  * ```
  */
+
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _esSymbol = require('es-symbol');
 
@@ -2385,16 +2317,14 @@ DispatcherRecorder.prototype.loadEvents = function (events) {
 exports['default'] = DispatcherRecorder;
 module.exports = exports['default'];
 
-},{"es-symbol":5}],22:[function(require,module,exports){
+},{"es-symbol":5}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { desc = parent = getter = undefined; _again = false; var object = _x,
-    property = _x2,
-    receiver = _x3; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 exports['default'] = atomic;
 
@@ -2439,20 +2369,20 @@ function makeAtomicObject(alt, StoreModel) {
 }
 
 function atomic(alt) {
-  var finalStore = _makeFinalStore2['default'](alt);
+  var finalStore = (0, _makeFinalStore2['default'])(alt);
 
   finalStore.listen(function () {
     return alt.takeSnapshot();
   });
 
   return function (StoreModel) {
-    return _functions.isFunction(StoreModel) ? makeAtomicClass(alt, StoreModel) : makeAtomicObject(alt, StoreModel);
+    return (0, _functions.isFunction)(StoreModel) ? makeAtomicClass(alt, StoreModel) : makeAtomicObject(alt, StoreModel);
   };
 }
 
 module.exports = exports['default'];
 
-},{"./functions":25,"./makeFinalStore":26}],23:[function(require,module,exports){
+},{"./functions":24,"./makeFinalStore":25}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2467,16 +2397,8 @@ function chromeDebug(alt) {
 
 module.exports = exports['default'];
 
-},{}],24:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 (function (global){
-'use strict';
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
 /**
  * 'Higher Order Component' that controls the props of a wrapped
  * component via stores.
@@ -2522,6 +2444,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
  * http://bit.ly/1abPkrP
  */
 
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
 var _react = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
 
 var _react2 = _interopRequireDefault(_react);
@@ -2530,10 +2460,10 @@ var _functions = require('./functions');
 
 function connectToStores(Component) {
   // Check for required static methods.
-  if (!_functions.isFunction(Component.getStores)) {
+  if (!(0, _functions.isFunction)(Component.getStores)) {
     throw new Error('connectToStores() expects the wrapped component to have a static getStores() method');
   }
-  if (!_functions.isFunction(Component.getPropsFromStores)) {
+  if (!(0, _functions.isFunction)(Component.getPropsFromStores)) {
     throw new Error('connectToStores() expects the wrapped component to have a static getPropsFromStores() method');
   }
 
@@ -2569,7 +2499,7 @@ function connectToStores(Component) {
     },
 
     render: function render() {
-      return _react2['default'].createElement(Component, _functions.assign({}, this.props, this.state));
+      return _react2['default'].createElement(Component, (0, _functions.assign)({}, this.props, this.state));
     }
   });
 
@@ -2580,7 +2510,7 @@ exports['default'] = connectToStores;
 module.exports = exports['default'];
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./functions":25}],25:[function(require,module,exports){
+},{"./functions":24}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2613,7 +2543,7 @@ function assign(target) {
   return target;
 }
 
-},{}],26:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2665,7 +2595,7 @@ function makeFinalStore(alt) {
 
 module.exports = exports["default"];
 
-},{}],27:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -2701,7 +2631,7 @@ function withAltContext(flux) {
 module.exports = exports['default'];
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],28:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2734,5 +2664,69 @@ function assign(target) {
   return target;
 }
 
-},{}]},{},[11])(11)
+},{}],28:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _ = require('./');
+
+var _2 = _interopRequireDefault(_);
+
+var _utilsActionListeners = require('../utils/ActionListeners');
+
+var _utilsActionListeners2 = _interopRequireDefault(_utilsActionListeners);
+
+var _utilsAltManager = require('../utils/AltManager');
+
+var _utilsAltManager2 = _interopRequireDefault(_utilsAltManager);
+
+var _utilsDispatcherRecorder = require('../utils/DispatcherRecorder');
+
+var _utilsDispatcherRecorder2 = _interopRequireDefault(_utilsDispatcherRecorder);
+
+var _utilsAtomic = require('../utils/atomic');
+
+var _utilsAtomic2 = _interopRequireDefault(_utilsAtomic);
+
+var _utilsConnectToStores = require('../utils/connectToStores');
+
+var _utilsConnectToStores2 = _interopRequireDefault(_utilsConnectToStores);
+
+var _utilsChromeDebug = require('../utils/chromeDebug');
+
+var _utilsChromeDebug2 = _interopRequireDefault(_utilsChromeDebug);
+
+var _utilsMakeFinalStore = require('../utils/makeFinalStore');
+
+var _utilsMakeFinalStore2 = _interopRequireDefault(_utilsMakeFinalStore);
+
+var _utilsWithAltContext = require('../utils/withAltContext');
+
+var _utilsWithAltContext2 = _interopRequireDefault(_utilsWithAltContext);
+
+var _AltContainer = require('../../AltContainer');
+
+var _AltContainer2 = _interopRequireDefault(_AltContainer);
+
+_2['default'].addons = {
+  ActionListeners: _utilsActionListeners2['default'],
+  AltContainer: _AltContainer2['default'],
+  AltManager: _utilsAltManager2['default'],
+  DispatcherRecorder: _utilsDispatcherRecorder2['default'],
+  atomic: _utilsAtomic2['default'],
+  chromeDebug: _utilsChromeDebug2['default'],
+  connectToStores: _utilsConnectToStores2['default'],
+  makeFinalStore: _utilsMakeFinalStore2['default'],
+  withAltContext: _utilsWithAltContext2['default']
+};
+
+exports['default'] = _2['default'];
+module.exports = exports['default'];
+
+},{"../../AltContainer":1,"../utils/ActionListeners":18,"../utils/AltManager":19,"../utils/DispatcherRecorder":20,"../utils/atomic":21,"../utils/chromeDebug":22,"../utils/connectToStores":23,"../utils/makeFinalStore":25,"../utils/withAltContext":26,"./":11}]},{},[28])(28)
 });
