@@ -10,7 +10,7 @@
  *
  *    const MyComponent = React.createClass({
  *      statics: {
- *        getStores() {
+ *        getStores(props) {
  *          return [myStore]
  *        },
  *        getPropsFromStores(props) {
@@ -27,7 +27,7 @@
  * Example using ES6 Class:
  *
  *    class MyComponent extends React.Component {
- *      static getStores() {
+ *      static getStores(props) {
  *        return [myStore]
  *      }
  *      static getPropsFromStores(props) {
@@ -55,9 +55,6 @@ function connectToStores(Component) {
     throw new Error('connectToStores() expects the wrapped component to have a static getPropsFromStores() method')
   }
 
-  // Cache stores.
-  const stores = Component.getStores()
-
   // Wrapper Component.
   const StoreConnection = React.createClass({
     getInitialState() {
@@ -65,12 +62,14 @@ function connectToStores(Component) {
     },
 
     componentDidMount() {
+      const stores = Component.getStores(this.props)
       stores.forEach((store) => {
         store.listen(this.onChange)
       })
     },
 
     componentWillUnmount() {
+      const stores = Component.getStores(this.props)
       stores.forEach((store) => {
         store.unlisten(this.onChange)
       })

@@ -109,6 +109,27 @@ export default {
       assert.include(output, 'Foo: Bar')
     },
 
+    'component can get use stores from props'() {
+      const LegacyComponent = React.createClass({
+        statics: {
+          getStores(props) {
+            return [props.store]
+          },
+          getPropsFromStores(props) {
+            return props.store.getState()
+          }
+        },
+        render() {
+          return React.createElement('div', null, `Foo${this.props.delim}${this.props.foo}`)
+        }
+      })
+
+      const WrappedComponent = connectToStores(LegacyComponent)
+      const element = React.createElement(WrappedComponent, {delim: ': ', store: testStore})
+      const output = React.renderToStaticMarkup(element)
+      assert.include(output, 'Foo: Bar')
+    },
+
     'ES6 class component responds to store events'() {
       class ClassComponent extends React.Component {
         static getStores() {
