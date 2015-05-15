@@ -17,6 +17,7 @@
     "chai": "^2.3.0",
     "coveralls": "^2.11.2",
     "envify": "^3.4.0",
+    "es6-promise": "^2.1.1",
     "eslint": "^0.21.0",
     "ghooks": "^0.3.2",
     "immutable": "^3.7.2",

@@ -907,7 +907,7 @@ var AltStore = (function () {
 exports['default'] = AltStore;
 module.exports = exports['default'];
 
-},{"../../utils/functions":13,"../symbols/symbols":10,"es-symbol":1,"eventemitter3":2}],8:[function(require,module,exports){
+},{"../../utils/functions":14,"../symbols/symbols":10,"es-symbol":1,"eventemitter3":2}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -952,15 +952,73 @@ var StoreMixin = {
     this.dispatcher.waitFor(tokens);
   },
 
-  exportPublicMethods: function exportPublicMethods(methods) {
+  exportAsync: function exportAsync(asyncMethods) {
     var _this = this;
+
+    var _isLoading = false;
+    var _hasError = false;
+
+    var toExport = Object.keys(asyncMethods).reduce(function (publicMethods, methodName) {
+      var asyncSpec = asyncMethods[methodName](_this);
+
+      var validHandlers = ['success', 'error', 'loading'];
+      validHandlers.forEach(function (handler) {
+        if (asyncSpec[handler] && !asyncSpec[handler][Sym.ACTION_KEY]) {
+          throw new Error('' + handler + ' handler must be an action function');
+        }
+      });
+
+      publicMethods[methodName] = function () {
+        for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+          args[_key2] = arguments[_key2];
+        }
+
+        var state = _this.getInstance().getState();
+        var value = asyncSpec.local && asyncSpec.local.apply(asyncSpec, [state].concat(args));
+
+        // if we don't have it in cache then fetch it
+        if (!value) {
+          _isLoading = true;
+          _hasError = false;
+          /* istanbul ignore else */
+          if (asyncSpec.loading) asyncSpec.loading();
+          asyncSpec.remote.apply(asyncSpec, [state].concat(args)).then(function (v) {
+            _isLoading = false;
+            asyncSpec.success(v);
+          })['catch'](function (v) {
+            _isLoading = false;
+            _hasError = true;
+            asyncSpec.error(v);
+          });
+        } else {
+          // otherwise emit the change now
+          _this.emitChange();
+        }
+      };
+
+      return publicMethods;
+    }, {});
+
+    this.exportPublicMethods(toExport);
+    this.exportPublicMethods({
+      isLoading: function isLoading() {
+        return _isLoading;
+      },
+      hasError: function hasError() {
+        return _hasError;
+      }
+    });
+  },
+
+  exportPublicMethods: function exportPublicMethods(methods) {
+    var _this2 = this;
 
     fn.eachObject(function (methodName, value) {
       if (!fn.isFunction(value)) {
         throw new TypeError('exportPublicMethods expects a function');
       }
 
-      _this[Sym.PUBLIC_METHODS][methodName] = value;
+      _this2[Sym.PUBLIC_METHODS][methodName] = value;
     }, [methods]);
   },
 
@@ -994,7 +1052,7 @@ var StoreMixin = {
   },
 
   bindActions: function bindActions(actions) {
-    var _this2 = this;
+    var _this3 = this;
 
     fn.eachObject(function (action, symbol) {
       var matchFirstCharacter = /./;
@@ -1003,39 +1061,39 @@ var StoreMixin = {
       });
       var handler = null;
 
-      if (_this2[action] && _this2[assumedEventHandler]) {
+      if (_this3[action] && _this3[assumedEventHandler]) {
         // If you have both action and onAction
         throw new ReferenceError('You have multiple action handlers bound to an action: ' + ('' + action + ' and ' + assumedEventHandler));
-      } else if (_this2[action]) {
+      } else if (_this3[action]) {
         // action
-        handler = _this2[action];
-      } else if (_this2[assumedEventHandler]) {
+        handler = _this3[action];
+      } else if (_this3[assumedEventHandler]) {
         // onAction
-        handler = _this2[assumedEventHandler];
+        handler = _this3[assumedEventHandler];
       }
 
       if (handler) {
-        _this2.bindAction(symbol, handler);
+        _this3.bindAction(symbol, handler);
       }
     }, [actions]);
   },
 
   bindListeners: function bindListeners(obj) {
-    var _this3 = this;
+    var _this4 = this;
 
     fn.eachObject(function (methodName, symbol) {
-      var listener = _this3[methodName];
+      var listener = _this4[methodName];
 
       if (!listener) {
-        throw new ReferenceError('' + methodName + ' defined but does not exist in ' + _this3._storeName);
+        throw new ReferenceError('' + methodName + ' defined but does not exist in ' + _this4._storeName);
       }
 
       if (Array.isArray(symbol)) {
         symbol.forEach(function (action) {
-          _this3.bindAction(action, listener);
+          _this4.bindAction(action, listener);
         });
       } else {
-        _this3.bindAction(symbol, listener);
+        _this4.bindAction(symbol, listener);
       }
     }, [obj]);
   }
@@ -1044,7 +1102,7 @@ var StoreMixin = {
 exports['default'] = StoreMixin;
 module.exports = exports['default'];
 
-},{"../../utils/functions":13,"../symbols/symbols":10,"es-symbol":1}],9:[function(require,module,exports){
+},{"../../utils/functions":14,"../symbols/symbols":10,"es-symbol":1}],9:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1210,12 +1268,16 @@ function createStoreFromClass(alt, StoreModel, key) {
     store.bindListeners(config.bindListeners);
   }
 
+  if (config.datasource) {
+    store.exportAsync(config.datasource);
+  }
+
   storeInstance = fn.assign(new _AltStore2['default'](alt, store, store[alt.config.stateKey] || store[config.stateKey] || null, StoreModel), utils.getInternalMethods(StoreModel), config.publicMethods, { displayName: key });
 
   return storeInstance;
 }
 
-},{"../../utils/functions":13,"../symbols/symbols":10,"../utils/AltUtils":11,"./AltStore":7,"./StoreMixin":8,"eventemitter3":2}],10:[function(require,module,exports){
+},{"../../utils/functions":14,"../symbols/symbols":10,"../utils/AltUtils":11,"./AltStore":7,"./StoreMixin":8,"eventemitter3":2}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1406,40 +1468,7 @@ function filterSnapshots(instance, state, stores) {
   }, {});
 }
 
-},{"../../utils/functions":13,"../symbols/symbols":10}],13:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-exports.eachObject = eachObject;
-exports.assign = assign;
-var isFunction = function isFunction(x) {
-  return typeof x === 'function';
-};
-
-exports.isFunction = isFunction;
-
-function eachObject(f, o) {
-  o.forEach(function (from) {
-    Object.keys(Object(from)).forEach(function (key) {
-      f(key, from[key]);
-    });
-  });
-}
-
-function assign(target) {
-  for (var _len = arguments.length, source = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    source[_key - 1] = arguments[_key];
-  }
-
-  eachObject(function (key, value) {
-    return target[key] = value;
-  }, source);
-  return target;
-}
-
-},{}],14:[function(require,module,exports){
+},{"../../utils/functions":14,"../symbols/symbols":10}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1733,5 +1762,38 @@ var Alt = (function () {
 exports['default'] = Alt;
 module.exports = exports['default'];
 
-},{"../utils/functions":13,"./actions":6,"./store":9,"./symbols/symbols":10,"./utils/AltUtils":11,"./utils/StateFunctions":12,"flux":3}]},{},[14])(14)
+},{"../utils/functions":14,"./actions":6,"./store":9,"./symbols/symbols":10,"./utils/AltUtils":11,"./utils/StateFunctions":12,"flux":3}],14:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports.eachObject = eachObject;
+exports.assign = assign;
+var isFunction = function isFunction(x) {
+  return typeof x === 'function';
+};
+
+exports.isFunction = isFunction;
+
+function eachObject(f, o) {
+  o.forEach(function (from) {
+    Object.keys(Object(from)).forEach(function (key) {
+      f(key, from[key]);
+    });
+  });
+}
+
+function assign(target) {
+  for (var _len = arguments.length, source = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    source[_key - 1] = arguments[_key];
+  }
+
+  eachObject(function (key, value) {
+    return target[key] = value;
+  }, source);
+  return target;
+}
+
+},{}]},{},[13])(13)
 });

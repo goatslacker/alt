@@ -21,6 +21,56 @@ const StoreMixin = {
     this.dispatcher.waitFor(tokens)
   },
 
+  exportAsync(asyncMethods) {
+    let isLoading = false
+    let hasError = false
+
+    const toExport = Object.keys(asyncMethods).reduce((publicMethods, methodName) => {
+      const asyncSpec = asyncMethods[methodName](this)
+
+      const validHandlers = ['success', 'error', 'loading']
+      validHandlers.forEach((handler) => {
+        if (asyncSpec[handler] && !asyncSpec[handler][Sym.ACTION_KEY]) {
+          throw new Error(`${handler} handler must be an action function`)
+        }
+      })
+
+      publicMethods[methodName] = (...args) => {
+        const state = this.getInstance().getState()
+        const value = asyncSpec.local && asyncSpec.local(state, ...args)
+
+        // if we don't have it in cache then fetch it
+        if (!value) {
+          isLoading = true
+          hasError = false
+          /* istanbul ignore else */
+          if (asyncSpec.loading) asyncSpec.loading()
+          asyncSpec.remote(state, ...args)
+            .then((v) => {
+              isLoading = false
+              asyncSpec.success(v)
+            })
+            .catch((v) => {
+              isLoading = false
+              hasError = true
+              asyncSpec.error(v)
+            })
+        } else {
+          // otherwise emit the change now
+          this.emitChange()
+        }
+      }
+
+      return publicMethods
+    }, {})
+
+    this.exportPublicMethods(toExport)
+    this.exportPublicMethods({
+      isLoading: () => isLoading,
+      hasError: () => hasError
+    })
+  },
+
   exportPublicMethods(methods) {
     fn.eachObject((methodName, value) => {
       if (!fn.isFunction(value)) {

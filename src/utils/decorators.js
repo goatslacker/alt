@@ -70,3 +70,11 @@ export function bindWithContext(fn) {
 export function expose(obj, name, description) {
   return addMeta(description, { publicMethod: true })
 }
+
+export function datasource(...sources) {
+  const source = assign(...sources)
+  return function (Store) {
+    Store.config = assign({ datasource: source }, Store.config)
+    return Store
+  }
+}
