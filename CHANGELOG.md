@@ -15,7 +15,7 @@
 * @bind and @expose decorators for binding actions and exporting public methods. [commit](https://github.com/goatslacker/alt/commit/9bf17f0)
 * Made the lifecycles eventemitters so you can bind multiple. [commit](https://github.com/goatslacker/alt/commit/cf226f5)
 
-#### Fixes
+### Fixes
 
 * Bug with react-native. Stop using the Object.assign polyfill since react-native overrides it with a non-spec compliant one. [commit](https://github.com/goatslacker/alt/commit/5ccab76)
 
