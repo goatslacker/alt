@@ -2,7 +2,7 @@
 
 ## 0.16.5
 
-### Added
+#### Added
 
 * @decorate(alt) to decorate your store and activate all @bind and @expose methods. [commit](https://github.com/goatslacker/alt/commit/3865214)
 * getStores in conenctToStores decorator/wrapper function now receives props from a store. [commit](https://github.com/goatslacker/alt/commit/7003703)
@@ -10,7 +10,7 @@
 
 ## 0.16.4
 
-### Added
+#### Added
 
 * @bind and @expose decorators for binding actions and exporting public methods. [commit](https://github.com/goatslacker/alt/commit/9bf17f0)
 * Made the lifecycles eventemitters so you can bind multiple. [commit](https://github.com/goatslacker/alt/commit/cf226f5)
