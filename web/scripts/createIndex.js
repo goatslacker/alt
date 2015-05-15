@@ -27,15 +27,24 @@ function addDocument(name) {
     }, { id: name, body: body })
 
   index.add(doc)
+
+  return {
+    id: doc.id,
+    title: doc.title,
+    description: doc.description,
+    permalink: doc.permalink
+  }
 }
 
 const docsdir = fs.readdirSync('../docs')
-docsdir.forEach(function (file) {
-  if (/.md$/.test(file)) {
-    addDocument(file)
-  }
-})
 
-const search_json = JSON.stringify(index.toJSON())
+const documents = docsdir.filter(function (file) {
+  return /.md$/.test(file)
+}).map(addDocument)
 
-fs.writeFileSync('./assets/search.json', search_json)
+const searchData = {
+  docs: documents,
+  index: index.toJSON()
+}
+
+fs.writeFileSync('./assets/search.json', JSON.stringify(searchData))
