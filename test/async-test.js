@@ -2,7 +2,7 @@ import Alt from '../'
 import { createStore, datasource } from '../utils/decorators'
 import sinon from 'sinon'
 import { assert } from 'chai'
-//import Promise from 'es6-promise'
+import { Promise } from 'es6-promise'
 
 const alt = new Alt()
 
