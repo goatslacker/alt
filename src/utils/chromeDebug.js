@@ -1,4 +1,4 @@
 /*global window*/
 export default function chromeDebug(alt) {
-  window['goatslacker.github.io/alt/'] = alt
+  if (typeof window !== 'undefined') window['alt.js.org'] = alt
 }
