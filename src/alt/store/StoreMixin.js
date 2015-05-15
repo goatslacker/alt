@@ -26,7 +26,7 @@ const StoreMixin = {
     let hasError = false
 
     const toExport = Object.keys(asyncMethods).reduce((publicMethods, methodName) => {
-      const asyncSpec = asyncMethods[methodName]
+      const asyncSpec = asyncMethods[methodName](this)
 
       const validHandlers = ['success', 'error', 'loading']
       validHandlers.forEach((handler) => {

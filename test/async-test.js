@@ -2,7 +2,7 @@ import Alt from '../'
 import { createStore, datasource } from '../utils/decorators'
 import sinon from 'sinon'
 import { assert } from 'chai'
-import Promise from 'es6-promise'
+//import Promise from 'es6-promise'
 
 const alt = new Alt()
 
@@ -30,12 +30,14 @@ const local = sinon.stub(api, 'local', (state) => {
 })
 
 const StargazerSource = {
-  fetchUsers: {
-    remote,
-    local,
-    loading: StargazerActions.fetchingUsers,
-    success: StargazerActions.usersReceived,
-    error: StargazerActions.failed
+  fetchUsers() {
+    return {
+      remote,
+      local,
+      loading: StargazerActions.fetchingUsers,
+      success: StargazerActions.usersReceived,
+      error: StargazerActions.failed
+    }
   }
 }
 
@@ -92,7 +94,7 @@ export default {
       assert.throws(() => {
         @createStore(alt)
         @datasource({
-          derp: { success: () => null }
+          derp() { return { success: () => null } }
         })
         class Store { }
       }, Error, /handler must be an action function/)
