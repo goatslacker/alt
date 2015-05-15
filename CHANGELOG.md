@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.16.5
+
+### Added
+
+* @decorate(alt) to decorate your store and activate all @bind and @expose methods. [commit](https://github.com/goatslacker/alt/commit/3865214)
+* getStores in conenctToStores decorator/wrapper function now receives props from a store. [commit](https://github.com/goatslacker/alt/commit/7003703)
+* Solving the async debate. [commit](https://github.com/goatslacker/alt/commit/4962ac5)
+
 ## 0.16.4
 
 ### Added
