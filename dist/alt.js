@@ -907,7 +907,7 @@ var AltStore = (function () {
 exports['default'] = AltStore;
 module.exports = exports['default'];
 
-},{"../../utils/functions":13,"../symbols/symbols":10,"es-symbol":1,"eventemitter3":2}],8:[function(require,module,exports){
+},{"../../utils/functions":14,"../symbols/symbols":10,"es-symbol":1,"eventemitter3":2}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -955,17 +955,11 @@ var StoreMixin = {
   exportAsync: function exportAsync(asyncMethods) {
     var _this = this;
 
-<<<<<<< HEAD
-    fn.eachObject(function (methodName, value) {
-      if (!fn.isFunction(value)) {
-        throw new TypeError('exportPublicMethods expects a function');
-      }
+    var _isLoading = false;
+    var _hasError = false;
 
-      _this[Sym.PUBLIC_METHODS][methodName] = value;
-    }, [methods]);
-=======
     var toExport = Object.keys(asyncMethods).reduce(function (publicMethods, methodName) {
-      var asyncSpec = asyncMethods[methodName];
+      var asyncSpec = asyncMethods[methodName](_this);
 
       var validHandlers = ['success', 'error', 'loading'];
       validHandlers.forEach(function (handler) {
@@ -980,12 +974,22 @@ var StoreMixin = {
         }
 
         var state = _this.getInstance().getState();
-        var value = asyncSpec.cache.apply(asyncSpec, [state].concat(args));
+        var value = asyncSpec.local && asyncSpec.local.apply(asyncSpec, [state].concat(args));
 
         // if we don't have it in cache then fetch it
         if (!value) {
+          _isLoading = true;
+          _hasError = false;
+          /* istanbul ignore else */
           if (asyncSpec.loading) asyncSpec.loading();
-          asyncSpec.fetch.apply(asyncSpec, [state].concat(args)).then(asyncSpec.success)['catch'](asyncSpec.error);
+          asyncSpec.remote.apply(asyncSpec, [state].concat(args)).then(function (v) {
+            _isLoading = false;
+            asyncSpec.success(v);
+          })['catch'](function (v) {
+            _isLoading = false;
+            _hasError = true;
+            asyncSpec.error(v);
+          });
         } else {
           // otherwise emit the change now
           _this.emitChange();
@@ -996,19 +1000,26 @@ var StoreMixin = {
     }, {});
 
     this.exportPublicMethods(toExport);
+    this.exportPublicMethods({
+      isLoading: function isLoading() {
+        return _isLoading;
+      },
+      hasError: function hasError() {
+        return _hasError;
+      }
+    });
   },
 
   exportPublicMethods: function exportPublicMethods(methods) {
     var _this2 = this;
 
-    Object.keys(methods).forEach(function (methodName) {
-      if (typeof methods[methodName] !== 'function') {
+    fn.eachObject(function (methodName, value) {
+      if (!fn.isFunction(value)) {
         throw new TypeError('exportPublicMethods expects a function');
       }
 
-      _this2[Sym.PUBLIC_METHODS][methodName] = methods[methodName];
-    });
->>>>>>> Update build
+      _this2[Sym.PUBLIC_METHODS][methodName] = value;
+    }, [methods]);
   },
 
   emitChange: function emitChange() {
@@ -1070,14 +1081,8 @@ var StoreMixin = {
   bindListeners: function bindListeners(obj) {
     var _this4 = this;
 
-<<<<<<< HEAD
     fn.eachObject(function (methodName, symbol) {
-      var listener = _this3[methodName];
-=======
-    Object.keys(obj).forEach(function (methodName) {
-      var symbol = obj[methodName];
       var listener = _this4[methodName];
->>>>>>> Update build
 
       if (!listener) {
         throw new ReferenceError('' + methodName + ' defined but does not exist in ' + _this4._storeName);
@@ -1097,7 +1102,7 @@ var StoreMixin = {
 exports['default'] = StoreMixin;
 module.exports = exports['default'];
 
-},{"../../utils/functions":13,"../symbols/symbols":10,"es-symbol":1}],9:[function(require,module,exports){
+},{"../../utils/functions":14,"../symbols/symbols":10,"es-symbol":1}],9:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1263,20 +1268,16 @@ function createStoreFromClass(alt, StoreModel, key) {
     store.bindListeners(config.bindListeners);
   }
 
-<<<<<<< HEAD
-  storeInstance = fn.assign(new _AltStore2['default'](alt, store, store[alt.config.stateKey] || store[config.stateKey] || null, StoreModel), utils.getInternalMethods(StoreModel), config.publicMethods, { displayName: key });
-=======
   if (config.datasource) {
     store.exportAsync(config.datasource);
   }
 
-  storeInstance = _objectAssign2['default'](new _AltStore2['default'](alt, store, store[alt.config.stateKey] || store[config.stateKey] || null, StoreModel), utils.getInternalMethods(StoreModel), config.publicMethods, { displayName: key });
->>>>>>> Update build
+  storeInstance = fn.assign(new _AltStore2['default'](alt, store, store[alt.config.stateKey] || store[config.stateKey] || null, StoreModel), utils.getInternalMethods(StoreModel), config.publicMethods, { displayName: key });
 
   return storeInstance;
 }
 
-},{"../../utils/functions":13,"../symbols/symbols":10,"../utils/AltUtils":11,"./AltStore":7,"./StoreMixin":8,"eventemitter3":2}],10:[function(require,module,exports){
+},{"../../utils/functions":14,"../symbols/symbols":10,"../utils/AltUtils":11,"./AltStore":7,"./StoreMixin":8,"eventemitter3":2}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1467,40 +1468,7 @@ function filterSnapshots(instance, state, stores) {
   }, {});
 }
 
-},{"../../utils/functions":13,"../symbols/symbols":10}],13:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-exports.eachObject = eachObject;
-exports.assign = assign;
-var isFunction = function isFunction(x) {
-  return typeof x === 'function';
-};
-
-exports.isFunction = isFunction;
-
-function eachObject(f, o) {
-  o.forEach(function (from) {
-    Object.keys(Object(from)).forEach(function (key) {
-      f(key, from[key]);
-    });
-  });
-}
-
-function assign(target) {
-  for (var _len = arguments.length, source = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    source[_key - 1] = arguments[_key];
-  }
-
-  eachObject(function (key, value) {
-    return target[key] = value;
-  }, source);
-  return target;
-}
-
-},{}],14:[function(require,module,exports){
+},{"../../utils/functions":14,"../symbols/symbols":10}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1794,5 +1762,38 @@ var Alt = (function () {
 exports['default'] = Alt;
 module.exports = exports['default'];
 
-},{"../utils/functions":13,"./actions":6,"./store":9,"./symbols/symbols":10,"./utils/AltUtils":11,"./utils/StateFunctions":12,"flux":3}]},{},[14])(14)
+},{"../utils/functions":14,"./actions":6,"./store":9,"./symbols/symbols":10,"./utils/AltUtils":11,"./utils/StateFunctions":12,"flux":3}],14:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports.eachObject = eachObject;
+exports.assign = assign;
+var isFunction = function isFunction(x) {
+  return typeof x === 'function';
+};
+
+exports.isFunction = isFunction;
+
+function eachObject(f, o) {
+  o.forEach(function (from) {
+    Object.keys(Object(from)).forEach(function (key) {
+      f(key, from[key]);
+    });
+  });
+}
+
+function assign(target) {
+  for (var _len = arguments.length, source = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    source[_key - 1] = arguments[_key];
+  }
+
+  eachObject(function (key, value) {
+    return target[key] = value;
+  }, source);
+  return target;
+}
+
+},{}]},{},[13])(13)
 });
