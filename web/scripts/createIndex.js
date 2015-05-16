@@ -32,6 +32,7 @@ function addDocument(name) {
     id: doc.id,
     title: doc.title,
     description: doc.description,
+    body: doc.body,
     permalink: doc.permalink
   }
 }
