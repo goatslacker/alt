@@ -185,20 +185,48 @@ class Alt {
   // Instance type methods for injecting alt into your application as context
 
   addActions(name, ActionsClass, ...args) {
+    if (typeof name !== 'string') utils.warn(`actions must have name`)
+
+    if (Object.is(ActionsClass, undefined) ||
+        Object.is(ActionsClass, null)) {
+      utils.warn(`${name} must be an Array or an ActionsClass`)
+    }
+
     this.actions[name] = Array.isArray(ActionsClass)
       ? this.generateActions.apply(this, ActionsClass)
       : this.createActions(ActionsClass, ...args)
   }
 
   addStore(name, StoreModel, ...args) {
+    if (typeof name !== 'string') utils.warn(`store must have name`)
+
+    if (Object.is(StoreModel, undefined) ||
+        Object.is(StoreModel, null)) {
+      utils.warn(`${name} must be a StoreModel`)
+    }
+
     this.createStore(StoreModel, name, ...args)
   }
 
   getActions(name) {
+    if (!this.actions[name]) {
+      utils.warn(
+        `"${name}" not found. available actions are:
+         ${Object.keys(this.actions).join(', ')}`
+      )
+    }
+
     return this.actions[name]
   }
 
   getStore(name) {
+    if (!this.stores[name]) {
+      utils.warn(
+        `"${name}" not found. available stores are:
+         ${Object.keys(this.stores).join(', ')}`
+      )
+    }
+
     return this.stores[name]
   }
 }
