@@ -22,8 +22,7 @@
 
   <body>
 
-    
-<nav class="navbar navbar-default sp-horiz-lg">
+    <nav class="navbar navbar-default sp-horiz-lg">
   <div class="container-fluid">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
@@ -32,7 +31,9 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
+
       <a class="navbar-brand" href="/"><img src="/assets/alt.png" alt="Alt" width="40" /></a>
+      <div id="alt-search-app"></div>
     </div>
 
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -180,18 +181,14 @@ module.exports = alt.createActions(LocationActions);
       </div>
     </div>
 
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/prism/0.0.1/prism.min.js"></script>
+    <script type="application/javascript" src="/assets/search.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/prism/0.0.1/prism.min.js"></script>
 <script type="text/javascript">
   // Alias for javascript so syntax highlighting works fine
   Prism.languages.js = Prism.languages.javascript;
 </script>
 <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.2.min.js" ></script>
 <script type="text/javascript" src="/assets/bootstrap-navbar.min.js"></script>
-
-<footer class="sp-vert-md">
-  <a href="https://www.npmjs.com/package/alt"><img src="https://img.shields.io/npm/v/alt.png?style=flat-square" alt="npm version" /></a>
-  <a href="https://gitter.im/goatslacker/alt"><img src="https://img.shields.io/badge/gitter-join%20chat-ff7d29.svg?style=flat-square" alt="Gitter Chat" /></a>
-</footer>
 
 
   </body>
