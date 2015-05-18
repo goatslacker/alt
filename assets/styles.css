@@ -188,3 +188,19 @@ a.btn-brand {
   background: #db5800;
   border-bottom: 2px solid #bb3800;
 }
+
+.navbar-collapse.collapse #alt-search-app {
+  position: absolute;
+}
+
+.navbar-collapse.collapsing #alt-search-app,
+.navbar-collapse.collapse.in #alt-search-app {
+  position: static;
+}
+
+.navbar-collapse.collapsing .alt-search__input,
+.navbar-collapse.collapse.in .alt-search__input {
+  display: block;
+  margin: 1em auto 0 auto;
+  position: static;
+}
