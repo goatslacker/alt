@@ -5,7 +5,7 @@
   "main": "lib",
   "dependencies": {
     "flux": "2.0.3",
-    "transmitter": "1.0.1"
+    "transmitter": "1.0.2"
   },
   "devDependencies": {
     "alt-search-docs": "1.0.6",

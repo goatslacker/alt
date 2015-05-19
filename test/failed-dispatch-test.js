@@ -46,7 +46,7 @@ export default {
 
       const storeListener = sinon.spy()
 
-      const dispose = caught.listen(storeListener)
+      caught.listen(storeListener)
 
       assert(caught.getState().x === 0)
       assert.doesNotThrow(() => actions.fire())
@@ -54,7 +54,7 @@ export default {
 
       assert.notOk(storeListener.calledOnce, 'the store did not emit a change')
 
-      dispose()
+      caught.unlisten(storeListener)
     },
 
     'you have to emit changes yourself'() {

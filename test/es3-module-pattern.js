@@ -45,7 +45,7 @@ export default {
 
     'store method exists'() {
       const storePrototype = Object.getPrototypeOf(myStore)
-      const assertMethods = ['constructor', 'emitChange', 'listen', 'getState']
+      const assertMethods = ['constructor', 'emitChange', 'listen', 'unlisten', 'getState']
       assert.deepEqual(Object.getOwnPropertyNames(storePrototype), assertMethods, 'methods exist for store')
       assert.isUndefined(myStore.addListener, 'event emitter methods not present')
       assert.isUndefined(myStore.removeListener, 'event emitter methods not present')
