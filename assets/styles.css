@@ -208,4 +208,5 @@ a.btn-brand {
 .navbar-collapse.collapse.in .alt-search__results {
   box-shadow: 1px 1px 10px #999;
   top: 120px;
+  z-index: 3000;
 }
