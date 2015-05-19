@@ -1,5 +1,41 @@
 # Changelog
 
+## 0.17.0
+
+### Breaking Changes
+
+* Removed `stateKey`. [commit](https://github.com/goatslacker/alt/commit/40830ea)
+
+  **Upgrade Guide**
+
+  - A `stateKey` property was configurable on stores as well as app level.
+  - This has now been removed.
+  - This key was mostly used so you can use the react-like API of `this.state`, now this is being supported first-class.
+
+```js
+// old behavior
+class MyStore {
+  static config = { stateKey = 'state' }
+
+  constructor() {
+    this.state = {}
+  }
+}
+```
+
+Now you can just use `this.state` directly. If it exists it'll be picked up.
+
+```js
+// old behavior
+class MyStore {
+  constructor() {
+    this.state = {}
+  }
+}
+```
+
+The old behavior of assigning state directly as instance properties will continue to be supported. However, this new behavior will be favored in the docs.
+
 ## 0.16.8
 
 ### Added
