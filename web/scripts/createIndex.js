@@ -10,8 +10,8 @@ const index = lunr(function () {
   this.field('permalink')
 })
 
-function addDocument(name) {
-  const markdown = String(fs.readFileSync('../docs/' + name)).split('---')
+function addDocument(name, idx) {
+  const markdown = String(fs.readFileSync(name)).split('---')
 
   const topdoc = markdown[1]
 
@@ -24,7 +24,7 @@ function addDocument(name) {
       const keyVal = prop.split(':')
       obj[keyVal[0]] = keyVal[1].trim()
       return obj
-    }, { id: name, body: body })
+    }, { id: idx, body: body })
 
   index.add(doc)
 
@@ -37,11 +37,27 @@ function addDocument(name) {
   }
 }
 
-const docsdir = fs.readdirSync('../docs')
+function isDir(fullpath) {
+  try {
+    return fs.statSync(fullpath).isDirectory()
+  } catch (err) {
+    return null
+  }
+}
 
-const documents = docsdir.filter(function (file) {
-  return /.md$/.test(file)
-}).map(addDocument)
+function fromDirectory(dir) {
+  return fs.readdirSync(dir).reduce(function (dirs, file) {
+    const fullpath = path.join(dir, file)
+    if (isDir(fullpath)) {
+      dirs.push.apply(dirs, fromDirectory(path.join(fullpath)))
+    } else if (/.md$/.test(file)) {
+      dirs.push(fullpath)
+    }
+    return dirs
+  }, [])
+}
+
+const documents = fromDirectory('../docs').map(addDocument)
 
 const searchData = {
   docs: documents,
