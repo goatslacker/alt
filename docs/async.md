@@ -48,7 +48,7 @@ class SearchStore {
   constructor() {
     this.value = '';
 
-    this.exportAsync(SearchSoure);
+    this.exportAsync(SearchSource);
   }
 }
 ```
@@ -57,7 +57,7 @@ Now we'll have a few methods available for use: `SearchStore.performSearch()`, `
 
 ## API
 
-The data source is an object where the keys correspond to methods that will be available to the store its tied. The values of the keys are functions, each function is called with the store's context as its only argument. If you are using the no-singletons approach then you'd use `context.alt` to retrieve the actions to listen to them.
+The data source is an object where the keys correspond to methods that will be available to the supplied Store. The values of the keys are functions, each function is called with the store's context as its only argument. If you are using the no-singletons approach then you'd use `context.alt` to retrieve the actions to listen to them.
 
 ```js
 const SearchSource = {
