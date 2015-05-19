@@ -56,11 +56,13 @@ class AltStore {
   }
 
   listen(cb) {
-    const { dispose } = this.transmitter.subscribe(cb)
-    return () => {
-      this.lifecycle.unlisten.push()
-      dispose()
-    }
+    this.transmitter.subscribe(cb)
+    return () => this.unlisten(cb)
+  }
+
+  unlisten(cb) {
+    this.lifecycle.unlisten.push()
+    this.transmitter.unsubscribe(cb)
   }
 
   getState() {
