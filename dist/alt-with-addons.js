@@ -78,7 +78,7 @@ var AltContainer = React.createClass(assign({
 module.exports = AltContainer;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../utils/functions":28,"./mixinContainer":3}],3:[function(require,module,exports){
+},{"../utils/functions":27,"./mixinContainer":3}],3:[function(require,module,exports){
 'use strict';
 
 var Subscribe = require('../mixins/Subscribe');
@@ -246,7 +246,7 @@ function mixinContainer(React) {
 
 module.exports = mixinContainer;
 
-},{"../mixins/Subscribe":4,"../utils/functions":28}],4:[function(require,module,exports){
+},{"../mixins/Subscribe":4,"../utils/functions":27}],4:[function(require,module,exports){
 'use strict';
 var Symbol = require('es-symbol');
 var MIXIN_REGISTRY = Symbol('alt store listeners');
@@ -1067,71 +1067,7 @@ function makeAction(alt, namespace, name, implementation, obj) {
 
 module.exports = exports['default'];
 
-},{"../symbols/symbols":16,"../utils/AltUtils":17,"es-symbol":5}],11:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-var _ = require('./');
-
-var _2 = _interopRequireDefault(_);
-
-var _utilsActionListeners = require('../utils/ActionListeners');
-
-var _utilsActionListeners2 = _interopRequireDefault(_utilsActionListeners);
-
-var _utilsAltManager = require('../utils/AltManager');
-
-var _utilsAltManager2 = _interopRequireDefault(_utilsAltManager);
-
-var _utilsDispatcherRecorder = require('../utils/DispatcherRecorder');
-
-var _utilsDispatcherRecorder2 = _interopRequireDefault(_utilsDispatcherRecorder);
-
-var _utilsAtomic = require('../utils/atomic');
-
-var _utilsAtomic2 = _interopRequireDefault(_utilsAtomic);
-
-var _utilsConnectToStores = require('../utils/connectToStores');
-
-var _utilsConnectToStores2 = _interopRequireDefault(_utilsConnectToStores);
-
-var _utilsChromeDebug = require('../utils/chromeDebug');
-
-var _utilsChromeDebug2 = _interopRequireDefault(_utilsChromeDebug);
-
-var _utilsMakeFinalStore = require('../utils/makeFinalStore');
-
-var _utilsMakeFinalStore2 = _interopRequireDefault(_utilsMakeFinalStore);
-
-var _utilsWithAltContext = require('../utils/withAltContext');
-
-var _utilsWithAltContext2 = _interopRequireDefault(_utilsWithAltContext);
-
-var _AltContainer = require('../../AltContainer');
-
-var _AltContainer2 = _interopRequireDefault(_AltContainer);
-
-_2['default'].addons = {
-  ActionListeners: _utilsActionListeners2['default'],
-  AltContainer: _AltContainer2['default'],
-  AltManager: _utilsAltManager2['default'],
-  DispatcherRecorder: _utilsDispatcherRecorder2['default'],
-  atomic: _utilsAtomic2['default'],
-  chromeDebug: _utilsChromeDebug2['default'],
-  connectToStores: _utilsConnectToStores2['default'],
-  makeFinalStore: _utilsMakeFinalStore2['default'],
-  withAltContext: _utilsWithAltContext2['default']
-};
-
-exports['default'] = _2['default'];
-module.exports = exports['default'];
-
-},{"../../AltContainer":1,"../utils/ActionListeners":19,"../utils/AltManager":20,"../utils/DispatcherRecorder":21,"../utils/atomic":22,"../utils/chromeDebug":23,"../utils/connectToStores":24,"../utils/makeFinalStore":26,"../utils/withAltContext":27,"./":12}],12:[function(require,module,exports){
+},{"../symbols/symbols":15,"../utils/AltUtils":16,"es-symbol":5}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1425,7 +1361,7 @@ var Alt = (function () {
 exports['default'] = Alt;
 module.exports = exports['default'];
 
-},{"../utils/functions":25,"./actions":10,"./store":15,"./symbols/symbols":16,"./utils/AltUtils":17,"./utils/StateFunctions":18,"flux":7}],13:[function(require,module,exports){
+},{"../utils/functions":24,"./actions":10,"./store":14,"./symbols/symbols":15,"./utils/AltUtils":16,"./utils/StateFunctions":17,"flux":7}],12:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1542,7 +1478,7 @@ var AltStore = (function () {
 exports['default'] = AltStore;
 module.exports = exports['default'];
 
-},{"../../utils/functions":25,"../symbols/symbols":16,"es-symbol":5,"eventemitter3":6}],14:[function(require,module,exports){
+},{"../../utils/functions":24,"../symbols/symbols":15,"es-symbol":5,"eventemitter3":6}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1737,7 +1673,7 @@ var StoreMixin = {
 exports['default'] = StoreMixin;
 module.exports = exports['default'];
 
-},{"../../utils/functions":25,"../symbols/symbols":16,"es-symbol":5}],15:[function(require,module,exports){
+},{"../../utils/functions":24,"../symbols/symbols":15,"es-symbol":5}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1912,7 +1848,7 @@ function createStoreFromClass(alt, StoreModel, key) {
   return storeInstance;
 }
 
-},{"../../utils/functions":25,"../symbols/symbols":16,"../utils/AltUtils":17,"./AltStore":13,"./StoreMixin":14,"eventemitter3":6}],16:[function(require,module,exports){
+},{"../../utils/functions":24,"../symbols/symbols":15,"../utils/AltUtils":16,"./AltStore":12,"./StoreMixin":13,"eventemitter3":6}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1973,7 +1909,7 @@ exports.PUBLIC_METHODS = PUBLIC_METHODS;
 var STATE_CONTAINER = (0, _esSymbol2['default'])();
 exports.STATE_CONTAINER = STATE_CONTAINER;
 
-},{"es-symbol":5}],17:[function(require,module,exports){
+},{"es-symbol":5}],16:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2033,7 +1969,7 @@ function dispatchIdentity(x) {
   this.dispatch(a.length ? [x].concat(a) : x);
 }
 
-},{}],18:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2103,7 +2039,7 @@ function filterSnapshots(instance, state, stores) {
   }, {});
 }
 
-},{"../../utils/functions":25,"../symbols/symbols":16}],19:[function(require,module,exports){
+},{"../../utils/functions":24,"../symbols/symbols":15}],18:[function(require,module,exports){
 /**
  * ActionListeners(alt: AltInstance): ActionListenersInstance
  *
@@ -2177,7 +2113,7 @@ ActionListeners.prototype.removeAllActionListeners = function () {
 exports['default'] = ActionListeners;
 module.exports = exports['default'];
 
-},{"es-symbol":5}],20:[function(require,module,exports){
+},{"es-symbol":5}],19:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2290,7 +2226,7 @@ var AltManager = (function () {
 exports['default'] = AltManager;
 module.exports = exports['default'];
 
-},{}],21:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 /**
  * DispatcherRecorder(alt: AltInstance): DispatcherInstance
  *
@@ -2443,7 +2379,7 @@ DispatcherRecorder.prototype.loadEvents = function (events) {
 exports['default'] = DispatcherRecorder;
 module.exports = exports['default'];
 
-},{"es-symbol":5}],22:[function(require,module,exports){
+},{"es-symbol":5}],21:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2508,7 +2444,7 @@ function atomic(alt) {
 
 module.exports = exports['default'];
 
-},{"./functions":25,"./makeFinalStore":26}],23:[function(require,module,exports){
+},{"./functions":24,"./makeFinalStore":25}],22:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2518,12 +2454,13 @@ Object.defineProperty(exports, '__esModule', {
 exports['default'] = chromeDebug;
 
 function chromeDebug(alt) {
-  window['goatslacker.github.io/alt/'] = alt;
+  if (typeof window !== 'undefined') window['alt.js.org'] = alt;
+  return alt;
 }
 
 module.exports = exports['default'];
 
-},{}],24:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 (function (global){
 /**
  * 'Higher Order Component' that controls the props of a wrapped
@@ -2635,7 +2572,7 @@ exports['default'] = connectToStores;
 module.exports = exports['default'];
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./functions":25}],25:[function(require,module,exports){
+},{"./functions":24}],24:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2668,7 +2605,7 @@ function assign(target) {
   return target;
 }
 
-},{}],26:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2720,7 +2657,7 @@ function makeFinalStore(alt) {
 
 module.exports = exports["default"];
 
-},{}],27:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -2756,7 +2693,7 @@ function withAltContext(flux) {
 module.exports = exports['default'];
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],28:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2789,5 +2726,69 @@ function assign(target) {
   return target;
 }
 
-},{}]},{},[11])(11)
+},{}],28:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var _ = require('./');
+
+var _2 = _interopRequireDefault(_);
+
+var _utilsActionListeners = require('../utils/ActionListeners');
+
+var _utilsActionListeners2 = _interopRequireDefault(_utilsActionListeners);
+
+var _utilsAltManager = require('../utils/AltManager');
+
+var _utilsAltManager2 = _interopRequireDefault(_utilsAltManager);
+
+var _utilsDispatcherRecorder = require('../utils/DispatcherRecorder');
+
+var _utilsDispatcherRecorder2 = _interopRequireDefault(_utilsDispatcherRecorder);
+
+var _utilsAtomic = require('../utils/atomic');
+
+var _utilsAtomic2 = _interopRequireDefault(_utilsAtomic);
+
+var _utilsConnectToStores = require('../utils/connectToStores');
+
+var _utilsConnectToStores2 = _interopRequireDefault(_utilsConnectToStores);
+
+var _utilsChromeDebug = require('../utils/chromeDebug');
+
+var _utilsChromeDebug2 = _interopRequireDefault(_utilsChromeDebug);
+
+var _utilsMakeFinalStore = require('../utils/makeFinalStore');
+
+var _utilsMakeFinalStore2 = _interopRequireDefault(_utilsMakeFinalStore);
+
+var _utilsWithAltContext = require('../utils/withAltContext');
+
+var _utilsWithAltContext2 = _interopRequireDefault(_utilsWithAltContext);
+
+var _AltContainer = require('../../AltContainer');
+
+var _AltContainer2 = _interopRequireDefault(_AltContainer);
+
+_2['default'].addons = {
+  ActionListeners: _utilsActionListeners2['default'],
+  AltContainer: _AltContainer2['default'],
+  AltManager: _utilsAltManager2['default'],
+  DispatcherRecorder: _utilsDispatcherRecorder2['default'],
+  atomic: _utilsAtomic2['default'],
+  chromeDebug: _utilsChromeDebug2['default'],
+  connectToStores: _utilsConnectToStores2['default'],
+  makeFinalStore: _utilsMakeFinalStore2['default'],
+  withAltContext: _utilsWithAltContext2['default']
+};
+
+exports['default'] = _2['default'];
+module.exports = exports['default'];
+
+},{"../../AltContainer":1,"../utils/ActionListeners":18,"../utils/AltManager":19,"../utils/DispatcherRecorder":20,"../utils/atomic":21,"../utils/chromeDebug":22,"../utils/connectToStores":23,"../utils/makeFinalStore":25,"../utils/withAltContext":26,"./":11}]},{},[28])(28)
 });
