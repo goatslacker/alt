@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Handling Async</title>
+  <meta name="description" content="A library for managing data within JavaScript applications. Alt is a pure flux implementation that is small, terse, well tested, extremely flexible, and forward thinking.
+">
+
+  <link rel="canonical" href="http://alt.js.org/docs/async/">
+  <link rel="alternate" type="application/rss+xml" title="Alt" href="http://alt.js.org/feed.xml" />
+
+  <link type="text/css" rel="stylesheet" href="/assets/bootstrap-navbar.css" />
+  <link type="text/css" rel="stylesheet" href="/assets/lotus.min.css" />
+  <link type="text/css" rel="stylesheet" href="/assets/prism.min.css" />
+  <link type="text/css" rel="stylesheet" href="/assets/styles.css" />
+</head>
+
+
+  <body>
+
+    <nav class="navbar navbar-default sp-horiz-lg">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+
+      <a class="navbar-brand" href="/"><img src="/assets/alt.png" alt="Alt" width="40" /></a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <div id="alt-search-app"></div>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <a href="/guide/">Getting Started</a>
+        </li>
+        <li class="dropdown">
+          <a href='#' class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">API Documentation <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li>
+              <a href="/docs/">Alt</a>
+            </li>
+            
+            <li>
+              <a href="/docs/createActions">Creating Actions</a>
+            </li>
+            
+            <li>
+              <a href="/docs/actions">Actions</a>
+            </li>
+            
+            <li>
+              <a href="/docs/createStore">Creating Stores</a>
+            </li>
+            
+            <li>
+              <a href="/docs/stores">Stores</a>
+            </li>
+            
+            <li>
+              <a href="/docs/lifecycleListeners">Lifecycle Listeners</a>
+            </li>
+            
+            <li>
+              <a href="/docs/bootstrap">Bootstrap</a>
+            </li>
+            
+            <li>
+              <a href="/docs/takeSnapshot">Take Snapshot</a>
+            </li>
+            
+            <li>
+              <a href="/docs/flush">Flush</a>
+            </li>
+            
+            <li>
+              <a href="/docs/recycle">Recycle</a>
+            </li>
+            
+            <li>
+              <a href="/docs/rollback">Rollback</a>
+            </li>
+            
+            <li>
+              <a href="/docs/altInstances">Alt Instances</a>
+            </li>
+            
+            <li>
+              <a href="/docs/components/altContainer">AltContainer</a>
+            </li>
+            
+          </ul>
+        </li>
+        <li>
+          <a href="/blog/">Blog</a>
+        </li>
+        <li>
+          <a href="https://gitter.im/goatslacker/alt">Support</a>
+        </li>
+        <li>
+          <a href="https://github.com/goatslacker/alt">GitHub</a>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+
+    <div class="main sp-vert-md sp-horiz-lg">
+      <div class="row">
+        <div class="col c2">
+          <ul class="sidenav">
+  
+  <li>
+    <a href="/docs/createActions">Creating Actions</a>
+  </li>
+  
+  <li>
+    <a href="/docs/actions">Actions</a>
+  </li>
+  
+  <li>
+    <a href="/docs/createStore">Creating Stores</a>
+  </li>
+  
+  <li>
+    <a href="/docs/stores">Stores</a>
+  </li>
+  
+  <li>
+    <a href="/docs/lifecycleListeners">Lifecycle Listeners</a>
+  </li>
+  
+  <li>
+    <a href="/docs/bootstrap">Bootstrap</a>
+  </li>
+  
+  <li>
+    <a href="/docs/takeSnapshot">Take Snapshot</a>
+  </li>
+  
+  <li>
+    <a href="/docs/flush">Flush</a>
+  </li>
+  
+  <li>
+    <a href="/docs/recycle">Recycle</a>
+  </li>
+  
+  <li>
+    <a href="/docs/rollback">Rollback</a>
+  </li>
+  
+  <li>
+    <a href="/docs/altInstances">Alt Instances</a>
+  </li>
+  
+  <li>
+    <a href="/docs/components/altContainer">AltContainer</a>
+  </li>
+  
+</ul>
+
+        </div>
+        <div class="col c10">
+          <div class="sp-horiz-md">
+            <h1 id="data-sources">Data Sources</h1>
+
+<p>A common question for newcomers to flux is “where do I put my async code?”. While kicking off the request in your actions, stores, or a util class is ok, the most important thing is how you handle your request. Handling a request should only be done via actions, this ensures that it goes through the dispatcher and that the data flow remains uni-directional.</p>
+
+<p>Alt has this concept called data sources which set up an easy way for you to handle your CRUD operations while keeping best practices. We prefer that you tie these pieces of logic to your stores. Why? Because sometimes you need partial state data in order to compose a request. The data source enforces that you handle the asynchronous responses through actions, and gives you access to store state so you can compose your request.</p>
+
+<p>Important note: data sources work with Promises. Make sure you have a Promise polyfill loaded in the browser if you plan on shipping to browsers that don’t natively support Promises.</p>
+
+<h3 id="what-it-looks-like">What it looks like</h3>
+
+<pre><code class="language-js">// sources/SearchSource.js
+
+const SearchSource = {
+  performSearch(context) {
+    return {
+      // remotely fetch something
+      remote(state) {
+        return axios.get(`/search/q/${state.value}`);
+      },
+
+      // this function checks in our local cache first
+      // if the value is present it'll use that instead.
+      local(state) {
+        return state.results[state.value] ? state.results : null;
+      },
+
+      // here we setup some actions to handle our response
+      loading: SearchActions.loadingResults,
+      success: SearchActions.receivedResults,
+      error: SearchActions.fetchingResultsFailed
+    };
+  }
+};
+</code></pre>
+
+<p>You then tie this to a store using the <code>exportAsync</code> function in the constructor.</p>
+
+<pre><code class="language-js">class SearchStore {
+  constructor() {
+    this.value = '';
+
+    this.exportAsync(SearchSoure);
+  }
+}
+</code></pre>
+
+<p>Now we’ll have a few methods available for use: <code>SearchStore.performSearch()</code>, <code>SearchStore.isLoading()</code>, and <code>SearchStore.hasError()</code>.</p>
+
+<h2 id="api">API</h2>
+
+<p>The data source is an object where the keys correspond to methods that will be available to the store its tied. The values of the keys are functions, each function is called with the store’s context as its only argument. If you are using the no-singletons approach then you’d use <code>context.alt</code> to retrieve the actions to listen to them.</p>
+
+<pre><code class="language-js">const SearchSource = {
+  performSearch(context) {
+    return {
+      loading: context.alt.actions.SearchActions.loadingResults
+    };
+  }
+};
+</code></pre>
+
+<p>Each function must return an object. The object may optionally implement <code>local</code> and <code>loading</code> but it must implement <code>remote</code>, <code>success</code>, and <code>error</code>.</p>
+
+<h3 id="localstate-object-args-any">local(state: object, …args: any)</h3>
+
+<p>This function is called first. If a value is returned then it’ll be passed to the success or error action handler.</p>
+
+<h3 id="remotestate-object-args-any">remote(state: object, …args: any)</h3>
+
+<p>This function is called whenever we need to fetch a value remotely. This is determined if <code>local</code> returns a falsy value.</p>
+
+<p>Any arguments passed to your public method will be passed through to both local and remote:</p>
+
+<pre><code class="language-js">remote(state, one, two, three) {
+}
+
+SearchStore.performSearch(1, 2, 3);
+</code></pre>
+
+<h3 id="loading">loading</h3>
+
+<p>Must be an action. Called before <code>remote</code> is called.</p>
+
+<h3 id="success">success</h3>
+
+<p>Must be an action. Called whenever a value resolves.</p>
+
+<h3 id="error">error</h3>
+
+<p>Must be an action. Called whenever a value rejects.</p>
+
+<h2 id="decorator">Decorator</h2>
+
+<p>There is also a decorator available for convenience for you ES7 folk out there.</p>
+
+<pre><code class="language-js">import { datasource } from 'alt/utils/decorators';
+
+@datasource(SearchSource);
+class SearchStore {
+  constructor() {
+    this.value = '';
+  }
+}
+</code></pre>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="application/javascript" src="http://alt.js.org/assets/search.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/prism/0.0.1/prism.min.js"></script>
+<script type="text/javascript">
+  // Alias for javascript so syntax highlighting works fine
+  Prism.languages.js = Prism.languages.javascript;
+</script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.2.min.js" ></script>
+<script type="text/javascript" src="/assets/bootstrap-navbar.min.js"></script>
+
+
+  </body>
+
+</html>
