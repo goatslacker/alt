@@ -209,4 +209,5 @@ a.btn-brand {
   box-shadow: 1px 1px 10px #999;
   top: 120px;
   z-index: 3000;
+  -webkit-transform-style: preserve-3d;
 }
