@@ -190,7 +190,12 @@ a.btn-brand {
 }
 
 .navbar-collapse.collapse #alt-search-app {
+  left: 0;
   position: absolute;
+}
+
+.navbar-collapse.collapse .alt-search__input {
+  left: 90px;
 }
 
 .navbar-collapse.collapsing #alt-search-app,
@@ -205,9 +210,12 @@ a.btn-brand {
   position: static;
 }
 
+html .alt-search__results {
+  position: relative;
+  top: 22px;
+  width: auto;
+}
+
 .navbar-collapse.collapse.in .alt-search__results {
-  box-shadow: 1px 1px 10px #999;
-  top: 120px;
-  z-index: 3000;
-  -webkit-transform-style: preserve-3d;
+  margin-bottom: 2em;
 }
