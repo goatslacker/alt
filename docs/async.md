@@ -73,7 +73,7 @@ Each function must return an object. The object may optionally implement `local`
 
 ### local(state: object, ...args: any)
 
-This function is called first. If a value is returned then it'll be passed to the success or error action handler.
+This function is called first. If a value is returned then a change event will be emitted from the store.
 
 ### remote(state: object, ...args: any)
 
