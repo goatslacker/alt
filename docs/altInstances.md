@@ -24,7 +24,7 @@ class MyAlt extends Alt {
 var flux = new MyAlt();
 ```
 
-You can then pass your flux instance using withAltContext.
+You can set your entire app context by wrapping your root component with `withAltContext`.
 
 As a decorator:
 ```js
