@@ -24,6 +24,27 @@ class MyAlt extends Alt {
 var flux = new MyAlt();
 ```
 
+You can set your entire app context by wrapping your root component with `withAltContext`.
+
+As a decorator:
+```js
+import withAltContext from 'alt/utils/withAltContext'
+
+@withAltContext(alt)
+export default class App extends React.Component {
+  render() {
+    return <div>{this.context.flux}</div>
+  }
+}
+```
+
+As a function:
+```js
+import withAltContext from 'alt/utils/withAltContext'
+
+export default withAltContext(alt)(App);
+```
+
 # AltClass
 
 ## AltClass#constructor
