@@ -38,6 +38,26 @@ const StargazerSource = {
       success: StargazerActions.usersReceived,
       error: StargazerActions.failed
     }
+  },
+  alwaysFetchUsers() {
+    return {
+      remote,
+      local: () => true,
+      loading: StargazerActions.fetchingUsers,
+      success: StargazerActions.usersReceived,
+      error: StargazerActions.failed,
+      shouldFetch: () => true
+    }
+  },
+  neverFetchUsers() {
+    return {
+      remote,
+      local: () => false,
+      loading: StargazerActions.fetchingUsers,
+      success: StargazerActions.usersReceived,
+      error: StargazerActions.failed,
+      shouldFetch: () => false
+    }
   }
 }
 
@@ -177,6 +197,18 @@ export default {
 
       StargazerStore.fetchUsers('alts')
       assert.ok(StargazerStore.isLoading())
+    },
+
+    'shouldFetch is true'() {
+      StargazerStore.alwaysFetchUsers()
+      assert.ok(StargazerStore.isLoading())
+      assert.ok(remote.calledOnce)
+    },
+
+    'shouldFetch is false'() {
+      StargazerStore.neverFetchUsers()
+      assert.notOk(StargazerStore.isLoading())
+      assert(remote.callCount === 0)
     },
   }
 }

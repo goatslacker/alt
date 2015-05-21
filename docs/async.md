@@ -35,7 +35,12 @@ const SearchSource = {
       // here we setup some actions to handle our response
       loading: SearchActions.loadingResults,
       success: SearchActions.receivedResults,
-      error: SearchActions.fetchingResultsFailed
+      error: SearchActions.fetchingResultsFailed,
+
+      // should fetch has precedence over the value returned by local in determining whether remote should be called
+      shouldFetch(state) {
+        return true
+      }
     };
   }
 };
@@ -87,6 +92,10 @@ remote(state, one, two, three) {
 
 SearchStore.performSearch(1, 2, 3);
 ```
+
+### shouldFetch(state: object, ...args: any)
+
+This function determines whether or not remote needs to be called, despite the value returned by `local`. If `shouldFetch` returns true, it will always get the data from `remote` and if it returns false, it will always use the value from `local`.
 
 ### loading
 
