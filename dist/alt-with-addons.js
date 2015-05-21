@@ -1546,9 +1546,10 @@ var StoreMixin = {
 
         var state = _this.getInstance().getState();
         var value = asyncSpec.local && asyncSpec.local.apply(asyncSpec, [state].concat(args));
+        var shouldFetch = asyncSpec.shouldFetch ? asyncSpec.shouldFetch.apply(asyncSpec, [state].concat(args)) : !value;
 
         // if we don't have it in cache then fetch it
-        if (!value) {
+        if (shouldFetch) {
           _isLoading = true;
           _hasError = false;
           /* istanbul ignore else */

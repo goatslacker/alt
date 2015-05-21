@@ -38,9 +38,10 @@ const StoreMixin = {
       publicMethods[methodName] = (...args) => {
         const state = this.getInstance().getState()
         const value = asyncSpec.local && asyncSpec.local(state, ...args)
+        const shouldFetch = asyncSpec.shouldFetch ? asyncSpec.shouldFetch(state, ...args) : !value
 
         // if we don't have it in cache then fetch it
-        if (!value) {
+        if (shouldFetch) {
           isLoading = true
           hasError = false
           /* istanbul ignore else */
