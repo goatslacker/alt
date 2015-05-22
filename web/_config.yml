@@ -18,6 +18,8 @@ sidenav:
   url: /docs/createStore
 - title: Stores
   url: /docs/stores
+- title: Handling Async
+  url: /docs/async
 - title: Lifecycle Listeners
   url: /docs/lifecycleListeners
 - title: Bootstrap
