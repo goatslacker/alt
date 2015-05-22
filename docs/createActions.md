@@ -35,7 +35,7 @@ MyActions.baz();
 
 > (alt: Alt): ActionsClass
 
-The constructor of your actions receieves the alt instance as its first and only argument. Inside the constructor any instance properties you define will be available as actions.
+The constructor of your actions receives the alt instance as its first and only argument. Inside the constructor any instance properties you define will be available as actions.
 
 ## ActionsClass#generateActions
 

@@ -303,7 +303,7 @@ locationStore.listen((data) => {
 
 Alternatively, you can use the `unlisten` method. It takes in the same function you used for `listen` and unregisters it.
 
-`getState` will return a copy of your the current store's state.
+`getState` will return a copy of the current store's state.
 
 ```js
 locationStore.getState().city === 'Denver'
