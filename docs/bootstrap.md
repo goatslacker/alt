@@ -9,7 +9,7 @@ permalink: /docs/bootstrap/
 
 > (data: string): undefined
 
-The `alt.bootstrap()` function takes in a snapshot you've saved and reloads every store's state with that the data provided in that snapshot.
+The `alt.bootstrap()` function takes in a snapshot you've saved and reloads every store's state with the data provided in that snapshot.
 
 Bootstrap is great if you're running an isomorphic app, or if you're persisting state to localstorage and then retrieving it on init later on. You can save a snapshot on the server side, send it down, and then bootstrap it back on the client.
 
