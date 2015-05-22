@@ -22,39 +22,45 @@ const StoreMixin = {
   },
 
   exportAsync(asyncMethods) {
-    let isLoading = false
-    let hasError = false
+    this.registerAsync(asyncMethods)
+  },
+
+  registerAsync(asyncDef) {
+    let loadCounter = 0
+
+    const asyncMethods = fn.isFunction(asyncDef)
+      ? asyncDef(this.alt)
+      : asyncDef
 
     const toExport = Object.keys(asyncMethods).reduce((publicMethods, methodName) => {
-      const asyncSpec = asyncMethods[methodName](this)
+      const desc = asyncMethods[methodName]
+      const spec = fn.isFunction(desc) ? desc(this) : desc
 
       const validHandlers = ['success', 'error', 'loading']
       validHandlers.forEach((handler) => {
-        if (asyncSpec[handler] && !asyncSpec[handler][Sym.ACTION_KEY]) {
+        if (spec[handler] && !spec[handler][Sym.ACTION_KEY]) {
           throw new Error(`${handler} handler must be an action function`)
         }
       })
 
       publicMethods[methodName] = (...args) => {
         const state = this.getInstance().getState()
-        const value = asyncSpec.local && asyncSpec.local(state, ...args)
-        const shouldFetch = asyncSpec.shouldFetch ? asyncSpec.shouldFetch(state, ...args) : !value
+        const value = spec.local && spec.local(state, ...args)
+        const shouldFetch = spec.shouldFetch ? spec.shouldFetch(state, ...args) : !value
 
         // if we don't have it in cache then fetch it
         if (shouldFetch) {
-          isLoading = true
-          hasError = false
+          loadCounter += 1
           /* istanbul ignore else */
-          if (asyncSpec.loading) asyncSpec.loading()
-          asyncSpec.remote(state, ...args)
+          if (spec.loading) spec.loading()
+          spec.remote(state, ...args)
             .then((v) => {
-              isLoading = false
-              asyncSpec.success(v)
+              loadCounter -= 1
+              spec.success(v)
             })
             .catch((v) => {
-              isLoading = false
-              hasError = true
-              asyncSpec.error(v)
+              loadCounter -= 1
+              spec.error(v)
             })
         } else {
           // otherwise emit the change now
@@ -67,8 +73,7 @@ const StoreMixin = {
 
     this.exportPublicMethods(toExport)
     this.exportPublicMethods({
-      isLoading: () => isLoading,
-      hasError: () => hasError
+      isLoading: () => loadCounter > 0
     })
   },
 
