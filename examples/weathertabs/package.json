@@ -11,6 +11,7 @@
     "browserify": "~4.2.2"
   },
   "scripts": {
+    "preinstall": "cd ../.. ; npm install",
     "build": "browserify js/app.js -t babelify --outfile js/bundle.js",
     "clean": "rm -R ./node_modules; npm install; npm run build"
   },
