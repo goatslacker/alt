@@ -13,6 +13,7 @@
     "browserify": "~4.2.2"
   },
   "scripts": {
+    "preinstall" : "cd ../.. ; npm install",
     "build": "browserify . > js/bundle.js",
     "test": "jest"
   },
