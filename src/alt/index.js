@@ -1,7 +1,6 @@
 import { Dispatcher } from 'flux'
 
 import * as StateFunctions from './utils/StateFunctions'
-import * as Sym from './symbols/symbols'
 import * as fn from '../utils/functions'
 import * as store from './store'
 import * as utils from './utils/AltUtils'
@@ -16,9 +15,9 @@ class Alt {
     this.actions = { global: {} }
     this.stores = {}
     this.storeTransforms = config.storeTransforms || []
-    this[Sym.ACTIONS_REGISTRY] = {}
-    this[Sym.INIT_SNAPSHOT] = {}
-    this[Sym.LAST_SNAPSHOT] = {}
+    this._actionsRegistry = {}
+    this._initSnapshot = {}
+    this._lastSnapshot = {}
   }
 
   dispatch(action, data, details) {
@@ -78,7 +77,7 @@ class Alt {
   createActions(ActionsClass, exportObj = {}, ...argsForConstructor) {
     const actions = {}
     const key = utils.uid(
-      this[Sym.ACTIONS_REGISTRY],
+      this._actionsRegistry,
       ActionsClass.displayName || ActionsClass.name || 'Unknown'
     )
 
@@ -119,23 +118,23 @@ class Alt {
 
       // generate a constant
       const constant = utils.formatAsConstant(actionName)
-      exportObj[constant] = exportObj[actionName][Sym.ACTION_KEY]
+      exportObj[constant] = exportObj[actionName].id
     }, [actions])
     return exportObj
   }
 
   takeSnapshot(...storeNames) {
     const state = StateFunctions.snapshot(this, storeNames)
-    fn.assign(this[Sym.LAST_SNAPSHOT], state)
+    fn.assign(this._lastSnapshot, state)
     return this.serialize(state)
   }
 
   rollback() {
     StateFunctions.setAppState(
       this,
-      this.serialize(this[Sym.LAST_SNAPSHOT]),
+      this.serialize(this._lastSnapshot),
       storeInst => {
-        storeInst[Sym.LIFECYCLE].emit('rollback')
+        storeInst.lifecycle.rollback.push()
         storeInst.emitChange()
       }
     )
@@ -145,16 +144,16 @@ class Alt {
     const initialSnapshot = storeNames.length
       ? StateFunctions.filterSnapshots(
           this,
-          this[Sym.INIT_SNAPSHOT],
+          this._initSnapshot,
           storeNames
         )
-      : this[Sym.INIT_SNAPSHOT]
+      : this._initSnapshot
 
     StateFunctions.setAppState(
       this,
       this.serialize(initialSnapshot),
       (storeInst) => {
-        storeInst[Sym.LIFECYCLE].emit('init')
+        storeInst.lifecycle.init.push()
         storeInst.emitChange()
       }
     )
@@ -168,7 +167,7 @@ class Alt {
 
   bootstrap(data) {
     StateFunctions.setAppState(this, data, (storeInst) => {
-      storeInst[Sym.LIFECYCLE].emit('bootstrap')
+      storeInst.lifecycle.bootstrap.push()
       storeInst.emitChange()
     })
   }

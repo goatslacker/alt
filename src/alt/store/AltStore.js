@@ -1,45 +1,37 @@
-import EventEmitter from 'eventemitter3'
-import Symbol from 'es-symbol'
-
-import * as Sym from '../symbols/symbols'
 import * as fn from '../../utils/functions'
-
-// event emitter instance
-const EE = Symbol()
+import transmitter from 'transmitter'
 
 class AltStore {
   constructor(alt, model, state, StoreModel) {
-    this[EE] = new EventEmitter()
-    this[Sym.LIFECYCLE] = model[Sym.LIFECYCLE]
-    this[Sym.STATE_CONTAINER] = state || model
+    this.transmitter = transmitter()
+    this.lifecycle = model.lifecycleEvents
+    this.state = state || model
 
     this._storeName = model._storeName
-    this.boundListeners = model[Sym.ALL_LISTENERS]
+    this.boundListeners = model.boundListeners
     this.StoreModel = StoreModel
 
-    fn.assign(this, model[Sym.PUBLIC_METHODS])
+    fn.assign(this, model.publicMethods)
 
     // Register dispatcher
     this.dispatchToken = alt.dispatcher.register((payload) => {
-      this[Sym.LIFECYCLE].emit(
-        'beforeEach',
+      this.lifecycle.beforeEach.push({
         payload,
-        this[Sym.STATE_CONTAINER]
-      )
+        state: this.state
+      })
 
-      if (model[Sym.LISTENERS][payload.action]) {
+      if (model.actionListeners[payload.action]) {
         let result = false
 
         try {
-          result = model[Sym.LISTENERS][payload.action](payload.data)
+          result = model.actionListeners[payload.action](payload.data)
         } catch (e) {
-          if (model[Sym.HANDLING_ERRORS]) {
-            this[Sym.LIFECYCLE].emit(
-              'error',
-              e,
+          if (model.handlesOwnErrors) {
+            this.lifecycle.error.push({
+              error: e,
               payload,
-              this[Sym.STATE_CONTAINER]
-            )
+              state: this.state
+            })
           } else {
             throw e
           }
@@ -50,39 +42,31 @@ class AltStore {
         }
       }
 
-      this[Sym.LIFECYCLE].emit(
-        'afterEach',
+      this.lifecycle.afterEach.push({
         payload,
-        this[Sym.STATE_CONTAINER]
-      )
+        state: this.state
+      })
     })
 
-    this[Sym.LIFECYCLE].emit('init')
-  }
-
-  getEventEmitter() {
-    return this[EE]
+    this.lifecycle.init.push()
   }
 
   emitChange() {
-    this[EE].emit('change', this[Sym.STATE_CONTAINER])
+    this.transmitter.push(this.state)
   }
 
   listen(cb) {
-    this[EE].on('change', cb)
+    this.transmitter.subscribe(cb)
     return () => this.unlisten(cb)
   }
 
   unlisten(cb) {
-    this[Sym.LIFECYCLE].emit('unlisten')
-    this[EE].removeListener('change', cb)
+    this.lifecycle.unlisten.push()
+    this.transmitter.unsubscribe(cb)
   }
 
   getState() {
-    return this.StoreModel.config.getState.call(
-      this,
-      this[Sym.STATE_CONTAINER]
-    )
+    return this.StoreModel.config.getState.call(this, this.state)
   }
 }
 

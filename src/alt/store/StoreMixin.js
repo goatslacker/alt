@@ -1,6 +1,3 @@
-import Symbol from 'es-symbol'
-
-import * as Sym from '../symbols/symbols'
 import * as fn from '../../utils/functions'
 
 const StoreMixin = {
@@ -30,7 +27,7 @@ const StoreMixin = {
 
       const validHandlers = ['success', 'error', 'loading']
       validHandlers.forEach((handler) => {
-        if (asyncSpec[handler] && !asyncSpec[handler][Sym.ACTION_KEY]) {
+        if (asyncSpec[handler] && !asyncSpec[handler].id) {
           throw new Error(`${handler} handler must be an action function`)
         }
       })
@@ -78,7 +75,7 @@ const StoreMixin = {
         throw new TypeError('exportPublicMethods expects a function')
       }
 
-      this[Sym.PUBLIC_METHODS][methodName] = value
+      this.publicMethods[methodName] = value
     }, [methods])
   },
 
@@ -87,10 +84,8 @@ const StoreMixin = {
   },
 
   on(lifecycleEvent, handler) {
-    if (lifecycleEvent === 'error') {
-      this[Sym.HANDLING_ERRORS] = true
-    }
-    this[Sym.LIFECYCLE].on(lifecycleEvent, handler.bind(this))
+    if (lifecycleEvent === 'error') this.handlesOwnErrors = true
+    return this.lifecycleEvents[lifecycleEvent].subscribe(handler.bind(this))
   },
 
   bindAction(symbol, handler) {
@@ -104,16 +99,16 @@ const StoreMixin = {
     if (handler.length > 1) {
       throw new TypeError(
         `Action handler in store ${this._storeName} for ` +
-        `${(symbol[Sym.ACTION_KEY] || symbol).toString()} was defined with ` +
+        `${(symbol.id || symbol).toString()} was defined with ` +
         `two parameters. Only a single parameter is passed through the ` +
         `dispatcher, did you mean to pass in an Object instead?`
       )
     }
 
     // You can pass in the constant or the function itself
-    const key = symbol[Sym.ACTION_KEY] ? symbol[Sym.ACTION_KEY] : symbol
-    this[Sym.LISTENERS][key] = handler.bind(this)
-    this[Sym.ALL_LISTENERS].push(Symbol.keyFor(key))
+    const key = symbol.id ? symbol.id : symbol
+    this.actionListeners[key] = handler.bind(this)
+    this.boundListeners.push(key)
   },
 
   bindActions(actions) {

@@ -17,12 +17,9 @@
  * ```
  */
 
-import Symbol from 'es-symbol'
-const ALT_LISTENERS = Symbol('global dispatcher listeners')
-
 function ActionListeners(alt) {
   this.dispatcher = alt.dispatcher
-  this[ALT_LISTENERS] = {}
+  this.listeners = {}
 }
 
 /*
@@ -36,7 +33,7 @@ ActionListeners.prototype.addActionListener = function (symAction, handler) {
       handler(payload.data, payload.details)
     }
   })
-  this[ALT_LISTENERS][id] = true
+  this.listeners[id] = true
   return id
 }
 
@@ -45,7 +42,7 @@ ActionListeners.prototype.addActionListener = function (symAction, handler) {
  * Removes the specified dispatch registration.
  */
 ActionListeners.prototype.removeActionListener = function (id) {
-  delete this[ALT_LISTENERS][id]
+  delete this.listeners[id]
   this.dispatcher.unregister(id)
 }
 
@@ -53,10 +50,10 @@ ActionListeners.prototype.removeActionListener = function (id) {
  * Remove all listeners.
  */
 ActionListeners.prototype.removeAllActionListeners = function () {
-  Object.keys(this[ALT_LISTENERS]).forEach(
+  Object.keys(this.listeners).forEach(
     this.removeActionListener.bind(this)
   )
-  this[ALT_LISTENERS] = {}
+  this.listeners = {}
 }
 
 export default ActionListeners
