@@ -131,7 +131,7 @@ var PostStore = alt.createStore({
 </AltContainer>
 ```
 
-`BlogPost` in this case will receive all the state of `BlogStore` as props. `this.props.id` and `this.props.title` will be passed through to `BlogPost`.
+`BlogPost` in this case will receive all the state of `PostStore` as props. `this.props.id` and `this.props.title` will be passed through to `BlogPost`.
 
 Just like `stores`, you can define your own custom function to use with `store`.
 
