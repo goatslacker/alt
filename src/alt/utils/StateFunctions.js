@@ -7,10 +7,10 @@ export function setAppState(instance, data, onStore) {
     const store = instance.stores[key]
     if (store) {
       const { config } = store.StoreModel
-      if (config.onDeserialize) {
-        obj[key] = config.onDeserialize(value) || value
-      }
-      fn.assign(store[Sym.STATE_CONTAINER], obj[key])
+      const state = store[Sym.STATE_CONTAINER]
+      if (config.onDeserialize) obj[key] = config.onDeserialize(value) || value
+      fn.eachObject(k => delete state[k], [state])
+      fn.assign(state, obj[key])
       onStore(store)
     }
   }, [obj])
