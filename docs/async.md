@@ -58,7 +58,7 @@ class SearchStore {
 }
 ```
 
-Now we'll have a few methods available for use: `SearchStore.performSearch()`, `SearchStore.isLoading()`, and `SearchStore.hasError()`.
+Now we'll have a few methods available for use: `SearchStore.performSearch()`, and `SearchStore.isLoading()`.
 
 ## API
 
