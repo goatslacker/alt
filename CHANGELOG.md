@@ -4,7 +4,7 @@
 
 ### Fixes
 
-* Fixes bug with recycle for keys that weren't set at the beginning. [commit](https://github.com/goatslacker/alt/commit/31f8da1b)
+* Fixes bug with recycle for keys that weren't set at the beginning. [commit](https://github.com/goatslacker/alt/commit/1f8da1)
 * Fixes isLoading for multiple async calls. [commit](https://github.com/goatslacker/alt/commit/6e4ed23)
 
 ## 0.16.5
