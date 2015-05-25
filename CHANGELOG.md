@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.16.6
+
+### Fixes
+
+* Fixes bug with recycle for keys that weren't set at the beginning. [commit](https://github.com/goatslacker/alt/commit/31f8da1b)
+* Fixes isLoading for multiple async calls. [commit](https://github.com/goatslacker/alt/commit/6e4ed23)
+
 ## 0.16.5
 
 ### Added
