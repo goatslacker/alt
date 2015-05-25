@@ -19,29 +19,28 @@ Important note: data sources work with Promises. Make sure you have a Promise po
 // sources/SearchSource.js
 
 const SearchSource = {
-  performSearch(context) {
-    return {
-      // remotely fetch something
-      remote(state) {
-        return axios.get(`/search/q/${state.value}`);
-      },
+  performSearch: {
+    // remotely fetch something
+    remote(state) {
+      return axios.get(`/search/q/${state.value}`);
+    },
 
-      // this function checks in our local cache first
-      // if the value is present it'll use that instead.
-      local(state) {
-        return state.results[state.value] ? state.results : null;
-      },
+    // this function checks in our local cache first
+    // if the value is present it'll use that instead.
+    local(state) {
+      return state.results[state.value] ? state.results : null;
+    },
 
-      // here we setup some actions to handle our response
-      loading: SearchActions.loadingResults,
-      success: SearchActions.receivedResults,
-      error: SearchActions.fetchingResultsFailed,
+    // here we setup some actions to handle our response
+    loading: SearchActions.loadingResults,
+    success: SearchActions.receivedResults,
+    error: SearchActions.fetchingResultsFailed,
 
-      // should fetch has precedence over the value returned by local in determining whether remote should be called
-      shouldFetch(state) {
-        return true
-      }
-    };
+    // should fetch has precedence over the value returned by local in determining whether remote should be called
+    // in this particular example if the value is present locally it would return but still fire off the remote request
+    shouldFetch(state) {
+      return true
+    }
   }
 };
 ```
@@ -53,7 +52,7 @@ class SearchStore {
   constructor() {
     this.value = '';
 
-    this.exportAsync(SearchSource);
+    this.registerAsync(SearchSource);
   }
 }
 ```
@@ -62,14 +61,18 @@ Now we'll have a few methods available for use: `SearchStore.performSearch()`, a
 
 ## API
 
-The data source is an object where the keys correspond to methods that will be available to the supplied Store. The values of the keys are functions, each function is called with the store's context as its only argument. If you are using the no-singletons approach then you'd use `context.alt` to retrieve the actions to listen to them.
+The data source is an object or a function that returns an object where the keys correspond to methods that will be available to the supplied Store. The values of the keys are an object that describes the behavior of calling that method.
+
+If you are using the no-singletons approach then you'd use the function form of data sources an use the first and only parameter `alt` that is passed to retrieve the actions to listen to them.
 
 ```js
-const SearchSource = {
-  performSearch(context) {
-    return {
-      loading: context.alt.actions.SearchActions.loadingResults
-    };
+const SearchSource = (alt) => {
+  return {
+    performSearch: {
+      return {
+        loading: alt.actions.SearchActions.loadingResults
+      };
+    }
   }
 };
 ```
