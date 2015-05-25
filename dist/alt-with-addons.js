@@ -1524,17 +1524,23 @@ var StoreMixin = {
   },
 
   exportAsync: function exportAsync(asyncMethods) {
+    this.registerAsync(asyncMethods);
+  },
+
+  registerAsync: function registerAsync(asyncDef) {
     var _this = this;
 
-    var _isLoading = false;
-    var _hasError = false;
+    var loadCounter = 0;
+
+    var asyncMethods = fn.isFunction(asyncDef) ? asyncDef(this.alt) : asyncDef;
 
     var toExport = Object.keys(asyncMethods).reduce(function (publicMethods, methodName) {
-      var asyncSpec = asyncMethods[methodName](_this);
+      var desc = asyncMethods[methodName];
+      var spec = fn.isFunction(desc) ? desc(_this) : desc;
 
       var validHandlers = ['success', 'error', 'loading'];
       validHandlers.forEach(function (handler) {
-        if (asyncSpec[handler] && !asyncSpec[handler][Sym.ACTION_KEY]) {
+        if (spec[handler] && !spec[handler][Sym.ACTION_KEY]) {
           throw new Error('' + handler + ' handler must be an action function');
         }
       });
@@ -1545,22 +1551,20 @@ var StoreMixin = {
         }
 
         var state = _this.getInstance().getState();
-        var value = asyncSpec.local && asyncSpec.local.apply(asyncSpec, [state].concat(args));
-        var shouldFetch = asyncSpec.shouldFetch ? asyncSpec.shouldFetch.apply(asyncSpec, [state].concat(args)) : !value;
+        var value = spec.local && spec.local.apply(spec, [state].concat(args));
+        var shouldFetch = spec.shouldFetch ? spec.shouldFetch.apply(spec, [state].concat(args)) : !value;
 
         // if we don't have it in cache then fetch it
         if (shouldFetch) {
-          _isLoading = true;
-          _hasError = false;
+          loadCounter += 1;
           /* istanbul ignore else */
-          if (asyncSpec.loading) asyncSpec.loading();
-          asyncSpec.remote.apply(asyncSpec, [state].concat(args)).then(function (v) {
-            _isLoading = false;
-            asyncSpec.success(v);
+          if (spec.loading) spec.loading();
+          spec.remote.apply(spec, [state].concat(args)).then(function (v) {
+            loadCounter -= 1;
+            spec.success(v);
           })['catch'](function (v) {
-            _isLoading = false;
-            _hasError = true;
-            asyncSpec.error(v);
+            loadCounter -= 1;
+            spec.error(v);
           });
         } else {
           // otherwise emit the change now
@@ -1574,10 +1578,7 @@ var StoreMixin = {
     this.exportPublicMethods(toExport);
     this.exportPublicMethods({
       isLoading: function isLoading() {
-        return _isLoading;
-      },
-      hasError: function hasError() {
-        return _hasError;
+        return loadCounter > 0;
       }
     });
   },
@@ -1996,13 +1997,17 @@ function setAppState(instance, data, onStore) {
   fn.eachObject(function (key, value) {
     var store = instance.stores[key];
     if (store) {
-      var config = store.StoreModel.config;
+      (function () {
+        var config = store.StoreModel.config;
 
-      if (config.onDeserialize) {
-        obj[key] = config.onDeserialize(value) || value;
-      }
-      fn.assign(store[Sym.STATE_CONTAINER], obj[key]);
-      onStore(store);
+        var state = store[Sym.STATE_CONTAINER];
+        if (config.onDeserialize) obj[key] = config.onDeserialize(value) || value;
+        fn.eachObject(function (k) {
+          return delete state[k];
+        }, [state]);
+        fn.assign(state, obj[key]);
+        onStore(store);
+      })();
     }
   }, [obj]);
 }
