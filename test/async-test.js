@@ -39,25 +39,33 @@ const StargazerSource = {
       error: StargazerActions.failed
     }
   },
-  alwaysFetchUsers() {
-    return {
-      remote,
-      local: () => true,
-      loading: StargazerActions.fetchingUsers,
-      success: StargazerActions.usersReceived,
-      error: StargazerActions.failed,
-      shouldFetch: () => true
-    }
+
+  alwaysFetchUsers: {
+    remote,
+    local: () => true,
+    loading: StargazerActions.fetchingUsers,
+    success: StargazerActions.usersReceived,
+    error: StargazerActions.failed,
+    shouldFetch: () => true
   },
-  neverFetchUsers() {
-    return {
-      remote,
-      local: () => false,
-      loading: StargazerActions.fetchingUsers,
-      success: StargazerActions.usersReceived,
-      error: StargazerActions.failed,
-      shouldFetch: () => false
-    }
+
+  neverFetchUsers: {
+    remote,
+    local: () => false,
+    loading: StargazerActions.fetchingUsers,
+    success: StargazerActions.usersReceived,
+    error: StargazerActions.failed,
+    shouldFetch: () => false
+  },
+
+  fetchRepos: {
+    remote() {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => resolve('TESTTEST'), 200)
+      })
+    },
+    success: StargazerActions.usersReceived,
+    error: StargazerActions.failed
   }
 }
 
@@ -165,7 +173,6 @@ export default {
           count()
           test()
           assert.ok(local.calledOnce)
-          assert.notOk(StargazerStore.hasError(), 'no errors')
           assert.notOk(StargazerStore.isLoading())
           assert(remote.callCount === 0)
           done()
@@ -185,7 +192,6 @@ export default {
           assert(state.users.length === 0)
         } else if (spy.callCount === 2) {
           assert.match(state.errorMessage, /things broke/)
-          assert.ok(StargazerStore.hasError(), 'we have an error')
           count()
           test()
           assert.notOk(StargazerStore.isLoading())
@@ -209,6 +215,57 @@ export default {
       StargazerStore.neverFetchUsers()
       assert.notOk(StargazerStore.isLoading())
       assert(remote.callCount === 0)
+    },
+
+    'multiple loads'(done) {
+      const unsub = StargazerStore.listen((state) => {
+        if (state.users === 'TESTTEST') {
+          assert.notOk(StargazerStore.isLoading())
+          unsub()
+          done()
+        } else {
+          assert.ok(StargazerStore.isLoading())
+        }
+      })
+
+      StargazerStore.fetchUsers()
+      StargazerStore.fetchRepos()
+      assert.ok(StargazerStore.isLoading())
+    },
+
+    'as a function'() {
+      const FauxSource = sinon.stub().returns({})
+
+      @datasource(FauxSource)
+      class FauxStore {
+        static displayName = 'FauxStore'
+      }
+
+      const store = alt.createStore(FauxStore)
+
+      assert(FauxSource.firstCall.args[0] === alt)
+      assert.isFunction(store.isLoading)
+    },
+
+    'as an object'() {
+      const actions = alt.generateActions('test')
+
+      const PojoSource = {
+        justTesting: {
+          success: actions.test,
+          error: actions.test,
+        }
+      }
+
+      @datasource(PojoSource)
+      class MyStore {
+        static displayName = 'MyStore'
+      }
+
+      const store = alt.createStore(MyStore)
+
+      assert.isFunction(store.justTesting)
+      assert.isFunction(store.isLoading)
     },
   }
 }
