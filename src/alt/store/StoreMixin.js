@@ -47,20 +47,21 @@ const StoreMixin = {
         const state = this.getInstance().getState()
         const value = spec.local && spec.local(state, ...args)
         const shouldFetch = spec.shouldFetch ? spec.shouldFetch(state, ...args) : !value
+        const intercept = spec.interceptResponse || (x => x)
 
         // if we don't have it in cache then fetch it
         if (shouldFetch) {
           loadCounter += 1
           /* istanbul ignore else */
-          if (spec.loading) spec.loading()
+          if (spec.loading) spec.loading(intercept(null, spec.loading))
           spec.remote(state, ...args)
             .then((v) => {
               loadCounter -= 1
-              spec.success(v)
+              spec.success(intercept(v, spec.success))
             })
             .catch((v) => {
               loadCounter -= 1
-              spec.error(v)
+              spec.error(intercept(v, spec.error))
             })
         } else {
           // otherwise emit the change now

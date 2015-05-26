@@ -60,9 +60,12 @@ const StargazerSource = {
 
   fetchRepos: {
     remote() {
-      return new Promise((resolve, reject) => {
-        setTimeout(() => resolve('TESTTEST'), 200)
-      })
+      return Promise.resolve('batman')
+    },
+    interceptResponse(x, action) {
+      assert(x === 'batman')
+      assert(action === StargazerActions.usersReceived)
+      return 'TESTTEST'
     },
     success: StargazerActions.usersReceived,
     error: StargazerActions.failed
