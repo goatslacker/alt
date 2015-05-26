@@ -982,18 +982,21 @@ var StoreMixin = {
         var state = _this.getInstance().getState();
         var value = spec.local && spec.local.apply(spec, [state].concat(args));
         var shouldFetch = spec.shouldFetch ? spec.shouldFetch.apply(spec, [state].concat(args)) : !value;
+        var intercept = spec.interceptResponse || function (x) {
+          return x;
+        };
 
         // if we don't have it in cache then fetch it
         if (shouldFetch) {
           loadCounter += 1;
           /* istanbul ignore else */
-          if (spec.loading) spec.loading();
+          if (spec.loading) spec.loading(intercept(null, spec.loading));
           spec.remote.apply(spec, [state].concat(args)).then(function (v) {
             loadCounter -= 1;
-            spec.success(v);
+            spec.success(intercept(v, spec.success));
           })['catch'](function (v) {
             loadCounter -= 1;
-            spec.error(v);
+            spec.error(intercept(v, spec.error));
           });
         } else {
           // otherwise emit the change now
