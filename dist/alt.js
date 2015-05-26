@@ -1508,6 +1508,7 @@ function assign(target) {
 }
 
 },{}],14:[function(require,module,exports){
+/*global window*/
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1792,6 +1793,16 @@ var Alt = (function () {
     key: 'getStore',
     value: function getStore(name) {
       return this.stores[name];
+    }
+  }], [{
+    key: 'debug',
+    value: function debug(name, alt) {
+      var key = 'alt.js.org';
+      if (typeof window !== 'undefined') {
+        window[key] = window[key] || [];
+        window[key].push({ name: name, alt: alt });
+      }
+      return alt;
     }
   }]);
 
