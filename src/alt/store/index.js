@@ -29,19 +29,7 @@ function doSetState(store, storeInstance, state) {
 
 function createPrototype(proto, alt, key, extras) {
   proto.boundListeners = []
-  proto.lifecycleEvents = [
-    'afterEach',
-    'beforeEach',
-    'bootstrap',
-    'error',
-    'init',
-    'rollback',
-    'snapshot',
-    'unlisten'
-  ].reduce((obj, name) => {
-    obj[name] = transmitter()
-    return obj
-  }, {})
+  proto.lifecycleEvents = {}
   proto.actionListeners = {}
   proto.publicMethods = {}
   proto.handlesOwnErrors = false
