@@ -4,6 +4,32 @@
 
 ### Breaking Changes
 
+* Removed Symbol
+
+  **Upgrade Guide**
+
+  - Remove all references to Symbol, Symbol.keyFor, etc.
+  - Get access to the action's unique id via `myAction.id`
+
+* Removed `getEventEmitter()`
+
+  **Upgrade Guide**
+
+  - You can no longer access the internal event emitter to dispatch your own custom events. This is usually an anti-pattern.
+  - If you still need this behavior you can create your own event emitter in your store.
+
+```js
+class TodoStore {
+  constructor() {
+    this.eventEmitter = new EventEmitter()
+
+    this.exportPublicMethods({
+      getEventEmitter: () => this.eventEmitter
+    });
+  }
+}
+```
+
 * Removed `_storeName`.
 
   **Upgrade Guide**
