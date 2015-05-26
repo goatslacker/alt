@@ -4,6 +4,13 @@
 
 ### Breaking Changes
 
+* Removed `_storeName`.
+
+  **Upgrade Guide**
+
+  - `_storeName` was an internal property to the store where the store's name was kept.
+  - You can now use `displayName` instead which is a public API.
+
 * Removed `stateKey`. [commit](https://github.com/goatslacker/alt/commit/40830ea)
 
   **Upgrade Guide**
