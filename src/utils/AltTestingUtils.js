@@ -5,7 +5,7 @@ const noop = function () { }
 const AltTestingUtils = {
   createStoreSpy: (alt) => {
     return {
-      _storeName: 'ALT_TEST_STORE',
+      displayName: 'ALT_TEST_STORE',
       alt: alt,
       bindAction: noop,
       bindActions: noop,

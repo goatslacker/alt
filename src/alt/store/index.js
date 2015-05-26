@@ -35,7 +35,7 @@ function createPrototype(proto, alt, key, extras) {
   proto.handlesOwnErrors = false
 
   return fn.assign(proto, StoreMixin, {
-    _storeName: key,
+    displayName: key,
     alt: alt,
     dispatcher: alt.dispatcher,
     preventDefault() {

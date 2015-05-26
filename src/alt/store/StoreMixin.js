@@ -114,7 +114,7 @@ const StoreMixin = {
 
     if (handler.length > 1) {
       throw new TypeError(
-        `Action handler in store ${this._storeName} for ` +
+        `Action handler in store ${this.displayName} for ` +
         `${(symbol.id || symbol).toString()} was defined with ` +
         `two parameters. Only a single parameter is passed through the ` +
         `dispatcher, did you mean to pass in an Object instead?`
@@ -161,7 +161,7 @@ const StoreMixin = {
 
       if (!listener) {
         throw new ReferenceError(
-          `${methodName} defined but does not exist in ${this._storeName}`
+          `${methodName} defined but does not exist in ${this.displayName}`
         )
       }
 

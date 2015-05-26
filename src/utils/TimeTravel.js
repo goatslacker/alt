@@ -34,12 +34,12 @@ function timetravel(alt, options = {}) {
         this.on('init', _ => {
           // capture the initial snapshot
           captureMoment(alt.serialize({
-            [this._storeName]: this
+            [this.displayName]: this
           }))
 
           // capture subsequent shots
           payloadStore.listen(_ => captureMoment(
-            alt.takeSnapshot(this._storeName)
+            alt.takeSnapshot(this.displayName)
           ))
         })
 
