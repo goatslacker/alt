@@ -1,5 +1,3 @@
-import transmitter from 'transmitter'
-
 import * as utils from '../utils/AltUtils'
 import * as fn from '../../utils/functions'
 import AltStore from './AltStore'
