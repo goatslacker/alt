@@ -1,3 +1,4 @@
+import transmitter from 'transmitter'
 import * as fn from '../../utils/functions'
 
 const StoreMixin = {
@@ -98,7 +99,9 @@ const StoreMixin = {
 
   on(lifecycleEvent, handler) {
     if (lifecycleEvent === 'error') this.handlesOwnErrors = true
-    return this.lifecycleEvents[lifecycleEvent].subscribe(handler.bind(this))
+    const bus = this.lifecycleEvents[lifecycleEvent] || transmitter()
+    this.lifecycleEvents[lifecycleEvent] = bus
+    return bus.subscribe(handler.bind(this))
   },
 
   bindAction(symbol, handler) {
