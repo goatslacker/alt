@@ -46,7 +46,9 @@ const StoreMixin = {
       publicMethods[methodName] = (...args) => {
         const state = this.getInstance().getState()
         const value = spec.local && spec.local(state, ...args)
-        const shouldFetch = spec.shouldFetch ? spec.shouldFetch(state, ...args) : !value
+        const shouldFetch = spec.shouldFetch
+          ? spec.shouldFetch(state, ...args)
+          : value == null
         const intercept = spec.interceptResponse || (x => x)
 
         // if we don't have it in cache then fetch it

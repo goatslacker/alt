@@ -45,7 +45,7 @@ const SearchSource = {
 };
 ```
 
-You then tie this to a store using the `exportAsync` function in the constructor.
+You then tie this to a store using the `registerAsync` function in the constructor.
 
 ```js
 class SearchStore {
@@ -85,7 +85,7 @@ This function is called first. If a value is returned then a change event will b
 
 ### remote(state: object, ...args: any)
 
-This function is called whenever we need to fetch a value remotely. This is determined if `local` returns a falsy value.
+This function is called whenever we need to fetch a value remotely. `remote` is only called if `local` returns null or undefined as its value, or if `shouldFetch` returns true.
 
 Any arguments passed to your public method will be passed through to both local and remote:
 
