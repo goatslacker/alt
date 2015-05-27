@@ -62,9 +62,10 @@ const StargazerSource = {
     remote() {
       return Promise.resolve('batman')
     },
-    interceptResponse(x, action) {
+    interceptResponse(x, action, args) {
       assert(x === 'batman')
       assert(action === StargazerActions.usersReceived)
+      assert(Array.isArray(args))
       return 'TESTTEST'
     },
     success: StargazerActions.usersReceived,
