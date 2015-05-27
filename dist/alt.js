@@ -981,7 +981,7 @@ var StoreMixin = {
 
         var state = _this.getInstance().getState();
         var value = spec.local && spec.local.apply(spec, [state].concat(args));
-        var shouldFetch = spec.shouldFetch ? spec.shouldFetch.apply(spec, [state].concat(args)) : !value;
+        var shouldFetch = spec.shouldFetch ? spec.shouldFetch.apply(spec, [state].concat(args)) : value == null;
         var intercept = spec.interceptResponse || function (x) {
           return x;
         };
@@ -990,13 +990,13 @@ var StoreMixin = {
         if (shouldFetch) {
           loadCounter += 1;
           /* istanbul ignore else */
-          if (spec.loading) spec.loading(intercept(null, spec.loading));
+          if (spec.loading) spec.loading(intercept(null, spec.loading, args));
           spec.remote.apply(spec, [state].concat(args)).then(function (v) {
             loadCounter -= 1;
-            spec.success(intercept(v, spec.success));
+            spec.success(intercept(v, spec.success, args));
           })['catch'](function (v) {
             loadCounter -= 1;
-            spec.error(intercept(v, spec.error));
+            spec.error(intercept(v, spec.error, args));
           });
         } else {
           // otherwise emit the change now
@@ -1344,6 +1344,7 @@ var STATE_CONTAINER = (0, _esSymbol2['default'])();
 exports.STATE_CONTAINER = STATE_CONTAINER;
 
 },{"es-symbol":1}],11:[function(require,module,exports){
+/* istanbul ignore next */
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1354,7 +1355,6 @@ exports.warn = warn;
 exports.uid = uid;
 exports.formatAsConstant = formatAsConstant;
 exports.dispatchIdentity = dispatchIdentity;
-/* istanbul ignore next */
 function NoopClass() {}
 
 var builtIns = Object.getOwnPropertyNames(NoopClass);

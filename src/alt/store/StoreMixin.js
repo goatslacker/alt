@@ -55,15 +55,15 @@ const StoreMixin = {
         if (shouldFetch) {
           loadCounter += 1
           /* istanbul ignore else */
-          if (spec.loading) spec.loading(intercept(null, spec.loading))
+          if (spec.loading) spec.loading(intercept(null, spec.loading, args))
           spec.remote(state, ...args)
             .then((v) => {
               loadCounter -= 1
-              spec.success(intercept(v, spec.success))
+              spec.success(intercept(v, spec.success, args))
             })
             .catch((v) => {
               loadCounter -= 1
-              spec.error(intercept(v, spec.error))
+              spec.error(intercept(v, spec.error, args))
             })
         } else {
           // otherwise emit the change now

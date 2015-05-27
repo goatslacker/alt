@@ -1552,7 +1552,7 @@ var StoreMixin = {
 
         var state = _this.getInstance().getState();
         var value = spec.local && spec.local.apply(spec, [state].concat(args));
-        var shouldFetch = spec.shouldFetch ? spec.shouldFetch.apply(spec, [state].concat(args)) : !value;
+        var shouldFetch = spec.shouldFetch ? spec.shouldFetch.apply(spec, [state].concat(args)) : value == null;
         var intercept = spec.interceptResponse || function (x) {
           return x;
         };
@@ -1561,13 +1561,13 @@ var StoreMixin = {
         if (shouldFetch) {
           loadCounter += 1;
           /* istanbul ignore else */
-          if (spec.loading) spec.loading(intercept(null, spec.loading));
+          if (spec.loading) spec.loading(intercept(null, spec.loading, args));
           spec.remote.apply(spec, [state].concat(args)).then(function (v) {
             loadCounter -= 1;
-            spec.success(intercept(v, spec.success));
+            spec.success(intercept(v, spec.success, args));
           })['catch'](function (v) {
             loadCounter -= 1;
-            spec.error(intercept(v, spec.error));
+            spec.error(intercept(v, spec.error, args));
           });
         } else {
           // otherwise emit the change now
@@ -1915,6 +1915,7 @@ var STATE_CONTAINER = (0, _esSymbol2['default'])();
 exports.STATE_CONTAINER = STATE_CONTAINER;
 
 },{"es-symbol":5}],16:[function(require,module,exports){
+/* istanbul ignore next */
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1925,7 +1926,6 @@ exports.warn = warn;
 exports.uid = uid;
 exports.formatAsConstant = formatAsConstant;
 exports.dispatchIdentity = dispatchIdentity;
-/* istanbul ignore next */
 function NoopClass() {}
 
 var builtIns = Object.getOwnPropertyNames(NoopClass);
@@ -2123,16 +2123,6 @@ exports['default'] = ActionListeners;
 module.exports = exports['default'];
 
 },{"es-symbol":5}],19:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
 /**
  * AltManager(Alt: AltClass): undefined
  *
@@ -2158,6 +2148,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  *
  * ```
  */
+
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var AltManager = (function () {
   function AltManager(Alt) {
@@ -2454,12 +2454,12 @@ function atomic(alt) {
 module.exports = exports['default'];
 
 },{"./functions":24,"./makeFinalStore":25}],22:[function(require,module,exports){
+/*global window*/
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
-/*global window*/
 exports['default'] = chromeDebug;
 
 function chromeDebug(alt) {
@@ -2615,12 +2615,6 @@ function assign(target) {
 }
 
 },{}],25:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = makeFinalStore;
 /**
  * makeFinalStore(alt: AltInstance): AltStore
  *
@@ -2645,6 +2639,12 @@ exports["default"] = makeFinalStore;
  * ```
  */
 
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = makeFinalStore;
 function FinalStore() {
   var _this = this;
 
