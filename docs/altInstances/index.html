@@ -65,6 +65,10 @@
             </li>
             
             <li>
+              <a href="/docs/async">Handling Async</a>
+            </li>
+            
+            <li>
               <a href="/docs/lifecycleListeners">Lifecycle Listeners</a>
             </li>
             
@@ -135,6 +139,10 @@
   </li>
   
   <li>
+    <a href="/docs/async">Handling Async</a>
+  </li>
+  
+  <li>
     <a href="/docs/lifecycleListeners">Lifecycle Listeners</a>
   </li>
   
@@ -188,6 +196,27 @@
 
 var flux = new MyAlt();
 </code></pre>
+
+<p>You can set your entire app context by wrapping your root component with <code>withAltContext</code>.</p>
+
+<p>As a decorator:<br />
+```js<br />
+import withAltContext from ‘alt/utils/withAltContext’</p>
+
+<p>@withAltContext(alt)<br />
+export default class App extends React.Component {<br />
+  render() {<br />
+    return &lt;div&gt;{this.context.flux}&lt;/div&gt;<br />
+  }<br />
+}<br />
+```</p>
+
+<p>As a function:<br />
+```js<br />
+import withAltContext from ‘alt/utils/withAltContext’</p>
+
+<p>export default withAltContext(alt)(App);<br />
+```</p>
 
 <h1 id="altclass">AltClass</h1>
 
