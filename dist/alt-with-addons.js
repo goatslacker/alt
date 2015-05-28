@@ -1915,7 +1915,6 @@ var STATE_CONTAINER = (0, _esSymbol2['default'])();
 exports.STATE_CONTAINER = STATE_CONTAINER;
 
 },{"es-symbol":5}],16:[function(require,module,exports){
-/* istanbul ignore next */
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1926,6 +1925,7 @@ exports.warn = warn;
 exports.uid = uid;
 exports.formatAsConstant = formatAsConstant;
 exports.dispatchIdentity = dispatchIdentity;
+/* istanbul ignore next */
 function NoopClass() {}
 
 var builtIns = Object.getOwnPropertyNames(NoopClass);
@@ -2000,17 +2000,13 @@ function setAppState(instance, data, onStore) {
   fn.eachObject(function (key, value) {
     var store = instance.stores[key];
     if (store) {
-      (function () {
-        var config = store.StoreModel.config;
+      var config = store.StoreModel.config;
 
-        var state = store[Sym.STATE_CONTAINER];
-        if (config.onDeserialize) obj[key] = config.onDeserialize(value) || value;
-        fn.eachObject(function (k) {
-          return delete state[k];
-        }, [state]);
-        fn.assign(state, obj[key]);
-        onStore(store);
-      })();
+      if (config.onDeserialize) {
+        obj[key] = config.onDeserialize(value) || value;
+      }
+      fn.assign(store[Sym.STATE_CONTAINER], obj[key]);
+      onStore(store);
     }
   }, [obj]);
 }
@@ -2123,6 +2119,16 @@ exports['default'] = ActionListeners;
 module.exports = exports['default'];
 
 },{"es-symbol":5}],19:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
 /**
  * AltManager(Alt: AltClass): undefined
  *
@@ -2148,16 +2154,6 @@ module.exports = exports['default'];
  *
  * ```
  */
-
-'use strict';
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var AltManager = (function () {
   function AltManager(Alt) {
@@ -2454,12 +2450,12 @@ function atomic(alt) {
 module.exports = exports['default'];
 
 },{"./functions":24,"./makeFinalStore":25}],22:[function(require,module,exports){
-/*global window*/
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
+/*global window*/
 exports['default'] = chromeDebug;
 
 function chromeDebug(alt) {
@@ -2615,6 +2611,12 @@ function assign(target) {
 }
 
 },{}],25:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = makeFinalStore;
 /**
  * makeFinalStore(alt: AltInstance): AltStore
  *
@@ -2639,12 +2641,6 @@ function assign(target) {
  * ```
  */
 
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = makeFinalStore;
 function FinalStore() {
   var _this = this;
 

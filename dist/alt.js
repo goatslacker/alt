@@ -1344,7 +1344,6 @@ var STATE_CONTAINER = (0, _esSymbol2['default'])();
 exports.STATE_CONTAINER = STATE_CONTAINER;
 
 },{"es-symbol":1}],11:[function(require,module,exports){
-/* istanbul ignore next */
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1355,6 +1354,7 @@ exports.warn = warn;
 exports.uid = uid;
 exports.formatAsConstant = formatAsConstant;
 exports.dispatchIdentity = dispatchIdentity;
+/* istanbul ignore next */
 function NoopClass() {}
 
 var builtIns = Object.getOwnPropertyNames(NoopClass);
@@ -1429,17 +1429,13 @@ function setAppState(instance, data, onStore) {
   fn.eachObject(function (key, value) {
     var store = instance.stores[key];
     if (store) {
-      (function () {
-        var config = store.StoreModel.config;
+      var config = store.StoreModel.config;
 
-        var state = store[Sym.STATE_CONTAINER];
-        if (config.onDeserialize) obj[key] = config.onDeserialize(value) || value;
-        fn.eachObject(function (k) {
-          return delete state[k];
-        }, [state]);
-        fn.assign(state, obj[key]);
-        onStore(store);
-      })();
+      if (config.onDeserialize) {
+        obj[key] = config.onDeserialize(value) || value;
+      }
+      fn.assign(store[Sym.STATE_CONTAINER], obj[key]);
+      onStore(store);
     }
   }, [obj]);
 }
