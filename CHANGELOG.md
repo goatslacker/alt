@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.16.7
+
+### Added
+
+* interceptResponse method to data sources [commit](https://github.com/goatslacker/alt/commit/6f074)
+
+### Fixes
+
+* Revert ["Fix recycling values that are not set"](https://github.com/goatslacker/alt/commit/1f8da) change [commit](https://github.com/goatslacker/alt/commit/9bc87)
+
+### Changed
+
+* local method in data souce must return null or undefiend to trigger remote [commit](https://github.com/goatslacker/alt/commit/4152c)
+
 ## 0.16.6
 
 ### Fixes
