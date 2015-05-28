@@ -8,7 +8,7 @@
 
 ### Fixes
 
-* Revert ["Fix recycling values that are not set"](https://github.com/goatslacker/alt/commit/1f8da) change [commit](https://github.com/goatslacker/alt/commit/9bc87)
+* Revert breaking change back to merge state. 0.17.0 will incldue bootstrap, recycle, and flush replace state instead of merge state. [commit](https://github.com/goatslacker/alt/commit/9bc87)
 
 ### Changed
 
