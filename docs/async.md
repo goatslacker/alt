@@ -102,7 +102,7 @@ This function determines whether or not remote needs to be called, despite the v
 
 ### interceptResponse(response, action, args)
 
-This function overrides the value passed to the action. Response is the value returned from the promise in `remote`, action is the action to be called, args are the arguments (as an array) passed to the data source method.
+This function overrides the value passed to the action. Response is the value returned from the promise in `remote` or `local` and null in the case of loading action, action is the action to be called, args are the arguments (as an array) passed to the data source method.
 
 ```js
 interceptResponse(data, action, args) {
