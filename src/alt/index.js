@@ -13,6 +13,7 @@ class Alt {
     this.serialize = config.serialize || JSON.stringify
     this.deserialize = config.deserialize || JSON.parse
     this.dispatcher = config.dispatcher || new Dispatcher()
+    this.batchingFunction = config.batchingFunction || (callback => callback())
     this.actions = { global: {} }
     this.stores = {}
     this.storeTransforms = config.storeTransforms || []
@@ -22,7 +23,7 @@ class Alt {
   }
 
   dispatch(action, data, details) {
-    this.dispatcher.dispatch({ action, data, details })
+    this.batchingFunction(() => this.dispatcher.dispatch({ action, data, details }))
   }
 
   createUnsavedStore(StoreModel, ...args) {
