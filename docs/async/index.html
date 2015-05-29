@@ -270,6 +270,15 @@ SearchStore.performSearch(1, 2, 3);
 
 <p>This function determines whether or not remote needs to be called, despite the value returned by <code>local</code>. If <code>shouldFetch</code> returns true, it will always get the data from <code>remote</code> and if it returns false, it will always use the value from <code>local</code>.</p>
 
+<h3 id="interceptresponseresponse-action-args">interceptResponse(response, action, args)</h3>
+
+<p>This function overrides the value passed to the action. Response is the value returned from the promise in <code>remote</code> or <code>local</code> and null in the case of loading action, action is the action to be called, args are the arguments (as an array) passed to the data source method.</p>
+
+<pre><code class="language-js">interceptResponse(data, action, args) {
+  return 12; // always returns 12 to loading/success/failed
+}
+</code></pre>
+
 <h3 id="loading">loading</h3>
 
 <p>Must be an action. Called before <code>remote</code> is called.</p>
