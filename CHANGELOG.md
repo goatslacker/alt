@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.16.7
+
+### Added
+
+* interceptResponse method to data sources [commit](https://github.com/goatslacker/alt/commit/6f074)
+
+### Fixes
+
+* Revert breaking change back to merge state. 0.17.0 will include bootstrap, recycle, and flush replace state instead of merge state. [commit](https://github.com/goatslacker/alt/commit/9bc87)
+
+### Changed
+
+* local method in data source must return null or undefined to trigger remote [commit](https://github.com/goatslacker/alt/commit/4152c)
+
 ## 0.16.6
 
 ### Fixes
