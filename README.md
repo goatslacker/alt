@@ -126,7 +126,7 @@ There are also many [utils](/src/utils) available which interface well with alt:
 
 ## Topical Guide
 
-Check out the [API Reference](http://alt.js.org/docs/) for full in-depth docs.
+Check out the [API Reference](http://alt.js.org/docs/) for full in-depth docs.  For a high-level walk-through, take a look at the [Getting Started](http://alt.js.org/guide/) guide.
 
 First we install alt through npm. Although alt is also available through bower.
 
