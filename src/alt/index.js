@@ -1,3 +1,4 @@
+/*global window*/
 import { Dispatcher } from 'flux'
 
 import * as StateFunctions from './utils/StateFunctions'
@@ -200,6 +201,15 @@ class Alt {
 
   getStore(name) {
     return this.stores[name]
+  }
+
+  static debug(name, alt) {
+    const key = 'alt.js.org'
+    if (typeof window !== 'undefined') {
+      window[key] = window[key] || []
+      window[key].push({ name, alt })
+    }
+    return alt
   }
 }
 
