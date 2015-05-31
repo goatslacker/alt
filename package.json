@@ -43,6 +43,7 @@
   "license": "MIT",
   "scripts": {
     "build": "npm run clean && npm run transpile && npm run build-alt-browser && npm run build-alt-browser-with-addons",
+    "build-alt": "babel src/alt --out-dir lib",
     "build-alt-browser": "browserify src/alt -t [envify --NODE_ENV production ] -t babelify --outfile dist/alt.js --standalone Alt",
     "build-alt-browser-with-addons": "browserify src/alt/addons.js -t [envify --NODE_ENV production ] -t babelify -t browserify-shim --outfile dist/alt-with-addons.js --standalone Alt",
     "transpile": "babel src/alt --out-dir lib && babel src/utils --out-dir utils",
