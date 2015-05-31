@@ -7,6 +7,12 @@ import * as fn from '../../utils/functions'
 // event emitter instance
 const EE = Symbol()
 
+/*istanbul ignore next*/
+function isPromise(obj) {
+  return obj && (typeof obj === 'object' || typeof obj === 'function') &&
+    typeof obj.then === 'function'
+}
+
 class AltStore {
   constructor(alt, model, state, StoreModel) {
     this[EE] = new EventEmitter()
@@ -27,9 +33,8 @@ class AltStore {
         this[Sym.STATE_CONTAINER]
       )
 
+      let result = false
       if (model[Sym.LISTENERS][payload.action]) {
-        let result = false
-
         try {
           result = model[Sym.LISTENERS][payload.action](payload.data)
         } catch (e) {
@@ -46,7 +51,11 @@ class AltStore {
         }
 
         if (result !== false) {
-          this.emitChange()
+          if (isPromise(result)) {
+            result.then(this.emitChange.bind(this))
+          } else {
+            this.emitChange()
+          }
         }
       }
 
@@ -55,6 +64,8 @@ class AltStore {
         payload,
         this[Sym.STATE_CONTAINER]
       )
+
+      return result
     })
 
     this[Sym.LIFECYCLE].emit('init')
