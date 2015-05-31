@@ -1,5 +1,6 @@
 TODO
 coverage
+dist
 node_modules
 npm-debug.log
 test/browser/tests.js
