@@ -113,9 +113,15 @@ class StargazerStore {
 export default {
   'async': {
     beforeEach() {
+      global.window = {}
+
       alt.recycle()
       local.reset()
       remote.reset()
+    },
+
+    afterEach() {
+      delete global.window
     },
 
     'methods are available'() {
@@ -212,14 +218,14 @@ export default {
 
     'shouldFetch is true'() {
       StargazerStore.alwaysFetchUsers()
-      assert.ok(StargazerStore.isLoading())
-      assert.ok(remote.calledOnce)
+      assert.ok(StargazerStore.isLoading(), 'i am loading')
+      assert.ok(remote.calledOnce, 'remote was called once')
     },
 
     'shouldFetch is false'() {
       StargazerStore.neverFetchUsers()
-      assert.notOk(StargazerStore.isLoading())
-      assert(remote.callCount === 0)
+      assert.notOk(StargazerStore.isLoading(), 'loading now')
+      assert(remote.callCount === 0, 'remote was not called')
     },
 
     'multiple loads'(done) {
@@ -273,6 +279,45 @@ export default {
 
       assert.isFunction(store.justTesting)
       assert.isFunction(store.isLoading)
+    },
+
+    'server rendering'(done) {
+      delete global.window
+
+      const actions = alt.generateActions('test')
+
+      const PojoSource = {
+        justTesting: {
+          remote() {
+            return Promise.resolve(true)
+          },
+          success: actions.test,
+          error: actions.test,
+        }
+      }
+
+      @datasource(PojoSource)
+      class MyStore {
+        static displayName = 'ServerRenderingStore'
+      }
+
+      const spy = sinon.spy()
+
+      const dispatchToken = alt.dispatcher.register(spy)
+
+      const store = alt.createStore(MyStore)
+
+      store.justTesting().then((value) => {
+        assert.isFunction(value)
+        assert(spy.callCount === 0, 'the dispatcher was never called')
+
+        value()
+
+        assert.ok(spy.calledOnce, 'the dispatcher was flushed')
+
+        alt.dispatcher.unregister(dispatchToken)
+        done()
+      })
     },
   }
 }

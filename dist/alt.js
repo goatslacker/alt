@@ -986,18 +986,24 @@ var StoreMixin = {
           return x;
         };
 
+        var makeActionHandler = function makeActionHandler(action) {
+          return function (x) {
+            var fire = function fire() {
+              loadCounter -= 1;
+              action(intercept(x, action, args));
+            };
+            return typeof window === 'undefined' ? function () {
+              return fire();
+            } : fire();
+          };
+        };
+
         // if we don't have it in cache then fetch it
         if (shouldFetch) {
           loadCounter += 1;
           /* istanbul ignore else */
           if (spec.loading) spec.loading(intercept(null, spec.loading, args));
-          spec.remote.apply(spec, [state].concat(args)).then(function (v) {
-            loadCounter -= 1;
-            spec.success(intercept(v, spec.success, args));
-          })['catch'](function (v) {
-            loadCounter -= 1;
-            spec.error(intercept(v, spec.error, args));
-          });
+          return spec.remote.apply(spec, [state].concat(args)).then(makeActionHandler(spec.success))['catch'](makeActionHandler(spec.error));
         } else {
           // otherwise emit the change now
           _this.emitChange();

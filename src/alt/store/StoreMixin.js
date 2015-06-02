@@ -51,20 +51,24 @@ const StoreMixin = {
           : value == null
         const intercept = spec.interceptResponse || (x => x)
 
+        const makeActionHandler = (action) => {
+          return (x) => {
+            const fire = () => {
+              loadCounter -= 1
+              action(intercept(x, action, args))
+            }
+            return typeof window === 'undefined' ? (() => fire()) : fire()
+          }
+        }
+
         // if we don't have it in cache then fetch it
         if (shouldFetch) {
           loadCounter += 1
           /* istanbul ignore else */
           if (spec.loading) spec.loading(intercept(null, spec.loading, args))
-          spec.remote(state, ...args)
-            .then((v) => {
-              loadCounter -= 1
-              spec.success(intercept(v, spec.success, args))
-            })
-            .catch((v) => {
-              loadCounter -= 1
-              spec.error(intercept(v, spec.error, args))
-            })
+          return spec.remote(state, ...args)
+            .then(makeActionHandler(spec.success))
+            .catch(makeActionHandler(spec.error))
         } else {
           // otherwise emit the change now
           this.emitChange()
