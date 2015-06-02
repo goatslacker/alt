@@ -88,6 +88,7 @@ export default alt.createStore(TodoStore, 'TodoStore');
 * [Todo](https://github.com/benstokoe/alt-todo)
 * [Typeahead](https://github.com/timtyrrell/alt-typeahead)
 * [Maple.js Webcomponents](https://github.com/Wildhoney/Maple.js/tree/master/example/app)
+* [Jumar's Tindahan](https://github.com/srph/jumars-tindahan)
 
 ### Boilerplates
 
