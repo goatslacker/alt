@@ -13,41 +13,70 @@ class AltStore {
     this[Sym.LIFECYCLE] = model[Sym.LIFECYCLE]
     this[Sym.STATE_CONTAINER] = state || model
 
+    this.preventDefault = false
     this._storeName = model._storeName
     this.boundListeners = model[Sym.ALL_LISTENERS]
     this.StoreModel = StoreModel
+
+    const output = model.output || ((a, b) => b)
+
+    this.emitChange = () => {
+      this[EE].emit(
+        'change',
+        output(alt, this[Sym.STATE_CONTAINER])
+      )
+    }
+
+    const handleDispatch = (f, payload) => {
+      try {
+        return f()
+      } catch (e) {
+        if (model[Sym.HANDLING_ERRORS]) {
+          this[Sym.LIFECYCLE].emit(
+            'error',
+            e,
+            payload,
+            this[Sym.STATE_CONTAINER]
+          )
+          return false
+        } else {
+          throw e
+        }
+      }
+    }
 
     fn.assign(this, model[Sym.PUBLIC_METHODS])
 
     // Register dispatcher
     this.dispatchToken = alt.dispatcher.register((payload) => {
+      this.preventDefault = false
       this[Sym.LIFECYCLE].emit(
         'beforeEach',
         payload,
         this[Sym.STATE_CONTAINER]
       )
 
-      if (model[Sym.LISTENERS][payload.action]) {
-        let result = false
+      const actionHandler = model[Sym.LISTENERS][payload.action] ||
+        model.otherwise
 
-        try {
-          result = model[Sym.LISTENERS][payload.action](payload.data)
-        } catch (e) {
-          if (model[Sym.HANDLING_ERRORS]) {
-            this[Sym.LIFECYCLE].emit(
-              'error',
-              e,
-              payload,
-              this[Sym.STATE_CONTAINER]
-            )
-          } else {
-            throw e
-          }
-        }
+      if (actionHandler) {
+        const result = handleDispatch(() => {
+          return actionHandler.call(model, payload.data)
+        }, payload)
 
-        if (result !== false) {
-          this.emitChange()
-        }
+        if (result !== false && !this.preventDefault) this.emitChange()
+      }
+
+      if (model.reduce) {
+        handleDispatch(() => {
+          model.setState(model.reduce(
+            alt,
+            this[Sym.STATE_CONTAINER],
+            payload.data
+          ))
+        }, payload)
+
+        if (!this.preventDefault) this.emitChange()
       }
 
       this[Sym.LIFECYCLE].emit(
@@ -62,10 +91,6 @@ class AltStore {
 
   getEventEmitter() {
     return this[EE]
-  }
-
-  emitChange() {
-    this[EE].emit('change', this[Sym.STATE_CONTAINER])
   }
 
   listen(cb) {

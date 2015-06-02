@@ -74,7 +74,6 @@ const StargazerSource = {
 }
 
 @createStore(alt)
-@datasource(StargazerSource)
 class StargazerStore {
   static config = {
     stateKey: 'state'
@@ -88,6 +87,8 @@ class StargazerStore {
       errorMessage: null,
       isLoading: false
     }
+
+    this.registerAsync(StargazerSource)
 
     this.bindListeners({
       loading: StargazerActions.fetchingUsers,
@@ -240,9 +241,12 @@ export default {
     'as a function'() {
       const FauxSource = sinon.stub().returns({})
 
-      @datasource(FauxSource)
       class FauxStore {
         static displayName = 'FauxStore'
+
+        constructor() {
+          this.exportAsync(FauxSource)
+        }
       }
 
       const store = alt.createStore(FauxStore)
@@ -261,12 +265,11 @@ export default {
         }
       }
 
-      @datasource(PojoSource)
       class MyStore {
         static displayName = 'MyStore'
       }
 
-      const store = alt.createStore(MyStore)
+      const store = alt.createStore(datasource(PojoSource)(MyStore))
 
       assert.isFunction(store.justTesting)
       assert.isFunction(store.isLoading)

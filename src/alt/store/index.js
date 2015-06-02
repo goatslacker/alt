@@ -37,7 +37,10 @@ function createPrototype(proto, alt, key, extras) {
   return fn.assign(proto, StoreMixin, {
     _storeName: key,
     alt: alt,
-    dispatcher: alt.dispatcher
+    dispatcher: alt.dispatcher,
+    preventDefault() {
+      this.getInstance().preventDefault = true
+    }
   }, extras)
 }
 
@@ -72,6 +75,13 @@ export function createStoreFromObject(alt, StoreModel, key) {
     StoreMixin.bindListeners.call(
       StoreProto,
       StoreProto.bindListeners
+    )
+  }
+  /* istanbul ignore else */
+  if (StoreProto.observe) {
+    StoreMixin.bindListeners.call(
+      StoreProto,
+      StoreProto.observe(alt)
     )
   }
 
@@ -117,13 +127,8 @@ export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
 
   const store = new Store(...argsForClass)
 
-  if (config.bindListeners) {
-    store.bindListeners(config.bindListeners)
-  }
-
-  if (config.datasource) {
-    store.exportAsync(config.datasource)
-  }
+  if (config.bindListeners) store.bindListeners(config.bindListeners)
+  if (config.datasource) store.registerAsync(config.datasource)
 
   storeInstance = fn.assign(
     new AltStore(
