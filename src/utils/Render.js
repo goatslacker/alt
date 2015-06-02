@@ -24,7 +24,9 @@ export function withData(fetch, MaybeComponent) {
       },
 
       render() {
-        return React.createElement(Component, this.props)
+        return this.context.buffer.locked
+          ? React.createElement(Component, this.props)
+          : null
       }
     })
   }
