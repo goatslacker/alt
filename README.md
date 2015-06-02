@@ -87,6 +87,7 @@ export default alt.createStore(TodoStore, 'TodoStore');
 * [Shopping Cart](https://github.com/voronianski/flux-comparison/tree/master/alt)
 * [Todo](https://github.com/benstokoe/alt-todo)
 * [Typeahead](https://github.com/timtyrrell/alt-typeahead)
+* [Maple.js Webcomponents](https://github.com/Wildhoney/Maple.js/tree/master/example/app)
 
 ### Boilerplates
 
