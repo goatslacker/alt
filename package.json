@@ -27,6 +27,7 @@
     "jsdom": "^3.1.2",
     "lunr": "^0.5.9",
     "mocha": "^2.2.4",
+    "object-assign": "^2.0.0",
     "react": "^0.13.3",
     "rimraf": "^2.3.2",
     "sinon": "^1.14.0"
@@ -41,22 +42,19 @@
   ],
   "license": "MIT",
   "scripts": {
-    "build": "npm run clean && npm run build-alt && npm run build-utils && npm run build-alt-browser && npm run build-alt-browser-with-addons",
-    "build-alt": "babel src/alt --out-dir lib --stage 0",
-    "build-utils": "babel src/utils --out-dir utils --stage 0",
+    "build": "npm run clean && npm run transpile && npm run build-alt-browser && npm run build-alt-browser-with-addons",
+    "build-alt": "babel src/alt --out-dir lib",
     "build-alt-browser": "browserify src/alt -t [envify --NODE_ENV production ] -t babelify --outfile dist/alt.js --standalone Alt",
     "build-alt-browser-with-addons": "browserify src/alt/addons.js -t [envify --NODE_ENV production ] -t babelify -t browserify-shim --outfile dist/alt-with-addons.js --standalone Alt",
-    "build-test": "babel src/alt --out-dir lib -r --stage 0 && babel src/utils --out-dir utils -r --stage 0",
-    "coverage": "npm run build-test && istanbul cover node_modules/mocha/bin/_mocha -- -u exports -R tap --require ./test/babel test",
+    "transpile": "babel src/alt --out-dir lib && babel src/utils --out-dir utils",
+    "coverage": "npm run transpile && istanbul cover node_modules/mocha/bin/_mocha -- -u exports -R tap --require ./test/babel test",
     "clean": "rimraf lib && rimraf utils",
     "lint": "eslint src components",
-    "posttest": "npm run build-alt",
     "prepublish": "npm run lint && npm run test && npm run build",
-    "pretest": "npm run clean && npm run build-test",
-    "size": "npm run build-alt; browserify flux.js > flux-build.js; uglifyjs -m -c 'comparisons=false,keep_fargs=true,unsafe=true,unsafe_comps=true,warnings=false' flux-build.js  > flux-build.min.js",
-    "test": "npm run tests-node",
+    "pretest": "npm run clean && npm run transpile",
+    "test": "npm run test-node",
     "test-browser": "browserify test/browser/index.js -t babelify --outfile test/browser/tests.js",
-    "tests-node": "mocha -u exports -R nyan --require ./test/babel test"
+    "test-node": "mocha -u exports -R nyan --require ./test/babel test"
   },
   "browserify-shim": {
     "react": "global:React",
