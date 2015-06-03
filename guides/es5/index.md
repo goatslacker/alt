@@ -48,6 +48,12 @@ function FoodStore() {
   this.bindListeners({
     addItem: foodActions.addItem
   });
+  
+  this.exportPublicMethods({
+    hasFood: function() {
+      return !!this.getState().foods.length;
+    }
+  });
 }
 
 FoodStore.prototype.addItem = function (item) {
@@ -71,6 +77,12 @@ var FoodStore = alt.createStore({
 
   state: {
     foods: []
+  },
+  
+  pubilcMethods: {
+    hasFood: function () {
+      return !!this.getState().foods.length;
+    }
   },
 
   addItem: function (item) {
@@ -104,6 +116,11 @@ function FoodStore(initialFood) {
     state: {
       foods: foods
     },
+    pubilcMethods: {
+      hasFood: function () {
+        return foods.length;
+      }
+    },
 
     addItem: function (item) {
       var foods = this.state.foods;
@@ -118,6 +135,13 @@ function FoodStore(initialFood) {
 var foodStore = alt.createStore(
   FoodStore(['banana', 'strawberry', 'mango', 'orange'])
 );
+```
+
+A less explicit way of creating a public method is to statically define it as property of the store constructor function:
+```
+FoodStore.hasFood = function() {
+  return !!this.getState().length;
+}
 ```
 
 ## Instances
