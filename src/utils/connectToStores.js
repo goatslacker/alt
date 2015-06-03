@@ -72,7 +72,6 @@ function connectToStores(Component) {
     },
 
     componentWillUnmount() {
-      const stores = Component.getStores(this.props, this.context)
       this.storeListeners.forEach(unlisten => unlisten())
     },
 

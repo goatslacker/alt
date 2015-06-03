@@ -17,7 +17,7 @@ class AltStore {
 
     const output = model.output || (x => x)
 
-    this.emitChange = () => this.transmitter.push(output(alt, this.state))
+    this.emitChange = () => this.transmitter.push(output(this.state))
 
     const handleDispatch = (f, payload) => {
       try {
@@ -60,10 +60,7 @@ class AltStore {
 
       if (model.reduce) {
         handleDispatch(() => {
-          model.setState(model.reduce(
-            this[Sym.STATE_CONTAINER],
-            payload
-          ))
+          model.setState(model.reduce(this.state, payload))
         }, payload)
 
         if (!this.preventDefault) this.emitChange()
@@ -84,14 +81,9 @@ class AltStore {
   }
 
   unlisten(cb) {
+    if (!cb) throw new TypeError('Unlisten must receive a function')
     this.lifecycle('unlisten')
     this.transmitter.unsubscribe(cb)
-  }
-
-  unlisten(cb) {
-    if (!cb) throw new TypeError('Unlisten must receive a function')
-    this[Sym.LIFECYCLE].unlisten.emit()
-    this[EE].rm(cb)
   }
 
   getState() {
