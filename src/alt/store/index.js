@@ -95,7 +95,7 @@ export function createStoreFromObject(alt, StoreModel, key) {
 
   // create the instance and fn.assign the public methods to the instance
   storeInstance = fn.assign(
-    new AltStore(alt, StoreProto, StoreProto.state, StoreModel),
+    new AltStore(alt, StoreProto, StoreProto.state || {}, StoreModel),
     StoreProto.publicMethods,
     { displayName: key }
   )
