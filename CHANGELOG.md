@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.16.8
+
+### Added
+
+* `preventDefault` to stop a store from emitting a change. [commit](https://github.com/goatslacker/alt/commit/1635589)
+
+* `observe()` a way for POJOs to observe for changes. [commit](https://github.com/goatslacker/alt/commit/1635589)
+
+* `otherwise()` listen to all dispatches that have not been bound in your stores. [commit](https://github.com/goatslacker/alt/commit/1635589)
+
+* `reduce()` listen to all dispatches in a store and return the new state. [commit](https://github.com/goatslacker/alt/commit/1635589)
+
+* `output()` transform the output that is emitted from the stores. [commit](https://github.com/goatslacker/alt/commit/1635589)
+
+* Proper server rendering resolving all data at the component level before rendering. [commit](https://github.com/goatslacker/alt/commit/4cf98e3)
+
+* Batched dispatches to avoid having componentWillMount cause a cannot dispatch while dispatching error when it loses context. [commit](https://github.com/goatslacker/alt/commit/907c94c)
+
+* Alt.debug for registering your alt instance with chrome dev tools. [commit](https://github.com/goatslacker/alt/commit/5b6d78c)
+
+* Function utils for transforming store state. [commit](https://github.com/goatslacker/alt/commit/e3564d6)
+
 ## 0.16.7
 
 ### Added
