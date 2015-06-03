@@ -17,7 +17,7 @@ class AltStore {
 
     const output = model.output || (x => x)
 
-    this.emitChange = () => this.transmitter.push(output(alt, this.state))
+    this.emitChange = () => this.transmitter.push(output(this.state))
 
     const handleDispatch = (f, payload) => {
       try {
@@ -60,10 +60,7 @@ class AltStore {
 
       if (model.reduce) {
         handleDispatch(() => {
-          model.setState(model.reduce(
-            this[Sym.STATE_CONTAINER],
-            payload
-          ))
+          model.setState(model.reduce(this.state, payload))
         }, payload)
 
         if (!this.preventDefault) this.emitChange()

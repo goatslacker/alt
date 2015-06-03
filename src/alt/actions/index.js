@@ -26,7 +26,7 @@ export default function makeAction(alt, namespace, name, implementation, obj) {
   // Wrap the action so we can provide a dispatch method
   const newAction = new AltAction(alt, id, implementation, obj, data)
 
-  const dispatch = (payload) => alt.dispatch(actionSymbol, payload, data)
+  const dispatch = (payload) => alt.dispatch(id, payload, data)
 
   // the action itself
   const action = (...args) => {
