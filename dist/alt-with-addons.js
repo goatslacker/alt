@@ -998,6 +998,10 @@ var _esSymbol = require('es-symbol');
 
 var _esSymbol2 = _interopRequireDefault(_esSymbol);
 
+var _utilsFunctions = require('../../utils/functions');
+
+var fn = _interopRequireWildcard(_utilsFunctions);
+
 var _symbolsSymbols = require('../symbols/symbols');
 
 var Sym = _interopRequireWildcard(_symbolsSymbols);
@@ -1015,11 +1019,13 @@ var AltAction = (function () {
     this.actions = actions;
     this.actionDetails = actionDetails;
     this.alt = alt;
+    this.dispatched = false;
   }
 
   _createClass(AltAction, [{
     key: 'dispatch',
     value: function dispatch(data) {
+      this.dispatched = true;
       this.alt.dispatch(this[Sym.ACTION_UID], data, this.actionDetails);
     }
   }]);
@@ -1043,11 +1049,30 @@ function makeAction(alt, namespace, name, implementation, obj) {
   // Wrap the action so we can provide a dispatch method
   var newAction = new AltAction(alt, actionSymbol, implementation, obj, data);
 
+  var dispatch = function dispatch(payload) {
+    return alt.dispatch(actionSymbol, payload, data);
+  };
+
   // the action itself
-  var action = newAction[Sym.ACTION_HANDLER];
-  action.defer = function () {
+  var action = function action() {
     for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
       args[_key] = arguments[_key];
+    }
+
+    newAction.dispatched = false;
+    var result = newAction[Sym.ACTION_HANDLER].apply(newAction, args);
+    if (!newAction.dispatched) {
+      if (fn.isFunction(result)) {
+        result(dispatch);
+      } else {
+        dispatch(result);
+      }
+    }
+    return result;
+  };
+  action.defer = function () {
+    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      args[_key2] = arguments[_key2];
     }
 
     setTimeout(function () {
@@ -1067,7 +1092,7 @@ function makeAction(alt, namespace, name, implementation, obj) {
 
 module.exports = exports['default'];
 
-},{"../symbols/symbols":15,"../utils/AltUtils":16,"es-symbol":5}],11:[function(require,module,exports){
+},{"../../utils/functions":24,"../symbols/symbols":15,"../utils/AltUtils":16,"es-symbol":5}],11:[function(require,module,exports){
 /*global window*/
 'use strict';
 
