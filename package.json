@@ -46,15 +46,16 @@
     "build-alt": "babel src/alt --out-dir lib",
     "build-alt-browser": "browserify src/alt -t [envify --NODE_ENV production ] -t babelify --outfile dist/alt.js --standalone Alt",
     "build-alt-browser-with-addons": "browserify src/alt/addons.js -t [envify --NODE_ENV production ] -t babelify -t browserify-shim --outfile dist/alt-with-addons.js --standalone Alt",
-    "transpile": "babel src/alt --out-dir lib && babel src/utils --out-dir utils",
-    "coverage": "npm run transpile && istanbul cover node_modules/mocha/bin/_mocha -- -u exports -R tap --require ./test/babel test",
+    "coverage": "npm run transpile-cover && istanbul cover node_modules/mocha/bin/_mocha -- -u exports -R tap --require ./test/babel test",
     "clean": "rimraf lib && rimraf utils",
     "lint": "eslint src components",
     "prepublish": "npm run lint && npm run test && npm run build",
     "pretest": "npm run clean && npm run transpile",
     "test": "npm run test-node",
     "test-browser": "browserify test/browser/index.js -t babelify --outfile test/browser/tests.js",
-    "test-node": "mocha -u exports -R nyan --require ./test/babel test"
+    "test-node": "mocha -u exports -R nyan --require ./test/babel test",
+    "transpile": "babel src/alt --out-dir lib && babel src/utils --out-dir utils",
+    "transpile-cover": "babel src/alt --out-dir lib -r && babel src/utils --out-dir utils -r"
   },
   "browserify-shim": {
     "react": "global:React",
