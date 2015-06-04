@@ -156,7 +156,7 @@ export default {
       assert(span.props.foo === 'Baz')
     },
 
-    'Component receives all updates'() {
+    'Component receives all updates'(done) {
       class ClassComponent extends React.Component {
         static getStores() {
           return [testStore]
@@ -167,6 +167,10 @@ export default {
         componentDidMount() {
           testActions.updateFoo('Baz')
         }
+        componentDidUpdate() {
+          assert(this.props.foo === 'Baz')
+          done()
+        }
         render() {
           return <span foo={this.props.foo} />
         }
@@ -174,36 +178,13 @@ export default {
 
       const WrappedComponent = connectToStores(ClassComponent)
 
-      let node = null
-
-      class PortalComponent extends React.Component {
-        render() {
-          return null
-        }
-        componentDidMount() {
-          this.portalElement = document.createElement('div')
-          document.body.appendChild(this.portalElement)
-          this.componentDidUpdate()
-        }
-        componentWillUnmount() {
-          React.unmountComponentAtNode(this.portalElement)
-          document.body.removeChild(this.portalElement)
-        }
-        componentDidUpdate() {
-          const { clickToClose, onRequestClose } = this.props
-          node = React.render(<div>{this.props.children}</div>, this.portalElement)
-        }
-      }
-
-      TestUtils.renderIntoDocument(
-        <PortalComponent>
-          <WrappedComponent />
-        </PortalComponent>
+      let node = TestUtils.renderIntoDocument(
+        <WrappedComponent />
       )
 
-      const span = TestUtils.scryRenderedDOMComponentsWithTag(node, 'span')[0]
+      const span = TestUtils.findRenderedDOMComponentWithTag(node, 'span')
+      assert(span.props.foo === 'Bar')
 
-      assert(span.props.foo === 'Baz')
     }
   }
 }
