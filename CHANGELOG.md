@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.16.8
+## 0.16.9
 
 ### Added
 
@@ -21,8 +21,6 @@
 * Alt.debug for registering your alt instance with chrome dev tools. [commit](https://github.com/goatslacker/alt/commit/5b6d78c)
 
 * Function utils for transforming store state. [commit](https://github.com/goatslacker/alt/commit/e3564d6)
-
-* Able to return from an action to dispatch rather than calling this.dispatch yourself. [commit](https://github.com/goatslacker/alt/commit/460a749)
 
 ## 0.16.7
 
