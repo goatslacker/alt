@@ -1453,12 +1453,12 @@ var AltStore = (function () {
     this.boundListeners = model[Sym.ALL_LISTENERS];
     this.StoreModel = StoreModel;
 
-    var output = model.output || function (a, b) {
-      return b;
+    var output = model.output || function (x) {
+      return x;
     };
 
     this.emitChange = function () {
-      _this[EE].emit('change', output(alt, _this[Sym.STATE_CONTAINER]));
+      _this[EE].emit('change', output.call(model, _this[Sym.STATE_CONTAINER]));
     };
 
     var handleDispatch = function handleDispatch(f, payload) {
@@ -1485,7 +1485,7 @@ var AltStore = (function () {
 
       if (actionHandler) {
         var result = handleDispatch(function () {
-          return actionHandler.call(model, payload.data);
+          return actionHandler.call(model, payload.data, payload.action);
         }, payload);
 
         if (result !== false && !_this.preventDefault) _this.emitChange();
@@ -1493,7 +1493,7 @@ var AltStore = (function () {
 
       if (model.reduce) {
         handleDispatch(function () {
-          model.setState(model.reduce(alt, _this[Sym.STATE_CONTAINER], payload.data));
+          model.setState(model.reduce(_this[Sym.STATE_CONTAINER], payload));
         }, payload);
 
         if (!_this.preventDefault) _this.emitChange();
