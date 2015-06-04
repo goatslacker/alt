@@ -308,9 +308,13 @@ This is a reference to the store's internal name. This is either the identifier 
 
 ## StoreModel#otherwise
 
+> otherwise(data, action)
+
 This is a method you can implement in your store in order to receive all dispatches that are not currently being handled in your store explicitly via bindActions, bindAction, or bindListeners. This is similar to guards matching in Haskell.
 
 ## StoreModel#reduce
+
+> reduce(state, { action, data }): {}
 
 Another method you can implement in your store. This method receives all dispatches and the result that is returned is then set as the new state of your store. This way you can write your stores as reducers of dispatches.
 
@@ -319,5 +323,7 @@ Another method you can implement in your store. This method receives all dispatc
 Rather than returning false to suppress a change event from your store you may call this method and the change event will not happen.
 
 ## StoreModel#observe
+
+> observe(alt): {}
 
 A method you can implment in your stores, mostly useful when using plain objects to create a store. This method will receive the current alt instance and returns an object containing the methods/actions it'll handle.
