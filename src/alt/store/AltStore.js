@@ -18,12 +18,12 @@ class AltStore {
     this.boundListeners = model[Sym.ALL_LISTENERS]
     this.StoreModel = StoreModel
 
-    const output = model.output || ((a, b) => b)
+    const output = model.output || (x => x)
 
     this.emitChange = () => {
       this[EE].emit(
         'change',
-        output(alt, this[Sym.STATE_CONTAINER])
+        output.call(model, this[Sym.STATE_CONTAINER])
       )
     }
 
@@ -61,7 +61,7 @@ class AltStore {
 
       if (actionHandler) {
         const result = handleDispatch(() => {
-          return actionHandler.call(model, payload.data)
+          return actionHandler.call(model, payload.data, payload.action)
         }, payload)
 
         if (result !== false && !this.preventDefault) this.emitChange()
@@ -70,9 +70,8 @@ class AltStore {
       if (model.reduce) {
         handleDispatch(() => {
           model.setState(model.reduce(
-            alt,
             this[Sym.STATE_CONTAINER],
-            payload.data
+            payload
           ))
         }, payload)
 

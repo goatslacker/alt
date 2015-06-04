@@ -106,7 +106,7 @@ export default {
 
         state: { x: 0 },
 
-        reduce(alt, state) {
+        reduce(state) {
           return { x: state.x + 1 }
         }
       })
@@ -127,7 +127,7 @@ export default {
 
         state: { x: 0 },
 
-        reduce(alt, state) {
+        reduce(state) {
           this.preventDefault()
           return {}
         }
