@@ -22,6 +22,8 @@
 
 * Function utils for transforming store state. [commit](https://github.com/goatslacker/alt/commit/e3564d6)
 
+* Able to return from an action to dispatch rather than calling this.dispatch yourself. [commit](https://github.com/goatslacker/alt/commit/460a749)
+
 ## 0.16.7
 
 ### Added
