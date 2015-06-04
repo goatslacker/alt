@@ -435,9 +435,11 @@ const tests = {
   'existence of actions'() {
     assert.isFunction(myActions.anotherAction, 'shorthand function created with createAction exists')
     assert.isFunction(myActions.callInternalMethod, 'shorthand function created with createActions exists')
+    assert(myActions.callInternalMethod.length === 1, 'shorthand function is an id function')
     assert.isFunction(myActions.updateName, 'prototype defined actions exist')
     assert.isFunction(myActions.updateTwo, 'prototype defined actions exist')
     assert.isFunction(myActions.updateThree, 'prototype defined actions exist')
+    assert(myActions.updateTwo.length === 2, 'actions can have > 1 arity')
     assert.isFunction(myShorthandActions.actionOne, 'action created with shorthand createActions exists')
     assert.isFunction(myShorthandActions.actionTwo, 'other action created with shorthand createActions exists')
     assert.isFunction(objActions.hello, 'actions created by obj are functions')
