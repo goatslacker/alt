@@ -29,17 +29,6 @@ This is a method that faciliates calling multiple actions in another actions. Si
 MyActions.updateName.defer('Zack');
 ```
 
-```js
-// Calling actions within actions is considered an anti-pattern but at least
-// at a quick glance it's easy to tell what updateName is going to fire-off.
-MyActions.prototype.updateName = function (name) {
-  this.dispatch(name);
-  this.actions.updateFirstName.defer(first(name));
-  this.actions.updateLastName.defer(last(name));
-  this.actions.saveToDatabase.defer();
-}
-```
-
 ## action.CONSTANT
 
 A constant is automatically available at creation time. This is a unique identifier for the constant that can be used for dispatching and listening.
