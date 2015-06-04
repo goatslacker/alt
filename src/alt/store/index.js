@@ -1,6 +1,3 @@
-import EventEmitter from 'eventemitter3'
-
-import * as Sym from '../symbols/symbols'
 import * as utils from '../utils/AltUtils'
 import * as fn from '../../utils/functions'
 import AltStore from './AltStore'
@@ -14,12 +11,12 @@ function doSetState(store, storeInstance, state) {
   const { config } = storeInstance.StoreModel
 
   const nextState = fn.isFunction(state)
-    ? state(storeInstance[Sym.STATE_CONTAINER])
+    ? state(storeInstance.state)
     : state
 
-  storeInstance[Sym.STATE_CONTAINER] = config.setState.call(
+  storeInstance.state = config.setState.call(
     store,
-    storeInstance[Sym.STATE_CONTAINER],
+    storeInstance.state,
     nextState
   )
 
@@ -29,13 +26,14 @@ function doSetState(store, storeInstance, state) {
 }
 
 function createPrototype(proto, alt, key, extras) {
-  proto[Sym.ALL_LISTENERS] = []
-  proto[Sym.LIFECYCLE] = new EventEmitter()
-  proto[Sym.LISTENERS] = {}
-  proto[Sym.PUBLIC_METHODS] = {}
+  proto.boundListeners = []
+  proto.lifecycleEvents = {}
+  proto.actionListeners = {}
+  proto.publicMethods = {}
+  proto.handlesOwnErrors = false
 
   return fn.assign(proto, StoreMixin, {
-    _storeName: key,
+    displayName: key,
     alt: alt,
     dispatcher: alt.dispatcher,
     preventDefault() {
@@ -134,7 +132,7 @@ export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
     new AltStore(
       alt,
       store,
-      store[alt.config.stateKey] || store[config.stateKey] || null,
+      typeof store.state === 'object' ? store.state : null,
       StoreModel
     ),
     utils.getInternalMethods(StoreModel),

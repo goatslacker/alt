@@ -81,7 +81,7 @@ export default {
 
       const storeListener = sinon.spy()
 
-      caughtReturn.listen(storeListener)
+      const dispose = caughtReturn.listen(storeListener)
 
       assert(caughtReturn.getState().x === 0)
       assert.doesNotThrow(() => actions.fire())
@@ -89,7 +89,7 @@ export default {
 
       assert.ok(storeListener.calledOnce)
 
-      caughtReturn.unlisten(storeListener)
+      dispose()
     },
   }
 }

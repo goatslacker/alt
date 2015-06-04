@@ -21,7 +21,7 @@ export default {
 
       const store = alt.createStore(MyStore)
 
-      assert(store._storeName === 'MyStore')
+      assert(store.displayName === 'MyStore')
       assert.isFunction(store.undo)
       assert.isFunction(store.redo)
       assert.isFunction(store.events)
