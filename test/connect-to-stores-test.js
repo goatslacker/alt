@@ -154,6 +154,29 @@ export default {
       const span = TestUtils.findRenderedDOMComponentWithTag(node, 'span')
 
       assert(span.props.foo === 'Baz')
+    },
+
+    'componentDidConnect hook is called '() {
+      let componentDidConnect = false
+      class ClassComponent extends React.Component {
+        static getStores() {
+          return [testStore]
+        }
+        static getPropsFromStores(props) {
+          return testStore.getState()
+        }
+        componentDidConnect() {
+          componentDidConnect = true
+        }
+        render() {
+          return <span foo={this.props.foo} />
+        }
+      }
+      const WrappedComponent = connectToStores(ClassComponent)
+      const node = TestUtils.renderIntoDocument(
+        <WrappedComponent />
+      )
+      assert(componentDidConnect === true)
     }
   }
 }
