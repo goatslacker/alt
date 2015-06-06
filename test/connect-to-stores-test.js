@@ -154,6 +154,37 @@ export default {
       const span = TestUtils.findRenderedDOMComponentWithTag(node, 'span')
 
       assert(span.props.foo === 'Baz')
+    },
+
+    'Component receives all updates'(done) {
+      class ClassComponent extends React.Component {
+        static getStores() {
+          return [testStore]
+        }
+        static getPropsFromStores(props) {
+          return testStore.getState()
+        }
+        componentDidMount() {
+          testActions.updateFoo('Baz')
+        }
+        componentDidUpdate() {
+          assert(this.props.foo === 'Baz')
+          done()
+        }
+        render() {
+          return <span foo={this.props.foo} />
+        }
+      }
+
+      const WrappedComponent = connectToStores(ClassComponent)
+
+      let node = TestUtils.renderIntoDocument(
+        <WrappedComponent />
+      )
+
+      const span = TestUtils.findRenderedDOMComponentWithTag(node, 'span')
+      assert(span.props.foo === 'Bar')
+
     }
   }
 }
