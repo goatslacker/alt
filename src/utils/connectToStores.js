@@ -68,7 +68,7 @@ function connectToStores(Component) {
       })
       const component = this.refs['connectToStores-component']
       if (typeof component.componentDidConnect === 'function') {
-        component.componentDidConnect(this.props)
+        component.componentDidConnect()
       }
     },
 
