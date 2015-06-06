@@ -177,6 +177,37 @@ export default {
         <WrappedComponent />
       )
       assert(componentDidConnect === true)
+    },
+    'Component receives all updates'(done) {
+      let componentDidConnect = false
+      class ClassComponent extends React.Component {
+        static getStores() {
+          return [testStore]
+        }
+        static getPropsFromStores(props) {
+          return testStore.getState()
+        }
+        componentDidConnect() {
+          testActions.updateFoo('Baz')
+          componentDidConnect = true
+        }
+        componentDidUpdate() {
+          assert(this.props.foo === 'Baz')
+          done()
+        }
+        render() {
+          return <span foo={this.props.foo} />
+        }
+      }
+
+      const WrappedComponent = connectToStores(ClassComponent)
+
+      let node = TestUtils.renderIntoDocument(
+        <WrappedComponent />
+      )
+
+      const span = TestUtils.findRenderedDOMComponentWithTag(node, 'span')
+      assert(componentDidConnect === true)
     }
   }
 }
