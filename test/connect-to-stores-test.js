@@ -165,7 +165,7 @@ export default {
         static getPropsFromStores(props) {
           return testStore.getState()
         }
-        componentDidConnect() {
+        static componentDidConnect() {
           componentDidConnect = true
         }
         render() {
@@ -187,7 +187,7 @@ export default {
         static getPropsFromStores(props) {
           return testStore.getState()
         }
-        componentDidConnect() {
+        static componentDidConnect() {
           testActions.updateFoo('Baz')
           componentDidConnect = true
         }

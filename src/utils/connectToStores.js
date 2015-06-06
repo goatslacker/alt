@@ -66,9 +66,8 @@ function connectToStores(Component) {
       stores.forEach((store) => {
         store.listen(this.onChange)
       })
-      const component = this.refs['connectToStores-component']
-      if (typeof component.componentDidConnect === 'function') {
-        component.componentDidConnect()
+      if (typeof Component.componentDidConnect === 'function') {
+        Component.componentDidConnect()
       }
     },
 
@@ -86,9 +85,7 @@ function connectToStores(Component) {
     render() {
       return React.createElement(
         Component,
-        assign({
-          ref: 'connectToStores-component'
-        }, this.props, this.state)
+        assign({}, this.props, this.state)
       )
     }
   })
