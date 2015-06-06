@@ -66,8 +66,8 @@ function connectToStores(Component) {
       stores.forEach((store) => {
         store.listen(this.onChange)
       })
-      if (typeof Component.componentDidConnect === 'function') {
-        Component.componentDidConnect()
+      if (Component.componentDidConnect) {
+        Component.componentDidConnect(this.props)
       }
     },
 
