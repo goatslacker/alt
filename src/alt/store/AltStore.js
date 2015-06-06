@@ -98,6 +98,7 @@ class AltStore {
   }
 
   unlisten(cb) {
+    if (!cb) throw new TypeError('Unlisten must receive a function')
     this[Sym.LIFECYCLE].emit('unlisten')
     this[EE].removeListener('change', cb)
   }
