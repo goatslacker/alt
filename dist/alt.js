@@ -1004,11 +1004,12 @@ var StoreMixin = {
           return x;
         };
 
-        var makeActionHandler = function makeActionHandler(action) {
+        var makeActionHandler = function makeActionHandler(action, isError) {
           return function (x) {
             var fire = function fire() {
               loadCounter -= 1;
               action(intercept(x, action, args));
+              if (isError) throw x;
             };
             return typeof window === 'undefined' ? function () {
               return fire();
@@ -1021,7 +1022,7 @@ var StoreMixin = {
           loadCounter += 1;
           /* istanbul ignore else */
           if (spec.loading) spec.loading(intercept(null, spec.loading, args));
-          return spec.remote.apply(spec, [state].concat(args)).then(makeActionHandler(spec.success))['catch'](makeActionHandler(spec.error));
+          return spec.remote.apply(spec, [state].concat(args))['catch'](makeActionHandler(spec.error, 1)).then(makeActionHandler(spec.success));
         } else {
           // otherwise emit the change now
           _this.emitChange();
@@ -1370,6 +1371,7 @@ var STATE_CONTAINER = (0, _esSymbol2['default'])();
 exports.STATE_CONTAINER = STATE_CONTAINER;
 
 },{"es-symbol":1}],11:[function(require,module,exports){
+/* istanbul ignore next */
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1380,7 +1382,6 @@ exports.warn = warn;
 exports.uid = uid;
 exports.formatAsConstant = formatAsConstant;
 exports.dispatchIdentity = dispatchIdentity;
-/* istanbul ignore next */
 function NoopClass() {}
 
 var builtIns = Object.getOwnPropertyNames(NoopClass);

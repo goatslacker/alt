@@ -4,7 +4,6 @@
 module.exports = require('./components/AltContainer.js');
 
 },{"./components/AltContainer.js":2}],2:[function(require,module,exports){
-(function (global){
 /**
  * AltContainer.
  *
@@ -63,7 +62,7 @@ module.exports = require('./components/AltContainer.js');
  */
 'use strict';
 
-var React = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
+var React = (window.React);
 var mixinContainer = require('./mixinContainer');
 var assign = require('../utils/functions').assign;
 
@@ -77,7 +76,6 @@ var AltContainer = React.createClass(assign({
 
 module.exports = AltContainer;
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"../utils/functions":27,"./mixinContainer":3}],3:[function(require,module,exports){
 'use strict';
 
@@ -1593,11 +1591,12 @@ var StoreMixin = {
           return x;
         };
 
-        var makeActionHandler = function makeActionHandler(action) {
+        var makeActionHandler = function makeActionHandler(action, isError) {
           return function (x) {
             var fire = function fire() {
               loadCounter -= 1;
               action(intercept(x, action, args));
+              if (isError) throw x;
             };
             return typeof window === 'undefined' ? function () {
               return fire();
@@ -1610,7 +1609,7 @@ var StoreMixin = {
           loadCounter += 1;
           /* istanbul ignore else */
           if (spec.loading) spec.loading(intercept(null, spec.loading, args));
-          return spec.remote.apply(spec, [state].concat(args)).then(makeActionHandler(spec.success))['catch'](makeActionHandler(spec.error));
+          return spec.remote.apply(spec, [state].concat(args))['catch'](makeActionHandler(spec.error, 1)).then(makeActionHandler(spec.success));
         } else {
           // otherwise emit the change now
           _this.emitChange();
@@ -1959,6 +1958,7 @@ var STATE_CONTAINER = (0, _esSymbol2['default'])();
 exports.STATE_CONTAINER = STATE_CONTAINER;
 
 },{"es-symbol":5}],16:[function(require,module,exports){
+/* istanbul ignore next */
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1969,7 +1969,6 @@ exports.warn = warn;
 exports.uid = uid;
 exports.formatAsConstant = formatAsConstant;
 exports.dispatchIdentity = dispatchIdentity;
-/* istanbul ignore next */
 function NoopClass() {}
 
 var builtIns = Object.getOwnPropertyNames(NoopClass);
@@ -2163,16 +2162,6 @@ exports['default'] = ActionListeners;
 module.exports = exports['default'];
 
 },{"es-symbol":5}],19:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
-
 /**
  * AltManager(Alt: AltClass): undefined
  *
@@ -2198,6 +2187,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  *
  * ```
  */
+
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 var AltManager = (function () {
   function AltManager(Alt) {
@@ -2494,12 +2493,12 @@ function atomic(alt) {
 module.exports = exports['default'];
 
 },{"./functions":24,"./makeFinalStore":25}],22:[function(require,module,exports){
+/*global window*/
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
-/*global window*/
 exports['default'] = chromeDebug;
 
 function chromeDebug(alt) {
@@ -2510,7 +2509,6 @@ function chromeDebug(alt) {
 module.exports = exports['default'];
 
 },{}],23:[function(require,module,exports){
-(function (global){
 /**
  * 'Higher Order Component' that controls the props of a wrapped
  * component via stores.
@@ -2564,7 +2562,7 @@ Object.defineProperty(exports, '__esModule', {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _react = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
+var _react = (window.React);
 
 var _react2 = _interopRequireDefault(_react);
 
@@ -2594,6 +2592,10 @@ function connectToStores(Component) {
       stores.forEach(function (store) {
         store.listen(_this.onChange);
       });
+      var component = this.refs['connectToStores-component'];
+      if (typeof component.componentDidConnect === 'function') {
+        component.componentDidConnect();
+      }
     },
 
     componentWillUnmount: function componentWillUnmount() {
@@ -2610,7 +2612,9 @@ function connectToStores(Component) {
     },
 
     render: function render() {
-      return _react2['default'].createElement(Component, (0, _functions.assign)({}, this.props, this.state));
+      return _react2['default'].createElement(Component, (0, _functions.assign)({
+        ref: 'connectToStores-component'
+      }, this.props, this.state));
     }
   });
 
@@ -2620,7 +2624,6 @@ function connectToStores(Component) {
 exports['default'] = connectToStores;
 module.exports = exports['default'];
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./functions":24}],24:[function(require,module,exports){
 'use strict';
 
@@ -2655,12 +2658,6 @@ function assign(target) {
 }
 
 },{}],25:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = makeFinalStore;
 /**
  * makeFinalStore(alt: AltInstance): AltStore
  *
@@ -2685,6 +2682,12 @@ exports["default"] = makeFinalStore;
  * ```
  */
 
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = makeFinalStore;
 function FinalStore() {
   var _this = this;
 
@@ -2707,7 +2710,6 @@ function makeFinalStore(alt) {
 module.exports = exports["default"];
 
 },{}],26:[function(require,module,exports){
-(function (global){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -2717,7 +2719,7 @@ exports['default'] = withAltContext;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _react = (typeof window !== "undefined" ? window.React : typeof global !== "undefined" ? global.React : null);
+var _react = (window.React);
 
 var _react2 = _interopRequireDefault(_react);
 
@@ -2741,7 +2743,6 @@ function withAltContext(flux) {
 
 module.exports = exports['default'];
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],27:[function(require,module,exports){
 'use strict';
 
