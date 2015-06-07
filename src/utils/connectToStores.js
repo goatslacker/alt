@@ -63,8 +63,8 @@ function connectToStores(Component) {
 
     componentDidMount() {
       const stores = Component.getStores(this.props, this.context)
-      stores.forEach((store) => {
-        store.listen(this.onChange)
+      this.storeListeners = stores.map((store) => {
+        return store.listen(this.onChange)
       })
       if (Component.componentDidConnect) {
         Component.componentDidConnect(this.props, this.context)
@@ -72,10 +72,7 @@ function connectToStores(Component) {
     },
 
     componentWillUnmount() {
-      const stores = Component.getStores(this.props, this.context)
-      stores.forEach((store) => {
-        store.unlisten(this.onChange)
-      })
+      this.storeListeners.forEach(unlisten => unlisten())
     },
 
     onChange() {

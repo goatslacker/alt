@@ -31,21 +31,6 @@ Available configuration options:
 
 `getState` receives the current state and returns a copy of it. You can override this function to provide your own implementation.
 
-#### stateKey
-
-`stateKey` is a string that controls where state should be defined at this particular store's level. For example:
-
-```js
-class TodoStore {
-  static config = {
-    stateKey: 'state'
-  }
-  constructor() {
-    this.state = { todos: {} }
-  }
-}
-```
-
 #### onSerialize
 
 `onSerialize` is also called before the store's state is serialized. You may optionally return an object, which will be used directly as the snapshot data for the store. If you do not return anything, the default, [`MyStore#getState()`](stores.md#storegetstate) is used for the snapshot data. See the [serialization](serialization.md) for an example.
@@ -302,7 +287,7 @@ class MyStore {
 }
 ```
 
-## StoreModel#_storeName
+## StoreModel#displayName
 
 This is a reference to the store's internal name. This is either the identifier you provided to `createStore` or StoreModel's class name.
 

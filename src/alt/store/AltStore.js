@@ -1,43 +1,34 @@
-import EventEmitter from 'eventemitter3'
-import Symbol from 'es-symbol'
-
-import * as Sym from '../symbols/symbols'
 import * as fn from '../../utils/functions'
-
-// event emitter instance
-const EE = Symbol()
+import transmitter from 'transmitter'
 
 class AltStore {
   constructor(alt, model, state, StoreModel) {
-    this[EE] = new EventEmitter()
-    this[Sym.LIFECYCLE] = model[Sym.LIFECYCLE]
-    this[Sym.STATE_CONTAINER] = state || model
+    const lifecycleEvents = model.lifecycleEvents
+    this.transmitter = transmitter()
+    this.lifecycle = (event, x) => {
+      if (lifecycleEvents[event]) lifecycleEvents[event].push(x)
+    }
+    this.state = state || model
 
     this.preventDefault = false
-    this._storeName = model._storeName
-    this.boundListeners = model[Sym.ALL_LISTENERS]
+    this.displayName = model.displayName
+    this.boundListeners = model.boundListeners
     this.StoreModel = StoreModel
 
     const output = model.output || (x => x)
 
-    this.emitChange = () => {
-      this[EE].emit(
-        'change',
-        output.call(model, this[Sym.STATE_CONTAINER])
-      )
-    }
+    this.emitChange = () => this.transmitter.push(output(this.state))
 
     const handleDispatch = (f, payload) => {
       try {
         return f()
       } catch (e) {
-        if (model[Sym.HANDLING_ERRORS]) {
-          this[Sym.LIFECYCLE].emit(
-            'error',
-            e,
+        if (model.handlesOwnErrors) {
+          this.lifecycle('error', {
+            error: e,
             payload,
-            this[Sym.STATE_CONTAINER]
-          )
+            state: this.state
+          })
           return false
         } else {
           throw e
@@ -45,18 +36,18 @@ class AltStore {
       }
     }
 
-    fn.assign(this, model[Sym.PUBLIC_METHODS])
+    fn.assign(this, model.publicMethods)
 
     // Register dispatcher
     this.dispatchToken = alt.dispatcher.register((payload) => {
       this.preventDefault = false
-      this[Sym.LIFECYCLE].emit(
-        'beforeEach',
-        payload,
-        this[Sym.STATE_CONTAINER]
-      )
 
-      const actionHandler = model[Sym.LISTENERS][payload.action] ||
+      this.lifecycle('beforeEach', {
+        payload,
+        state: this.state
+      })
+
+      const actionHandler = model.actionListeners[payload.action] ||
         model.otherwise
 
       if (actionHandler) {
@@ -69,45 +60,34 @@ class AltStore {
 
       if (model.reduce) {
         handleDispatch(() => {
-          model.setState(model.reduce(
-            this[Sym.STATE_CONTAINER],
-            payload
-          ))
+          model.setState(model.reduce(this.state, payload))
         }, payload)
 
         if (!this.preventDefault) this.emitChange()
       }
 
-      this[Sym.LIFECYCLE].emit(
-        'afterEach',
+      this.lifecycle('afterEach', {
         payload,
-        this[Sym.STATE_CONTAINER]
-      )
+        state: this.state
+      })
     })
 
-    this[Sym.LIFECYCLE].emit('init')
-  }
-
-  getEventEmitter() {
-    return this[EE]
+    this.lifecycle('init')
   }
 
   listen(cb) {
-    this[EE].on('change', cb)
+    this.transmitter.subscribe(cb)
     return () => this.unlisten(cb)
   }
 
   unlisten(cb) {
     if (!cb) throw new TypeError('Unlisten must receive a function')
-    this[Sym.LIFECYCLE].emit('unlisten')
-    this[EE].removeListener('change', cb)
+    this.lifecycle('unlisten')
+    this.transmitter.unsubscribe(cb)
   }
 
   getState() {
-    return this.StoreModel.config.getState.call(
-      this,
-      this[Sym.STATE_CONTAINER]
-    )
+    return this.StoreModel.config.getState.call(this, this.state)
   }
 }
 

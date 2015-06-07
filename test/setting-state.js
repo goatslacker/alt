@@ -32,14 +32,14 @@ export default {
 
     'using setState to set the state'() {
       const spy = sinon.spy()
-      myStore.listen(spy)
+      const dispose = myStore.listen(spy)
 
       actions.fire()
 
       assert(myStore.getState().foo === 2, 'foo was incremented')
       assert.isUndefined(myStore.getState().retVal, 'return value of setState is undefined')
 
-      myStore.unlisten(spy)
+      dispose()
 
       // calling set state without anything doesn't make things crash and burn
       actions.nothing()
@@ -49,7 +49,7 @@ export default {
 
     'by using setState a change event is not emitted twice'() {
       const spy = sinon.spy()
-      myStore.listen(spy)
+      const dispose = myStore.listen(spy)
 
       actions.nothing()
 
@@ -57,7 +57,7 @@ export default {
 
       assert.ok(spy.calledOnce, 'spy was only called once')
 
-      myStore.unlisten(spy)
+      dispose()
     },
 
     'transactional setState'() {

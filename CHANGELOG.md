@@ -1,5 +1,74 @@
 # Changelog
 
+## 0.17.0
+
+### Breaking Changes
+
+* Removed Symbol
+
+  **Upgrade Guide**
+
+  - Remove all references to Symbol, Symbol.keyFor, etc.
+  - Get access to the action's unique id via `myAction.id`
+
+* Removed `getEventEmitter()`
+
+  **Upgrade Guide**
+
+  - You can no longer access the internal event emitter to dispatch your own custom events. This is usually an anti-pattern.
+  - If you still need this behavior you can create your own event emitter in your store.
+
+```js
+class TodoStore {
+  constructor() {
+    this.eventEmitter = new EventEmitter()
+
+    this.exportPublicMethods({
+      getEventEmitter: () => this.eventEmitter
+    });
+  }
+}
+```
+
+* Removed `_storeName`.
+
+  **Upgrade Guide**
+
+  - `_storeName` was an internal property to the store where the store's name was kept.
+  - You can now use `displayName` instead which is a public API.
+
+* Removed `stateKey`. [commit](https://github.com/goatslacker/alt/commit/40830ea)
+
+  **Upgrade Guide**
+
+  - A `stateKey` property was configurable on stores as well as app level.
+  - This has now been removed.
+  - This key was mostly used so you can use the react-like API of `this.state`, now this is being supported first-class.
+
+```js
+// old behavior
+class MyStore {
+  static config = { stateKey = 'state' }
+
+  constructor() {
+    this.state = {}
+  }
+}
+```
+
+Now you can just use `this.state` directly. If it exists it'll be picked up.
+
+```js
+// old behavior
+class MyStore {
+  constructor() {
+    this.state = {}
+  }
+}
+```
+
+The old behavior of assigning state directly as instance properties will continue to be supported. However, this new behavior will be favored in the docs.
+
 ## 0.16.10
 
 ### Added

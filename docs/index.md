@@ -65,31 +65,6 @@ This controls how store data is serialized in snapshots. By default alt uses `JS
 
 This controls how store data is deserialized from snapshot/bootstrap data. By default alt uses `JSON.parse`, but you can provide your own function to deserialize data.
 
-#### stateKey
-
-`stateKey` is a string that controls where state should be defined at the store level. For example:
-
-```js
-var alt = new Alt({
-  stateKey: 'cherry'
-});
-
-class MyStore {
-  constructor() {
-    // state now goes in this.cherry
-    this.cherry = {
-      a: 1,
-      b: 2,
-      c: 3
-    };
-
-    // instance properties declared below do not go into state
-    this.isPrivate = 'yes'
-    this.yay = true
-  }
-}
-```
-
 #### stateTransforms
 
 This is an array of functions you can provide which will be executed every time `createStore` or `createUnsavedStore` is ran. It will iterate through the array applying each function to your store. This can be useful if you wish to perform any pre-processing or transformations to your store before it's created.

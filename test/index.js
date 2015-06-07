@@ -66,7 +66,7 @@ const objActions = alt.createActions({
   world() { }
 })
 
-const myShorthandActions = alt.generateActions("actionOne", "actionTwo")
+const myShorthandActions = alt.generateActions('actionOne', 'actionTwo')
 
 class MyStore {
   constructor() {
@@ -389,7 +389,7 @@ const tests = {
 
   'store methods'() {
     const storePrototype = Object.getPrototypeOf(myStore)
-    const assertMethods = ['constructor', 'getEventEmitter', 'listen', 'unlisten', 'getState']
+    const assertMethods = ['constructor', 'listen', 'unlisten', 'getState']
     assert.deepEqual(Object.getOwnPropertyNames(storePrototype), assertMethods, 'methods exist for store')
     assert.isUndefined(myStore.addListener, 'event emitter methods not present')
     assert.isUndefined(myStore.removeListener, 'event emitter methods not present')
@@ -435,11 +435,9 @@ const tests = {
   'existence of actions'() {
     assert.isFunction(myActions.anotherAction, 'shorthand function created with createAction exists')
     assert.isFunction(myActions.callInternalMethod, 'shorthand function created with createActions exists')
-    assert(myActions.callInternalMethod.length === 1, 'shorthand function is an id function')
     assert.isFunction(myActions.updateName, 'prototype defined actions exist')
     assert.isFunction(myActions.updateTwo, 'prototype defined actions exist')
     assert.isFunction(myActions.updateThree, 'prototype defined actions exist')
-    assert(myActions.updateTwo.length === 2, 'actions can have > 1 arity')
     assert.isFunction(myShorthandActions.actionOne, 'action created with shorthand createActions exists')
     assert.isFunction(myShorthandActions.actionTwo, 'other action created with shorthand createActions exists')
     assert.isFunction(objActions.hello, 'actions created by obj are functions')
@@ -553,12 +551,12 @@ const tests = {
       assert(x.name === 'moose', 'listener for store works')
       assert(myStore.getState().name === 'moose', 'new store state present')
     }
-    myStore.listen(mooseChecker)
+    const dispose = myStore.listen(mooseChecker)
     myActions.updateName('moose')
 
     assert(myStore.getState().name === 'moose', 'new store state present')
 
-    myStore.unlisten(mooseChecker)
+    dispose()
     myActions.updateName('badger')
 
     assert(myStore.getState().name === 'badger', 'new store state present')
@@ -765,9 +763,9 @@ const tests = {
     function eventEmittedFail() {
       assert(true === false, 'event was emitted but I did not want it to be')
     }
-    myStore.listen(eventEmittedFail)
+    const dispose = myStore.listen(eventEmittedFail)
     myActions.dontEmit()
-    myStore.unlisten(eventEmittedFail)
+    dispose()
     assert(myStore.getState().dontEmitEventCalled === true, 'dont emit event was called successfully and event was not emitted')
   },
 
@@ -957,11 +955,11 @@ const tests = {
 
     const listener = () => {
       assert(myStore.getState().async === true, 'store async is true')
-      myStore.unlisten(listener)
+      dispose()
       done()
     }
 
-    myStore.listen(listener)
+    const dispose = myStore.listen(listener)
     myActions.asyncStoreAction()
   },
 
@@ -995,11 +993,11 @@ const tests = {
 
     const listener = () => {
       assert(store.getState().test === true, 'test is true')
-      store.unlisten(listener)
+      dispose()
       done()
     }
 
-    store.listen(listener)
+    const dispose = store.listen(listener)
     actions.test()
   },
 
