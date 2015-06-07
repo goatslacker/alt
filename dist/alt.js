@@ -909,6 +909,7 @@ var AltStore = (function () {
   }, {
     key: 'unlisten',
     value: function unlisten(cb) {
+      if (!cb) throw new TypeError('Unlisten must receive a function');
       this[Sym.LIFECYCLE].emit('unlisten');
       this[EE].removeListener('change', cb);
     }
@@ -1371,7 +1372,6 @@ var STATE_CONTAINER = (0, _esSymbol2['default'])();
 exports.STATE_CONTAINER = STATE_CONTAINER;
 
 },{"es-symbol":1}],11:[function(require,module,exports){
-/* istanbul ignore next */
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -1382,6 +1382,7 @@ exports.warn = warn;
 exports.uid = uid;
 exports.formatAsConstant = formatAsConstant;
 exports.dispatchIdentity = dispatchIdentity;
+/* istanbul ignore next */
 function NoopClass() {}
 
 var builtIns = Object.getOwnPropertyNames(NoopClass);

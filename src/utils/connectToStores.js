@@ -58,28 +58,28 @@ function connectToStores(Component) {
   // Wrapper Component.
   const StoreConnection = React.createClass({
     getInitialState() {
-      return Component.getPropsFromStores(this.props)
+      return Component.getPropsFromStores(this.props, this.context)
     },
 
     componentDidMount() {
-      const stores = Component.getStores(this.props)
+      const stores = Component.getStores(this.props, this.context)
       stores.forEach((store) => {
         store.listen(this.onChange)
       })
-      if (Component.componentDidConnect !== undefined) {
-        Component.componentDidConnect(this.props)
+      if (Component.componentDidConnect) {
+        Component.componentDidConnect(this.props, this.context)
       }
     },
 
     componentWillUnmount() {
-      const stores = Component.getStores(this.props)
+      const stores = Component.getStores(this.props, this.context)
       stores.forEach((store) => {
         store.unlisten(this.onChange)
       })
     },
 
     onChange() {
-      this.setState(Component.getPropsFromStores(this.props))
+      this.setState(Component.getPropsFromStores(this.props, this.context))
     },
 
     render() {
