@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.16.10
+
+### Added
+
+* componentDidConnect for connectToStores. Allows you to specify data fetching in there. [commit](https://github.com/goatslacker/alt/commit/464bb26)
+
+* Hot reload of stores using webpack. [commit](https://github.com/goatslacker/alt/commit/66c875c)
+
+### Changed
+
+* Reversed the then/catch in the promise resolution for data sources so the catch only handles data source failures. [commit](https://github.com/goatslacker/alt/commit/8e1418b)
+
+* Throw when passing `undefined` to store.unlisten. [commit](https://github.com/goatslacker/alt/commit/4998c6a)
+
 ## 0.16.9
 
 ### Added
