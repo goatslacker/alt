@@ -229,7 +229,7 @@ class Store extends StoreBase {
 
 > (): (AltStore)[stores.md]
 
-This method retrieves the store instance which contains other methods like `getEventEmitter()`, `getState()`, and `emitChange()`.
+This method retrieves the store instance which contains any of the public methods you've exported as well as the listen/unlisten methods.
 
 ```js
 class MyStore {
