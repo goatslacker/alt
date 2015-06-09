@@ -211,7 +211,7 @@ class MyComponent extends Component {
 
 ### Serializing/Deserializing Immutable Data
 
-If you are using immutable data and plan on taking advantage of alt's [snapshot](../takeSnapshot.md) and [bootstrap](../bootstrap.md) capabilities you must ensure that [serialize](../lifecycleListeners.md#serialize) and [deserialize](../lifecycleListeners.md#deserialize) handle the immutable data.
+If you are using immutable data and plan on taking advantage of alt's [snapshot](../takeSnapshot.md) and [bootstrap](../bootstrap.md) capabilities you must ensure that the [onSerialize](../serialization.md#onSerialize) and [onDeserialize](../serialization.md#onDeserialize) hooks handle the immutable data.
 
 Serialize returns the data from the store to be used in a snapshot so the immutable getters will need to be used to return a plain JS object to be serialized.
 
