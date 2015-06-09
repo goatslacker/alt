@@ -6,11 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>API Documentation</title>
+  <title>Webpack Hot Module Replacement</title>
   <meta name="description" content="A library for managing data within JavaScript applications. Alt is a pure flux implementation that is small, terse, well tested, extremely flexible, and forward thinking.
 ">
 
-  <link rel="canonical" href="http://alt.js.org/docs/">
+  <link rel="canonical" href="http://alt.js.org/docs/hot-reload/">
   <link rel="alternate" type="application/rss+xml" title="Alt" href="http://alt.js.org/feed.xml" />
 
   <link type="text/css" rel="stylesheet" href="/assets/bootstrap-navbar.css" />
@@ -179,80 +179,24 @@
         </div>
         <div class="col c10">
           <div class="sp-horiz-md">
-            <h1 id="api-documentation">Api Documentation</h1>
+            <h1 id="hmr-hot-module-replacement">HMR (hot module replacement)</h1>
 
-<p>Welcome to alt API docs page. These pages contain the reference material for the latest version of alt. The pages are organized by various features that alt has.</p>
+<p>When working with webpack and something like <a href="https://github.com/gaearon/react-hot-loader">react-hot-loader</a> changing stores often causes your stores to be re-created (since they’re wrapped) while this isn’t a big deal it does cause a surplus of stores which pollutes the alt namespace and the alt debugger. With this util you’re able to get proper hot replacement for stores, changing code within a store will reload it properly.</p>
 
-<h2 id="alt">Alt</h2>
+<p>To use this just export a hot store using <code>makeHot</code> rather than using <code>alt.createStore</code>.</p>
 
-<p>Creating a new instance of alt.</p>
+<pre><code class="language-js">import alt from '../alt';
+import makeHot from 'alt/utils/makeHot';
 
-<pre><code class="language-js">var Alt = require('alt');
-var alt = new Alt();
-</code></pre>
+class TodoStore {
+  static displayName = 'TodoStore'
 
-<h2 id="altclassconstructor">AltClass#constructor</h2>
-
-<blockquote>
-  <p>constructor(config: object) : Alt</p>
-</blockquote>
-
-<p>The alt constructor takes an optional configuration object. This is where you can configure your alt instance.</p>
-
-<pre><code class="language-js">var alt = new Alt({
-  dispatcher: new MyDispatcher()
-});
-</code></pre>
-
-<h3 id="config-object">Config Object</h3>
-
-<p>The following properties can be defined on the config object:</p>
-
-<h4 id="dispatcher">dispatcher</h4>
-
-<p>By default alt uses Facebook’s Flux <a href="https://github.com/facebook/flux/blob/master/src/Dispatcher.js">dispatcher</a>, but you can provide your own dispatcher implementation for alt to use. Your dispatcher must have a similar interface to the Facebook dispatcher including, <code>waitFor</code>, <code>register</code>, and <code>dispatch</code>.</p>
-
-<p>One easy way to provide your own dispatcher is to extend the Facebook dispatcher. The following example shows a dispatcher that extends Facebook’s dispatcher, but modifies it such that all dispatched payloads are logged to the console and <code>register</code> has a custom implementation.</p>
-
-<pre><code class="language-js">class MyDispatcher extends Dispatcher {
   constructor() {
-    super();
-  }
-
-  dispatch(payload) {
-    console.log(payload);
-    super.dispatch(payload);
-  }
-
-  register(callback) {
-    // custom register implementation
-  }
-}
-</code></pre>
-
-<h4 id="serialize">serialize</h4>
-
-<p>This controls how store data is serialized in snapshots. By default alt uses <code>JSON.stringify</code>, but you can provide your own function to serialize data.</p>
-
-<h4 id="deserialize">deserialize</h4>
-
-<p>This controls how store data is deserialized from snapshot/bootstrap data. By default alt uses <code>JSON.parse</code>, but you can provide your own function to deserialize data.</p>
-
-<h4 id="statetransforms">stateTransforms</h4>
-
-<p>This is an array of functions you can provide which will be executed every time <code>createStore</code> or <code>createUnsavedStore</code> is ran. It will iterate through the array applying each function to your store. This can be useful if you wish to perform any pre-processing or transformations to your store before it’s created.</p>
-
-<h2 id="instances">Instances</h2>
-
-<p>Alternatively, you can <a href="/docs/altInstances/">create instances</a> of the entire alt universe including stores.</p>
-
-<pre><code class="language-js">class Flux extends Alt {
-  constructor() {
-    // add your actions and stores here
+    this.todos = {};
   }
 }
 
-var flux = new Flux();
+export default makeHot(alt, TodoStore);
 </code></pre>
 
           </div>

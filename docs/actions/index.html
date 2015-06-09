@@ -205,16 +205,6 @@
 <pre><code class="language-js">MyActions.updateName.defer('Zack');
 </code></pre>
 
-<pre><code class="language-js">// Calling actions within actions is considered an anti-pattern but at least
-// at a quick glance it's easy to tell what updateName is going to fire-off.
-MyActions.prototype.updateName = function (name) {
-  this.dispatch(name);
-  this.actions.updateFirstName.defer(first(name));
-  this.actions.updateLastName.defer(last(name));
-  this.actions.saveToDatabase.defer();
-}
-</code></pre>
-
 <h2 id="actionconstant">action.CONSTANT</h2>
 
 <p>A constant is automatically available at creation time. This is a unique identifier for the constant that can be used for dispatching and listening.</p>

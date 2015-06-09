@@ -211,20 +211,6 @@
 
 <p><code>getState</code> receives the current state and returns a copy of it. You can override this function to provide your own implementation.</p>
 
-<h4 id="statekey">stateKey</h4>
-
-<p><code>stateKey</code> is a string that controls where state should be defined at this particular store’s level. For example:</p>
-
-<pre><code class="language-js">class TodoStore {
-  static config = {
-    stateKey: 'state'
-  }
-  constructor() {
-    this.state = { todos: {} }
-  }
-}
-</code></pre>
-
 <h4 id="onserialize">onSerialize</h4>
 
 <p><code>onSerialize</code> is also called before the store’s state is serialized. You may optionally return an object, which will be used directly as the snapshot data for the store. If you do not return anything, the default, <a href="/docs/stores#storegetstate"><code>MyStore#getState()</code></a> is used for the snapshot data. See the <a href="/docs/serialization">serialization</a> for an example.</p>
@@ -439,7 +425,7 @@ class Store extends StoreBase {
   <p>(): (AltStore)[stores.md]</p>
 </blockquote>
 
-<p>This method retrieves the store instance which contains other methods like <code>getEventEmitter()</code>, <code>getState()</code>, and <code>emitChange()</code>.</p>
+<p>This method retrieves the store instance which contains any of the public methods you’ve exported as well as the listen/unlisten methods.</p>
 
 <pre><code class="language-js">class MyStore {
   handleFoo() {
@@ -495,9 +481,37 @@ class Store extends StoreBase {
 }
 </code></pre>
 
-<h2 id="storemodelstorename">StoreModel#_storeName</h2>
+<h2 id="storemodeldisplayname">StoreModel#displayName</h2>
 
 <p>This is a reference to the store’s internal name. This is either the identifier you provided to <code>createStore</code> or StoreModel’s class name.</p>
+
+<h2 id="storemodelotherwise">StoreModel#otherwise</h2>
+
+<blockquote>
+  <p>otherwise(data, action)</p>
+</blockquote>
+
+<p>This is a method you can implement in your store in order to receive all dispatches that are not currently being handled in your store explicitly via bindActions, bindAction, or bindListeners. This is similar to guards matching in Haskell.</p>
+
+<h2 id="storemodelreduce">StoreModel#reduce</h2>
+
+<blockquote>
+  <p>reduce(state, { action, data }): {}</p>
+</blockquote>
+
+<p>Another method you can implement in your store. This method receives all dispatches and the result that is returned is then set as the new state of your store. This way you can write your stores as reducers of dispatches.</p>
+
+<h2 id="storemodelpreventdefault">StoreModel#preventDefault</h2>
+
+<p>Rather than returning false to suppress a change event from your store you may call this method and the change event will not happen.</p>
+
+<h2 id="storemodelobserve">StoreModel#observe</h2>
+
+<blockquote>
+  <p>observe(alt): {}</p>
+</blockquote>
+
+<p>A method you can implment in your stores, mostly useful when using plain objects to create a store. This method will receive the current alt instance and returns an object containing the methods/actions it’ll handle.</p>
 
           </div>
         </div>
