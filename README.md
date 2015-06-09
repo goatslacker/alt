@@ -35,7 +35,7 @@ import alt from './alt';
 
 class TodoActions {
   updateTodo(id, text) {
-    this.dispatch({ id, text });
+    return { id, text }
   }
 }
 
@@ -54,20 +54,48 @@ class TodoStore {
       updateTodo: TodoActions.updateTodo
     });
 
-    this.todos = {};
+    this.state = {
+      todos: []
+    };
   }
 
-  updateTodo({ id, text }) {
-    const todos = this.todos;
-
-    todos[id] = todos[id] || {};
-    todos[id].text = text;
-
-    this.setState({ todos });
+  updateTodo(todo) {
+    this.setState({ todos: this.state.todos.concat(todo) });
   }
 }
 
 export default alt.createStore(TodoStore, 'TodoStore');
+```
+
+View
+
+```js
+import connectToStores from 'alt/utils/connectToStores';
+import { Component } from 'react';
+import TodoStore from './TodoStore';
+
+@connectToStores
+class TodoView extends Component {
+  static getStores() {
+    return [TodoStore];
+  }
+
+  static getPropsFromStores() {
+    return TodoStore.getState();
+  }
+
+  render() {
+    return (
+      <ul>
+        {this.props.todos.map((todo) => {
+          return (
+            <li key={todo.id}>{todo.text}</li>
+          );
+        })}
+      </ul>
+    );
+  }
+}
 ```
 
 ## In the Wild
@@ -80,6 +108,8 @@ export default alt.createStore(TodoStore, 'TodoStore');
 * [Example Tests](https://github.com/jdlehman/alt-example-tests)
 * [Github Example](https://github.com/RookieOne/react-alt-github-example)
 * [Isomorphic Alt](https://github.com/patrickkim/iso-alt)
+* [Jumar's Tindahan](https://github.com/srph/jumars-tindahan)
+* [Maple.js Webcomponents](https://github.com/Wildhoney/Maple.js/tree/master/example/app)
 * [React Router Example](https://github.com/lostpebble/alt-react-router-example)
 * [React Router Loopback](https://github.com/bkniffler/react-router-alt-loopback)
 * [React Webpack Rails Example](https://github.com/justin808/react-webpack-rails-tutorial)
@@ -87,8 +117,6 @@ export default alt.createStore(TodoStore, 'TodoStore');
 * [Shopping Cart](https://github.com/voronianski/flux-comparison/tree/master/alt)
 * [Todo](https://github.com/benstokoe/alt-todo)
 * [Typeahead](https://github.com/timtyrrell/alt-typeahead)
-* [Maple.js Webcomponents](https://github.com/Wildhoney/Maple.js/tree/master/example/app)
-* [Jumar's Tindahan](https://github.com/srph/jumars-tindahan)
 
 ### Boilerplates
 
@@ -117,18 +145,18 @@ There are also many [utils](/src/utils) available which interface well with alt:
 
 * [ActionListener](/src/utils/ActionListeners.js) lets you listen to individual actions without having to create a store.
 * [AltContainer](/components/AltContainer.js) a higher-order container component that is your swiss army knife for React.
+* [AltIso](/src/utils/AltIso.js) addon that uses [iso](https://github.com/goatslacker/iso) to render your application on both server and client.
 * [atomic](/src/utils/atomic.js) enables your stores for atomic transactions.
 * [connectToStores](/src/utils/connectToStores.js) a higher-order function that wraps your React components for store listening.
 * [decorators](/src/utils/decorators.js) a collection of useful ES7 decorators for working with alt.
 * [DispatchRecorder](/src/utils/DispatcherRecorder.js) lets you record all your dispatches and replay them back at a later time.
-* [ImmutableUtil](/src/utils/ImmutableUtil.js) makes working with immutable-js easy.
-* [IsomorphicRenderer](/src/utils/IsomorphicRenderer.js) a function that wraps your component to be isomorphic ready.
-* [TimeTravel](/src/utils/TimeTravel.js) enhances your stores so they are able to travel through different states in time.
 * [FinalStore](/src/utils/makeFinalStore.js) is a Store that you can listen to that only emits when all your other stores have received all their data.
+* [ImmutableUtil](/src/utils/ImmutableUtil.js) makes working with immutable-js easy.
+* [TimeTravel](/src/utils/TimeTravel.js) enhances your stores so they are able to travel through different states in time.
 
 ## Topical Guide
 
-Check out the [API Reference](http://alt.js.org/docs/) for full in-depth docs.  For a high-level walk-through, take a look at the [Getting Started](http://alt.js.org/guide/) guide.
+Check out the [API Reference](http://alt.js.org/docs/) for full in-depth docs. For a high-level walk-through on flux, take a look at the [Getting Started](http://alt.js.org/guide/) guide.
 
 First we install alt through npm. Although alt is also available through bower.
 
@@ -138,11 +166,11 @@ npm install alt
 
 The following topical guide covers on using alt as a singleton in a traditional flux way.
 
-We'll be referring back to this code a lot by using the `alt` variable declared.
+We'll be referring back to this code a lot by using the `alt` reference declared.
 
 ```js
-var Alt = require('alt')
-var alt = new Alt()
+const Alt = require('alt');
+const alt = new Alt();
 ```
 
 ### ES6
@@ -167,19 +195,29 @@ Actions are the way you update state. They're kind of a big deal.
 ```js
 class LocationActions {
   updateLocation(city) {
-    this.dispatch(city)
+    return city;
   }
 }
 
-var locationActions = alt.createActions(LocationActions)
+const locationActions = alt.createActions(LocationActions);
 ```
 
-Every action contains a `dispatch` method which is what sends your data to the dispatcher for dispatching to stores. The type signature for dispatch is `dispatch :: x -> undefined`.
+You return the data from your action that you wish to dispatch. If you want to run async in your actions then you simply return a function where the first argument is the dispatch:
+
+```js
+class LocationActions {
+  updateLocationThatDoesItAsync(city) {
+    return (dispatch) => {
+      setTimeout(() => dispatch(city));
+    };
+  }
+}
+```
 
 `alt.createActions` then returns an `Object` containing all the methods defined. You can then call your actions directly.
 
 ```js
-locationActions.updateLocation('Paris')
+locationActions.updateLocation('Paris');
 ```
 
 Writing out actions that pass data through directly can get quite tedious so there's a shorthand for writing these what are essentially `identity` functions
@@ -188,14 +226,14 @@ Writing out actions that pass data through directly can get quite tedious so the
 class LocationActions {
   constructor() {
     // for single action
-    this.generateActions('updateLocation')
+    this.generateActions('updateLocation');
 
     // as well as for many actions
-    this.generateActions('updateCity', 'updateCountry')
+    this.generateActions('updateCity', 'updateCountry');
   }
 }
 
-var locationActions = alt.createActions(LocationActions)
+const locationActions = alt.createActions(LocationActions);
 ```
 
 ```js
@@ -210,13 +248,13 @@ Remember, `dispatch` only takes one argument. Therefore, if you need to pass mul
 ```js
 class LocationActions {
   updateLocation(x, y) {
-    this.dispatch({ x, y })
+    return { x, y };
   }
 }
 
-var locationActions = alt.createActions(LocationActions)
+const locationActions = alt.createActions(LocationActions);
 
-locationActions.updateLocation('Miami', 'Florida')
+locationActions.updateLocation('Miami', 'Florida');
 ```
 
 A shorthand function created in the constructor will pass through the multiple parameters as an Array
@@ -224,19 +262,19 @@ A shorthand function created in the constructor will pass through the multiple p
 ```js
 class LocationActions {
   constructor() {
-    this.generateActions('updateLocation') // ['South Lake Tahoe, 'California']
+    this.generateActions('updateLocation'); // ['South Lake Tahoe, 'California']
   }
 }
 
-var locationActions = alt.createActions(LocationActions)
+const locationActions = alt.createActions(LocationActions);
 
-locationActions.updateLocation('South Lake Tahoe', 'California')
+locationActions.updateLocation('South Lake Tahoe', 'California');
 ```
 
 There's even a shorthand for the shorthand if all you're doing is generating a list of actions
 
 ```js
-var locationActions = alt.generateActions('updateLocation', 'updateCity', 'updateCountry')
+const locationActions = alt.generateActions('updateLocation', 'updateCity', 'updateCountry');
 ```
 
 ### Stores
@@ -250,28 +288,27 @@ You can either define your stores as a class/constructor-prototype or as an Obje
 ```js
 class LocationStore {
   constructor() {
-    this.bindAction(locationActions.updateLocation, this.onUpdateLocation)
+    this.bindAction(locationActions.updateLocation, this.onUpdateLocation);
 
-    this.city = 'Denver'
-    this.country = 'US'
+    this.state = {
+      city: 'Denver',
+      country: 'US'
+    };
   }
 
   onUpdateLocation(obj) {
-    var { city, country } = obj
-    this.city = city
-    this.country = country
+    const { city, country } = obj
+    this.setState({ city, country });
   }
 }
 
-var locationStore = alt.createStore(LocationStore)
+const locationStore = alt.createStore(LocationStore);
 ```
-
-If you're creating a store via the class/constructor method then all values assigned to `this` inside the store will accessible via `LocationStore.getState()`.
 
 You can also use a regular old JavaScript Object to create your stores. This is more about aesthetic preference.
 
 ```js
-var locationStore = alt.createStore({
+const locationStore = alt.createStore({
   displayName: 'LocationStore',
 
   bindListeners: {
@@ -283,35 +320,30 @@ var locationStore = alt.createStore({
     country: 'US'
   },
 
-  onUpdateLocation: function(obj) {
-    var { city, country } = obj
-    this.setState({
-      city: city,
-      country: country
-    })
+  onUpdateLocation(obj) {
+    const { city, country } = obj
+    this.setState({ city, country });
   }
-})
+});
 ```
 
-All store instances returned by `alt.createStore` will have the following methods:
+Store instances returned by `alt.createStore` can be listened to for updates by calling `listen`.
 
 `listen` is meant to be used by your View components in order to await changes made to each store. It returns a function you can use to un-listen to your store.
 
 ```js
 locationStore.listen((data) => {
   console.log(data)
-})
+});
 ```
 
 Alternatively, you can use the `unlisten` method. It takes in the same function you used for `listen` and unregisters it.
 
-`getState` will return a copy of the current store's state.
+Another important method is `getState`, which returns a copy of the current store's state.
 
 ```js
 locationStore.getState().city === 'Denver'
 ```
-
-The store exposes a `dispatchToken` that can be used with waitFor e.g. `locationStore.dispatchToken`. The store itself may be passed to `waitFor` as a shortcut.
 
 #### Important Note
 
@@ -328,50 +360,53 @@ class LocationStore {
   }
 
   myPublicMethod() {
-    var internalInstanceState = this.getState()
-    return internalInstanceState
+    const internalInstanceState = this.getState();
+    return internalInstanceState;
   }
 }
 
-var locationStore = alt.createStore(LocationStore)
+const locationStore = alt.createStore(LocationStore);
 
-locationStore.myPublicMethod()
+locationStore.myPublicMethod();
 ```
 
-Another less explicit alternative is to declare the method as `static`, which will cause alt to expose the method on the store:
+An alternative is to declare the method as `static`, which will cause alt to expose the method on the store:
 
 ```js
+// does the same thing as above except in a more magical way
 class LocationStore {
   static myPublicMethod() {
-    var internalInstanceState = this.getState()
-    return internalInstanceState
+    const internalInstanceState = this.getState();
+    return internalInstanceState;
   }
 }
 ```
 
 #### Canceling An Event
 
-If you don't want the store to inform the view of an action make sure to return false
-from the action handler methods, alt won't judge you.
+If you don't want the store to inform the view of an action you can call
+`this.preventDefault()` (or you can return false) from inside an action handler method.
 
 ```js
 class LocationStore {
   constructor() {
-    this.bindAction(locationActions.updateCity, this.onUpdateCity)
+    this.bindAction(locationActions.updateCity, this.onUpdateCity);
 
-    this.city = 'Portland'
-    this.country = 'US'
+    this.state = {
+      city: 'Portland',
+      country: 'US'
+    };
   }
 
   onUpdateCity(city) {
-    this.city = city
+    this.setState({ city });
 
     // ensure the view never finds out
-    return false
+    this.preventDefault();
   }
 }
 
-var locationStore = alt.createStore(LocationStore)
+const locationStore = alt.createStore(LocationStore);
 ```
 
 #### Constants
@@ -382,14 +417,16 @@ Feel free to use them to bind your actions or use the method itself, whatever re
 ```js
 class LocationStore {
   constructor() {
-    this.bindAction(locationActions.UPDATE_CITY, this.onUpdateCity)
+    this.bindAction(locationActions.UPDATE_CITY, this.onUpdateCity);
 
-    this.city = ''
-    this.country = ''
+    this.state = {
+      city: '',
+      country: ''
+    };
   }
 }
 
-var locationStore = alt.createStore(LocationStore)
+const locationStore = alt.createStore(LocationStore);
 ```
 
 #### Listening To Multiple Actions
@@ -397,11 +434,11 @@ var locationStore = alt.createStore(LocationStore)
 ```js
 class LocationActions {
   constructor() {
-    this.generateActions('updateCity', 'updateCountry')
+    this.generateActions('updateCity', 'updateCountry');
   }
 }
 
-var locationActions = alt.createActions(LocationActions)
+const locationActions = alt.createActions(LocationActions);
 ```
 
 Using the function `bindListeners` you're able to specify which action handlers belong to which actions this way you have ultimate control over what gets called and handled.
@@ -432,22 +469,24 @@ Alternatively, you can bind all the actions inside `locationActions` using the s
 ```js
 class LocationStore {
   constructor() {
-    this.bindActions(locationActions)
+    this.bindActions(locationActions);
 
-    this.city = 'Austin'
-    this.country = 'US'
+    this.state = {
+      city: 'Austin',
+      country: 'US'
+    };
   }
 
   onUpdateCity(city) {
-    this.city = city
+    this.setState({ city });
   }
 
   onUpdateCountry(country) {
-    this.country = country
+    this.setState({ country });
   }
 }
 
-var locationStore = alt.createStore(LocationStore)
+const locationStore = alt.createStore(LocationStore);
 ```
 
 Actions who have a `onCamelCasedAction` method or an `actionName` method available in the store will be bound. In this example `locationActions.updateCity` will be handled by `onUpdateCity`. There is no difference between calling the action handler `updateCity` or `onUpdateCity` it's just a matter of aesthetic preference.
@@ -461,27 +500,31 @@ Actions who have a `onCamelCasedAction` method or an `actionName` method availab
 You can use waitFor like so:
 
 ```js
-var dependingStore = alt.createStore(class DependingStore {
+const dependingStore = alt.createStore(class DependingStore {
   constructor() {
-    this.bindActions(someActions)
-    this.data = 42
+    this.bindActions(someActions);
+
+    this.state = { answer: 42 };
   }
 
-  onRandom(x) {
-    this.data = x
+  onRandom(answer) {
+    this.setState({ answer });
   }
 })
 
-var locationStore = alt.createStore(class LocationStore {
+const locationStore = alt.createStore(class LocationStore {
   constructor() {
     this.bindActions(someOtherActions)
 
-    this.syncedData = Date.now()
+    this.state = {
+      meaningOfLife: null
+    };
   }
 
   onThings() {
-    this.waitFor(dependingStore.dispatchToken)
-    this.syncedData = dependingStore.getState().data
+    this.waitFor(dependingStore.dispatchToken);
+
+    this.setState({ meaningOfLife: dependingStore.getState().answer });
   }
 })
 ```
@@ -495,71 +538,39 @@ Your choice of view isn't important to alt. What's important is to know how the 
 In this example I'll be using React, but you're free to use your library of choice.
 
 ```js
-var LocationComponent = React.createClass({
-  getInitialState() {
-    return locationStore.getState()
-  },
 
-  componentDidMount() {
-    locationStore.listen(this.onChange)
-  },
+class LocationView extends React.Component {
+  // these are methods that work with `connectToStores` which connects
+  // one or many stores to your component passing the state in as props.
+  // you're free to choose how the state from the store is passed into the
+  // component as props.
 
-  componentWillUnmount() {
-    locationStore.unlisten(this.onChange)
-  },
+  // this automatically does the listening/unlistening for you as well as
+  // handles the state changes
+  static getStores() {
+    return [locationStore];
+  }
 
-  onChange() {
-    this.setState(this.getInitialState())
-  },
+  static getPropsFromStores() {
+    return locationStore.getState();
+  }
 
   render() {
     return (
       <div>
         <p>
-          City {this.state.city}
+          City {this.props.city}
         </p>
         <p>
-          Country {this.state.country}
+          Country {this.props.country}
         </p>
       </div>
     )
   }
-})
-```
+}
 
-Alt provides a free `ListenerMixin` for React so you don't have to remember to unregister your listener. You can use said mixin like this:
-
-```js
-var ListenerMixin = require('alt/mixins/ListenerMixin')
-
-var LocationComponent = React.createClass({
-  mixins: [ListenerMixin],
-
-  getInitialState() {
-    return locationStore.getState()
-  },
-
-  componentDidMount() {
-    this.listenTo(locationStore, this.onChange)
-  },
-
-  onChange() {
-    this.setState(this.getInitialState())
-  },
-
-  render() {
-    return (
-      <div>
-        <p>
-          City {this.state.city}
-        </p>
-        <p>
-          Country {this.state.country}
-        </p>
-      </div>
-    )
-  }
-})
+// just make sure to wrap your component with connectToStores()
+export default connectToStores(LocationView);
 ```
 
 ### Full Circle
@@ -622,18 +633,6 @@ When bootstrapping, snapshotting, or recycling there are special methods you can
 class Store {
   constructor() {
     this.on('bootstrap', () => {
-      // do something here
-    })
-  }
-}
-```
-
-`serialize` is called before the store's state is serialized. Here you can perform any final tasks you need to before the state is saved.
-
-```js
-class Store {
-  constructor() {
-    this.on('serialize', () => {
       // do something here
     })
   }
@@ -736,26 +735,26 @@ If you're afraid of singletons, or if you want to skip synchronous actions or da
 ```js
 class Flux extends Alt {
   constructor() {
-    super()
+    super();
 
-    this.addActions('myActions', ActionCreators)
-    this.addStore('storeName', Store)
+    this.addActions('myActions', ActionCreators);
+    this.addStore('storeName', Store);
   }
 }
 
-var flux = new Flux()
+const flux = new Flux();
 
 // sample using react...
 React.render(
   <App flux={flux} />,
   document.body
-)
+);
 
 // retrieving stores
-flux.getStore('storeName').getState()
+flux.getStore('storeName').getState();
 
 // actions
-flux.getActions('myActions')
+flux.getActions('myActions');
 ```
 
 #### Picking back up on the client
@@ -785,23 +784,23 @@ all the actions are being called, with alt you get the same benefit without havi
 #### Before: Flux
 
 ```js
-var keyMirror = require('keymirror')
+var keyMirror = require('keymirror');
 
 var actionConstants = keyMirror({
   HANDLE_ACTION: null
-})
+});
 
 var action = {
   foo() {
     AppDispatcher.handleAction({ type: actionConstants.HANDLE_ACTION, data: 'foo' })
   }
-}
+};
 
 var AppDispatcher = Object.assign(new Dispatcher(), {
   handleAction(payload) {
-    this.dispatch(payload)
+    this.dispatch(payload);
   }
-})
+});
 ```
 
 #### After: Alt
@@ -809,11 +808,11 @@ var AppDispatcher = Object.assign(new Dispatcher(), {
 ```js
 class Action {
   handleAction() {
-    this.dispatch('foo')
+    return 'foo';
   }
 }
 
-var action = alt.createActions(Action)
+const action = alt.createActions(Action);
 ```
 
 ## TL;DR
