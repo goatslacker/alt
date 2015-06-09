@@ -225,24 +225,24 @@ import Immutable, {Map} from 'immutable';
 
 class MyStore {
   constructor() {
-
-    this.on('serialize', () => {
-      return {
-        data: this.data.toJS()
-      };
-    });
-
-    this.on('deserialize', (data) => {
-      return Immutable.fromJS({
-        prop1: data.prop1,
-        prop2: data.prop2
-      });
-    });
-
     this.data = new Map({
       prop1: 1,
       prop2: 2
     });
+  }
+
+  static config = {
+    onSerialize(state) {
+      return {
+        data: state.data.toJS()
+      }
+    },
+    onDeserialize(data) {
+      return Immutable.fromJS({
+        prop1: data.prop1,
+        prop2: data.prop2
+      });
+    }
   }
 }
 ```
