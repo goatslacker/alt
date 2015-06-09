@@ -327,6 +327,20 @@ const locationStore = alt.createStore({
 });
 ```
 
+If you're creating a store using a class/constructor then you also have the option of assigning your state values to your instance directly and then you're able to update them in place.
+
+```js
+function LocationStore() {
+  this.city = 'San Francisco';
+  this.country = 'US';
+}
+
+LocationStore.prototype.onUpdateLocation = function (obj) {
+  this.city = obj.city;
+  this.country = obj.country;
+};
+```
+
 Store instances returned by `alt.createStore` can be listened to for updates by calling `listen`.
 
 `listen` is meant to be used by your View components in order to await changes made to each store. It returns a function you can use to un-listen to your store.

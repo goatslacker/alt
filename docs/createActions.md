@@ -18,7 +18,7 @@ This is a function that takes in a class of actions and returns back an object w
 If all of your actions are just straight through dispatches you can shorthand generate them using this function.
 
 ```js
-var MyActions = alt.generateActions('foo', 'bar', 'baz');
+const MyActions = alt.generateActions('foo', 'bar', 'baz');
 ```
 
 Which could then be used like this:
@@ -47,7 +47,7 @@ Actions like these:
 
 ```js
 ActionsClass.prototype.myAction = function (data) {
-  this.dispatch(data);
+  return data;
 };
 ```
 
@@ -65,7 +65,13 @@ There is also a shorthand for this shorthand [available](generateActions.md) on 
 
 > (data: mixed): undefined
 
-This method is available inside every action. It is a method that is unique to every action which lets the dispatcher know where each dispatch is coming from.
+This method is available inside every action. It's a method you may call rather than returning from each dispatch. It is unique to every action and lets the dispatcher know where each dispatch is coming from.
+
+```js
+ActionsClass.prototype.myActionFail = function (data) {
+  this.dispatch(data);
+};
+```
 
 ## ActionsClass#actions
 

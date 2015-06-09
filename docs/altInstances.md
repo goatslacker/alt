@@ -21,7 +21,7 @@ class MyAlt extends Alt {
   }
 }
 
-var flux = new MyAlt();
+const flux = new MyAlt();
 ```
 
 You can set your entire app context by wrapping your root component with `withAltContext`.
@@ -84,5 +84,5 @@ class MyStore {
 Retrieves the store instance that was created.
 
 ```js
-var state = alt.getStore('myStore').getState();
+const state = alt.getStore('myStore').getState();
 ```

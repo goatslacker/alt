@@ -58,3 +58,11 @@ myActions.updateName;
 ```
 
 This allows flexibility giving you choice between using the constant form or the method form.
+
+## action.id
+
+Is the unique id given to the action, you can use this id to identify which dispatch is what.
+
+## action.data
+
+Some meta data about the action including which action group it belongs to, the name of the action, and the id.

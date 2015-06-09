@@ -14,8 +14,8 @@ Welcome to alt API docs page. These pages contain the reference material for the
 Creating a new instance of alt.
 
 ```js
-var Alt = require('alt');
-var alt = new Alt();
+const Alt = require('alt');
+const alt = new Alt();
 ```
 
 ## AltClass#constructor
@@ -25,7 +25,7 @@ var alt = new Alt();
 The alt constructor takes an optional configuration object. This is where you can configure your alt instance.
 
 ```js
-var alt = new Alt({
+const alt = new Alt({
   dispatcher: new MyDispatcher()
 });
 ```
@@ -80,5 +80,5 @@ class Flux extends Alt {
   }
 }
 
-var flux = new Flux();
+const flux = new Flux();
 ```

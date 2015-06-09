@@ -178,7 +178,7 @@ class MyStore {
 ```js
 class MyStore {
   handleFoo() {
-    this.foo = 0;
+    this.state = { foo: 0 };
 
     setTimeout(() => {
       // set foo to 1 and emit a change.
@@ -188,7 +188,7 @@ class MyStore {
     }, 100);
 
     // supress emitting a change.
-    return false;
+    this.preventDefault();
   }
 }
 ```
@@ -233,15 +233,14 @@ This method retrieves the store instance which contains any of the public method
 
 ```js
 class MyStore {
+  constructor() {
+    this.exportPublicMethods({
+      accessToPublicMethod: () => 2
+    });
+  }
+
   handleFoo() {
-
-    setTimeout(() => {
-      // emit change later via the store instance.
-      this.getInstance().emitChange();
-    }, 100);
-
-    // supress emitting a change.
-    return false;
+    this.getInstance().accessToPublicMethod();
   }
 }
 ```
@@ -260,7 +259,7 @@ class MyStore {
     }, 100);
 
     // supress emitting a change.
-    return false;
+    this.preventDefault();
   }
 }
 ```
@@ -282,7 +281,7 @@ This is a reference to the alt instance. It can be used for getting other stores
 ```js
 class MyStore {
   constructor() {
-    var actions = this.alt.getActions('MyActions');
+    const actions = this.alt.getActions('MyActions');
   }
 }
 ```
@@ -305,7 +304,7 @@ Another method you can implement in your store. This method receives all dispatc
 
 ## StoreModel#preventDefault
 
-Rather than returning false to suppress a change event from your store you may call this method and the change event will not happen.
+You may call this method in order to suppress a change event from being pushed. Alternatively, you can just return `false` from your action handler in your store.
 
 ## StoreModel#observe
 

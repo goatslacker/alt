@@ -249,8 +249,12 @@ If you don't like the way `AltContainer` passing the props, you can give it a `t
 
 ```js
 <AltContainer
-  stores={{ BlogStore }}
-  actions={{ BlogActions }}
+  stores={
+    { BlogStore }
+  }
+  actions={
+    { BlogActions }
+  }
   transform={({ BlogStore, BlogActions }) => {
     var posts = BlogStore.posts.slice(0, 42);
     var makePost =

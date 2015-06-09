@@ -50,7 +50,7 @@ You then tie this to a store using the `registerAsync` function in the construct
 ```js
 class SearchStore {
   constructor() {
-    this.value = '';
+    this.state = { value: '' };
 
     this.registerAsync(SearchSource);
   }
@@ -132,7 +132,7 @@ import { datasource } from 'alt/utils/decorators';
 @datasource(SearchSource);
 class SearchStore {
   constructor() {
-    this.value = '';
+    this.state = { value: '' };
   }
 }
 ```
