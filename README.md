@@ -744,7 +744,15 @@ Once you've completed loading the stores with data you call `flush()` which take
 
 #### Flux Instances
 
-If you're afraid of singletons, or if you want to skip synchronous actions or data loading you may want to create separate instances of flux for every server request. Taking this approach means you're making the trade-off of injecting the flux instance into your application in order to retrieve the stores and use the actions. This approach is similar to how [fluxible](https://github.com/yahoo/fluxible) solves isomorphic applications. Creating a new alt instances is fairly simple.
+Creating separate instances of flux rather than relying on singletons can help when building isomorphic applications.
+
+The problem with singletons is that you need to manage them by clearing out all their state and reloading them with new state on every request because requests happen concurrently. This isn't a problem if you already have your data and just need to load it into flux, or if you don't want to share your data fetching logic with the client -- in which case you can just load all your data at once on the server and render once that is all complete.
+
+Singletons only become a problem if you wish to share data fetching with client and server, don't want to use something like [Render](/src/utils/Render) to define your data fetching at the component level, or if you have a really complex data fetching scheme where some fetches depend on the result of other ones. In these cases creating separate instances (or copies) keeps flux sandboxed to each request so other async requests won't mutate the state in the stores.
+
+Taking this approach means you're making the trade-off of injecting the flux instance into your application in order to retrieve the stores and use the actions. This approach is similar to how [fluxible](https://github.com/yahoo/fluxible) solves isomorphic applications.
+
+Creating a new alt instances is fairly simple.
 
 ```js
 class Flux extends Alt {
@@ -757,13 +765,23 @@ class Flux extends Alt {
 }
 
 const flux = new Flux();
+```
 
-// sample using react...
+```js
+// client.js
+
 React.render(
   <App flux={flux} />,
   document.body
 );
+```
 
+```js
+// server.js
+React.renderToString(<App flux={flux} />);
+```
+
+```js
 // retrieving stores
 flux.getStore('storeName').getState();
 
