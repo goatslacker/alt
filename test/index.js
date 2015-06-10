@@ -1369,6 +1369,26 @@ const tests = {
       alt.prepare({}, { x: 0 })
     }, ReferenceError)
   },
+
+  'async dispatches'(done) {
+    const AsyncAction = alt.createActions({
+      displayName: 'AsyncAction',
+      fire(x) {
+        return (dispatch) => {
+          dispatch(x)
+        }
+      }
+    })
+
+    const token = alt.dispatcher.register((payload) => {
+      assert(payload.action === 'AsyncAction.fire')
+      assert(payload.data === 2)
+      alt.dispatcher.unregister(token)
+      done()
+    })
+
+    AsyncAction.fire(2)
+  },
 }
 
 export default tests
