@@ -111,6 +111,14 @@ function renderWithStrategy(strategy) {
   }
 }
 
+export function prepare(Component, props) {
+  const buffer = new DispatchBuffer(x => x)
+  const Container = usingDispatchBuffer(buffer, Component)
+  const Element = React.createElement(Container, props)
+  React.renderToStaticMarkup(Element)
+  return buffer.flush(Element)
+}
+
 export function toDOM(Component, props, documentNode) {
   const buffer = new DispatchBuffer()
   buffer.locked = true
