@@ -174,8 +174,8 @@
 
 <p><code>stores/FavoritesStore.js</code></p>
 
-<pre><code class="language-js">var alt = require('../alt');
-var LocationActions = require('../actions/LocationActions');
+<pre><code class="language-js">import alt from '../alt';
+import LocationActions from '../actions/LocationActions';
 
 class FavoritesStore {
   constructor() {
@@ -191,7 +191,7 @@ class FavoritesStore {
   }
 }
 
-module.exports = alt.createStore(FavoritesStore, 'FavoritesStore');
+export default alt.createStore(FavoritesStore, 'FavoritesStore');
 </code></pre>
 
 <p>And finally lets set the waitFor dependency in our LocationStore. But first, make sure you bind the new action to a new action handler in the store.</p>

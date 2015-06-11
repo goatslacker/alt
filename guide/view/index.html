@@ -186,8 +186,8 @@
 
 <p><code>components/Locations.jsx</code></p>
 
-<pre><code class="language-js">var React = require('react');
-var LocationStore = require('../stores/LocationStore');
+<pre><code class="language-js">import React from 'react';
+import LocationStore from '../stores/LocationStore';
 
 var Locations = React.createClass({
   getInitialState() {
@@ -219,7 +219,7 @@ var Locations = React.createClass({
   }
 });
 
-module.exports = Locations;
+export default Locations;
 </code></pre>
 
 <p><a href="/guide/async">Continue to next step…</a></p>
