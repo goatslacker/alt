@@ -118,6 +118,7 @@ class TodoView extends Component {
 * [Shopping Cart](https://github.com/voronianski/flux-comparison/tree/master/alt)
 * [Todo](https://github.com/benstokoe/alt-todo)
 * [Typeahead](https://github.com/timtyrrell/alt-typeahead)
+* [Isomorphic React Examples](https://github.com/goatslacker/isomorphic-react-examples)
 
 ### Boilerplates
 
