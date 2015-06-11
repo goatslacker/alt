@@ -167,7 +167,7 @@
 
 <p><code>actions/LocationActions.js</code></p>
 
-<pre><code class="language-js">var alt = require('../alt');
+<pre><code class="language-js">import alt from '../alt';
 
 class LocationActions {
   updateLocations(locations) {
@@ -175,7 +175,7 @@ class LocationActions {
   }
 }
 
-module.exports = alt.createActions(LocationActions);
+export default alt.createActions(LocationActions);
 </code></pre>
 
 <p><a href="/guide/store">Continue to next step…</a></p>
