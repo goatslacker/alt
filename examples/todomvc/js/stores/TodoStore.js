@@ -37,7 +37,9 @@ var todoStore = alt.createStore(class TodoStore {
   }
 
   onUpdateText(x) {
-    var { id, text } = x
+    var id = x.id,
+        text = x.text
+
     text = text ? text.trim() : ''
     if (text === '') {
       return false
