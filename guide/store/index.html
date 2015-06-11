@@ -195,8 +195,8 @@ Stores automatically emit a change event when an action is dispatched through th
 
 <p><code>stores/LocationStore.js</code></p>
 
-<pre><code class="language-js">var alt = require('../alt');
-var LocationActions = require('../actions/LocationActions');
+<pre><code class="language-js">import alt from '../alt';
+import LocationActions from '../actions/LocationActions';
 
 class LocationStore {
   constructor() {
@@ -212,7 +212,7 @@ class LocationStore {
   }
 }
 
-module.exports = alt.createStore(LocationStore, 'LocationStore');
+export default alt.createStore(LocationStore, 'LocationStore');
 </code></pre>
 
 <p><a href="/guide/view">Continue to next step…</a></p>
