@@ -1,6 +1,6 @@
 {
   "version": "v4",
-  "repo": "https://github.com/goatslacker/alt.git",
+  "repo": "borisyankov/DefinitelyTyped",
   "ref": "master",
   "path": "typings",
   "bundle": "typings/tsd.d.ts",

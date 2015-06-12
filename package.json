@@ -33,7 +33,8 @@
     "object-assign": "^2.0.0",
     "react": "^0.13.3",
     "rimraf": "^2.3.2",
-    "sinon": "^1.14.0"
+    "sinon": "^1.14.0",
+    "tsd": "^0.6.1"
   },
   "repository": {
     "type": "git",
@@ -45,6 +46,7 @@
   ],
   "license": "MIT",
   "scripts": {
+    "postinstall": "tsd reinstall -o -s",
     "build": "npm run clean && npm run transpile && npm run build-alt-browser && npm run build-alt-browser-with-addons",
     "build-alt": "babel src/alt --out-dir lib",
     "build-alt-browser": "browserify src/alt -t [envify --NODE_ENV production ] -t babelify --outfile dist/alt.js --standalone Alt",
