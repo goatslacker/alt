@@ -83,7 +83,9 @@ Render.toString(App, props).then(obj => console.log(obj.html))
 
 ### Added
 
+* You may now return from actions directly in order to dispatch, no need to call `this.dispatch`.
 * connectToStores can now be used where you specify the methods at the callsite. [commit](https://github.com/goatslacker/alt/commit/a117e30)
+* statics addon lets you add your static methods to components that have been connected. [commit](https://github.com/goatslacker/alt/commit/537ec26)
 
 ## 0.16.10
 
