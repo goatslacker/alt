@@ -132,18 +132,19 @@ export default {
 
     'ES6 class component responds to store events'() {
       class ClassComponent extends React.Component {
-        static getStores() {
-          return [testStore]
-        }
-        static getPropsFromStores(props) {
-          return testStore.getState()
-        }
         render() {
           return <span foo={this.props.foo} />
         }
       }
 
-      const WrappedComponent = connectToStores(ClassComponent)
+      const WrappedComponent = connectToStores({
+        getStores() {
+          return [testStore]
+        },
+        getPropsFromStores(props) {
+          return testStore.getState()
+        }
+      }, ClassComponent)
 
       const node = TestUtils.renderIntoDocument(
         <WrappedComponent />
@@ -159,25 +160,27 @@ export default {
     'componentDidConnect hook is called '() {
       let componentDidConnect = false
       class ClassComponent extends React.Component {
-        static getStores() {
-          return [testStore]
-        }
-        static getPropsFromStores(props) {
-          return testStore.getState()
-        }
-        static componentDidConnect() {
-          componentDidConnect = true
-        }
         render() {
           return <span foo={this.props.foo} />
         }
       }
-      const WrappedComponent = connectToStores(ClassComponent)
+      const WrappedComponent = connectToStores({
+        getStores() {
+          return [testStore]
+        },
+        getPropsFromStores(props) {
+          return testStore.getState()
+        },
+        componentDidConnect() {
+          componentDidConnect = true
+        }
+      }, ClassComponent)
       const node = TestUtils.renderIntoDocument(
         <WrappedComponent />
       )
       assert(componentDidConnect === true)
     },
+
     'Component receives all updates'(done) {
       let componentDidConnect = false
       class ClassComponent extends React.Component {

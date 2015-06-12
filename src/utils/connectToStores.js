@@ -46,28 +46,27 @@
 import React from 'react'
 import { assign, isFunction } from './functions'
 
-function connectToStores(Component) {
+function connectToStores(Spec, Component = Spec) {
   // Check for required static methods.
-  if (!isFunction(Component.getStores)) {
+  if (!isFunction(Spec.getStores)) {
     throw new Error('connectToStores() expects the wrapped component to have a static getStores() method')
   }
-  if (!isFunction(Component.getPropsFromStores)) {
+  if (!isFunction(Spec.getPropsFromStores)) {
     throw new Error('connectToStores() expects the wrapped component to have a static getPropsFromStores() method')
   }
 
-  // Wrapper Component.
   const StoreConnection = React.createClass({
     getInitialState() {
-      return Component.getPropsFromStores(this.props, this.context)
+      return Spec.getPropsFromStores(this.props, this.context)
     },
 
     componentDidMount() {
-      const stores = Component.getStores(this.props, this.context)
+      const stores = Spec.getStores(this.props, this.context)
       this.storeListeners = stores.map((store) => {
         return store.listen(this.onChange)
       })
-      if (Component.componentDidConnect) {
-        Component.componentDidConnect(this.props, this.context)
+      if (Spec.componentDidConnect) {
+        Spec.componentDidConnect(this.props, this.context)
       }
     },
 
@@ -76,7 +75,7 @@ function connectToStores(Component) {
     },
 
     onChange() {
-      this.setState(Component.getPropsFromStores(this.props, this.context))
+      this.setState(Spec.getPropsFromStores(this.props, this.context))
     },
 
     render() {
