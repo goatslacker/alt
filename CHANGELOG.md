@@ -69,6 +69,22 @@ class MyStore {
 
 The old behavior of assigning state directly as instance properties will continue to be supported. However, this new behavior will be favored in the docs.
 
+* Render.toString/toStaticMarkup now return an object rather than a string of html.
+
+  **Upgrade Guide**
+
+```js
+// old
+Render.toString(App, props).then(markup => console.log(markup))
+
+// new
+Render.toString(App, props).then(obj => console.log(obj.html))
+```
+
+### Added
+
+* connectToStores can now be used where you specify the methods at the callsite. [commit](https://github.com/goatslacker/alt/commit/a117e30)
+
 ## 0.16.10
 
 ### Added
