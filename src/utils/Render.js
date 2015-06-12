@@ -35,6 +35,10 @@ export function withData(fetch, MaybeComponent) {
   return MaybeComponent ? bind(MaybeComponent) : Component => bind(Component)
 }
 
+function call(f) {
+  if (typeof f === 'function') f()
+}
+
 function usingDispatchBuffer(buffer, Component) {
   return React.createClass({
     childContextTypes: {
@@ -75,17 +79,22 @@ class DispatchBuffer {
       // fire off all the actions synchronously
       data.forEach((f) => {
         if (Array.isArray(f)) {
-          f.forEach(x => x())
+          f.forEach(call)
         } else {
-          f()
+          call(f)
         }
       })
       this.locked = true
 
-      return this.renderStrategy(Element)
-    }).catch(() => {
-      // if there's an error still render the markup with what we've got.
-      return this.renderStrategy(Element)
+      return {
+        html: this.renderStrategy(Element),
+        element: Element
+      }
+    }).catch((err) => {
+      return {
+        err,
+        element: Element
+      }
     })
   }
 }
@@ -109,14 +118,6 @@ function renderWithStrategy(strategy) {
     // state and returning the markup
     return buffer.flush(Element)
   }
-}
-
-export function prepare(Component, props) {
-  const buffer = new DispatchBuffer(x => x)
-  const Container = usingDispatchBuffer(buffer, Component)
-  const Element = React.createElement(Container, props)
-  React.renderToStaticMarkup(Element)
-  return buffer.flush(Element)
 }
 
 export function toDOM(Component, props, documentNode) {

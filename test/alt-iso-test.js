@@ -134,17 +134,17 @@ export default {
 
       setTimeout(() => {
         Promise.all(promises).then((values) => {
-          assert.match(values[0], /AAAAAA/)
-          assert.match(values[0], /111111/)
+          assert.match(values[0].html, /AAAAAA/)
+          assert.match(values[0].html, /111111/)
 
-          assert.match(values[1], /BBBBBB/)
-          assert.match(values[1], /222222/)
+          assert.match(values[1].html, /BBBBBB/)
+          assert.match(values[1].html, /222222/)
 
-          assert.match(values[2], /CCCCCC/)
-          assert.match(values[2], /333333/)
+          assert.match(values[2].html, /CCCCCC/)
+          assert.match(values[2].html, /333333/)
 
-          assert.match(values[3], /DDDDDD/)
-          assert.match(values[3], /444444/)
+          assert.match(values[3].html, /DDDDDD/)
+          assert.match(values[3].html, /444444/)
 
           done()
         })
@@ -170,8 +170,8 @@ export default {
         }
       })
 
-      AltIso.render(alt, User, { id: 0, name: 'ZZZZZZ' }).then((markup) => {
-        assert.match(markup, /ZZZZZZ/)
+      AltIso.render(alt, User, { id: 0, name: 'ZZZZZZ' }).then((obj) => {
+        assert.match(obj.html, /ZZZZZZ/)
         done()
       })
     },
@@ -185,8 +185,8 @@ export default {
         }
       })
 
-      AltIso.render(alt, User, { id: 0, name: '√∆' }).then((markup) => {
-        assert.match(markup, /JUST TESTING/)
+      AltIso.render(alt, User, { id: 0, name: '√∆' }).then((obj) => {
+        assert.match(obj.html, /JUST TESTING/)
         done()
       })
     },

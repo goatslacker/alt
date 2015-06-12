@@ -9,8 +9,15 @@ export default {
     alt.recycle()
 
     if (typeof window === 'undefined') {
-      return Render.toString(Component, props).then((markup) => {
-        return Iso.render(markup, alt.takeSnapshot())
+      return Render.toString(Component, props).then((obj) => {
+        return {
+          html: Iso.render(obj.html, alt.takeSnapshot())
+        }
+      }).catch((err) => {
+        return {
+          err,
+          html: Iso.render()
+        }
       })
     } else {
       return Promise.resolve(

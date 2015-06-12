@@ -1,9 +1,13 @@
 import { jsdom } from 'jsdom'
-import React from 'react'
+import React, { Component } from 'react'
 import Alt from '../'
 import AltContainer from '../AltContainer'
 import AltIso from '../utils/AltIso'
+import * as Render from '../utils/Render'
+import connectToStores from '../utils/connectToStores'
 import { assert } from 'chai'
+
+const { TestUtils } = React.addons
 
 const alt = new Alt()
 
@@ -123,9 +127,9 @@ class App extends React.Component {
 export default {
   'AltIso browser': {
     'browser requests'(done) {
-      AltIso.render(alt, App, { id: 0, name: 'Z' }).then((markup) => {
+      AltIso.render(alt, App, { id: 0, name: 'Z' }).then((obj) => {
         global.document = jsdom(
-          `<!doctype html><html><body>${markup}</body></html>`
+          `<!doctype html><html><body>${obj.html}</body></html>`
         )
         global.window = global.document.parentWindow
         global.navigator = global.window.navigator
@@ -142,6 +146,70 @@ export default {
 
         done()
       })
+    },
+
+    'works with connectToStores'(done) {
+      global.document = jsdom('<!doctype html><html><body></body></html>')
+      global.window = global.document.parentWindow
+      global.navigator = global.window.navigator
+
+      const alt = new Alt()
+
+      const actions = alt.generateActions('success', 'fail')
+
+      const DataSource = {
+        bananas: {
+          remote() {
+            console.log('called!')
+            return Promise.resolve(2222222)
+          },
+
+          success: actions.success,
+          error: actions.fail,
+        }
+      }
+
+      const Store = alt.createStore(function () {
+        this.id = 0
+        this.registerAsync(DataSource)
+
+        this.bindAction(actions.success, id => this.id = id)
+        this.bindAction(actions.fail, err => console.log('STORE FETCH ERROR HANDLER', err))
+      }, 'Store')
+
+      const App = Render.withData((props) => {
+        return Store.bananas()
+      }, connectToStores(class extends Component {
+        static getStores() {
+          return [Store]
+        }
+
+        static getPropsFromStores() {
+          return Store.getState()
+        }
+
+        render() {
+          return <div>{this.props.id}</div>
+        }
+      }))
+
+      Render.toString(App)
+        .then((obj) => {
+          assert.ok(React.isValidElement(obj.element))
+          assert.isString(obj.html)
+          assert.match(obj.html, /2222222/)
+
+          const node = TestUtils.renderIntoDocument(obj.element)
+
+          assert.match(node.getDOMNode().innerHTML, /2222222/)
+
+          delete global.document
+          delete global.window
+          delete global.navigator
+
+          done()
+        })
+        .catch(obj => console.log('@', obj.err.stack))
     },
   },
 }
