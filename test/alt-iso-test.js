@@ -177,15 +177,17 @@ export default {
     },
 
     'errors still render the request'() {
+      const err = new Error('oops')
       const User = AltIso.define((props) => {
-        return Promise.reject(new Error('oops'))
+        return Promise.reject(err)
       }, class extends React.Component {
         render() {
           return <span>JUST TESTING</span>
         }
       })
 
-      AltIso.render(alt, User, { id: 0, name: '√∆' }).then((obj) => {
+      AltIso.render(alt, User, { id: 0, name: '√∆' }).catch((obj) => {
+        assert(obj.err === err)
         assert.match(obj.html, /JUST TESTING/)
         done()
       })

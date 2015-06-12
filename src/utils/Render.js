@@ -91,10 +91,10 @@ class DispatchBuffer {
         element: Element
       }
     }).catch((err) => {
-      return {
+      return Promise.reject({
         err,
         element: Element
-      }
+      })
     })
   }
 }
