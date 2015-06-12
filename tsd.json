@@ -1,0 +1,15 @@
+{
+  "version": "v4",
+  "repo": "https://github.com/goatslacker/alt.git",
+  "ref": "master",
+  "path": "typings",
+  "bundle": "typings/tsd.d.ts",
+  "installed": {
+    "flux/flux.d.ts": {
+      "commit": "066819c65ff561ca109955e0b725c253e243f0a2"
+    },
+    "eventemitter3/eventemitter3.d.ts": {
+      "commit": "066819c65ff561ca109955e0b725c253e243f0a2"
+    }
+  }
+}

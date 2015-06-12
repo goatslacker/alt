@@ -4,6 +4,7 @@ node_modules
 npm-debug.log
 test/browser/tests.js
 lib
+typings
 utils/*
 flux.js
 flux-build.js
