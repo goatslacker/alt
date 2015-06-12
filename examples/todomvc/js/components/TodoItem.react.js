@@ -88,7 +88,10 @@ var TodoItem = React.createClass({
    * @param  {string} text
    */
   _onSave: function(text) {
-    TodoActions.updateText(this.props.todo.id, text);
+    TodoActions.updateText({
+      id: this.props.todo.id,
+      text: text
+    });
     this.setState({isEditing: false});
   },
 
