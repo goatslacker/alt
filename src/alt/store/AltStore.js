@@ -49,13 +49,14 @@ class AltStore {
 
       const actionHandler = model.actionListeners[payload.action] ||
         model.otherwise
+      const shouldEmitChange = this.StoreModel.config.shouldEmitChange
 
       if (actionHandler) {
         const result = handleDispatch(() => {
           return actionHandler.call(model, payload.data, payload.action)
         }, payload)
 
-        if (result !== false && !this.preventDefault) this.emitChange()
+        if (result !== false && !this.preventDefault && shouldEmitChange) this.emitChange()
       }
 
       if (model.reduce) {
@@ -63,7 +64,7 @@ class AltStore {
           model.setState(model.reduce(this.state, payload))
         }, payload)
 
-        if (!this.preventDefault) this.emitChange()
+        if (!this.preventDefault && shouldEmitChange) this.emitChange()
       }
 
       this.lifecycle('afterEach', {

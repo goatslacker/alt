@@ -31,6 +31,12 @@ Available configuration options:
 
 `getState` receives the current state and returns a copy of it. You can override this function to provide your own implementation.
 
+#### shouldEmitChange
+
+> shouldEmitChange: boolean
+
+`shouldEmitChange` determines whether `emitChange` should be called automatically after action listeners finish executing. This is set to true by default.
+
 #### onSerialize
 
 `onSerialize` is also called before the store's state is serialized. You may optionally return an object, which will be used directly as the snapshot data for the store. If you do not return anything, the default, [`MyStore#getState()`](stores.md#storegetstate) is used for the snapshot data. See the [serialization](serialization.md) for an example.

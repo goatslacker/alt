@@ -527,7 +527,7 @@ var AltStore = (function () {
           return actionHandler.call(model, payload.data, payload.action);
         }, payload);
 
-        if (result !== false && !_this.preventDefault) _this.emitChange();
+        if (result !== false && !_this.preventDefault && _this.StoreModel.config.shouldEmitChange) _this.emitChange();
       }
 
       if (model.reduce) {
@@ -535,7 +535,7 @@ var AltStore = (function () {
           model.setState(model.reduce(_this.state, payload));
         }, payload);
 
-        if (!_this.preventDefault) _this.emitChange();
+        if (!_this.preventDefault && _this.StoreModel.config.shouldEmitChange) _this.emitChange();
       }
 
       _this.lifecycle('afterEach', {
@@ -659,7 +659,7 @@ var StoreMixin = {
               action(intercept(x, action, args));
               if (isError) throw x;
             };
-            return _this.alt.buffer ? function () {
+            return typeof window === 'undefined' ? function () {
               return fire();
             } : fire();
           };
@@ -670,7 +670,7 @@ var StoreMixin = {
           loadCounter += 1;
           /* istanbul ignore else */
           if (spec.loading) spec.loading(intercept(null, spec.loading, args));
-          return spec.remote.apply(spec, [state].concat(args)).then(makeActionHandler(spec.success), makeActionHandler(spec.error, 1));
+          return spec.remote.apply(spec, [state].concat(args))['catch'](makeActionHandler(spec.error, 1)).then(makeActionHandler(spec.success));
         } else {
           // otherwise emit the change now
           _this.emitChange();
@@ -857,7 +857,8 @@ function createStoreConfig(globalConfig, StoreModel) {
     getState: function getState(state) {
       return fn.assign({}, state);
     },
-    setState: fn.assign
+    setState: fn.assign,
+    shouldEmitChange: true
   }, globalConfig, StoreModel.config);
 }
 
@@ -1172,7 +1173,6 @@ var Alt = (function () {
     this.actions = { global: {} };
     this.stores = {};
     this.storeTransforms = config.storeTransforms || [];
-    this.buffer = false;
     this._actionsRegistry = {};
     this._initSnapshot = {};
     this._lastSnapshot = {};
