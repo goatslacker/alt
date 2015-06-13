@@ -5,6 +5,10 @@
 
 /// <reference path="../typings/tsd.d.ts"/>
 
+/**
+* TODO: More interfaces may need to be in a public namespace
+*
+*/
 declare module AltJS {
   export interface StoreModel<S> {
     bindActions( ...actions:Array<Object>);
@@ -24,7 +28,7 @@ declare module "alt" {
 
   import {Dispatcher} from "flux";
 
-  type StateTransform = (store:StoreModel<any>) => AltStore<any>;
+  type StateTransform = (store:StoreModel<any>) => AltJS.AltStore<any>;
 
   interface AltConfig {
     dispatcher?:Dispatcher<any>;
@@ -40,17 +44,12 @@ declare module "alt" {
     bootstrap(data:string);
     takeSnapshot( ...storeNames:Array<string>):string;
     flush():Object;
-    recycle( ...store:Array<AltStore<any>>);
+    recycle( ...store:Array<AltJS.AltStore<any>>);
     rollback();
     dispatch(action:Action<any>, data:Object, details:any);
     addActions(actionsName:string, actions:ActionsClass);
     addStore(name:string, store:StoreModel<any>, saveStore?:boolean);
-    /**
-    * TODO: Actions and stores need a generic construct to pass the names of the
-    * Members to the generated class
-    * basics have been implemented but I'm sure we could make this more typesafe
-    */
-    getStore(name:string):AltStore<any>;
+    getStore(name:string):AltJS.AltStore<any>;
     getActions(actionsName:string):Actions;
     createAction<T>(name:string, implementation:ActionsClass):Action<T>;
     createAction<T>(name:string, implementation:ActionsClass, ...args:Array<any>):Action<T>;
@@ -75,14 +74,6 @@ declare module "alt" {
 
   type ActionsClassConstructor = new (alt:Alt) => ActionsClass;
 
-  class AltStore<S> {
-    getState():S;
-    listen(handler:(state:S) => any):() => void;
-    unlisten(handler:(state:S) => any):void;
-    emitChange():void;
-    getEventEmitter():EventEmitter3.EventEmitter;
-  }
-
   enum lifeCycleEvents {
     bootstrap,
     snapshot,
@@ -104,7 +95,7 @@ declare module "alt" {
     bindListeners?(config:{string: Action<any> | Actions});
     waitFor?(dispatcherSource:any):void;
     exportPublicMethods?(exportConfig:ExportConfig):void;
-    getInstance?():AltStore<S>;
+    getInstance?():AltJS.AltStore<S>;
     emitChange?():void;
     dispatcher?:Dispatcher<any>;
     alt?:Alt;
