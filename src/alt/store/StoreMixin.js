@@ -56,7 +56,7 @@ const StoreMixin = {
               action(intercept(x, action, args))
               if (isError) throw x
             }
-            return typeof window === 'undefined' ? (() => fire()) : fire()
+            return this.alt.buffer ? (() => fire()) : fire()
           }
         }
 

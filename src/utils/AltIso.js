@@ -9,6 +9,7 @@ export default {
     alt.recycle()
 
     if (typeof window === 'undefined') {
+      alt.buffer = true
       return Render.toString(Component, props).then((obj) => {
         return {
           html: Iso.render(obj.html, alt.takeSnapshot())

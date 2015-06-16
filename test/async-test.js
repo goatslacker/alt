@@ -281,10 +281,11 @@ export default {
       assert.isFunction(store.isLoading)
     },
 
-    'server rendering'(done) {
+    'server rendering does not happen unless you lock alt'(done) {
       delete global.window
 
       const actions = alt.generateActions('test')
+      alt.buffer = true
 
       const PojoSource = {
         justTesting: {
@@ -316,6 +317,7 @@ export default {
         assert.ok(spy.calledOnce, 'the dispatcher was flushed')
 
         alt.dispatcher.unregister(dispatchToken)
+        alt.buffer = false
         done()
       })
     },
