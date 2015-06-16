@@ -120,9 +120,9 @@ function renderWithStrategy(strategy) {
   }
 }
 
-export function toDOM(Component, props, documentNode) {
+export function toDOM(Component, props, documentNode, shouldLock) {
   const buffer = new DispatchBuffer()
-  buffer.locked = true
+  buffer.locked = !!shouldLock
   const Node = usingDispatchBuffer(buffer, Component)
   const Element = React.createElement(Node, props)
   buffer.clear()

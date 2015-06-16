@@ -12,9 +12,10 @@ export default {
       alt.buffer = true
       return Render.toString(Component, props).then((obj) => {
         return {
-          html: Iso.render(obj.html, alt.takeSnapshot())
+          html: Iso.render(obj.html, alt.takeSnapshot(), { iso: 1 })
         }
       }).catch((err) => {
+        // return the empty markup in html when there's an error
         return {
           err,
           html: Iso.render()
@@ -22,9 +23,9 @@ export default {
       })
     } else {
       return Promise.resolve(
-        Iso.bootstrap((state, _, node) => {
+        Iso.bootstrap((state, meta, node) => {
           alt.bootstrap(state)
-          Render.toDOM(Component, props, node)
+          Render.toDOM(Component, props, node, meta.iso)
         })
       )
     }
