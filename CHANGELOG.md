@@ -81,6 +81,22 @@ Render.toString(App, props).then(markup => console.log(markup))
 Render.toString(App, props).then(obj => console.log(obj.html))
 ```
 
+* Render.toDOM no longer locks by default.
+
+  **Upgrade Guide**
+
+  - Render.toDOM used to "lock" meaning it wouldn't perform the fetches on the client when it rendered.
+  - Now this is configurable and off by default in case you want to use Render to render client side only.
+
+```js
+// old
+Render.toDOM(App, props, document.getElementById('react-root'))
+
+// new
+// the `true` is to not fetch client side.
+Render.toDOM(App, props, document.getElementById('react-root'), true)
+```
+
 ### Added
 
 * You may now return from actions directly in order to dispatch, no need to call `this.dispatch`.
