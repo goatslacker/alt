@@ -5,8 +5,12 @@
     "es6": true
   },
   "ecmaFeatures": {
-    "modules": true
+    "modules": true,
+    "jsx": true
   },
+  "plugins": [
+    "react"
+  ],
   "rules": {
     /* airbnb javascript style guide rules */
     "strict": [2, "never"],
@@ -171,6 +175,9 @@
         "nonwords": false
       }
     ],
-    "wrap-regex": [2, "never"]
+    "wrap-regex": [2, "never"],
+
+    /* react rules */
+    "react/jsx-uses-vars": 1
   }
 }
