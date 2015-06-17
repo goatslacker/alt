@@ -5,14 +5,27 @@
 
 /// <reference path="../typings/tsd.d.ts"/>
 
-/**
-* TODO: More interfaces may need to be in a public namespace
-*
-*/
+
 declare module AltJS {
+
   export interface StoreModel<S> {
-    bindActions( ...actions:Array<Object>);
-    getState():S;
+    bindActions?( ...actions:Array<Object>);
+    exportPublicMethods?<M>(exportConfig:M):void;
+    getState?():S;
+    exportAsync?(source:Source);
+    waitFor?(store:AltStore<any>):void;
+  }
+
+  export type Source = {[name:string]:() => SourceModel};
+
+  export interface SourceModel {
+    local( ...args:Array<any>);
+    remote( ...args:Array<any>);
+    shouldFetch?(state:Object, ...args:Array<any>);
+    loading: ( ...args:Array<any>) => void;
+    success:( ...args:Array<any>) => void;
+    error:( ...args:Array<any>) => void;
+    interceptResponse?(response:Object, action:AltJS.Action<any>, ...args:Array<any>);
   }
 
   export interface AltStore<S> {
@@ -22,6 +35,46 @@ declare module AltJS {
     emitChange():void;
     getEventEmitter():EventEmitter3.EventEmitter;
   }
+
+  export enum lifeCycleEvents {
+    bootstrap,
+    snapshot,
+    init,
+    rollback,
+    error
+  }
+
+  export type Actions = {[action:string]:Action<any>};
+
+  export interface Action<T> {
+    (T);
+    defer(data:any):void;
+  }
+
+  export interface ActionsClass {
+    generateActions?( ...action:Array<string>);
+    dispatch( ...payload:Array<any>);
+    actions?:Actions;
+  }
+}
+
+declare module "alt/utils/chromeDebug" {
+	function chromeDebug(alt:any):void;
+	export = chromeDebug;
+}
+
+declare module "alt/AltContainer" {
+
+  import * as React from "react";
+
+  interface ContainerProps {
+    store:AltJS.AltStore<any>
+  }
+
+  class AltContainer extends React.Component<ContainerProps, any> {
+  }
+  
+  export = AltContainer;
 }
 
 declare module "alt" {
@@ -40,59 +93,43 @@ declare module "alt" {
 
   class Alt {
     constructor(config?:AltConfig);
-    actions:Actions;
+    actions:AltJS.Actions;
     bootstrap(data:string);
     takeSnapshot( ...storeNames:Array<string>):string;
     flush():Object;
     recycle( ...store:Array<AltJS.AltStore<any>>);
     rollback();
-    dispatch(action:Action<any>, data:Object, details:any);
-    addActions(actionsName:string, actions:ActionsClass);
+    dispatch(action?:AltJS.Action<any>, data?:Object, details?:any);
+    addActions(actionsName:string, actions:AltJS.ActionsClass);
     addStore(name:string, store:StoreModel<any>, saveStore?:boolean);
     getStore(name:string):AltJS.AltStore<any>;
-    getActions(actionsName:string):Actions;
-    createAction<T>(name:string, implementation:ActionsClass):Action<T>;
-    createAction<T>(name:string, implementation:ActionsClass, ...args:Array<any>):Action<T>;
+    getActions(actionsName:string):AltJS.Actions;
+    createAction<T>(name:string, implementation:AltJS.ActionsClass):AltJS.Action<T>;
+    createAction<T>(name:string, implementation:AltJS.ActionsClass, ...args:Array<any>):AltJS.Action<T>;
     createActions<T>(ActionsClass: ActionsClassConstructor, exportObj?: Object):T;
     createActions<T>(ActionsClass: ActionsClassConstructor, exportObj?: Object, ...constructorArgs:Array<any>):T;
     generateActions<T>( ...action:Array<string>):T;
-    createStore<S>(store:StoreModel<S>):AltJS.AltStore<S>;
+    createStore<S>(store:StoreModel<S>, name?:string):AltJS.AltStore<S>;
   }
 
-  type Actions = {[action:string]:Action<any>};
-
-  interface Action<T> {
-    (T);
-    defer(data:any):void;
-  }
-
-  class ActionsClass {
-    generateActions( ...action:Array<string>);
-    dispatch(action:Action<any>, data:Object, details:any);
-    actions:Actions;
-  }
-
-  type ActionsClassConstructor = new (alt:Alt) => ActionsClass;
-
-  enum lifeCycleEvents {
-    bootstrap,
-    snapshot,
-    init,
-    rollback,
-    error
-  }
+  type ActionsClassConstructor = new (alt:Alt) => AltJS.ActionsClass;
 
   type ActionHandler = ( ...data:Array<any>) => any;
   type ExportConfig = {[key:string]:( ...args:Array<any>) => any};
 
-  interface StoreModel<S> {
+  interface StoreReduce {
+    action:any;
+    data: any;
+  }
+
+  interface StoreModel<S> extends AltJS.StoreModel<S> {
     setState?(currentState:Object, nextState:Object):Object;
-    getState?(currentState:Object):any;
+    getState?():S;
     onSerialize?(data:any):void;
     onDeserialize?(data:any):void;
-    on?(event:lifeCycleEvents, callback:() => any):void;
-    bindActions?(action:Action<any>, method:ActionHandler):void;
-    bindListeners?(config:{string: Action<any> | Actions});
+    on?(event:AltJS.lifeCycleEvents, callback:() => any):void;
+    bindActions?(action:AltJS.Action<any>, method:ActionHandler):void;
+    bindListeners?(config:{string: AltJS.Action<any> | AltJS.Actions});
     waitFor?(dispatcherSource:any):void;
     exportPublicMethods?(exportConfig:ExportConfig):void;
     getInstance?():AltJS.AltStore<S>;
@@ -100,29 +137,17 @@ declare module "alt" {
     dispatcher?:Dispatcher<any>;
     alt?:Alt;
     displayName?:string;
-    otherwise?(data:any, action:Action<any>);
-    reduce?(state:any, {action:any, data:any}):Object;
+    otherwise?(data:any, action:AltJS.Action<any>);
+    reduce?(state:any, config:StoreReduce):Object;
     preventDefault?();
     observe?(alt:Alt):any;
-    registerAsync?(datasource:DataSource);
+    registerAsync?(datasource:AltJS.Source);
     beforeEach?(payload:Object, state:Object);
     afterEach?(payload:Object, state:Object);
     unlisten?();
   }
 
   type StoreModelConstructor = (alt:Alt) => StoreModel<any>;
-
-  interface DataSourceMethod {
-    local(state:Object, ...args:Array<any>);
-    remote(state:Object, ...args:Array<any>);
-    shouldFetch(state:Object, ...args:Array<any>);
-    loading:Action<any>;
-    success:Action<any>;
-    error:Action<any>;
-    interceptResponse?(response:Object, action:Action<any>, ...args:Array<any>);
-  }
-
-  type DataSource = {[key:string]:DataSourceMethod};
 
   interface AltFactory {
     new(config?:AltConfig):Alt;
