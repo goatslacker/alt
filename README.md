@@ -119,6 +119,7 @@ class TodoView extends Component {
 * [Todo](https://github.com/benstokoe/alt-todo)
 * [Typeahead](https://github.com/timtyrrell/alt-typeahead)
 * [Isomorphic React Examples](https://github.com/goatslacker/isomorphic-react-examples)
+* [Typescript Project](https://github.com/Shearerbeard/alt-typescript-tutorial)
 
 ### Boilerplates
 
@@ -161,6 +162,14 @@ There are also many [utils](/src/utils) available which interface well with alt:
 Check out the [API Reference](http://alt.js.org/docs/) for full in-depth docs. For a high-level walk-through on flux, take a look at the [Getting Started](http://alt.js.org/guide/) guide.
 
 First we install alt through npm. Although alt is also available through bower.
+
+##Typescript Definitions
+You can import the typescript definitions easily with [TSD](https://github.com/DefinitelyTyped/tsd). Install alt with node or bower then run tsd link. This command will automatically grab the definitions and link them to your tsd.d.ts file and your tsd.json.
+
+Using Typescript 1.5 you can import with the legacy syntax:
+```
+import Alt = require("alt");
+```
 
 ```sh
 npm install alt
