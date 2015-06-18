@@ -3,9 +3,6 @@ coverage
 node_modules
 npm-debug.log
 test/browser/tests.js
-typings
-!typings/references.d.ts
-!typings/flux/flux-global.d.ts
 lib
 utils/*
 flux.js

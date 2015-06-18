@@ -6,10 +6,7 @@
     "Josh Perez <josh@goatslacker.com>"
   ],
   "description": "Alt is a flux implementation that is small (~4.3kb & 400 LOC), well tested, terse, insanely flexible, and forward thinking.",
-  "main": "dist/alt.js",
-  "typescript": {
-    "definition": "dist/alt.d.ts"
-  },
+  "main": "dist/alt.js", 
   "devDependencies": {
     "babel": "^4.0.1",
     "coveralls": "^2.11.2",

@@ -2,10 +2,7 @@
   "name": "alt",
   "version": "0.16.10",
   "description": "A flux implementation",
-  "main": "lib",
-  "typescript": {
-    "definition": "dist/alt.d.ts"
-  },
+  "main": "lib", 
   "dependencies": {
     "flux": "2.0.3",
     "transmitter": "1.0.2"
