@@ -3,8 +3,7 @@
 // Definitions by: Michael Shearer <https://github.com/Shearerbeard>
 // Definitions: https://github.com/borisyankov/DefinitelyTyped
 
-/// <reference path="../typings/tsd.d.ts"/>
-
+/// <reference path="../typings/references.d.ts"/>
 
 declare module AltJS {
 
@@ -65,26 +64,23 @@ declare module "alt/utils/chromeDebug" {
 
 declare module "alt/AltContainer" {
 
-  import * as React from "react";
-
   interface ContainerProps {
     store:AltJS.AltStore<any>
   }
 
   class AltContainer extends React.Component<ContainerProps, any> {
   }
-  
+
   export = AltContainer;
 }
 
 declare module "alt" {
 
-  import {Dispatcher} from "flux";
 
   type StateTransform = (store:StoreModel<any>) => AltJS.AltStore<any>;
 
   interface AltConfig {
-    dispatcher?:Dispatcher<any>;
+    dispatcher?:Flux.Dispatcher<any>;
     serialize?:(data:Object) => string;
     deserialize?:(serialized:string) => Object;
     storeTransforms?:Array<StateTransform>;
@@ -134,7 +130,7 @@ declare module "alt" {
     exportPublicMethods?(exportConfig:ExportConfig):void;
     getInstance?():AltJS.AltStore<S>;
     emitChange?():void;
-    dispatcher?:Dispatcher<any>;
+    dispatcher?:Flux.Dispatcher<any>;
     alt?:Alt;
     displayName?:string;
     otherwise?(data:any, action:AltJS.Action<any>);

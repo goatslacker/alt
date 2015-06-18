@@ -4,14 +4,11 @@
   "ref": "master",
   "path": "typings",
   "bundle": "typings/tsd.d.ts",
-  "installed": {
-    "flux/flux.d.ts": {
-      "commit": "066819c65ff561ca109955e0b725c253e243f0a2"
-    },
+  "installed": {  
     "eventemitter3/eventemitter3.d.ts": {
       "commit": "066819c65ff561ca109955e0b725c253e243f0a2"
     },
-    "react/react.d.ts": {
+    "react/react-global.d.ts": {
       "commit": "faff1866df10486a4c50904236183edc62ca841e"
     }
   }
