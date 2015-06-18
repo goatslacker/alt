@@ -54,7 +54,7 @@ const StoreMixin = {
             const fire = () => {
               loadCounter -= 1
               action(intercept(x, action, args))
-              if (isError) throw x
+              if (isError && !spec.ignoreErrors) throw x
             }
             return this.alt.buffer ? (() => fire()) : fire()
           }
@@ -66,8 +66,8 @@ const StoreMixin = {
           /* istanbul ignore else */
           if (spec.loading) spec.loading(intercept(null, spec.loading, args))
           return spec.remote(state, ...args)
-            .catch(makeActionHandler(spec.error, 1))
             .then(makeActionHandler(spec.success))
+            .catch(makeActionHandler(spec.error, 1))
         } else {
           // otherwise emit the change now
           this.emitChange()
