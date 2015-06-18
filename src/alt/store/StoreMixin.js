@@ -54,7 +54,7 @@ const StoreMixin = {
             const fire = () => {
               loadCounter -= 1
               action(intercept(x, action, args))
-              if (isError) throw x
+              if (isError && !spec.ignoreErrors) throw x
             }
             return this.alt.buffer ? (() => fire()) : fire()
           }
