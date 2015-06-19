@@ -130,6 +130,27 @@ export default {
       assert.include(output, 'Foo: Bar')
     },
 
+    'createClass() keeps statics'() {
+      const StaticsComponent = React.createClass({
+        statics: {
+          getStores() {
+            return [testStore]
+          },
+          getPropsFromStores(props) {
+            return testStore.getState()
+          },
+          getFoo() {
+            return 'foo'
+          }
+        },
+        render() {
+          return null
+        }
+      })
+      const WrappedComponent = connectToStores(StaticsComponent)
+      assert(WrappedComponent.getFoo() === 'foo')
+    },
+
     'ES6 class component responds to store events'() {
       class ClassComponent extends React.Component {
         render() {
