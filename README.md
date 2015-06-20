@@ -163,8 +163,6 @@ Check out the [API Reference](http://alt.js.org/docs/) for full in-depth docs. F
 
 First we install alt through npm. Although alt is also available through bower.
 
-
-
 ```sh
 npm install alt
 ```
@@ -181,7 +179,7 @@ const alt = new Alt();
 ### ES6
 
 ##Typescript Definitions
-The typescript definitions for alt are located in the typings directory. This should be included in your project under typings/alt or whatever folder you use to manage your definitions files. You can import the dependencies react, flux, and eventemitter3 easily with [TSD](https://github.com/DefinitelyTyped/tsd). From here you can reference your typings as per usual with a reference tag ```<reference path="<path>.d.ts" />```. Check the [alt-typescript-tutorial](https://github.com/Shearerbeard/alt-typescript-tutorial) for more information and project examples.
+The typescript definitions for alt are located in the typings directory. This should be included in your project under typings/alt or whatever folder you use to manage your definitions files. You can import the dependencies react and flux, easily with [TSD](https://github.com/DefinitelyTyped/tsd). From here you can reference your typings as per usual with a reference tag ```<reference path="<path>.d.ts" />```. Check the [alt-typescript-tutorial](https://github.com/Shearerbeard/alt-typescript-tutorial) for more information and project examples.
 
 Using Typescript 1.5 you can import with the legacy syntax:
 ```
