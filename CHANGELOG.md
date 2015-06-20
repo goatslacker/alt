@@ -103,6 +103,10 @@ Render.toDOM(App, props, document.getElementById('react-root'), true)
 * connectToStores can now be used where you specify the methods at the callsite. [commit](https://github.com/goatslacker/alt/commit/a117e30)
 * statics addon lets you add your static methods to components that have been connected. [commit](https://github.com/goatslacker/alt/commit/537ec26)
 
+### Changed
+
+* Made the promise resolution to then(success, failure) so errors will be properly rejected. [commit](https://github.com/goatslacker/alt/commit/6f6bb05)
+
 ## 0.16.10
 
 ### Added
