@@ -48,7 +48,7 @@ export function createStoreConfig(globalConfig, StoreModel) {
       return fn.assign({}, state)
     },
     setState: fn.assign,
-    shouldEmitChange: true
+    shouldEmitChange: () => true
   }, globalConfig, StoreModel.config)
 }
 

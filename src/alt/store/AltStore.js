@@ -56,7 +56,9 @@ class AltStore {
           return actionHandler.call(model, payload.data, payload.action)
         }, payload)
 
-        if (result !== false && !this.preventDefault && shouldEmitChange) this.emitChange()
+        if (result !== false && !this.preventDefault && shouldEmitChange()) {
+          this.emitChange()
+        }
       }
 
       if (model.reduce) {
@@ -64,7 +66,9 @@ class AltStore {
           model.setState(model.reduce(this.state, payload))
         }, payload)
 
-        if (!this.preventDefault && shouldEmitChange) this.emitChange()
+        if (!this.preventDefault && shouldEmitChange()) {
+          this.emitChange()
+        }
       }
 
       this.lifecycle('afterEach', {
