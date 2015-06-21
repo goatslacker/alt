@@ -1,144 +1,237 @@
 import * as utils from '../utils/AltUtils'
 import * as fn from '../../utils/functions'
-import AltStore from './AltStore'
-import StoreMixin from './StoreMixin'
+// import * as StateFunctions from '../utils/StateFunctions'
+import transmitter from 'transmitter'
 
-function doSetState(store, storeInstance, state) {
-  if (!state) {
-    return
+class Store {
+  constructor(alt, config) {
+    this.config = fn.assign({
+      getState(state) {
+        return fn.assign({}, state)
+      },
+      setState: fn.assign
+    }, config)
+
+    this.displayName = this.config.displayName || this.displayName || this.name || ''
+    this.boundListeners = []
+    this.lifecycleEvents = {}
+    this.actionListeners = {}
+    this.handlesOwnErrors = false
+    this.preventDefault = false
+
+    this.alt = alt
+    this.dispatcher = alt.dispatcher
+    this.transmitter = transmitter()
+
+    this.lifecycle = (event, x) => {
+      if (this.lifecycleEvents[event]) this.lifecycleEvents[event].push(x)
+    }
+
+    const output = this.output || (x => x)
+    this.emitChange = () => this.transmitter.push(output(this.state))
+
+    const handleDispatch = (f, payload) => {
+      try {
+        return f()
+      } catch (e) {
+        if (this.handlesOwnErrors) {
+          this.lifecycle('error', {
+            error: e,
+            payload,
+            state: this.state
+          })
+          return false
+        } else {
+          throw e
+        }
+      }
+    }
+
+    // Register dispatcher
+    this.dispatchToken = alt.dispatcher.register((payload) => {
+      this.preventDefault = false
+
+      this.lifecycle('beforeEach', {
+        payload,
+        state: this.state
+      })
+
+      const actionHandler = this.actionListeners[payload.action] ||
+        this.otherwise
+
+      if (actionHandler) {
+        const result = handleDispatch(() => {
+          return actionHandler.call(this, payload.data, payload.action)
+        }, payload)
+
+        if (result !== false && !this.preventDefault) this.emitChange()
+      }
+
+      if (this.reduce) {
+        handleDispatch(() => {
+          this.setState(this.reduce(this.state, payload))
+        }, payload)
+
+        if (!this.preventDefault) this.emitChange()
+      }
+
+      this.lifecycle('afterEach', {
+        payload,
+        state: this.state
+      })
+    })
+
+//    this.lifecycle('init')
+
+    if (this.alt.stores[this.displayName] || !this.displayName) {
+      if (this.alt.stores[this.displayName]) {
+        utils.warn(
+          `A store named ${this.displayName} already exists, double check your store ` +
+          `names or pass in your own custom identifier for each store`
+        )
+      } else {
+        utils.warn('Store name was not specified')
+      }
+
+      this.displayName = utils.uid(this.alt.stores, this.displayName)
+    }
+
+    // XXX this needs to happen after this.state is set!
+//    StateFunctions.saveInitialSnapshot(this.state, this.displayName)
+
+    this.alt.stores[this.displayName] = this
   }
 
-  const { config } = storeInstance.StoreModel
+  bindAction(symbol, handler) {
+    if (!symbol) {
+      throw new ReferenceError('Invalid action reference passed in')
+    }
+    if (!fn.isFunction(handler)) {
+      throw new TypeError('bindAction expects a function')
+    }
 
-  const nextState = fn.isFunction(state)
-    ? state(storeInstance.state)
-    : state
+    if (handler.length > 1) {
+      throw new TypeError(
+        `Action handler in store ${this.displayName} for ` +
+        `${(symbol.id || symbol).toString()} was defined with ` +
+        `two parameters. Only a single parameter is passed through the ` +
+        `dispatcher, did you mean to pass in an Object instead?`
+      )
+    }
 
-  storeInstance.state = config.setState.call(
-    store,
-    storeInstance.state,
-    nextState
-  )
-
-  if (!store.alt.dispatcher.isDispatching()) {
-    store.emitChange()
+    // You can pass in the constant or the function itself
+    const key = symbol.id ? symbol.id : symbol
+    this.actionListeners[key] = handler.bind(this)
+    this.boundListeners.push(key)
   }
-}
 
-function createPrototype(proto, alt, key, extras) {
-  proto.boundListeners = []
-  proto.lifecycleEvents = {}
-  proto.actionListeners = {}
-  proto.publicMethods = {}
-  proto.handlesOwnErrors = false
+  bindActions(actions) {
+    fn.eachObject((action, symbol) => {
+      const matchFirstCharacter = /./
+      const assumedEventHandler = action.replace(matchFirstCharacter, (x) => {
+        return `on${x[0].toUpperCase()}`
+      })
+      let handler = null
 
-  return fn.assign(proto, StoreMixin, {
-    displayName: key,
-    alt: alt,
-    dispatcher: alt.dispatcher,
-    preventDefault() {
-      this.getInstance().preventDefault = true
+      if (this[action] && this[assumedEventHandler]) {
+        // If you have both action and onAction
+        throw new ReferenceError(
+          `You have multiple action handlers bound to an action: ` +
+          `${action} and ${assumedEventHandler}`
+        )
+      } else if (this[action]) {
+        // action
+        handler = this[action]
+      } else if (this[assumedEventHandler]) {
+        // onAction
+        handler = this[assumedEventHandler]
+      }
+
+      if (handler) {
+        this.bindAction(symbol, handler)
+      }
+    }, [actions])
+  }
+
+  bindListeners(obj) {
+    fn.eachObject((methodName, symbol) => {
+      const listener = this[methodName]
+
+      if (!listener) {
+        throw new ReferenceError(
+          `${methodName} defined but does not exist in ${this.displayName}`
+        )
+      }
+
+      if (Array.isArray(symbol)) {
+        symbol.forEach((action) => {
+          this.bindAction(action, listener)
+        })
+      } else {
+        this.bindAction(symbol, listener)
+      }
+    }, [obj])
+  }
+
+  waitFor(...sources) {
+    if (!sources.length) {
+      throw new ReferenceError('Dispatch tokens not provided')
     }
-  }, extras)
-}
 
-export function createStoreConfig(globalConfig, StoreModel) {
-  StoreModel.config = fn.assign({
-    getState(state) {
-      return fn.assign({}, state)
-    },
-    setState: fn.assign
-  }, globalConfig, StoreModel.config)
-}
-
-export function transformStore(transforms, StoreModel) {
-  return transforms.reduce((Store, transform) => transform(Store), StoreModel)
-}
-
-export function createStoreFromObject(alt, StoreModel, key) {
-  let storeInstance
-
-  const StoreProto = createPrototype({}, alt, key, fn.assign({
-    getInstance() {
-      return storeInstance
-    },
-    setState(nextState) {
-      doSetState(this, storeInstance, nextState)
+    let sourcesArray = sources
+    if (sources.length === 1) {
+      sourcesArray = Array.isArray(sources[0]) ? sources[0] : sources
     }
-  }, StoreModel))
 
-  // bind the store listeners
-  /* istanbul ignore else */
-  if (StoreProto.bindListeners) {
-    StoreMixin.bindListeners.call(
-      StoreProto,
-      StoreProto.bindListeners
+    const tokens = sourcesArray.map((source) => {
+      return source.dispatchToken || source
+    })
+
+    this.dispatcher.waitFor(tokens)
+  }
+
+  preventDefault() {
+    this.preventDefault = true
+  }
+
+  on(lifecycleEvent, handler) {
+    if (lifecycleEvent === 'error') this.handlesOwnErrors = true
+    const bus = this.lifecycleEvents[lifecycleEvent] || transmitter()
+    this.lifecycleEvents[lifecycleEvent] = bus
+    return bus.subscribe(handler.bind(this))
+  }
+
+  listen(cb) {
+    this.transmitter.subscribe(cb)
+    return () => this.unlisten(cb)
+  }
+
+  unlisten(cb) {
+    if (!cb) throw new TypeError('Unlisten must receive a function')
+    this.lifecycle('unlisten')
+    this.transmitter.unsubscribe(cb)
+  }
+
+  getState() {
+    return this.config.getState.call(this, this.state)
+  }
+
+  setState(state) {
+    // XXX you can do some clever batching here...
+    if (!state) return
+
+    const nextState = fn.isFunction(state)
+      ? state(this.state)
+      : state
+
+    this.state = this.config.setState.call(
+      this,
+      this.state,
+      nextState
     )
-  }
-  /* istanbul ignore else */
-  if (StoreProto.observe) {
-    StoreMixin.bindListeners.call(
-      StoreProto,
-      StoreProto.observe(alt)
-    )
-  }
 
-  // bind the lifecycle events
-  /* istanbul ignore else */
-  if (StoreProto.lifecycle) {
-    fn.eachObject((eventName, event) => {
-      StoreMixin.on.call(StoreProto, eventName, event)
-    }, [StoreProto.lifecycle])
+    if (!this.dispatcher.isDispatching()) this.emitChange()
   }
-
-  // create the instance and fn.assign the public methods to the instance
-  storeInstance = fn.assign(
-    new AltStore(alt, StoreProto, StoreProto.state || {}, StoreModel),
-    StoreProto.publicMethods,
-    { displayName: key }
-  )
-
-  return storeInstance
 }
 
-export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
-  let storeInstance
-  const { config } = StoreModel
-
-  // Creating a class here so we don't overload the provided store's
-  // prototype with the mixin behaviour and I'm extending from StoreModel
-  // so we can inherit any extensions from the provided store.
-  class Store extends StoreModel {
-    constructor(...args) {
-      super(...args)
-    }
-  }
-
-  createPrototype(Store.prototype, alt, key, {
-    getInstance() {
-      return storeInstance
-    },
-    setState(nextState) {
-      doSetState(this, storeInstance, nextState)
-    }
-  })
-
-  const store = new Store(...argsForClass)
-
-  if (config.bindListeners) store.bindListeners(config.bindListeners)
-  if (config.datasource) store.registerAsync(config.datasource)
-
-  storeInstance = fn.assign(
-    new AltStore(
-      alt,
-      store,
-      typeof store.state === 'object' ? store.state : null,
-      StoreModel
-    ),
-    utils.getInternalMethods(StoreModel),
-    config.publicMethods,
-    { displayName: key }
-  )
-
-  return storeInstance
-}
+export default Store
