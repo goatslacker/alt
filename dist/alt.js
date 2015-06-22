@@ -443,7 +443,7 @@ function makeAction(alt, namespace, name, implementation, obj) {
 
 module.exports = exports['default'];
 
-},{"../../utils/functions":12,"../utils/AltUtils":9}],6:[function(require,module,exports){
+},{"../../utils/functions":11,"../utils/AltUtils":9}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -577,7 +577,7 @@ var AltStore = (function () {
 exports['default'] = AltStore;
 module.exports = exports['default'];
 
-},{"../../utils/functions":12,"transmitter":4}],7:[function(require,module,exports){
+},{"../../utils/functions":11,"transmitter":4}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -659,7 +659,7 @@ var StoreMixin = {
               action(intercept(x, action, args));
               if (isError) throw x;
             };
-            return typeof window === 'undefined' ? function () {
+            return _this.alt.buffer ? function () {
               return fire();
             } : fire();
           };
@@ -670,7 +670,7 @@ var StoreMixin = {
           loadCounter += 1;
           /* istanbul ignore else */
           if (spec.loading) spec.loading(intercept(null, spec.loading, args));
-          return spec.remote.apply(spec, [state].concat(args))['catch'](makeActionHandler(spec.error, 1)).then(makeActionHandler(spec.success));
+          return spec.remote.apply(spec, [state].concat(args)).then(makeActionHandler(spec.success), makeActionHandler(spec.error, 1));
         } else {
           // otherwise emit the change now
           _this.emitChange();
@@ -780,7 +780,7 @@ var StoreMixin = {
 exports['default'] = StoreMixin;
 module.exports = exports['default'];
 
-},{"../../utils/functions":12,"transmitter":4}],8:[function(require,module,exports){
+},{"../../utils/functions":11,"transmitter":4}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -950,8 +950,7 @@ function createStoreFromClass(alt, StoreModel, key) {
   return storeInstance;
 }
 
-},{"../../utils/functions":12,"../utils/AltUtils":9,"./AltStore":6,"./StoreMixin":7}],9:[function(require,module,exports){
-/* istanbul ignore next */
+},{"../../utils/functions":11,"../utils/AltUtils":9,"./AltStore":6,"./StoreMixin":7}],9:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -962,6 +961,7 @@ exports.warn = warn;
 exports.uid = uid;
 exports.formatAsConstant = formatAsConstant;
 exports.dispatchIdentity = dispatchIdentity;
+/* istanbul ignore next */
 function NoopClass() {}
 
 var builtIns = Object.getOwnPropertyNames(NoopClass);
@@ -1080,7 +1080,40 @@ function filterSnapshots(instance, state, stores) {
   }, {});
 }
 
-},{"../../utils/functions":12}],11:[function(require,module,exports){
+},{"../../utils/functions":11}],11:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+exports.eachObject = eachObject;
+exports.assign = assign;
+var isFunction = function isFunction(x) {
+  return typeof x === 'function';
+};
+
+exports.isFunction = isFunction;
+
+function eachObject(f, o) {
+  o.forEach(function (from) {
+    Object.keys(Object(from)).forEach(function (key) {
+      f(key, from[key]);
+    });
+  });
+}
+
+function assign(target) {
+  for (var _len = arguments.length, source = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    source[_key - 1] = arguments[_key];
+  }
+
+  eachObject(function (key, value) {
+    return target[key] = value;
+  }, source);
+  return target;
+}
+
+},{}],12:[function(require,module,exports){
 /*global window*/
 'use strict';
 
@@ -1139,6 +1172,7 @@ var Alt = (function () {
     this.actions = { global: {} };
     this.stores = {};
     this.storeTransforms = config.storeTransforms || [];
+    this.buffer = false;
     this._actionsRegistry = {};
     this._initSnapshot = {};
     this._lastSnapshot = {};
@@ -1388,38 +1422,5 @@ var Alt = (function () {
 exports['default'] = Alt;
 module.exports = exports['default'];
 
-},{"../utils/functions":12,"./actions":5,"./store":8,"./utils/AltUtils":9,"./utils/StateFunctions":10,"flux":1}],12:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, '__esModule', {
-  value: true
-});
-exports.eachObject = eachObject;
-exports.assign = assign;
-var isFunction = function isFunction(x) {
-  return typeof x === 'function';
-};
-
-exports.isFunction = isFunction;
-
-function eachObject(f, o) {
-  o.forEach(function (from) {
-    Object.keys(Object(from)).forEach(function (key) {
-      f(key, from[key]);
-    });
-  });
-}
-
-function assign(target) {
-  for (var _len = arguments.length, source = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    source[_key - 1] = arguments[_key];
-  }
-
-  eachObject(function (key, value) {
-    return target[key] = value;
-  }, source);
-  return target;
-}
-
-},{}]},{},[11])(11)
+},{"../utils/functions":11,"./actions":5,"./store":8,"./utils/AltUtils":9,"./utils/StateFunctions":10,"flux":1}]},{},[12])(12)
 });
