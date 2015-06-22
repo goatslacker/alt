@@ -119,6 +119,7 @@ class TodoView extends Component {
 * [Todo](https://github.com/benstokoe/alt-todo)
 * [Typeahead](https://github.com/timtyrrell/alt-typeahead)
 * [Isomorphic React Examples](https://github.com/goatslacker/isomorphic-react-examples)
+* [Typescript Project](https://github.com/Shearerbeard/alt-typescript-tutorial)
 
 ### Boilerplates
 
@@ -176,6 +177,14 @@ const alt = new Alt();
 ```
 
 ### ES6
+
+##Typescript Definitions
+The typescript definitions for alt are located in the typings directory. This should be included in your project under typings/alt or whatever folder you use to manage your definitions files. You can import the dependencies react and flux, easily with [TSD](https://github.com/DefinitelyTyped/tsd). From here you can reference your typings as per usual with a reference tag ```<reference path="<path>.d.ts" />```. Check the [alt-typescript-tutorial](https://github.com/Shearerbeard/alt-typescript-tutorial) for more information and project examples.
+
+Using Typescript 1.5 you can import with the legacy syntax:
+```
+import Alt = require("alt");
+```
 
 Alt is written in, and encourages ES6. It is completely optional but it is pleasant to write.
 
