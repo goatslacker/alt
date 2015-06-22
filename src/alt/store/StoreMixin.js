@@ -49,12 +49,11 @@ const StoreMixin = {
           : value == null
         const intercept = spec.interceptResponse || (x => x)
 
-        const makeActionHandler = (action, isError) => {
+        const makeActionHandler = (action) => {
           return (x) => {
             const fire = () => {
               loadCounter -= 1
               action(intercept(x, action, args))
-              if (isError) throw x
             }
             return this.alt.buffer ? (() => fire()) : fire()
           }
@@ -67,7 +66,7 @@ const StoreMixin = {
           if (spec.loading) spec.loading(intercept(null, spec.loading, args))
           return spec.remote(state, ...args).then(
             makeActionHandler(spec.success),
-            makeActionHandler(spec.error, 1)
+            makeActionHandler(spec.error)
           )
         } else {
           // otherwise emit the change now
