@@ -42,6 +42,18 @@ class Alt {
     return makeAction(this, 'global', name, implementation, obj)
   }
 
+  registerStore(...args) {
+    return (TheStore) => {
+      const store = new TheStore(...args)
+      // meh
+      StateFunctions.saveInitialSnapshot(store.state, store.displayName)
+
+      // double meh
+      this.stores[store.displayName] = store
+      return store
+    }
+  }
+
   createActions(ActionsClass, exportObj = {}, ...argsForConstructor) {
     const actions = {}
     const key = utils.uid(

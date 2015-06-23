@@ -1,18 +1,22 @@
 import * as utils from '../utils/AltUtils'
 import * as fn from '../../utils/functions'
-// import * as StateFunctions from '../utils/StateFunctions'
 import transmitter from 'transmitter'
 
+
 class Store {
-  constructor(alt, config) {
-    this.config = fn.assign({
-      getState(state) {
-        return fn.assign({}, state)
-      },
-      setState: fn.assign
-    }, config)
+
+  constructor(alt) {
 
     this.displayName = this.config.displayName || this.displayName || this.name || ''
+
+    // XXX well then how do I make sure this gets set? Ideally as a static prop in the derived class
+//    this.config = fn.assign({
+//      getState(state) {
+//        return fn.assign({}, state)
+//      },
+//      setState: fn.assign
+//    }, config)
+
     this.boundListeners = []
     this.lifecycleEvents = {}
     this.actionListeners = {}
@@ -81,8 +85,6 @@ class Store {
       })
     })
 
-//    this.lifecycle('init')
-
     if (this.alt.stores[this.displayName] || !this.displayName) {
       if (this.alt.stores[this.displayName]) {
         utils.warn(
@@ -95,11 +97,6 @@ class Store {
 
       this.displayName = utils.uid(this.alt.stores, this.displayName)
     }
-
-    // XXX this needs to happen after this.state is set!
-//    StateFunctions.saveInitialSnapshot(this.state, this.displayName)
-
-    this.alt.stores[this.displayName] = this
   }
 
   bindAction(symbol, handler) {

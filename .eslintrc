@@ -120,7 +120,7 @@
       "no-wrap-func": 2,
       "no-underscore-dangle": 0,
       "one-var": [2, "never"],
-      "padded-blocks": [2, "never"],
+      "padded-blocks": [0],
       "semi-spacing": [2, {
         "before": false,
         "after": true
