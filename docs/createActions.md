@@ -7,9 +7,9 @@ permalink: /docs/createActions/
 
 # createActions
 
-> (ActionsClass: function, exportObj: ?object): [Actions](actions.md)
+> (ActionsClass: function, exportObj: ?object, ...constructorArgs): [Actions](actions.md)
 
-This is a function that takes in a class of actions and returns back an object with those actions defined. The second argument `exportObj` is optional and provides a way to export to a specific object. This is useful when you have circular dependencies you can either export to an app managed global or straight to `exports`.
+This is a function that takes in a class of actions and returns back an object with those actions defined. The second argument `exportObj` is optional and provides a way to export to a specific object. This is useful when you have circular dependencies you can either export to an app managed global or straight to `exports`. `constructorArgs` are passed to the `ActionClass` constructor.
 
 # generateActions
 
@@ -33,9 +33,9 @@ MyActions.baz();
 
 ## ActionsClass#constructor
 
-> (alt: Alt): ActionsClass
+> (...args): ActionsClass
 
-The constructor of your actions receives the alt instance as its first and only argument. Inside the constructor any instance properties you define will be available as actions.
+The constructor of your actions receives any constructor arguments passed through the [`createActions`](#createActions) function. Inside the constructor any instance properties you define will be available as actions.
 
 ## ActionsClass#generateActions
 

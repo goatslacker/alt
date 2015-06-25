@@ -7,9 +7,9 @@ permalink: /docs/createStore/
 
 # createStore
 
-> (StoreModel: function, iden: ?string, saveStore = true: boolean): [AltStore](stores.md)
+> (StoreModel: function, iden: ?string, saveStore = true: boolean, ...constructorArgs): [AltStore](stores.md)
 
-This is a function that takes in a class of your store and returns back the singleton store. The second parameter `iden` is a string that is used as a unique identifier for serializing/deserializing your store. The name of the store comes from the class name but on production due to heavy minification it is a good idea to provide your own name to avoid collisions. The third parameter `saveStore` is to tell alt whether to save a reference to the store for later when using [bootstrap](bootstrap.md) or [snapshots](takeSnapshot.md).
+This is a function that takes in a class of your store and returns back the singleton store. The second parameter `iden` is a string that is used as a unique identifier for serializing/deserializing your store. The name of the store comes from the class name but on production due to heavy minification it is a good idea to provide your own name to avoid collisions. The third parameter `saveStore` is to tell alt whether to save a reference to the store for later when using [bootstrap](bootstrap.md) or [snapshots](takeSnapshot.md). `constructorArgs` are passed to the `StoreModel` constructor (if `StoreModel` is a class).
 
 # StoreModel
 
@@ -64,9 +64,9 @@ class TodoStore {
 
 ## StoreModel#constructor
 
-> (alt: Alt): StoreModel
+> (...args): StoreModel
 
-The constructor of your store definition receieves the alt instance as its first and only argument. All instance variables, values assigned to `this`, in any part of the StoreModel will become part of state.
+The constructor of your store definition receives any constructor arguments passed through the [`createStore`](#createStore) function. All instance variables, values assigned to `this`, in any part of the StoreModel will become part of state.
 
 ## StoreModel#on
 
