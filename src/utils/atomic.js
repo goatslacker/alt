@@ -8,7 +8,7 @@ function makeAtomicClass(alt, StoreModel) {
       this.on('error', () => alt.rollback())
     }
   }
-  AtomicClass.displayName = StoreModel.displayName || StoreModel.name || 'AtomicClass'
+  AtomicClass.displayName = StoreModel.displayName || StoreModel.name
   return AtomicClass
 }
 

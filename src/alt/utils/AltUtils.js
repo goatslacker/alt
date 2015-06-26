@@ -1,6 +1,3 @@
-/* istanbul ignore next */
-function NoopClass() { }
-
 const builtIns = Object.getOwnPropertyNames(NoopClass)
 const builtInProto = Object.getOwnPropertyNames(NoopClass.prototype)
 
@@ -42,3 +39,6 @@ export function formatAsConstant(name) {
 export function dispatchIdentity(x, ...a) {
   this.dispatch(a.length ? [x].concat(a) : x)
 }
+
+/* istanbul ignore next */
+function NoopClass() { }
