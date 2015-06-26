@@ -89,7 +89,7 @@ This function is called first. If a value is returned then a change event will b
 
 This function is called whenever we need to fetch a value remotely. `remote` is only called if `local` returns null or undefined as its value, or if `shouldFetch` returns true.
 
-Any arguments passed to your public method will be passed through to both local and remote:
+Any arguments passed to your public method will be passed through to both local and remote, as well as to the loading, success, and error actions:
 
 ```js
 remote(state, one, two, three) {
@@ -98,15 +98,19 @@ remote(state, one, two, three) {
 SearchStore.performSearch(1, 2, 3);
 ```
 
-### success
+### success(resolveValue: any, ...args: any)
 ##### Required
 
 Must be an action. Called whenever a value resolves.
 
-### error
+Called with any arguments passed to the public method.
+
+### error(rejectValue: any, ...args: any)
 ##### Required
 
 Must be an action. Called whenever a value rejects.
+
+Called with any arguments passed to the public method.
 
 ### shouldFetch(state: object, ...args: any)
 _Optional_
@@ -124,10 +128,14 @@ interceptResponse(data, action, args) {
 }
 ```
 
-### loading
+### loading(value: any, ...args: any)
 _Optional_
 
 Must be an action. This function will be called immediately prior to the `remote` function. This call is a synchronous  and is not related to the `isLoading()` method of the store.
+
+Value will be null unless changed by interceptResponse.
+
+Called with any arguments passed to the public method.
 
 ## Decorator
 
