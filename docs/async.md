@@ -82,7 +82,7 @@ Each function must return an object. The object may optionally implement `local`
 ### local(state: object, ...args: any)
 _Optional_
 
-This function is called first. If a value is returned then a change event will be emitted from the store.
+This function is called first. If a value is returned then a change event will be emitted from the store. Omit this function to always fetch a value remotely;
 
 ### remote(state: object, ...args: any)
 ##### Required
@@ -111,7 +111,7 @@ Must be an action. Called whenever a value rejects.
 ### shouldFetch(state: object, ...args: any)
 _Optional_
 
-This function determines whether or not remote needs to be called, despite the value returned by `local`. If `shouldFetch` returns true, it will always get the data from `remote` and if it returns false, it will always use the value from `local`.
+This function determines whether or not remote needs to be called, despite the value returned by `local`. If `shouldFetch` returns true, it will always get the data from `remote` and if it returns false, it will always use the value from `local`. You can omit both `shouldFetch` and `local` if you wish to always fetch remotely.
 
 ### interceptResponse(response, action, args)
 _Optional_
@@ -127,7 +127,7 @@ interceptResponse(data, action, args) {
 ### loading
 _Optional_
 
-Must be an action. Called before `remote` is called. This is a synchronous call.
+Must be an action. This function will be called immediately prior to the `remote` function. This call is a synchronous  and is not related to the `isLoading()` method of the store.
 
 ## Decorator
 
