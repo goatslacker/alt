@@ -1,5 +1,7 @@
+/*eslint-disable*/
 const builtIns = Object.getOwnPropertyNames(NoopClass)
 const builtInProto = Object.getOwnPropertyNames(NoopClass.prototype)
+/*eslint-enable*/
 
 export function getInternalMethods(Obj, isProto) {
   const excluded = isProto ? builtInProto : builtIns
