@@ -80,7 +80,7 @@ class NumberStore {
   }
 
   failed(e) {
-    console.error(e)
+    console.error('Fail', e)
   }
 }
 
@@ -126,6 +126,12 @@ class App extends React.Component {
 
 export default {
   'AltIso browser': {
+    afterEach() {
+      delete global.document
+      delete global.window
+      delete global.navigator
+    },
+
     'browser requests'(done) {
       AltIso.render(alt, App, { id: 0, name: 'Z' }).then((obj) => {
         global.document = jsdom(
@@ -140,12 +146,8 @@ export default {
         assert(alt.stores.UserStore.getState().user.name === 'Z')
         assert.isUndefined(data)
 
-        delete global.document
-        delete global.window
-        delete global.navigator
-
         done()
-      })
+      }).catch(e => done(e))
     },
 
     'works with connectToStores'(done) {
@@ -160,7 +162,6 @@ export default {
       const DataSource = {
         bananas: {
           remote() {
-            console.log('called!')
             return Promise.resolve(2222222)
           },
 
@@ -193,23 +194,18 @@ export default {
         }
       }))
 
-      Render.toString(App)
+      Render.toString(alt, App)
         .then((obj) => {
-          assert.ok(React.isValidElement(obj.element))
           assert.isString(obj.html)
           assert.match(obj.html, /2222222/)
 
-          const node = TestUtils.renderIntoDocument(obj.element)
-
-          assert.match(node.getDOMNode().innerHTML, /2222222/)
-
-          delete global.document
-          delete global.window
-          delete global.navigator
+          // if you try to render this element you'll have to bootstrap the
+          // stores with the state yourself prior to rendering this element.
+          assert.ok(React.isValidElement(obj.element))
 
           done()
         })
-        .catch(obj => console.log('@', obj.err.stack))
+        .catch(e => done(e))
     },
   },
 }

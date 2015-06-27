@@ -137,17 +137,45 @@ export default {
           assert.match(values[0].html, /AAAAAA/)
           assert.match(values[0].html, /111111/)
 
+          assert.notMatch(values[0].html, /BBBBBB/)
+          assert.notMatch(values[0].html, /222222/)
+          assert.notMatch(values[0].html, /CCCCCC/)
+          assert.notMatch(values[0].html, /333333/)
+          assert.notMatch(values[0].html, /DDDDDD/)
+          assert.notMatch(values[0].html, /444444/)
+
           assert.match(values[1].html, /BBBBBB/)
           assert.match(values[1].html, /222222/)
+
+          assert.notMatch(values[1].html, /AAAAAA/)
+          assert.notMatch(values[1].html, /111111/)
+          assert.notMatch(values[1].html, /CCCCCC/)
+          assert.notMatch(values[1].html, /333333/)
+          assert.notMatch(values[1].html, /DDDDDD/)
+          assert.notMatch(values[1].html, /444444/)
 
           assert.match(values[2].html, /CCCCCC/)
           assert.match(values[2].html, /333333/)
 
+          assert.notMatch(values[2].html, /AAAAAA/)
+          assert.notMatch(values[2].html, /111111/)
+          assert.notMatch(values[2].html, /BBBBBB/)
+          assert.notMatch(values[2].html, /222222/)
+          assert.notMatch(values[2].html, /DDDDDD/)
+          assert.notMatch(values[2].html, /444444/)
+
           assert.match(values[3].html, /DDDDDD/)
           assert.match(values[3].html, /444444/)
 
+          assert.notMatch(values[3].html, /AAAAAA/)
+          assert.notMatch(values[3].html, /111111/)
+          assert.notMatch(values[3].html, /BBBBBB/)
+          assert.notMatch(values[3].html, /222222/)
+          assert.notMatch(values[3].html, /CCCCCC/)
+          assert.notMatch(values[3].html, /333333/)
+
           done()
-        })
+        }).catch(e => done(e))
       }, 50)
     },
 
@@ -173,7 +201,7 @@ export default {
       AltIso.render(alt, User, { id: 0, name: 'ZZZZZZ' }).then((obj) => {
         assert.match(obj.html, /ZZZZZZ/)
         done()
-      })
+      }).catch(e => done(e))
     },
 
     'errors still render the request'() {

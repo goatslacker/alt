@@ -74,7 +74,7 @@ class DispatchBuffer {
     this.promisesBuffer = []
   }
 
-  flush(Element) {
+  flush(alt, Element) {
     return Promise.all(this.promisesBuffer).then((data) => {
       // fire off all the actions synchronously
       data.forEach((f) => {
@@ -88,11 +88,13 @@ class DispatchBuffer {
 
       return {
         html: this.renderStrategy(Element),
+        state: alt.flush(),
         element: Element
       }
     }).catch((err) => {
       return Promise.reject({
         err,
+        state: alt.flush(),
         element: Element
       })
     })
@@ -101,7 +103,9 @@ class DispatchBuffer {
 
 
 function renderWithStrategy(strategy) {
-  return (Component, props) => {
+  return (alt, Component, props) => {
+    alt.buffer = true
+
     // create a buffer and use context to pass it through to the components
     const buffer = new DispatchBuffer((Node) => {
       return React[strategy](Node)
@@ -116,7 +120,7 @@ function renderWithStrategy(strategy) {
 
     // flush out the results in the buffer synchronously setting the store
     // state and returning the markup
-    return buffer.flush(Element)
+    return buffer.flush(alt, Element)
   }
 }
 
