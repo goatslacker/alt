@@ -80,7 +80,7 @@ class NumberStore {
   }
 
   failed(e) {
-    console.error(e)
+    console.error('Fail', e)
   }
 }
 
@@ -145,7 +145,7 @@ export default {
         delete global.navigator
 
         done()
-      })
+      }).catch(e => done(e))
     },
 
     'works with connectToStores'(done) {
@@ -160,7 +160,6 @@ export default {
       const DataSource = {
         bananas: {
           remote() {
-            console.log('called!')
             return Promise.resolve(2222222)
           },
 
@@ -193,15 +192,16 @@ export default {
         }
       }))
 
-      Render.toString(App)
+      Render.toString(alt, App)
         .then((obj) => {
-          assert.ok(React.isValidElement(obj.element))
           assert.isString(obj.html)
           assert.match(obj.html, /2222222/)
 
-          const node = TestUtils.renderIntoDocument(obj.element)
+          assert('broken' === 'yup')
 
-          assert.match(node.getDOMNode().innerHTML, /2222222/)
+          // if you try to render this element you'll have to bootstrap the
+          // stores with the state yourself prior to rendering this element.
+          assert.ok(React.isValidElement(obj.element))
 
           delete global.document
           delete global.window
@@ -209,7 +209,7 @@ export default {
 
           done()
         })
-        .catch(obj => console.log('@', obj.err.stack))
+        .catch(e => done(e))
     },
   },
 }

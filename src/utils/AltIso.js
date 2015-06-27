@@ -5,14 +5,10 @@ export default {
   define: Render.withData,
 
   render(alt, Component, props) {
-    // recycle state
-    alt.recycle()
-
     if (typeof window === 'undefined') {
-      alt.buffer = true
-      return Render.toString(Component, props).then((obj) => {
+      return Render.toString(alt, Component, props).then((obj) => {
         return {
-          html: Iso.render(obj.html, alt.takeSnapshot(), { iso: 1 })
+          html: Iso.render(obj.html, obj.state, { iso: 1 })
         }
       }).catch((err) => {
         // return the empty markup in html when there's an error
