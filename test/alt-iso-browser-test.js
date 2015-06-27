@@ -126,6 +126,12 @@ class App extends React.Component {
 
 export default {
   'AltIso browser': {
+    afterEach() {
+      delete global.document
+      delete global.window
+      delete global.navigator
+    },
+
     'browser requests'(done) {
       AltIso.render(alt, App, { id: 0, name: 'Z' }).then((obj) => {
         global.document = jsdom(
@@ -139,10 +145,6 @@ export default {
         assert(alt.stores.UserStore.getState().user.id === 0)
         assert(alt.stores.UserStore.getState().user.name === 'Z')
         assert.isUndefined(data)
-
-        delete global.document
-        delete global.window
-        delete global.navigator
 
         done()
       }).catch(e => done(e))
@@ -197,15 +199,9 @@ export default {
           assert.isString(obj.html)
           assert.match(obj.html, /2222222/)
 
-          assert('broken' === 'yup')
-
           // if you try to render this element you'll have to bootstrap the
           // stores with the state yourself prior to rendering this element.
           assert.ok(React.isValidElement(obj.element))
-
-          delete global.document
-          delete global.window
-          delete global.navigator
 
           done()
         })

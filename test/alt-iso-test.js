@@ -134,7 +134,6 @@ export default {
 
       setTimeout(() => {
         Promise.all(promises).then((values) => {
-          console.log('SERIOUSLY, why is this bleeding into this query?', values)
           assert.match(values[0].html, /AAAAAA/)
           assert.match(values[0].html, /111111/)
 

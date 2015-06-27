@@ -18,12 +18,11 @@ export default {
         }
       })
     } else {
-      return Promise.resolve(
-        Iso.bootstrap((state, meta, node) => {
-          alt.bootstrap(state)
-          Render.toDOM(Component, props, node, meta.iso)
-        })
-      )
+      Iso.bootstrap((state, meta, node) => {
+        alt.bootstrap(state)
+        Render.toDOM(Component, props, node, meta.iso)
+      })
+      return Promise.resolve()
     }
   }
 }
