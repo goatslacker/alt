@@ -776,7 +776,6 @@ var Alt = (function () {
     this.actions = { global: {} };
     this.stores = {};
     this.storeTransforms = config.storeTransforms || [];
-    this.buffer = false;
     this._actionsRegistry = {};
     this._initSnapshot = {};
     this._lastSnapshot = {};
@@ -1110,7 +1109,7 @@ var AltStore = (function () {
           return actionHandler.call(model, payload.data, payload.action);
         }, payload);
 
-        if (result !== false && !_this.preventDefault) _this.emitChange();
+        if (result !== false && !_this.preventDefault && _this.StoreModel.config.shouldEmitChange) _this.emitChange();
       }
 
       if (model.reduce) {
@@ -1118,7 +1117,7 @@ var AltStore = (function () {
           model.setState(model.reduce(_this.state, payload));
         }, payload);
 
-        if (!_this.preventDefault) _this.emitChange();
+        if (!_this.preventDefault && _this.StoreModel.config.shouldEmitChange) _this.emitChange();
       }
 
       _this.lifecycle('afterEach', {
@@ -1242,7 +1241,7 @@ var StoreMixin = {
               action(intercept(x, action, args));
               if (isError) throw x;
             };
-            return _this.alt.buffer ? function () {
+            return typeof window === 'undefined' ? function () {
               return fire();
             } : fire();
           };
@@ -1253,7 +1252,7 @@ var StoreMixin = {
           loadCounter += 1;
           /* istanbul ignore else */
           if (spec.loading) spec.loading(intercept(null, spec.loading, args));
-          return spec.remote.apply(spec, [state].concat(args)).then(makeActionHandler(spec.success), makeActionHandler(spec.error, 1));
+          return spec.remote.apply(spec, [state].concat(args))['catch'](makeActionHandler(spec.error, 1)).then(makeActionHandler(spec.success));
         } else {
           // otherwise emit the change now
           _this.emitChange();
@@ -1440,7 +1439,8 @@ function createStoreConfig(globalConfig, StoreModel) {
     getState: function getState(state) {
       return fn.assign({}, state);
     },
-    setState: fn.assign
+    setState: fn.assign,
+    shouldEmitChange: true
   }, globalConfig, StoreModel.config);
 }
 
@@ -2129,53 +2129,51 @@ var _react2 = _interopRequireDefault(_react);
 
 var _functions = require('./functions');
 
-function connectToStores(Spec) {
-  var Component = arguments[1] === undefined ? Spec : arguments[1];
-  return (function () {
-    // Check for required static methods.
-    if (!(0, _functions.isFunction)(Spec.getStores)) {
-      throw new Error('connectToStores() expects the wrapped component to have a static getStores() method');
-    }
-    if (!(0, _functions.isFunction)(Spec.getPropsFromStores)) {
-      throw new Error('connectToStores() expects the wrapped component to have a static getPropsFromStores() method');
-    }
+function connectToStores(Component) {
+  // Check for required static methods.
+  if (!(0, _functions.isFunction)(Component.getStores)) {
+    throw new Error('connectToStores() expects the wrapped component to have a static getStores() method');
+  }
+  if (!(0, _functions.isFunction)(Component.getPropsFromStores)) {
+    throw new Error('connectToStores() expects the wrapped component to have a static getPropsFromStores() method');
+  }
 
-    var StoreConnection = _react2['default'].createClass({
-      displayName: 'StoreConnection',
+  // Wrapper Component.
+  var StoreConnection = _react2['default'].createClass({
+    displayName: 'StoreConnection',
 
-      getInitialState: function getInitialState() {
-        return Spec.getPropsFromStores(this.props, this.context);
-      },
+    getInitialState: function getInitialState() {
+      return Component.getPropsFromStores(this.props, this.context);
+    },
 
-      componentDidMount: function componentDidMount() {
-        var _this = this;
+    componentDidMount: function componentDidMount() {
+      var _this = this;
 
-        var stores = Spec.getStores(this.props, this.context);
-        this.storeListeners = stores.map(function (store) {
-          return store.listen(_this.onChange);
-        });
-        if (Spec.componentDidConnect) {
-          Spec.componentDidConnect(this.props, this.context);
-        }
-      },
-
-      componentWillUnmount: function componentWillUnmount() {
-        this.storeListeners.forEach(function (unlisten) {
-          return unlisten();
-        });
-      },
-
-      onChange: function onChange() {
-        this.setState(Spec.getPropsFromStores(this.props, this.context));
-      },
-
-      render: function render() {
-        return _react2['default'].createElement(Component, (0, _functions.assign)({}, this.props, this.state));
+      var stores = Component.getStores(this.props, this.context);
+      this.storeListeners = stores.map(function (store) {
+        return store.listen(_this.onChange);
+      });
+      if (Component.componentDidConnect) {
+        Component.componentDidConnect(this.props, this.context);
       }
-    });
+    },
 
-    return StoreConnection;
-  })();
+    componentWillUnmount: function componentWillUnmount() {
+      this.storeListeners.forEach(function (unlisten) {
+        return unlisten();
+      });
+    },
+
+    onChange: function onChange() {
+      this.setState(Component.getPropsFromStores(this.props, this.context));
+    },
+
+    render: function render() {
+      return _react2['default'].createElement(Component, (0, _functions.assign)({}, this.props, this.state));
+    }
+  });
+
+  return StoreConnection;
 }
 
 exports['default'] = connectToStores;
