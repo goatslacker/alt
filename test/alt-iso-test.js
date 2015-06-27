@@ -175,7 +175,7 @@ export default {
           assert.notMatch(values[3].html, /333333/)
 
           done()
-        })
+        }).catch(e => done(e))
       }, 50)
     },
 
@@ -201,7 +201,7 @@ export default {
       AltIso.render(alt, User, { id: 0, name: 'ZZZZZZ' }).then((obj) => {
         assert.match(obj.html, /ZZZZZZ/)
         done()
-      })
+      }).catch(e => done(e))
     },
 
     'errors still render the request'() {
