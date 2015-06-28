@@ -65,10 +65,11 @@ class DispatchBuffer {
     })
   }
 
-  // XXX need to add a timeout/iteration limit
-  // XXX study a fail case, make sure when it does fail it sends down partial markup of what was already resolved. we can client render the rest
-  render(alt, Element, i = 0) {
+  render(alt, Element, info) {
     alt.recycle()
+
+    const startTime = Date.now()
+    const i = info.i || 0
 
     // fire off all the actions synchronously
     this.dispatches.forEach((f) => {
@@ -82,6 +83,28 @@ class DispatchBuffer {
     // render the html
     const html = this.renderStrategy(Element)
 
+    console.log('@', info)
+
+    if (i >= info.maxIterations) {
+      return this.resolve(
+        new Error('Max number of iterations reached'),
+        html,
+        alt,
+        Element,
+        i
+      )
+    }
+
+    if (info.time > info.timeout) {
+      return this.resolve(
+        new Error('Render timed out'),
+        html,
+        alt,
+        Element,
+        i
+      )
+    }
+
     // do we have new async queries we need to take care of?
     if (this.promisesBuffer.length) {
       // resolve them
@@ -92,19 +115,21 @@ class DispatchBuffer {
         // clear the buffer and call render again
         this.promisesBuffer = []
 
-        return this.render(alt, Element, i + 1)
+        info.i = i + 1
+        info.time = info.time + (Date.now() - startTime)
+
+        return this.render(alt, Element, info)
       }).catch((error) => {
         return this.resolve(error, html, alt, Element, i)
       })
     } else {
       return this.resolve(null, html, alt, Element, i)
     }
-    // XXX enhancement: we also should probably cache same calls with same args and just return the promise in that instance.
   }
 }
 
 function renderWithStrategy(strategy) {
-  return (alt, Component, props) => {
+  return (alt, Component, props, info) => {
     alt.buffer = true
 
     // create a buffer and use context to pass it through to the components
@@ -118,7 +143,7 @@ function renderWithStrategy(strategy) {
 
     const start = Date.now()
 
-    return buffer.render(alt, Element).then((obj) => {
+    return buffer.render(alt, Element, info).then((obj) => {
       const time = Date.now() - start
 
       return {
@@ -141,14 +166,33 @@ export default class Render {
   constructor(alt, options = {}) {
     this.alt = alt
     this.options = options
+
+    // defaults
+    // 500ms or 5 iteration max
+    this.options.timeout = options.timeout || 500
+    this.options.maxIterations = options.maxIterations || 5
   }
 
   toString(Component, props) {
-    return renderWithStrategy('renderToString')(this.alt, Component, props)
+    this.options.i = 0
+    this.options.time = 0
+    return renderWithStrategy('renderToString')(
+      this.alt,
+      Component,
+      props,
+      this.options
+    )
   }
 
   toStaticMarkup(Component, props) {
-    return renderWithStrategy('renderToStaticMarkup')(this.alt, Component, props)
+    this.options.i = 0
+    this.options.time = 0
+    return renderWithStrategy('renderToStaticMarkup')(
+      this.alt,
+      Component,
+      props,
+      this.options
+    )
   }
 
   toDOM(Component, props, documentNode, opts = {}) {
