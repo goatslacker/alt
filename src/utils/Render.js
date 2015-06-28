@@ -83,8 +83,6 @@ class DispatchBuffer {
     // render the html
     const html = this.renderStrategy(Element)
 
-    console.log('@', info)
-
     if (i >= info.maxIterations) {
       return this.resolve(
         new Error('Max number of iterations reached'),
