@@ -1,9 +1,5 @@
 import React from 'react'
 
-function call(f) {
-  if (typeof f === 'function') f()
-}
-
 function usingDispatchBuffer(buffer, Component) {
   return React.createClass({
     childContextTypes: {
@@ -74,9 +70,9 @@ class DispatchBuffer {
     // fire off all the actions synchronously
     this.dispatches.forEach((f) => {
       if (Array.isArray(f)) {
-        f.forEach(call)
+        f.forEach(x => x())
       } else {
-        call(f)
+        f()
       }
     })
 
