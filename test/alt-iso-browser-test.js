@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 import Alt from '../'
 import AltContainer from '../AltContainer'
 import AltIso from '../utils/AltIso'
-import * as Render from '../utils/Render'
+import Render from '../utils/Render'
 import connectToStores from '../utils/connectToStores'
 import { assert } from 'chai'
 
@@ -178,7 +178,7 @@ export default {
         this.bindAction(actions.fail, err => console.log('STORE FETCH ERROR HANDLER', err))
       }, 'Store')
 
-      const App = Render.withData((props) => {
+      const App = Render.resolve((props) => {
         return Store.bananas()
       }, connectToStores(class extends Component {
         static getStores() {
@@ -194,7 +194,7 @@ export default {
         }
       }))
 
-      Render.toString(alt, App)
+      new Render(alt).toString(App)
         .then((obj) => {
           assert.isString(obj.html)
           assert.match(obj.html, /2222222/)

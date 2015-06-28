@@ -1,49 +1,5 @@
 import React from 'react'
 
-export function withData(fetch, MaybeComponent) {
-  function bind(Component) {
-    return React.createClass({
-      contextTypes: {
-        universalId: React.PropTypes.string.isRequired,
-        buffer: React.PropTypes.object.isRequired
-      },
-
-      childContextTypes: {
-        universalId: React.PropTypes.string.isRequired,
-        buffer: React.PropTypes.object.isRequired
-      },
-
-      getChildContext() {
-        const children = this.props.children || []
-        const universalId = `${this.context.universalId}.${children.length}`
-        return {
-          universalId,
-          buffer: this.context.buffer
-        }
-      },
-
-      componentWillMount() {
-        if (this.context.buffer.shouldFetch(this.context.universalId)) {
-          this.context.buffer.push(
-            this.context.universalId,
-            fetch(this.props)
-          )
-        }
-      },
-
-      render() {
-        // XXX I need to make sure I can render since this promise has fulfilled successfully!
-        return this.context.buffer.shouldRender(this.context.universalId)
-          ? React.createElement(Component, this.props)
-          : null
-      }
-    })
-  }
-
-  // works as a decorator or as a function
-  return MaybeComponent ? bind(MaybeComponent) : Component => bind(Component)
-}
-
 function call(f) {
   if (typeof f === 'function') f()
 }
@@ -74,7 +30,6 @@ class DispatchBuffer {
     this.fetched = {}
     this.fulfilled = {}
     this.dispatches = []
-    this.locked = false
     this.renderStrategy = renderStrategy
   }
 
@@ -86,7 +41,6 @@ class DispatchBuffer {
 
   shouldFetch(id) {
     return !this.fetched[id]
-//    return !this.locked && !this.fetched[this.promisesBuffer.length]
   }
 
   shouldRender(id) {
@@ -135,6 +89,7 @@ class DispatchBuffer {
       return Promise.resolve({
         html,
         state: alt.flush(),
+        fulfilled: this.fulfilled,
         element: Element,
         diagnostics: {
           iterations: i,
@@ -149,7 +104,6 @@ class DispatchBuffer {
     // XXX i need to create deterministic id's for all this shit.
   }
 }
-
 
 function renderWithStrategy(strategy) {
   return (alt, Component, props) => {
@@ -172,6 +126,7 @@ function renderWithStrategy(strategy) {
       return {
         html: obj.html,
         state: obj.state,
+        fulfilled: obj.fulfilled,
         element: obj.element,
         diagnostics: {
           iterations: obj.diagnostics.iterations,
@@ -183,14 +138,70 @@ function renderWithStrategy(strategy) {
   }
 }
 
-export function toDOM(Component, props, documentNode, shouldLock) {
-  const buffer = new DispatchBuffer()
-  buffer.locked = !!shouldLock
-  const Node = usingDispatchBuffer(buffer, Component)
-  const Element = React.createElement(Node, props)
-  buffer.clear()
-  return React.render(Element, documentNode)
-}
+export default class Render {
+  constructor(alt, options = {}) {
+    this.alt = alt
+    this.options = options
+  }
 
-export const toStaticMarkup = renderWithStrategy('renderToStaticMarkup')
-export const toString = renderWithStrategy('renderToString')
+  toString(Component, props) {
+    return renderWithStrategy('renderToString')(this.alt, Component, props)
+  }
+
+  toStaticMarkup(Component, props) {
+    return renderWithStrategy('renderToStaticMarkup')(this.alt, Component, props)
+  }
+
+  toDOM(Component, props, documentNode, opts = {}) {
+    const buffer = new DispatchBuffer()
+
+    if (opts.fulfilled) buffer.fulfilled = opts.fulfilled
+    const Node = usingDispatchBuffer(buffer, Component)
+    const Element = React.createElement(Node, props)
+    buffer.clear()
+    return React.render(Element, documentNode)
+  }
+
+  static resolve(fetch, MaybeComponent) {
+    function bind(Component) {
+      return React.createClass({
+        contextTypes: {
+          universalId: React.PropTypes.string.isRequired,
+          buffer: React.PropTypes.object.isRequired
+        },
+
+        childContextTypes: {
+          universalId: React.PropTypes.string.isRequired,
+          buffer: React.PropTypes.object.isRequired
+        },
+
+        getChildContext() {
+          const children = this.props.children || []
+          const universalId = `${this.context.universalId}.${children.length}`
+          return {
+            universalId,
+            buffer: this.context.buffer
+          }
+        },
+
+        componentWillMount() {
+          if (this.context.buffer.shouldFetch(this.context.universalId)) {
+            this.context.buffer.push(
+              this.context.universalId,
+              fetch(this.props)
+            )
+          }
+        },
+
+        render() {
+          return this.context.buffer.shouldRender(this.context.universalId)
+            ? React.createElement(Component, this.props)
+            : null
+        }
+      })
+    }
+
+    // works as a decorator or as a function
+    return MaybeComponent ? bind(MaybeComponent) : Component => bind(Component)
+  }
+}
