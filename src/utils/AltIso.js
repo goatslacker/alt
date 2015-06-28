@@ -13,13 +13,18 @@ export default {
             fulfilled: obj.fulfilled
           })
         }
-      }).catch((err) => {
-        // return the empty markup in html when there's an error
-        return {
-          err,
-          html: Iso.render()
+      }).catch(
+        /* istanbul ignore next */
+        (err) => {
+          // this is a fail-safe case you should never hit. In case there's an
+          // error flushing alt or something blows up then we should render
+          // empty markup so that we can bootstrap anyway and render client side.
+          return {
+            err,
+            html: Iso.render()
+          }
         }
-      })
+      )
     } else {
       Iso.bootstrap((state, meta, node) => {
         alt.bootstrap(state)
