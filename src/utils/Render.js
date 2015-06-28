@@ -51,6 +51,20 @@ class DispatchBuffer {
     this.promisesBuffer = []
   }
 
+  resolve(error, html, alt, Element, i) {
+    return Promise.resolve({
+      error,
+      html,
+      state: alt.flush(),
+      fulfilled: this.fulfilled,
+      element: Element,
+      diagnostics: {
+        iterations: i,
+        dispatches: this.dispatches.length
+      }
+    })
+  }
+
   // XXX need to add a timeout/iteration limit
   // XXX study a fail case, make sure when it does fail it sends down partial markup of what was already resolved. we can client render the rest
   render(alt, Element, i = 0) {
@@ -79,29 +93,13 @@ class DispatchBuffer {
         this.promisesBuffer = []
 
         return this.render(alt, Element, i + 1)
-      }).catch((e) => {
-
-        // XXX need a better story here
-//        console.error(e)
-        return 'derp'
+      }).catch((error) => {
+        return this.resolve(error, html, alt, Element, i)
       })
     } else {
-      return Promise.resolve({
-        html,
-        state: alt.flush(),
-        fulfilled: this.fulfilled,
-        element: Element,
-        diagnostics: {
-          iterations: i,
-          dispatches: this.dispatches.length
-        }
-      })
+      return this.resolve(null, html, alt, Element, i)
     }
-
-    // so bookeeping: we need to keep track of all the dispatches that have happened, queue them up and replay them when all is said and done.
-    // we need to clear the promise buffer on render and then re-render, but only lock certain calls from happening (the ones that have happened/returned)
     // XXX enhancement: we also should probably cache same calls with same args and just return the promise in that instance.
-    // XXX i need to create deterministic id's for all this shit.
   }
 }
 
@@ -124,6 +122,7 @@ function renderWithStrategy(strategy) {
       const time = Date.now() - start
 
       return {
+        error: obj.error,
         html: obj.html,
         state: obj.state,
         fulfilled: obj.fulfilled,
