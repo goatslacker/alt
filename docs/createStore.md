@@ -296,6 +296,22 @@ This is a reference to the store's internal name. This is either the identifier 
 
 This is a method you can implement in your store in order to receive all dispatches that are not currently being handled in your store explicitly via bindActions, bindAction, or bindListeners. This is similar to guards matching in Haskell.
 
+## StoreModel#output
+
+> output(state): {}
+
+A method you can use to control the output of what gets sent down to `listen()` as "state".
+
+```js
+output(state) {
+  return { foo: 'bar' }
+}
+
+store.listen((state) => {
+  state.foo === 'bar'
+})
+```
+
 ## StoreModel#reduce
 
 > reduce(state, { action, data }): {}
