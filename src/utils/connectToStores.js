@@ -60,6 +60,10 @@ function connectToStores(Spec, Component = Spec) {
       return Spec.getPropsFromStores(this.props, this.context)
     },
 
+    componentWillReceiveProps(nextProps) {
+      this.setState(Spec.getPropsFromStores(nextProps, this.context))
+    },
+
     componentDidMount() {
       const stores = Spec.getStores(this.props, this.context)
       this.storeListeners = stores.map((store) => {

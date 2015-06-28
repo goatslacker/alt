@@ -3,6 +3,7 @@ import Alt from '../dist/alt-with-runtime'
 import React from 'react/addons'
 import connectToStores from '../utils/connectToStores'
 import { assert } from 'chai'
+import sinon from 'sinon'
 
 const { TestUtils } = React.addons
 
@@ -37,6 +38,48 @@ export default {
       delete global.document
       delete global.window
       delete global.navigator
+    },
+
+    'resolve props on re-render'() {
+      const FooStore = alt.createStore(function () {
+        this.x = 1
+      }, 'FooStore')
+
+      const getPropsFromStores = sinon.stub().returns(FooStore.getState())
+
+      const Child = connectToStores(React.createClass({
+        statics: {
+          getStores(props) {
+            return [FooStore]
+          },
+
+          getPropsFromStores
+        },
+        render() {
+          return <span>{this.props.x + this.props.y}</span>
+        }
+      }))
+
+      const Parent = React.createClass({
+        getInitialState() {
+          return { y: 0 }
+        },
+        componentDidMount() {
+          this.setState({ y: 1 })
+        },
+        render() {
+          return <Child y={this.state.y} />
+        }
+      })
+
+      const node = TestUtils.renderIntoDocument(
+        <Parent />
+      )
+
+      assert(getPropsFromStores.callCount === 2, 'getPropsFromStores called twice')
+
+      const span = TestUtils.findRenderedDOMComponentWithTag(node, 'span')
+      assert(span.getDOMNode().innerHTML === '2', 'prop passed in is correct')
     },
 
     'missing the static getStores() method should throw'() {
@@ -211,6 +254,8 @@ export default {
 
       const span = TestUtils.findRenderedDOMComponentWithTag(node, 'span')
       assert(componentDidConnect === true)
-    }
+    },
+
+
   }
 }
