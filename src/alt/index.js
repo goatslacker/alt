@@ -5,11 +5,10 @@ import * as StateFunctions from './utils/StateFunctions'
 import * as fn from '../utils/functions'
 import * as utils from './utils/AltUtils'
 import makeAction from './actions'
-import transmitter from 'transmitter'
+
+import registerStore from './store/register'
 
 import Store from './store'
-
-export { Store }
 
 class Alt {
   constructor(config = {}) {
@@ -43,104 +42,28 @@ class Alt {
     return makeAction(this, 'global', name, implementation, obj)
   }
 
+  createUnsavedStore(StoreModel, ...args) {
+    StoreModel.config = fn.assign({
+      invisible: true
+    }, StoreModel.config)
+    return this.createStore(StoreModel, ...args)
+  }
+
+  createStore(StoreModel, iden, ...args) {
+    // XXX I would love to be able to keep alt's current API here. Somehow...
+    // force your Store to extends Store and call super() idk how that works.
+    if (iden) StoreModel.displayName = iden
+    return this.register(...args)(StoreModel)
+  }
+
   register(...args) {
-    return (StoreModel) => {
-      const store = new StoreModel(...args)
-
-      // setup our config
-      store.config = fn.assign({
-        getState(state) {
-          return fn.assign({}, state)
-        },
-        setState: fn.assign
-      }, StoreModel.config)
-
-
-      store.displayName = store.config.displayName || StoreModel.displayName || StoreModel.name || ''
-
-
-      store.alt = this
-      store.dispatcher = this.dispatcher
-      store.transmitter = transmitter()
-
-      store.lifecycle = (event, x) => {
-        if (store.lifecycleEvents[event]) store.lifecycleEvents[event].push(x)
+    return (Class) => {
+      const instance = new Class(...args)
+      if (instance instanceof Store) {
+        return registerStore(this, instance, Class)
+      } else {
+        throw new Error('wtf')
       }
-
-      const output = store.output || (x => x)
-      store.emitChange = () => store.transmitter.push(output(store.state))
-
-      const handleDispatch = (f, payload) => {
-        try {
-          return f()
-        } catch (e) {
-          if (store.handlesOwnErrors) {
-            store.lifecycle('error', {
-              error: e,
-              payload,
-              state: store.state
-            })
-            return false
-          } else {
-            throw e
-          }
-        }
-      }
-
-      // Register dispatcher
-      store.dispatchToken = this.dispatcher.register((payload) => {
-        store.preventDefault = false
-
-        store.lifecycle('beforeEach', {
-          payload,
-          state: store.state
-        })
-
-        const actionHandler = store.actionListeners[payload.action] ||
-          store.otherwise
-
-        if (actionHandler) {
-          const result = handleDispatch(() => {
-            return actionHandler.call(store, payload.data, payload.action)
-          }, payload)
-
-          if (result !== false && !store.preventDefault) store.emitChange()
-        }
-
-        if (store.reduce) {
-          handleDispatch(() => {
-            store.setState(store.reduce(store.state, payload))
-          }, payload)
-
-          if (!store.preventDefault) store.emitChange()
-        }
-
-        store.lifecycle('afterEach', {
-          payload,
-          state: store.state
-        })
-      })
-
-      if (this.stores[store.displayName] || !store.displayName) {
-        if (this.stores[store.displayName]) {
-          utils.warn(
-            `A store named ${store.displayName} already exists, double check your store ` +
-            `names or pass in your own custom identifier for each store`
-          )
-        } else {
-          utils.warn('Store name was not specified')
-        }
-
-        store.displayName = utils.uid(this.stores, store.displayName)
-      }
-
-      // save the store
-      this.stores[store.displayName] = store
-
-      // save the initial snapshot
-      StateFunctions.saveInitialSnapshot(this, store.displayName)
-
-      return store
     }
   }
 
@@ -279,6 +202,8 @@ class Alt {
     }
     return alt
   }
+
+  static Store = Store
 }
 
 export default Alt
