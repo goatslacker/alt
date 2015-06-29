@@ -100,5 +100,11 @@ export default function registerStore(alt, store, Store) {
   // save the initial snapshot
   StateFunctions.saveInitialSnapshot(alt, store.displayName)
 
-  return store
+  return fn.assign({
+    displayName: store.displayName,
+    dispatchToken: store.dispatchToken,
+    listen: store.listen.bind(store),
+    unlisten: store.unlisten.bind(store),
+    getState: store.getState.bind(store),
+  }, store.publicMethods)
 }

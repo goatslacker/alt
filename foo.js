@@ -21,14 +21,23 @@ class MyStore {
   constructor() {
     this.state = { x: 1 }
     this.bindActions(actions)
+    this.exportPublicMethods({
+      bar: this.bar.bind(this)
+    })
   }
 
   foo() {
     this.setState({ x: this.state.x + 1 })
   }
+
+  bar() {
+    return this.state.x
+  }
 }
 
 const store = alt.createStore(MyStore)
+
+console.log(store.bar())
 
 store.listen(state => console.log('CHANGED', state))
 

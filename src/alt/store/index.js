@@ -6,6 +6,7 @@ class Store {
     this.boundListeners = []
     this.lifecycleEvents = {}
     this.actionListeners = {}
+    this.publicMethods = {}
     this.handlesOwnErrors = false
     this.preventDefault = false
   }
@@ -107,6 +108,12 @@ class Store {
     const bus = this.lifecycleEvents[lifecycleEvent] || transmitter()
     this.lifecycleEvents[lifecycleEvent] = bus
     return bus.subscribe(handler.bind(this))
+  }
+
+  exportPublicMethods(methods) {
+    fn.eachObject((key, value) => {
+      this.publicMethods[key] = value
+    }, [methods])
   }
 
   listen(cb) {
