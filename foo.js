@@ -15,24 +15,20 @@ const actions = alt.generateActions('foo')
 //    })
 //  }
 //}
-
-//export default alt.registerStore(1, 2, 3)(MyStore)
-
-// XXX good except i need to pull the config
 //const store = alt.register(1, 2, 3)(MyStore)
 
-
-const store = alt.createStore(class {
-  constructor(one, two, three) {
-    super()
-
+class MyStore {
+  constructor() {
     this.state = { x: 1 }
-
-    this.bindAction(actions.foo, () => {
-      this.setState({ x: this.state.x + 1 })
-    })
+    this.bindActions(actions)
   }
-})
+
+  foo() {
+    this.setState({ x: this.state.x + 1 })
+  }
+}
+
+const store = alt.createStore(MyStore)
 
 store.listen(state => console.log('CHANGED', state))
 

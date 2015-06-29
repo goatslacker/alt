@@ -17,6 +17,7 @@ export default function registerStore(alt, store, Store) {
   store.alt = alt
   store.dispatcher = alt.dispatcher
   store.transmitter = transmitter()
+  store.state = store.state || {}
 
   store.lifecycle = (event, x) => {
     if (store.lifecycleEvents[event]) store.lifecycleEvents[event].push(x)

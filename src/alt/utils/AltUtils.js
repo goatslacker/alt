@@ -1,8 +1,22 @@
+import * as fn from '../../utils/functions'
+
 /* istanbul ignore next */
 function NoopClass() { }
 
 const builtIns = Object.getOwnPropertyNames(NoopClass)
 const builtInProto = Object.getOwnPropertyNames(NoopClass.prototype)
+
+export function inherit(subClass, superClass, optMethods) {
+  subClass.prototype = Object.create(superClass.prototype, fn.assign({
+    constructor: {
+      value: subClass,
+      enumerable: false,
+      writable: true,
+      configurable: true
+    }
+  }, optMethods))
+  subClass.__proto__ = superClass;
+}
 
 export function getInternalMethods(Obj, isProto) {
   const excluded = isProto ? builtInProto : builtIns

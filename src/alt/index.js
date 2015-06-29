@@ -46,14 +46,34 @@ class Alt {
     StoreModel.config = fn.assign({
       invisible: true
     }, StoreModel.config)
-    return this.createStore(StoreModel, ...args)
+    return this.createStore(StoreModel, null, ...args)
   }
 
   createStore(StoreModel, iden, ...args) {
-    // XXX I would love to be able to keep alt's current API here. Somehow...
-    // force your Store to extends Store and call super() idk how that works.
-    if (iden) StoreModel.displayName = iden
-    return this.register(...args)(StoreModel)
+    // pull all prototype methods out
+    const proto = utils.getInternalMethods(StoreModel, true)
+
+    // force inheritance on store
+    utils.inherit(StoreModel, Store, Object.keys(proto).reduce((obj, name) => {
+      obj[name] = {
+        value: StoreModel.prototype[name],
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+      return obj
+    }, {}))
+
+    // setup the a container store which will call Store first
+    // then your store
+    function FauxStore() {
+      Store.prototype.constructor.apply(this, arguments)
+      StoreModel.prototype.constructor.apply(this, arguments)
+    }
+    utils.inherit(FauxStore, StoreModel)
+
+    if (iden) FauxStore.displayName = iden
+    return this.register(...args)(FauxStore)
   }
 
   register(...args) {
