@@ -5,6 +5,7 @@ import * as StateFunctions from './utils/StateFunctions'
 import * as fn from '../utils/functions'
 import * as utils from './utils/AltUtils'
 import makeAction from './actions'
+import transmitter from 'transmitter'
 
 import Store from './store'
 
@@ -42,14 +43,103 @@ class Alt {
     return makeAction(this, 'global', name, implementation, obj)
   }
 
-  registerStore(...args) {
-    return (TheStore) => {
-      const store = new TheStore(...args)
-      // meh
-      StateFunctions.saveInitialSnapshot(store.state, store.displayName)
+  register(...args) {
+    return (StoreModel) => {
+      const store = new StoreModel(...args)
 
-      // double meh
+      // setup our config
+      store.config = fn.assign({
+        getState(state) {
+          return fn.assign({}, state)
+        },
+        setState: fn.assign
+      }, StoreModel.config)
+
+
+      store.displayName = store.config.displayName || StoreModel.displayName || StoreModel.name || ''
+
+
+      store.alt = this
+      store.dispatcher = this.dispatcher
+      store.transmitter = transmitter()
+
+      store.lifecycle = (event, x) => {
+        if (store.lifecycleEvents[event]) store.lifecycleEvents[event].push(x)
+      }
+
+      const output = store.output || (x => x)
+      store.emitChange = () => store.transmitter.push(output(store.state))
+
+      const handleDispatch = (f, payload) => {
+        try {
+          return f()
+        } catch (e) {
+          if (store.handlesOwnErrors) {
+            store.lifecycle('error', {
+              error: e,
+              payload,
+              state: store.state
+            })
+            return false
+          } else {
+            throw e
+          }
+        }
+      }
+
+      // Register dispatcher
+      store.dispatchToken = this.dispatcher.register((payload) => {
+        store.preventDefault = false
+
+        store.lifecycle('beforeEach', {
+          payload,
+          state: store.state
+        })
+
+        const actionHandler = store.actionListeners[payload.action] ||
+          store.otherwise
+
+        if (actionHandler) {
+          const result = handleDispatch(() => {
+            return actionHandler.call(store, payload.data, payload.action)
+          }, payload)
+
+          if (result !== false && !store.preventDefault) store.emitChange()
+        }
+
+        if (store.reduce) {
+          handleDispatch(() => {
+            store.setState(store.reduce(store.state, payload))
+          }, payload)
+
+          if (!store.preventDefault) store.emitChange()
+        }
+
+        store.lifecycle('afterEach', {
+          payload,
+          state: store.state
+        })
+      })
+
+      if (this.stores[store.displayName] || !store.displayName) {
+        if (this.stores[store.displayName]) {
+          utils.warn(
+            `A store named ${store.displayName} already exists, double check your store ` +
+            `names or pass in your own custom identifier for each store`
+          )
+        } else {
+          utils.warn('Store name was not specified')
+        }
+
+        store.displayName = utils.uid(this.stores, store.displayName)
+      }
+
+      // save the store
       this.stores[store.displayName] = store
+
+      // save the initial snapshot
+      StateFunctions.saveInitialSnapshot(this, store.displayName)
+
       return store
     }
   }

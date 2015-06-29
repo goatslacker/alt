@@ -6,9 +6,7 @@ const actions = alt.generateActions('foo')
 
 class MyStore extends Store {
   constructor(one, two, three) {
-    super(alt)
-//      displayName: 'MyStore'
-//    })
+    super()
 
     this.state = { x: 1 }
 
@@ -20,7 +18,7 @@ class MyStore extends Store {
 
 //export default alt.registerStore(1, 2, 3)(MyStore)
 
-const store = alt.registerStore()(MyStore)
+const store = alt.register()(MyStore)
 
 store.listen(state => console.log('CHANGED', state))
 

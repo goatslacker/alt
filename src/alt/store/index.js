@@ -1,102 +1,13 @@
-import * as utils from '../utils/AltUtils'
 import * as fn from '../../utils/functions'
 import transmitter from 'transmitter'
 
-
 class Store {
-
-  constructor(alt) {
-
-    this.displayName = this.config.displayName || this.displayName || this.name || ''
-
-    // XXX well then how do I make sure this gets set? Ideally as a static prop in the derived class
-//    this.config = fn.assign({
-//      getState(state) {
-//        return fn.assign({}, state)
-//      },
-//      setState: fn.assign
-//    }, config)
-
+  constructor() {
     this.boundListeners = []
     this.lifecycleEvents = {}
     this.actionListeners = {}
     this.handlesOwnErrors = false
     this.preventDefault = false
-
-    this.alt = alt
-    this.dispatcher = alt.dispatcher
-    this.transmitter = transmitter()
-
-    this.lifecycle = (event, x) => {
-      if (this.lifecycleEvents[event]) this.lifecycleEvents[event].push(x)
-    }
-
-    const output = this.output || (x => x)
-    this.emitChange = () => this.transmitter.push(output(this.state))
-
-    const handleDispatch = (f, payload) => {
-      try {
-        return f()
-      } catch (e) {
-        if (this.handlesOwnErrors) {
-          this.lifecycle('error', {
-            error: e,
-            payload,
-            state: this.state
-          })
-          return false
-        } else {
-          throw e
-        }
-      }
-    }
-
-    // Register dispatcher
-    this.dispatchToken = alt.dispatcher.register((payload) => {
-      this.preventDefault = false
-
-      this.lifecycle('beforeEach', {
-        payload,
-        state: this.state
-      })
-
-      const actionHandler = this.actionListeners[payload.action] ||
-        this.otherwise
-
-      if (actionHandler) {
-        const result = handleDispatch(() => {
-          return actionHandler.call(this, payload.data, payload.action)
-        }, payload)
-
-        if (result !== false && !this.preventDefault) this.emitChange()
-      }
-
-      if (this.reduce) {
-        handleDispatch(() => {
-          this.setState(this.reduce(this.state, payload))
-        }, payload)
-
-        if (!this.preventDefault) this.emitChange()
-      }
-
-      this.lifecycle('afterEach', {
-        payload,
-        state: this.state
-      })
-    })
-
-    if (this.alt.stores[this.displayName] || !this.displayName) {
-      if (this.alt.stores[this.displayName]) {
-        utils.warn(
-          `A store named ${this.displayName} already exists, double check your store ` +
-          `names or pass in your own custom identifier for each store`
-        )
-      } else {
-        utils.warn('Store name was not specified')
-      }
-
-      this.displayName = utils.uid(this.alt.stores, this.displayName)
-    }
   }
 
   bindAction(symbol, handler) {
