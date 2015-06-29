@@ -3,9 +3,12 @@ import { Dispatcher } from 'flux'
 
 import * as StateFunctions from './utils/StateFunctions'
 import * as fn from '../utils/functions'
-import * as store from './store'
 import * as utils from './utils/AltUtils'
 import makeAction from './actions'
+
+import registerStore from './store/register'
+
+import Store from './store'
 
 class Alt {
   constructor(config = {}) {
@@ -27,44 +30,6 @@ class Alt {
     this.batchingFunction(() => this.dispatcher.dispatch({ action, data, details }))
   }
 
-  createUnsavedStore(StoreModel, ...args) {
-    const key = StoreModel.displayName || ''
-    store.createStoreConfig(this.config, StoreModel)
-    const Store = store.transformStore(this.storeTransforms, StoreModel)
-
-    return fn.isFunction(Store)
-      ? store.createStoreFromClass(this, Store, key, ...args)
-      : store.createStoreFromObject(this, Store, key)
-  }
-
-  createStore(StoreModel, iden, ...args) {
-    let key = iden || StoreModel.displayName || StoreModel.name || ''
-    store.createStoreConfig(this.config, StoreModel)
-    const Store = store.transformStore(this.storeTransforms, StoreModel)
-
-    if (this.stores[key] || !key) {
-      if (this.stores[key]) {
-        utils.warn(
-          `A store named ${key} already exists, double check your store ` +
-          `names or pass in your own custom identifier for each store`
-        )
-      } else {
-        utils.warn('Store name was not specified')
-      }
-
-      key = utils.uid(this.stores, key)
-    }
-
-    const storeInstance = fn.isFunction(Store)
-      ? store.createStoreFromClass(this, Store, key, ...args)
-      : store.createStoreFromObject(this, Store, key)
-
-    this.stores[key] = storeInstance
-    StateFunctions.saveInitialSnapshot(this, key)
-
-    return storeInstance
-  }
-
   generateActions(...actionNames) {
     const actions = { name: 'global' }
     return this.createActions(actionNames.reduce((obj, action) => {
@@ -75,6 +40,31 @@ class Alt {
 
   createAction(name, implementation, obj) {
     return makeAction(this, 'global', name, implementation, obj)
+  }
+
+  createUnsavedStore(StoreModel, ...args) {
+    StoreModel.config = fn.assign({
+      invisible: true
+    }, StoreModel.config)
+    return this.createStore(StoreModel, ...args)
+  }
+
+  createStore(StoreModel, iden, ...args) {
+    // XXX I would love to be able to keep alt's current API here. Somehow...
+    // force your Store to extends Store and call super() idk how that works.
+    if (iden) StoreModel.displayName = iden
+    return this.register(...args)(StoreModel)
+  }
+
+  register(...args) {
+    return (Class) => {
+      const instance = new Class(...args)
+      if (instance instanceof Store) {
+        return registerStore(this, instance, Class)
+      } else {
+        throw new Error('wtf')
+      }
+    }
   }
 
   createActions(ActionsClass, exportObj = {}, ...argsForConstructor) {
@@ -212,6 +202,8 @@ class Alt {
     }
     return alt
   }
+
+  static Store = Store
 }
 
 export default Alt
