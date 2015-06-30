@@ -52,19 +52,3 @@ When you manually need to emit a change event you can use this method. Useful if
 ```js
 MyStore.emitChange();
 ```
-
-## Store#getEventEmitter
-
-> (): EventEmitter
-
-Returns the eventemitter used internally to emit changes. This affords you the flexibility to create custom events, listen to them, and emit those events within your store or across different stores.
-
-```js
-var ee = MyStore.getEventEmitter();
-
-ee.on('foo', function () {
-  console.log('hi');
-});
-
-ee.emit('foo');
-```
