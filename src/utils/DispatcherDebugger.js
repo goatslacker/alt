@@ -1,5 +1,5 @@
 /*eslint-disable */
-import React, { Component } from 'react'
+import React from 'react'
 import { Column, Table } from 'fixed-data-table'
 import makeFinalStore from './makeFinalStore'
 import connectToStores from './connectToStores'
@@ -9,7 +9,7 @@ import FixedDataTableCss from './debug/FixedDataTableCss'
 import DebugActions from './debug/DebugActions'
 import DispatcherStore from './debug/DispatcherStore'
 
-class DispatcherDebugger extends Component {
+class DispatcherDebugger extends React.Component {
   constructor() {
     super()
 

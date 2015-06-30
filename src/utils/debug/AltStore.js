@@ -24,8 +24,8 @@ export default alt.createStore(class {
     })
   }
 
-  setAlt(alt) {
-    this.alt = alt
+  setAlt(altInst) {
+    this.alt = altInst
     this.stores = Object.keys(this.alt.stores).map((name) => {
       return this.alt.stores[name]
     })

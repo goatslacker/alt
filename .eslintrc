@@ -26,7 +26,7 @@
     }],
     "no-use-before-define": 2,
     // possible errors
-    "comma-dangle": [2, "never"],
+    "comma-dangle": [0, "always"],
     "no-cond-assign": [2, "always"],
     "no-debugger": 1,
     "no-alert": 1,

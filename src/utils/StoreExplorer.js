@@ -1,9 +1,9 @@
 import AltStore from './debug/AltStore'
 import DebugActions from './debug/DebugActions'
-import React, { Component } from 'react'
+import React from 'react'
 import connectToStores from './connectToStores'
 
-class StoreExplorer extends Component {
+class StoreExplorer extends React.Component {
   constructor() {
     super()
 

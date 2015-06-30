@@ -1,10 +1,10 @@
 /*eslint-disable */
 import DebugActions from './debug/DebugActions'
 import DispatcherDebugger from './DispatcherDebugger'
-import React, { Component } from 'react'
+import React from 'react'
 import StoreExplorer from './StoreExplorer'
 
-class Debugger extends Component {
+class Debugger extends React.Component {
   componentDidMount() {
     DebugActions.setAlt(this.props.alt)
   }
