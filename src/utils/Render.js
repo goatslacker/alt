@@ -1,52 +1,17 @@
 import React from 'react'
 
-export function withData(fetch, MaybeComponent) {
-  function bind(Component) {
-    return React.createClass({
-      contextTypes: {
-        buffer: React.PropTypes.object.isRequired
-      },
-
-      childContextTypes: {
-        buffer: React.PropTypes.object.isRequired
-      },
-
-      getChildContext() {
-        return { buffer: this.context.buffer }
-      },
-
-      componentWillMount() {
-        if (!this.context.buffer.locked) {
-          this.context.buffer.push(
-            fetch(this.props)
-          )
-        }
-      },
-
-      render() {
-        return this.context.buffer.locked
-          ? React.createElement(Component, this.props)
-          : null
-      }
-    })
-  }
-
-  // works as a decorator or as a function
-  return MaybeComponent ? bind(MaybeComponent) : Component => bind(Component)
-}
-
-function call(f) {
-  if (typeof f === 'function') f()
-}
-
 function usingDispatchBuffer(buffer, Component) {
   return React.createClass({
     childContextTypes: {
+      universalId: React.PropTypes.string.isRequired,
       buffer: React.PropTypes.object.isRequired
     },
 
     getChildContext() {
-      return { buffer }
+      return {
+        universalId: 'root',
+        buffer
+      }
     },
 
     render() {
@@ -58,52 +23,107 @@ function usingDispatchBuffer(buffer, Component) {
 class DispatchBuffer {
   constructor(renderStrategy) {
     this.promisesBuffer = []
-    this.locked = false
+    this.fetched = {}
+    this.fulfilled = {}
+    this.dispatches = []
     this.renderStrategy = renderStrategy
   }
 
-  push(v) {
-    this.promisesBuffer.push(v)
+  push(id, promise) {
+    this.promisesBuffer.push(promise)
+    promise.then(() => this.fulfilled[id] = true)
+    this.fetched[id] = true
   }
 
-  fill(Element) {
-    return this.renderStrategy(Element)
+  shouldFetch(id) {
+    return !this.fetched[id]
+  }
+
+  shouldRender(id) {
+    return this.fulfilled[id]
   }
 
   clear() {
     this.promisesBuffer = []
   }
 
-  flush(alt, Element) {
-    return Promise.all(this.promisesBuffer).then((data) => {
-      // fire off all the actions synchronously
-      data.forEach((f) => {
-        if (Array.isArray(f)) {
-          f.forEach(call)
-        } else {
-          call(f)
-        }
-      })
-      this.locked = true
-
-      return {
-        html: this.renderStrategy(Element),
-        state: alt.flush(),
-        element: Element
+  resolve(error, html, alt, Element, i) {
+    return Promise.resolve({
+      error,
+      html,
+      state: alt.flush(),
+      fulfilled: this.fulfilled,
+      element: Element,
+      diagnostics: {
+        iterations: i,
+        dispatches: this.dispatches.length
       }
-    }).catch((err) => {
-      return Promise.reject({
-        err,
-        state: alt.flush(),
-        element: Element
-      })
     })
+  }
+
+  render(alt, Element, info) {
+    alt.recycle()
+
+    const startTime = Date.now()
+    const i = info.i || 0
+
+    // fire off all the actions synchronously
+    this.dispatches.forEach((f) => {
+      if (Array.isArray(f)) {
+        f.forEach(x => x())
+      } else {
+        f()
+      }
+    })
+
+    // render the html
+    const html = this.renderStrategy(Element)
+
+    if (i >= info.maxIterations) {
+      return this.resolve(
+        new Error('Max number of iterations reached'),
+        html,
+        alt,
+        Element,
+        i
+      )
+    }
+
+    if (info.time > info.timeout) {
+      return this.resolve(
+        new Error('Render timed out'),
+        html,
+        alt,
+        Element,
+        i
+      )
+    }
+
+    // do we have new async queries we need to take care of?
+    if (this.promisesBuffer.length) {
+      // resolve them
+      return Promise.all(this.promisesBuffer).then((data) => {
+        // add the dispatches to our queue
+        this.dispatches = this.dispatches.concat(data)
+
+        // clear the buffer and call render again
+        this.promisesBuffer = []
+
+        info.i = i + 1
+        info.time = info.time + (Date.now() - startTime)
+
+        return this.render(alt, Element, info)
+      }).catch((error) => {
+        return this.resolve(error, html, alt, Element, i)
+      })
+    } else {
+      return this.resolve(null, html, alt, Element, i)
+    }
   }
 }
 
-
 function renderWithStrategy(strategy) {
-  return (alt, Component, props) => {
+  return (alt, Component, props, info) => {
     alt.buffer = true
 
     // create a buffer and use context to pass it through to the components
@@ -115,23 +135,110 @@ function renderWithStrategy(strategy) {
     // cache the element
     const Element = React.createElement(Container, props)
 
-    // render so we kick things off and get the props
-    buffer.fill(Element)
+    const start = Date.now()
 
-    // flush out the results in the buffer synchronously setting the store
-    // state and returning the markup
-    return buffer.flush(alt, Element)
+    return buffer.render(alt, Element, info).then((obj) => {
+      const time = Date.now() - start
+
+      return {
+        error: obj.error,
+        html: obj.html,
+        state: obj.state,
+        fulfilled: obj.fulfilled,
+        element: obj.element,
+        diagnostics: {
+          iterations: obj.diagnostics.iterations,
+          dispatches: obj.diagnostics.dispatches,
+          time
+        }
+      }
+    })
   }
 }
 
-export function toDOM(Component, props, documentNode, shouldLock) {
-  const buffer = new DispatchBuffer()
-  buffer.locked = !!shouldLock
-  const Node = usingDispatchBuffer(buffer, Component)
-  const Element = React.createElement(Node, props)
-  buffer.clear()
-  return React.render(Element, documentNode)
-}
+export default class Render {
+  constructor(alt, options = {}) {
+    this.alt = alt
+    this.options = options
 
-export const toStaticMarkup = renderWithStrategy('renderToStaticMarkup')
-export const toString = renderWithStrategy('renderToString')
+    // defaults
+    // 500ms or 5 iteration max
+    this.options.timeout = options.timeout || 500
+    this.options.maxIterations = options.maxIterations || 5
+  }
+
+  toString(Component, props) {
+    this.options.i = 0
+    this.options.time = 0
+    return renderWithStrategy('renderToString')(
+      this.alt,
+      Component,
+      props,
+      this.options
+    )
+  }
+
+  toStaticMarkup(Component, props) {
+    this.options.i = 0
+    this.options.time = 0
+    return renderWithStrategy('renderToStaticMarkup')(
+      this.alt,
+      Component,
+      props,
+      this.options
+    )
+  }
+
+  toDOM(Component, props, documentNode, opts = {}) {
+    const buffer = new DispatchBuffer()
+
+    if (opts.fulfilled) buffer.fulfilled = opts.fulfilled
+    const Node = usingDispatchBuffer(buffer, Component)
+    const Element = React.createElement(Node, props)
+    buffer.clear()
+    return React.render(Element, documentNode)
+  }
+
+  static resolve(fetch, MaybeComponent) {
+    function bind(Component) {
+      return React.createClass({
+        contextTypes: {
+          universalId: React.PropTypes.string.isRequired,
+          buffer: React.PropTypes.object.isRequired
+        },
+
+        childContextTypes: {
+          universalId: React.PropTypes.string.isRequired,
+          buffer: React.PropTypes.object.isRequired
+        },
+
+        getChildContext() {
+          const children = this.props.children || []
+          const universalId = `${this.context.universalId}.${children.length}`
+          return {
+            universalId,
+            buffer: this.context.buffer
+          }
+        },
+
+        componentWillMount() {
+          if (this.context.buffer.shouldFetch(this.context.universalId)) {
+            this.context.buffer.push(
+              this.context.universalId,
+              fetch(this.props)
+            )
+          }
+        },
+
+        render() {
+          return this.context.buffer.shouldRender(this.context.universalId)
+            ? React.createElement(Component, this.props)
+            : null
+        }
+      })
+    }
+
+    // works as a decorator or as a function
+    return MaybeComponent ? bind(MaybeComponent) : Component => bind(Component)
+  }
+}
