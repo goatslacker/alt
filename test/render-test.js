@@ -125,9 +125,9 @@ export default {
         }
       }
 
-      new Render(alt).toDOM(App, {}, document.body)
-
-      assert.ok(resolveSpy.calledOnce, 'the resolver')
+      new Render(alt).toDOM(App, {}, document.body).then(() => {
+        assert.ok(resolveSpy.calledOnce, 'the resolver')
+      })
 
       const unlisten = Store.listen(() => {
         assert.ok(successSpy.calledOnce, 'action success')

@@ -55,7 +55,7 @@ class DispatchBuffer {
       state: alt.flush(),
       buffer: {
         fetched: this.fetched,
-        fulfilled: this.fulfilled,
+        fulfilled: this.fulfilled
       },
       element: Element,
       diagnostics: {
@@ -193,7 +193,7 @@ export default class Render {
     )
   }
 
-  toDOM(Component, props, documentNode, opts = {}) {
+  getReady(Component, props, opts = {}) {
     const buffer = new DispatchBuffer()
 
     buffer.unlocked = true
@@ -202,10 +202,14 @@ export default class Render {
     const Node = usingDispatchBuffer(buffer, Component)
     const Element = React.createElement(Node, props)
     buffer.clear()
-    return React.render(Element, documentNode)
+    return Promise.resolve(Element)
   }
 
-  // TODO toTest
+  toDOM(Component, props, documentNode, opts = {}) {
+    return this.getReady(Component, props, opts).then((Element) => {
+      return React.render(Element, documentNode)
+    })
+  }
 
   static resolve(fetch, MaybeComponent) {
     function bind(Component) {

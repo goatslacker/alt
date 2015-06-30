@@ -150,6 +150,57 @@ export default {
       }).catch(e => done(e))
     },
 
+    'works with connectToStores and render.toDOM'(done) {
+      global.document = jsdom('<!doctype html><html><body></body></html>')
+      global.window = global.document.parentWindow
+      global.navigator = global.window.navigator
+
+      const alt = new Alt()
+
+      const actions = alt.generateActions('success', 'fail')
+
+      const DataSource = {
+        bananas: {
+          remote() {
+            return Promise.resolve(2222222)
+          },
+
+          success: actions.success,
+          error: actions.fail,
+        }
+      }
+
+      const Store = alt.createStore(function () {
+        this.id = 0
+        this.registerAsync(DataSource)
+
+        this.bindAction(actions.success, id => this.id = id)
+        this.bindAction(actions.fail, err => console.log('STORE FETCH ERROR HANDLER', err))
+      }, 'Store')
+
+      const App = Render.resolve((props) => {
+        return Store.bananas()
+      }, connectToStores(class extends Component {
+        static getStores() {
+          return [Store]
+        }
+
+        static getPropsFromStores() {
+          return Store.getState()
+        }
+
+        render() {
+          assert(this.props.id === 2222222, 'render was called once')
+          done()
+          return <strong>{this.props.id}</strong>
+        }
+      }))
+
+      new Render(alt).getReady(App, {}).then((Element) => {
+        const node = TestUtils.renderIntoDocument(Element)
+      }).catch(e => done(e))
+    },
+
     'works with connectToStores'(done) {
       global.document = jsdom('<!doctype html><html><body></body></html>')
       global.window = global.document.parentWindow
