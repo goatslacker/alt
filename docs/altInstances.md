@@ -27,6 +27,7 @@ const flux = new MyAlt();
 You can set your entire app context by wrapping your root component with `withAltContext`.
 
 As a decorator:
+
 ```js
 import withAltContext from 'alt/utils/withAltContext'
 
@@ -39,6 +40,7 @@ export default class App extends React.Component {
 ```
 
 As a function:
+
 ```js
 import withAltContext from 'alt/utils/withAltContext'
 
