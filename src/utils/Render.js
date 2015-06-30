@@ -23,6 +23,7 @@ function usingDispatchBuffer(buffer, Component) {
 class DispatchBuffer {
   constructor(renderStrategy) {
     this.promisesBuffer = []
+    this.unlocked = false
     this.fetched = {}
     this.fulfilled = {}
     this.dispatches = []
@@ -52,7 +53,10 @@ class DispatchBuffer {
       error,
       html,
       state: alt.flush(),
-      fulfilled: this.fulfilled,
+      buffer: {
+        fetched: this.fetched,
+        fulfilled: this.fulfilled,
+      },
       element: Element,
       diagnostics: {
         iterations: i,
@@ -144,7 +148,7 @@ function renderWithStrategy(strategy) {
         error: obj.error,
         html: obj.html,
         state: obj.state,
-        fulfilled: obj.fulfilled,
+        buffer: obj.buffer,
         element: obj.element,
         diagnostics: {
           iterations: obj.diagnostics.iterations,
@@ -192,12 +196,16 @@ export default class Render {
   toDOM(Component, props, documentNode, opts = {}) {
     const buffer = new DispatchBuffer()
 
+    buffer.unlocked = true
+    if (opts.fetched) buffer.fetched = opts.fetched
     if (opts.fulfilled) buffer.fulfilled = opts.fulfilled
     const Node = usingDispatchBuffer(buffer, Component)
     const Element = React.createElement(Node, props)
     buffer.clear()
     return React.render(Element, documentNode)
   }
+
+  // TODO toTest
 
   static resolve(fetch, MaybeComponent) {
     function bind(Component) {
@@ -221,17 +229,34 @@ export default class Render {
           }
         },
 
+        getInitialState() {
+          return { fulfilled: false }
+        },
+
         componentWillMount() {
           if (this.context.buffer.shouldFetch(this.context.universalId)) {
-            this.context.buffer.push(
-              this.context.universalId,
-              fetch(this.props)
-            )
+            const promise = fetch(this.props)
+            this.context.buffer.push(this.context.universalId, promise)
+
+            if (this.context.buffer.unlocked) {
+              promise.then(() => {
+                this.setState({ fulfilled: true })
+              })
+            }
           }
         },
 
         render() {
-          return this.context.buffer.shouldRender(this.context.universalId)
+          // Current issues:
+          //
+          // If there is an error fetching and shouldFetch is set to true but
+          // shouldRender is set to false then this component will never render nor fetch.
+          // Having a container which has loading/failed states makes sense here.
+          //
+          // shouldRender shouldn't be passed down from Render. We should just check that
+          // all props were resolved and that determines if we should render. Having this connect
+          // to a store(s) through a container where we check the existence of props might work fine.
+          return this.state.fulfilled || this.context.buffer.shouldRender(this.context.universalId)
             ? React.createElement(Component, this.props)
             : null
         }

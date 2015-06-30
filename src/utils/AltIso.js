@@ -9,9 +9,7 @@ export default {
     if (typeof window === 'undefined') {
       return new Render(alt).toString(Component, props).then((obj) => {
         return {
-          html: Iso.render(obj.html, obj.state, {
-            fulfilled: obj.fulfilled
-          })
+          html: Iso.render(obj.html, obj.state, obj.buffer)
         }
       }).catch(
         /* istanbul ignore next */
