@@ -110,8 +110,9 @@ DispatcherRecorder.prototype.replay = function (replayTime, done) {
 DispatcherRecorder.prototype.serializeEvents = function () {
   const events = this.events.map((event) => {
     return {
+      id: event.id,
       action: event.action,
-      data: event.data
+      data: event.data || {}
     }
   })
   return JSON.stringify(events)
@@ -129,6 +130,7 @@ DispatcherRecorder.prototype.loadEvents = function (events) {
       data: event.data
     }
   })
+  return parsedEvents
 }
 
 export default DispatcherRecorder

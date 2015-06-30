@@ -24,7 +24,15 @@ class Alt {
   }
 
   dispatch(action, data, details) {
-    this.batchingFunction(() => this.dispatcher.dispatch({ action, data, details }))
+    this.batchingFunction(() => {
+      const id = Math.random().toString(18).substr(2, 16)
+      return this.dispatcher.dispatch({
+        id,
+        action,
+        data,
+        details
+      })
+    })
   }
 
   createUnsavedStore(StoreModel, ...args) {
