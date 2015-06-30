@@ -105,6 +105,7 @@ export default {
     'serialize and deserialize events'() {
       const recording = recorder.record()
 
+      actions.a()
       actions.a('hello')
       actions.b('world')
       actions.c('it works')
@@ -131,7 +132,7 @@ export default {
 
       newRecorder.loadEvents(serialized)
 
-      assert.equal(newRecorder.events.length, 3, 'events are loaded')
+      assert.equal(newRecorder.events.length, 4, 'events are loaded')
 
       newRecorder.replay()
 
