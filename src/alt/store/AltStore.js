@@ -81,7 +81,6 @@ class AltStore {
   }
 
   unlisten(cb) {
-    if (!cb) throw new TypeError('Unlisten must receive a function')
     this.lifecycle('unlisten')
     this.transmitter.unsubscribe(cb)
   }
