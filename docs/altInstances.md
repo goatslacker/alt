@@ -86,3 +86,66 @@ Retrieves the store instance that was created.
 ```js
 const state = alt.getStore('myStore').getState();
 ```
+
+# Integrating with React
+
+You have two options on passing your alt instance through to your React components: manually through props, or using context.
+
+We won't go over manually through props except for this one small code sample:
+
+```js
+const flux = new Flux()
+
+class MyApplicationComponent extends React.Component {
+  render() {
+    return (
+      <div>
+        <MySuperCoolComponent flux={this.props.flux} />
+      </div>
+    )
+  }
+}
+
+
+<MyApplicationComponent flux={flux} />
+```
+
+Now, using context, which is a more common approach. There's a [util you can use](../src/utils/withAltContext) which will automatically create the context for you and then make it available for every immediate child of AltContainer.
+
+```js
+const flux = new Flux()
+
+class MyApplicationComponent extends React.Component {
+  render() {
+    // MySuperCoolComponent would automatically get this.props.flux
+    return (
+      <div>
+        <AltContainer>
+          <MySuperCoolComponent />
+        </AltContainer>
+      </div>
+    )
+  }
+}
+
+const App = withAltContext(flux, MyApplicationComponent)
+<App />
+```
+
+Now you're setup to do things with each instance of Alt:
+
+```js
+class MySuperCoolComponent extends React.Component {
+  componentDidMount() {
+    this.props.flux.actions.CoolActions.goFetchData()
+  }
+
+  render() {
+    return (
+      <div>{this.props.flux.stores.CoolStore.getMyCoolName()}</div>
+    )
+  }
+}
+```
+
+You can read more about [AltContainer here](components/altContainer.md).
