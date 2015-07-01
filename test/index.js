@@ -577,10 +577,6 @@ const tests = {
 
     assert(myStore.getState().name === 'badger', 'new store state present')
     assert.ok(mooseChecker.calledOnce)
-
-    assert.throws(() => {
-      myStore.unlisten()
-    })
   },
 
   'unlisten lifecycle hook'() {

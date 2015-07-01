@@ -35,10 +35,6 @@ export function withData(fetch, MaybeComponent) {
   return MaybeComponent ? bind(MaybeComponent) : Component => bind(Component)
 }
 
-function call(f) {
-  if (typeof f === 'function') f()
-}
-
 function usingDispatchBuffer(buffer, Component) {
   return React.createClass({
     childContextTypes: {
@@ -79,9 +75,9 @@ class DispatchBuffer {
       // fire off all the actions synchronously
       data.forEach((f) => {
         if (Array.isArray(f)) {
-          f.forEach(call)
+          f.forEach(x => x())
         } else {
-          call(f)
+          f()
         }
       })
       this.locked = true
