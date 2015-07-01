@@ -81,15 +81,6 @@ class Alt {
     }, actions))
   }
 
-  generateAsyncActions(...actionNames) {
-    const actionsList = actionNames.reduce((list, action) => {
-      list.push(`${action}Loading`, `${action}Success`, `${action}Failure`)
-      return list
-    }, [])
-
-    return this.generateActions(...actionsList)
-  }
-
   createAction(name, implementation, obj) {
     return makeAction(this, 'global', name, implementation, obj)
   }
