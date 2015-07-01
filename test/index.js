@@ -1389,6 +1389,17 @@ const tests = {
 
     AsyncAction.fire(2)
   },
+
+  'async actions generated'() {
+    const actions = alt.generateAsyncActions('foo', 'bar')
+
+    assert.isFunction(actions.fooLoading)
+    assert.isFunction(actions.fooSuccess)
+    assert.isFunction(actions.fooFailure)
+    assert.isFunction(actions.barLoading)
+    assert.isFunction(actions.barSuccess)
+    assert.isFunction(actions.barFailure)
+  },
 }
 
 export default tests
