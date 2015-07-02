@@ -314,7 +314,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.actions = { global: {} };
 	    this.stores = {};
 	    this.storeTransforms = config.storeTransforms || [];
-	    this.buffer = false;
+	    this.trapAsync = false;
 	    this._actionsRegistry = {};
 	    this._initSnapshot = {};
 	    this._lastSnapshot = {};
@@ -326,7 +326,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var _this = this;
 
 	      this.batchingFunction(function () {
-	        return _this.dispatcher.dispatch({ action: action, data: data, details: details });
+	        var id = Math.random().toString(18).substr(2, 16);
+	        return _this.dispatcher.dispatch({
+	          id: id,
+	          action: action,
+	          data: data,
+	          details: details
+	        });
 	      });
 	    }
 	  }, {
@@ -744,22 +750,22 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* istanbul ignore next */
+	/*eslint-disable*/
 	'use strict';
 
 	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
+
+	/*eslint-enable*/
+
 	exports.getInternalMethods = getInternalMethods;
 	exports.warn = warn;
 	exports.uid = uid;
 	exports.formatAsConstant = formatAsConstant;
 	exports.dispatchIdentity = dispatchIdentity;
-	function NoopClass() {}
-
 	var builtIns = Object.getOwnPropertyNames(NoopClass);
 	var builtInProto = Object.getOwnPropertyNames(NoopClass.prototype);
-
 	function getInternalMethods(Obj, isProto) {
 	  var excluded = isProto ? builtInProto : builtIns;
 	  var obj = isProto ? Obj.prototype : Obj;
@@ -802,6 +808,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  this.dispatch(a.length ? [x].concat(a) : x);
 	}
+
+	/* istanbul ignore next */
+	function NoopClass() {}
 
 /***/ },
 /* 7 */
@@ -882,6 +891,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      getInitialState: function getInitialState() {
 	        return Spec.getPropsFromStores(this.props, this.context);
+	      },
+
+	      componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+	        this.setState(Spec.getPropsFromStores(nextProps, this.context));
 	      },
 
 	      componentDidMount: function componentDidMount() {
@@ -1227,8 +1240,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	DispatcherRecorder.prototype.serializeEvents = function () {
 	  var events = this.events.map(function (event) {
 	    return {
+	      id: event.id,
 	      action: event.action,
-	      data: event.data
+	      data: event.data || {}
 	    };
 	  });
 	  return JSON.stringify(events);
@@ -1246,6 +1260,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      data: event.data
 	    };
 	  });
+	  return parsedEvents;
 	};
 
 	exports["default"] = DispatcherRecorder;
@@ -1293,7 +1308,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return AtomicClass;
 	  })(StoreModel);
 
-	  AtomicClass.displayName = StoreModel.displayName || StoreModel.name || 'AtomicClass';
+	  AtomicClass.displayName = StoreModel.displayName || StoreModel.name;
 	  return AtomicClass;
 	}
 
@@ -1436,7 +1451,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	module.exports = __webpack_require__(20);
+	module.exports = __webpack_require__(22);
 
 /***/ },
 /* 16 */
@@ -1472,11 +1487,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var fn = _interopRequireWildcard(_utilsFunctions);
 
-	var _AltStore = __webpack_require__(21);
+	var _AltStore = __webpack_require__(20);
 
 	var _AltStore2 = _interopRequireDefault(_AltStore);
 
-	var _StoreMixin = __webpack_require__(22);
+	var _StoreMixin = __webpack_require__(21);
 
 	var _StoreMixin2 = _interopRequireDefault(_StoreMixin);
 
@@ -1737,82 +1752,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
-	 * AltContainer.
-	 *
-	 * There are many ways to use AltContainer.
-	 *
-	 * Using the `stores` prop.
-	 *
-	 * <AltContainer stores={{ FooStore: FooStore }}>
-	 *   children get this.props.FooStore.storeData
-	 * </AltContainer>
-	 *
-	 * You can also pass in functions.
-	 *
-	 * <AltContainer stores={{ FooStore: function () { return { storeData: true } } }}>
-	 *   children get this.props.FooStore.storeData
-	 * </AltContainer>
-	 *
-	 * Using the `store` prop.
-	 *
-	 * <AltContainer store={FooStore}>
-	 *   children get this.props.storeData
-	 * </AltContainer>
-	 *
-	 * Passing in `flux` because you're using alt instances
-	 *
-	 * <AltContainer flux={flux}>
-	 *   children get this.props.flux
-	 * </AltContainer>
-	 *
-	 * Using a custom render function.
-	 *
-	 * <AltContainer
-	 *   render={function (props) {
-	 *     return <div />;
-	 *   }}
-	 * />
-	 *
-	 * Using the `transform` prop.
-	 *
-	 * <AltContainer
-	 *   stores={{ FooStore: FooStore, BarStore: BarStore }}
-	 *   transform={function(stores) {
-	 *     var FooStore = stores.FooStore;
-	 *     var BarStore = stores.BarStore;
-	 *     var products =
-	 *       FooStore.products
-	 *         .slice(0, 10)
-	 *         .concat(BarStore.products);
-	 *     return { products: products };
-	 *   }}
-	 * >
-	 *   children get this.props.products
-	 * </AltContainer>
-	 *
-	 * Full docs available at http://goatslacker.github.io/alt/
-	 */
-	'use strict';
-
-	var React = __webpack_require__(27);
-	var mixinContainer = __webpack_require__(24);
-	var assign = __webpack_require__(25).assign;
-
-	var AltContainer = React.createClass(assign({
-	  displayName: 'AltContainer',
-
-	  render: function render() {
-	    return this.altRender('div');
-	  }
-	}, mixinContainer(React)));
-
-	module.exports = AltContainer;
-
-/***/ },
-/* 21 */
-/***/ function(module, exports, __webpack_require__) {
-
 	'use strict';
 
 	Object.defineProperty(exports, '__esModule', {
@@ -1831,7 +1770,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var fn = _interopRequireWildcard(_utilsFunctions);
 
-	var _transmitter = __webpack_require__(28);
+	var _transmitter = __webpack_require__(27);
 
 	var _transmitter2 = _interopRequireDefault(_transmitter);
 
@@ -1929,7 +1868,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'unlisten',
 	    value: function unlisten(cb) {
-	      if (!cb) throw new TypeError('Unlisten must receive a function');
 	      this.lifecycle('unlisten');
 	      this.transmitter.unsubscribe(cb);
 	    }
@@ -1947,7 +1885,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 22 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1960,7 +1898,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _transmitter = __webpack_require__(28);
+	var _transmitter = __webpack_require__(27);
 
 	var _transmitter2 = _interopRequireDefault(_transmitter);
 
@@ -2031,7 +1969,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              action(intercept(x, action, args));
 	              if (isError) throw x;
 	            };
-	            return _this.alt.buffer ? function () {
+	            return _this.alt.trapAsync ? function () {
 	              return fire();
 	            } : fire();
 	          };
@@ -2153,6 +2091,82 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
+/* 22 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * AltContainer.
+	 *
+	 * There are many ways to use AltContainer.
+	 *
+	 * Using the `stores` prop.
+	 *
+	 * <AltContainer stores={{ FooStore: FooStore }}>
+	 *   children get this.props.FooStore.storeData
+	 * </AltContainer>
+	 *
+	 * You can also pass in functions.
+	 *
+	 * <AltContainer stores={{ FooStore: function () { return { storeData: true } } }}>
+	 *   children get this.props.FooStore.storeData
+	 * </AltContainer>
+	 *
+	 * Using the `store` prop.
+	 *
+	 * <AltContainer store={FooStore}>
+	 *   children get this.props.storeData
+	 * </AltContainer>
+	 *
+	 * Passing in `flux` because you're using alt instances
+	 *
+	 * <AltContainer flux={flux}>
+	 *   children get this.props.flux
+	 * </AltContainer>
+	 *
+	 * Using a custom render function.
+	 *
+	 * <AltContainer
+	 *   render={function (props) {
+	 *     return <div />;
+	 *   }}
+	 * />
+	 *
+	 * Using the `transform` prop.
+	 *
+	 * <AltContainer
+	 *   stores={{ FooStore: FooStore, BarStore: BarStore }}
+	 *   transform={function(stores) {
+	 *     var FooStore = stores.FooStore;
+	 *     var BarStore = stores.BarStore;
+	 *     var products =
+	 *       FooStore.products
+	 *         .slice(0, 10)
+	 *         .concat(BarStore.products);
+	 *     return { products: products };
+	 *   }}
+	 * >
+	 *   children get this.props.products
+	 * </AltContainer>
+	 *
+	 * Full docs available at http://goatslacker.github.io/alt/
+	 */
+	'use strict';
+
+	var React = __webpack_require__(28);
+	var mixinContainer = __webpack_require__(25);
+	var assign = __webpack_require__(26).assign;
+
+	var AltContainer = React.createClass(assign({
+	  displayName: 'AltContainer',
+
+	  render: function render() {
+	    return this.altRender('div');
+	  }
+	}, mixinContainer(React)));
+
+	module.exports = AltContainer;
+
+/***/ },
 /* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -2170,7 +2184,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 
-	var invariant = __webpack_require__(26);
+	var invariant = __webpack_require__(24);
 
 	var _lastID = 1;
 	var _prefix = 'ID_';
@@ -2412,10 +2426,69 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
+	/**
+	 * Copyright (c) 2014, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule invariant
+	 */
+
+	"use strict";
+
+	/**
+	 * Use invariant() to assert state which your program assumes to be true.
+	 *
+	 * Provide sprintf-style format (only %s is supported) and arguments
+	 * to provide information about what broke and what you were
+	 * expecting.
+	 *
+	 * The invariant message will be stripped in production, but the invariant
+	 * will remain to ensure logic does not differ in production.
+	 */
+
+	var invariant = function(condition, format, a, b, c, d, e, f) {
+	  if (false) {
+	    if (format === undefined) {
+	      throw new Error('invariant requires an error message argument');
+	    }
+	  }
+
+	  if (!condition) {
+	    var error;
+	    if (format === undefined) {
+	      error = new Error(
+	        'Minified exception occurred; use the non-minified dev environment ' +
+	        'for the full error message and additional helpful warnings.'
+	      );
+	    } else {
+	      var args = [a, b, c, d, e, f];
+	      var argIndex = 0;
+	      error = new Error(
+	        'Invariant Violation: ' +
+	        format.replace(/%s/g, function() { return args[argIndex++]; })
+	      );
+	    }
+
+	    error.framesToPop = 1; // we don't care about invariant's own frame
+	    throw error;
+	  }
+	};
+
+	module.exports = invariant;
+
+
+/***/ },
+/* 25 */
+/***/ function(module, exports, __webpack_require__) {
+
 	'use strict';
 
 	var Subscribe = __webpack_require__(29);
-	var assign = __webpack_require__(25).assign;
+	var assign = __webpack_require__(26).assign;
 
 	function id(it) {
 	  return it;
@@ -2580,7 +2653,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = mixinContainer;
 
 /***/ },
-/* 25 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2616,73 +2689,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 /***/ },
-/* 26 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright (c) 2014, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule invariant
-	 */
-
-	"use strict";
-
-	/**
-	 * Use invariant() to assert state which your program assumes to be true.
-	 *
-	 * Provide sprintf-style format (only %s is supported) and arguments
-	 * to provide information about what broke and what you were
-	 * expecting.
-	 *
-	 * The invariant message will be stripped in production, but the invariant
-	 * will remain to ensure logic does not differ in production.
-	 */
-
-	var invariant = function(condition, format, a, b, c, d, e, f) {
-	  if (false) {
-	    if (format === undefined) {
-	      throw new Error('invariant requires an error message argument');
-	    }
-	  }
-
-	  if (!condition) {
-	    var error;
-	    if (format === undefined) {
-	      error = new Error(
-	        'Minified exception occurred; use the non-minified dev environment ' +
-	        'for the full error message and additional helpful warnings.'
-	      );
-	    } else {
-	      var args = [a, b, c, d, e, f];
-	      var argIndex = 0;
-	      error = new Error(
-	        'Invariant Violation: ' +
-	        format.replace(/%s/g, function() { return args[argIndex++]; })
-	      );
-	    }
-
-	    error.framesToPop = 1; // we don't care about invariant's own frame
-	    throw error;
-	  }
-	};
-
-	module.exports = invariant;
-
-
-/***/ },
 /* 27 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__(30);
-
-
-/***/ },
-/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -2713,6 +2720,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	module.exports = transmitter;
+
+/***/ },
+/* 28 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__(30);
+
 
 /***/ },
 /* 29 */

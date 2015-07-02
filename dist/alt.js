@@ -120,7 +120,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.actions = { global: {} };
 	    this.stores = {};
 	    this.storeTransforms = config.storeTransforms || [];
-	    this.buffer = false;
+	    this.trapAsync = false;
 	    this._actionsRegistry = {};
 	    this._initSnapshot = {};
 	    this._lastSnapshot = {};
@@ -132,7 +132,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var _this = this;
 
 	      this.batchingFunction(function () {
-	        return _this.dispatcher.dispatch({ action: action, data: data, details: details });
+	        var id = Math.random().toString(18).substr(2, 16);
+	        return _this.dispatcher.dispatch({
+	          id: id,
+	          action: action,
+	          data: data,
+	          details: details
+	        });
 	      });
 	    }
 	  }, {
@@ -484,22 +490,22 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* istanbul ignore next */
+	/*eslint-disable*/
 	'use strict';
 
 	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
+
+	/*eslint-enable*/
+
 	exports.getInternalMethods = getInternalMethods;
 	exports.warn = warn;
 	exports.uid = uid;
 	exports.formatAsConstant = formatAsConstant;
 	exports.dispatchIdentity = dispatchIdentity;
-	function NoopClass() {}
-
 	var builtIns = Object.getOwnPropertyNames(NoopClass);
 	var builtInProto = Object.getOwnPropertyNames(NoopClass.prototype);
-
 	function getInternalMethods(Obj, isProto) {
 	  var excluded = isProto ? builtInProto : builtIns;
 	  var obj = isProto ? Obj.prototype : Obj;
@@ -542,6 +548,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  this.dispatch(a.length ? [x].concat(a) : x);
 	}
+
+	/* istanbul ignore next */
+	function NoopClass() {}
 
 /***/ },
 /* 7 */,
@@ -586,11 +595,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var fn = _interopRequireWildcard(_utilsFunctions);
 
-	var _AltStore = __webpack_require__(21);
+	var _AltStore = __webpack_require__(20);
 
 	var _AltStore2 = _interopRequireDefault(_AltStore);
 
-	var _StoreMixin = __webpack_require__(22);
+	var _StoreMixin = __webpack_require__(21);
 
 	var _StoreMixin2 = _interopRequireDefault(_StoreMixin);
 
@@ -843,8 +852,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 19 */,
-/* 20 */,
-/* 21 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -865,7 +873,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var fn = _interopRequireWildcard(_utilsFunctions);
 
-	var _transmitter = __webpack_require__(28);
+	var _transmitter = __webpack_require__(27);
 
 	var _transmitter2 = _interopRequireDefault(_transmitter);
 
@@ -963,7 +971,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }, {
 	    key: 'unlisten',
 	    value: function unlisten(cb) {
-	      if (!cb) throw new TypeError('Unlisten must receive a function');
 	      this.lifecycle('unlisten');
 	      this.transmitter.unsubscribe(cb);
 	    }
@@ -981,7 +988,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
-/* 22 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -994,7 +1001,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-	var _transmitter = __webpack_require__(28);
+	var _transmitter = __webpack_require__(27);
 
 	var _transmitter2 = _interopRequireDefault(_transmitter);
 
@@ -1065,7 +1072,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              action(intercept(x, action, args));
 	              if (isError) throw x;
 	            };
-	            return _this.alt.buffer ? function () {
+	            return _this.alt.trapAsync ? function () {
 	              return fire();
 	            } : fire();
 	          };
@@ -1187,6 +1194,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = exports['default'];
 
 /***/ },
+/* 22 */,
 /* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -1204,7 +1212,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 
-	var invariant = __webpack_require__(26);
+	var invariant = __webpack_require__(24);
 
 	var _lastID = 1;
 	var _prefix = 'ID_';
@@ -1443,9 +1451,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 24 */,
-/* 25 */,
-/* 26 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -1504,8 +1510,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 27 */,
-/* 28 */
+/* 25 */,
+/* 26 */,
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
