@@ -1,5 +1,12 @@
 import React from 'react'
 
+const STAT = {
+  READY: 0,
+  DONE: 1,
+  LOADING: 2,
+  FAILED: 3
+}
+
 function usingDispatchBuffer(buffer, Component) {
   return React.createClass({
     childContextTypes: {
@@ -23,25 +30,21 @@ function usingDispatchBuffer(buffer, Component) {
 class DispatchBuffer {
   constructor(renderStrategy) {
     this.promisesBuffer = []
-    this.unlocked = false
-    this.fetched = {}
-    this.fulfilled = {}
+    this.status = {}
     this.dispatches = []
     this.renderStrategy = renderStrategy
   }
 
   push(id, promise) {
     this.promisesBuffer.push(promise)
-    promise.then(() => this.fulfilled[id] = true)
-    this.fetched[id] = true
+    promise.then(
+      () => this.status[id] = STAT.DONE,
+      () => this.status[id] = STAT.FAILED
+    )
   }
 
-  shouldFetch(id) {
-    return !this.fetched[id]
-  }
-
-  shouldRender(id) {
-    return this.fulfilled[id]
+  getStatus(id) {
+    return this.status[id]
   }
 
   clear() {
@@ -54,8 +57,7 @@ class DispatchBuffer {
       html,
       state: alt.flush(),
       buffer: {
-        fetched: this.fetched,
-        fulfilled: this.fulfilled
+        status: this.status
       },
       element: Element,
       diagnostics: {
@@ -196,9 +198,7 @@ export default class Render {
   getReady(Component, props, opts = {}) {
     const buffer = new DispatchBuffer()
 
-    buffer.unlocked = true
-    if (opts.fetched) buffer.fetched = opts.fetched
-    if (opts.fulfilled) buffer.fulfilled = opts.fulfilled
+    if (opts.status) buffer.status = opts.status
     const Node = usingDispatchBuffer(buffer, Component)
     const Element = React.createElement(Node, props)
     buffer.clear()
@@ -211,7 +211,7 @@ export default class Render {
     })
   }
 
-  static resolve(fetch, MaybeComponent) {
+  static connect(Spec, MaybeComponent) {
     function bind(Component) {
       return React.createClass({
         contextTypes: {
@@ -234,40 +234,90 @@ export default class Render {
         },
 
         getInitialState() {
-          return { fulfilled: false }
-        },
-
-        componentWillMount() {
-          if (this.context.buffer.shouldFetch(this.context.universalId)) {
-            const promise = fetch(this.props)
-            this.context.buffer.push(this.context.universalId, promise)
-
-            if (this.context.buffer.unlocked) {
-              promise.then(() => {
-                this.setState({ fulfilled: true })
-              })
-            }
+          return {
+            status: this.context.buffer.getStatus(this.context.universalId),
+            props: Spec.reduceProps(this.props, this.context)
           }
         },
 
+        componentWillReceiveProps(nextProps) {
+          if (Spec.willReceiveProps) {
+            Spec.willReceiveProps(nextProps, this.props, this.context)
+          }
+        },
+
+        componentWillMount() {
+          // XXX I would like to have the loading and async resolving stuff client side whenever new props are passed...
+          // how do i get this behavior?
+          if (Spec.resolveAsync && this.state.status === STAT.READY) {
+            const promise = Spec.resolveAsync(this.props, this.context)
+
+            // client side we setup a listener for loading and done
+            if (typeof window !== 'undefined') {
+              this.setState({ status: STAT.LOADING })
+              promise.then(
+                () => this.setState({ status: STAT.DONE }),
+                () => this.setState({ status: STAT.FAILED })
+              )
+
+            // server side we push it into our buffer
+            } else {
+              this.context.buffer.push(this.context.universalId, promise)
+            }
+          }
+
+          if (Spec.willMount) Spec.willMount(this.props, this.context)
+        },
+
+        componentDidMount() {
+          const stores = Spec.listenTo(this.props, this.context)
+          this.storeListeners = stores.map((store) => {
+            return store.listen(this.onChange)
+          })
+
+          if (Spec.didMount) Spec.didMount(this.props, this.context)
+        },
+
+        componentWillUnmount() {
+          this.storeListeners.forEach(unlisten => unlisten())
+        },
+
+        onChange() {
+          this.setState({
+            props: Spec.reduceProps(this.props, this.context)
+          })
+        },
+
+        renderIfValid(val) {
+          return React.isValidElement(val)
+            ? val
+            : <Component {...val} />
+        },
+
         render() {
-          // Current issues:
-          //
-          // If there is an error fetching and shouldFetch is set to true but
-          // shouldRender is set to false then this component will never render nor fetch.
-          // Having a container which has loading/failed states makes sense here.
-          //
-          // shouldRender shouldn't be passed down from Render. We should just check that
-          // all props were resolved and that determines if we should render. Having this connect
-          // to a store(s) through a container where we check the existence of props might work fine.
-          return this.state.fulfilled || this.context.buffer.shouldRender(this.context.universalId)
-            ? React.createElement(Component, this.props)
-            : null
+          const { status } = this.state
+
+          switch (status) {
+            case STAT.READY:
+              return null
+            case STAT.DONE:
+              return <Component {...this.state.props} />
+            case STAT.LOADING:
+              return Spec.loading
+                ? this.renderIfValid(Spec.loading(this.props))
+                : null
+            case STAT.FAILED:
+              return Spec.failed
+                ? this.renderIfValid(Spec.failed(this.state.error))
+                : null
+          }
         }
       })
     }
 
     // works as a decorator or as a function
-    return MaybeComponent ? bind(MaybeComponent) : Component => bind(Component)
+    return MaybeComponent
+      ? bind(MaybeComponent)
+      : Component => bind(Component)
   }
 }

@@ -1,36 +1,65 @@
 import Alt from './'
-
-// XXX
-global.window = {}
+import React from 'react'
+import Render, { connect } from './utils/Render'
 
 const alt = new Alt()
 
 const actions = alt.generateActions('yes', 'no')
 
-const Source = {
-  checkOneTwo: {
-    remote() {
-      return Promise.resolve('ok')
-    },
-    success: actions.yes,
-    error: actions.no
+const UserStore = alt.createStore(function () {
+  this.state = { user: null }
+
+  this.bindAction(actions.yes, user => this.setState({ user }))
+
+  this.exportPublicMethods({
+    getUser: () => this.state.user,
+
+    fetchUser: (id) => {
+      this.fetch({
+        remote() {
+          if (id === 1) {
+            return Promise.resolve('Josh')
+          } else {
+            return Promise.resolve('Unknown')
+          }
+        },
+
+        success: actions.yes,
+        error: actions.no
+      })
+    }
+  })
+}, 'UserStore')
+
+@connect({
+  listenTo() {
+    return [UserStore]
+  },
+
+  resolveAsync(props) {
+    return UserStore.fetchUser(props.id)
+  },
+
+  reduceProps(props, context) {
+    return {
+      user: UserStore.getUser()
+    }
+  },
+
+  loading() {
+    return <div>Loading</div>
+  },
+
+  failed() {
+    return <div>Uh oh</div>
+  }
+})
+class App extends React.Component {
+  render() {
+    return <div>{this.props.user}</div>
   }
 }
 
-const Store = alt.createStore(function () {
-  this.exportAsync(Source)
-  this.bindAction(actions.yes, () => {
-    console.log('In success')
-  })
-}, 'Store')
-
-const unlisten = Store.listen(() => {
-  throw new Error('crap')
-})
-
-//actions.yes()
-Store.checkOneTwo().then(() => {
-  console.log('??')
-}).catch((e) => {
-  console.log('no?')
+new Render(alt).toString(App, { id: 1 }).then((obj) => {
+  console.log(obj)
 })
