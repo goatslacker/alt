@@ -20,7 +20,7 @@ const UserStore = alt.createStore(function () {
           if (id === 1) {
             return Promise.resolve('Josh')
           } else {
-            return Promise.resolve('Unknown')
+            return Promise.reject('Unknown')
           }
         },
 
@@ -56,6 +56,14 @@ class App extends React.Component {
   }
 }
 
-new Render(alt).toString(App, { id: 1 }).then((obj) => {
-  console.log(obj)
-})
+export default {
+  server(props) {
+    console.log('Requesting', props)
+    return new Render(alt).toString(App, props)
+  },
+
+  client(state, props, node) {
+    alt.bootstrap(state)
+    new Render(alt).toDOM(App, props, node)
+  }
+}
