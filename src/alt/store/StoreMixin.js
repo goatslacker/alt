@@ -19,69 +19,43 @@ const StoreMixin = {
     this.dispatcher.waitFor(tokens)
   },
 
-  exportAsync(asyncMethods) {
-    this.registerAsync(asyncMethods)
-  },
-
-  registerAsync(asyncDef) {
-    let loadCounter = 0
-
-    const asyncMethods = fn.isFunction(asyncDef)
-      ? asyncDef(this.alt)
-      : asyncDef
-
-    const toExport = Object.keys(asyncMethods).reduce((publicMethods, methodName) => {
-      const desc = asyncMethods[methodName]
-      const spec = fn.isFunction(desc) ? desc(this) : desc
-
-      const validHandlers = ['success', 'error', 'loading']
-      validHandlers.forEach((handler) => {
-        if (spec[handler] && !spec[handler].id) {
-          throw new Error(`${handler} handler must be an action function`)
-        }
-      })
-
-      publicMethods[methodName] = (...args) => {
-        const state = this.getInstance().getState()
-        const value = spec.local && spec.local(state, ...args)
-        const shouldFetch = spec.shouldFetch
-          ? spec.shouldFetch(state, ...args)
-          : value == null
-        const intercept = spec.interceptResponse || (x => x)
-
-        const makeActionHandler = (action, isError) => {
-          return (x) => {
-            const fire = () => {
-              loadCounter -= 1
-              action(intercept(x, action, args))
-              if (isError) throw x
-            }
-            return this.alt.buffer ? (() => fire()) : fire()
-          }
-        }
-
-        // if we don't have it in cache then fetch it
-        if (shouldFetch) {
-          loadCounter += 1
-          /* istanbul ignore else */
-          if (spec.loading) spec.loading(intercept(null, spec.loading, args))
-          return spec.remote(state, ...args).then(
-            makeActionHandler(spec.success),
-            makeActionHandler(spec.error, 1)
-          )
-        } else {
-          // otherwise emit the change now
-          this.emitChange()
-        }
+  fetch(spec) {
+    const validHandlers = ['success', 'error', 'loading']
+    validHandlers.forEach((handler) => {
+      if (spec[handler] && !spec[handler].id) {
+        throw new Error(`${handler} handler must be an action function`)
       }
-
-      return publicMethods
-    }, {})
-
-    this.exportPublicMethods(toExport)
-    this.exportPublicMethods({
-      isLoading: () => loadCounter > 0
     })
+
+    const value = spec.local && spec.local()
+    const shouldFetch = spec.shouldFetch
+      ? spec.shouldFetch()
+      : value == null
+
+    const intercept = spec.interceptResponse || (x => x)
+
+    const makeActionHandler = (action, isError) => {
+      return (x) => {
+        const fire = () => {
+          action(intercept(x, action))
+          if (isError) throw x
+        }
+        return this.alt.buffer ? (() => fire()) : fire()
+      }
+    }
+
+    // if we don't have it in cache then fetch it
+    if (shouldFetch) {
+      /* istanbul ignore else */
+      if (spec.loading) spec.loading(intercept(null, spec.loading))
+      return spec.remote().then(
+        makeActionHandler(spec.success),
+        makeActionHandler(spec.error, 1)
+      )
+    } else {
+      // otherwise emit the change now
+      this.emitChange()
+    }
   },
 
   exportPublicMethods(methods) {

@@ -44,7 +44,7 @@ class DispatchBuffer {
   }
 
   getStatus(id) {
-    return this.status[id]
+    return this.status[id] || STAT.READY
   }
 
   clear() {

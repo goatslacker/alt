@@ -15,7 +15,7 @@ const UserStore = alt.createStore(function () {
     getUser: () => this.state.user,
 
     fetchUser: (id) => {
-      this.fetch({
+      return this.fetch({
         remote() {
           if (id === 1) {
             return Promise.resolve('Josh')
@@ -44,10 +44,6 @@ const UserStore = alt.createStore(function () {
     return {
       user: UserStore.getUser()
     }
-  },
-
-  loading() {
-    return <div>Loading</div>
   },
 
   failed() {
