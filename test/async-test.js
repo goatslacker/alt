@@ -285,7 +285,7 @@ export default {
       delete global.window
 
       const actions = alt.generateActions('test')
-      alt.buffer = true
+      alt.trapAsync = true
 
       const PojoSource = {
         justTesting: {
@@ -317,7 +317,7 @@ export default {
         assert.ok(spy.calledOnce, 'the dispatcher was flushed')
 
         alt.dispatcher.unregister(dispatchToken)
-        alt.buffer = false
+        alt.trapAsync = false
         done()
       })
     },

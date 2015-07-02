@@ -100,7 +100,7 @@ class DispatchBuffer {
 
 function renderWithStrategy(strategy) {
   return (alt, Component, props) => {
-    alt.buffer = true
+    alt.trapAsync = true
 
     // create a buffer and use context to pass it through to the components
     const buffer = new DispatchBuffer((Node) => {
