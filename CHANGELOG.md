@@ -71,6 +71,8 @@ The old behavior of assigning state directly as instance properties will continu
 
 * Render.toString/toStaticMarkup now return an object rather than a string of html.
 
+  **Note: Render API is still in flux**
+
   **Upgrade Guide**
 
 ```js
@@ -99,9 +101,11 @@ Render.toDOM(App, props, document.getElementById('react-root'), true)
 
 ### Added
 
+* A sweet new DispatcherDebugger react component which lets you debug your flux application on the browser. [commit](https://github.com/goatslacker/alt/commit/aad9c2bb)
 * You may now return from actions directly in order to dispatch, no need to call `this.dispatch`.
 * connectToStores can now be used where you specify the methods at the callsite. [commit](https://github.com/goatslacker/alt/commit/a117e30)
 * statics addon lets you add your static methods to components that have been connected. [commit](https://github.com/goatslacker/alt/commit/537ec26)
+* TypeScript definitions!. [commit](https://github.com/goatslacker/alt/commit/d4ce63a)
 
 ### Changed
 
