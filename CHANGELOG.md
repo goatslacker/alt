@@ -101,7 +101,7 @@ Render.toDOM(App, props, document.getElementById('react-root'), true)
 
 ### Added
 
-* A sweet new DispatcherDebugger react component which lets you debug your flux application on the browser. [commit](https://github.com/goatslacker/alt/commit/aad9c2bb)
+* A sweet new DispatcherDebugger react component which lets you debug your flux application on the browser. [commit](https://github.com/goatslacker/alt/commit/ad9c2bb)
 * You may now return from actions directly in order to dispatch, no need to call `this.dispatch`.
 * connectToStores can now be used where you specify the methods at the callsite. [commit](https://github.com/goatslacker/alt/commit/a117e30)
 * statics addon lets you add your static methods to components that have been connected. [commit](https://github.com/goatslacker/alt/commit/537ec26)
