@@ -381,7 +381,7 @@ class MyComponent extends Component {
 
 <h3 id="serializingdeserializing-immutable-data">Serializing/Deserializing Immutable Data</h3>
 
-<p>If you are using immutable data and plan on taking advantage of alt’s <a href="/docs/utils/../takeSnapshot">snapshot</a> and <a href="/docs/utils/../bootstrap">bootstrap</a> capabilities you must ensure that <a href="/docs/utils/../lifecycleListeners#serialize">serialize</a> and <a href="/docs/utils/../lifecycleListeners#deserialize">deserialize</a> handle the immutable data.</p>
+<p>If you are using immutable data and plan on taking advantage of alt’s <a href="/docs/utils/../takeSnapshot">snapshot</a> and <a href="/docs/utils/../bootstrap">bootstrap</a> capabilities you must ensure that the <a href="/docs/utils/../serialization#onSerialize">onSerialize</a> and <a href="/docs/utils/../serialization#onDeserialize">onDeserialize</a> hooks handle the immutable data.</p>
 
 <p>Serialize returns the data from the store to be used in a snapshot so the immutable getters will need to be used to return a plain JS object to be serialized.</p>
 

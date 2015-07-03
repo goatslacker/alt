@@ -194,29 +194,29 @@
   }
 }
 
-var flux = new MyAlt();
+const flux = new MyAlt();
 </code></pre>
 
 <p>You can set your entire app context by wrapping your root component with <code>withAltContext</code>.</p>
 
-<p>As a decorator:<br />
-```js<br />
-import withAltContext from ‘alt/utils/withAltContext’</p>
+<p>As a decorator:</p>
 
-<p>@withAltContext(alt)<br />
-export default class App extends React.Component {<br />
-  render() {<br />
-    return &lt;div&gt;{this.context.flux}&lt;/div&gt;<br />
-  }<br />
-}<br />
-```</p>
+<pre><code class="language-js">import withAltContext from 'alt/utils/withAltContext'
 
-<p>As a function:<br />
-```js<br />
-import withAltContext from ‘alt/utils/withAltContext’</p>
+@withAltContext(alt)
+export default class App extends React.Component {
+  render() {
+    return &lt;div&gt;{this.context.flux}&lt;/div&gt;
+  }
+}
+</code></pre>
 
-<p>export default withAltContext(alt)(App);<br />
-```</p>
+<p>As a function:</p>
+
+<pre><code class="language-js">import withAltContext from 'alt/utils/withAltContext'
+
+export default withAltContext(alt)(App);
+</code></pre>
 
 <h1 id="altclass">AltClass</h1>
 
@@ -265,8 +265,68 @@ import withAltContext from ‘alt/utils/withAltContext’</p>
 
 <p>Retrieves the store instance that was created.</p>
 
-<pre><code class="language-js">var state = alt.getStore('myStore').getState();
+<pre><code class="language-js">const state = alt.getStore('myStore').getState();
 </code></pre>
+
+<h1 id="integrating-with-react">Integrating with React</h1>
+
+<p>You have two options on passing your alt instance through to your React components: manually through props, or using context.</p>
+
+<p>We won’t go over manually through props except for this one small code sample:</p>
+
+<pre><code class="language-js">const flux = new Flux()
+
+class MyApplicationComponent extends React.Component {
+  render() {
+    return (
+      &lt;div&gt;
+        &lt;MySuperCoolComponent flux={this.props.flux} /&gt;
+      &lt;/div&gt;
+    )
+  }
+}
+
+
+&lt;MyApplicationComponent flux={flux} /&gt;
+</code></pre>
+
+<p>Now, using context, which is a more common approach. There’s a <a href="../src/utils/withAltContext">util you can use</a> which will automatically create the context for you and then make it available for every immediate child of AltContainer.</p>
+
+<pre><code class="language-js">const flux = new Flux()
+
+class MyApplicationComponent extends React.Component {
+  render() {
+    // MySuperCoolComponent would automatically get this.props.flux
+    return (
+      &lt;div&gt;
+        &lt;AltContainer&gt;
+          &lt;MySuperCoolComponent /&gt;
+        &lt;/AltContainer&gt;
+      &lt;/div&gt;
+    )
+  }
+}
+
+const App = withAltContext(flux, MyApplicationComponent)
+&lt;App /&gt;
+</code></pre>
+
+<p>Now you’re setup to do things with each instance of Alt:</p>
+
+<pre><code class="language-js">class MySuperCoolComponent extends React.Component {
+  componentDidMount() {
+    this.props.flux.actions.CoolActions.goFetchData()
+  }
+
+  render() {
+    return (
+      &lt;div&gt;{this.props.flux.stores.CoolStore.getMyCoolName()}&lt;/div&gt;
+    )
+  }
+}
+</code></pre>
+
+<p>You can read more about <a href="/docs/components/altContainer">AltContainer here</a>.</p>
 
           </div>
         </div>

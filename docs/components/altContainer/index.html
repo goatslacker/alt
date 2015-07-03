@@ -407,8 +407,12 @@ function blogStoreFetcher(props) {
 <p>If you don’t like the way <code>AltContainer</code> passing the props, you can give it a <code>transform</code> function.</p>
 
 <pre><code class="language-js">&lt;AltContainer
-  stores=
-  actions=
+  stores={
+    { BlogStore }
+  }
+  actions={
+    { BlogActions }
+  }
   transform={({ BlogStore, BlogActions }) =&gt; {
     var posts = BlogStore.posts.slice(0, 42);
     var makePost =

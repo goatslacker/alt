@@ -193,24 +193,24 @@
 
 const SearchSource = {
   performSearch: {
-    // remotely fetch something
+    // remotely fetch something (required)
     remote(state) {
       return axios.get(`/search/q/${state.value}`);
     },
 
     // this function checks in our local cache first
-    // if the value is present it'll use that instead.
+    // if the value is present it'll use that instead (optional).
     local(state) {
       return state.results[state.value] ? state.results : null;
     },
 
     // here we setup some actions to handle our response
-    loading: SearchActions.loadingResults,
-    success: SearchActions.receivedResults,
-    error: SearchActions.fetchingResultsFailed,
+    loading: SearchActions.loadingResults, // (optional)
+    success: SearchActions.receivedResults, // (required)
+    error: SearchActions.fetchingResultsFailed, // (required)
 
     // should fetch has precedence over the value returned by local in determining whether remote should be called
-    // in this particular example if the value is present locally it would return but still fire off the remote request
+    // in this particular example if the value is present locally it would return but still fire off the remote request (optional)
     shouldFetch(state) {
       return true
     }
@@ -222,7 +222,7 @@ const SearchSource = {
 
 <pre><code class="language-js">class SearchStore {
   constructor() {
-    this.value = '';
+    this.state = { value: '' };
 
     this.registerAsync(SearchSource);
   }
@@ -251,10 +251,12 @@ const SearchSource = {
 <p>Each function must return an object. The object may optionally implement <code>local</code> and <code>loading</code> but it must implement <code>remote</code>, <code>success</code>, and <code>error</code>.</p>
 
 <h3 id="localstate-object-args-any">local(state: object, …args: any)</h3>
+<p><em>Optional</em></p>
 
-<p>This function is called first. If a value is returned then a change event will be emitted from the store.</p>
+<p>This function is called first. If a value is returned then a change event will be emitted from the store. Omit this function to always fetch a value remotely;</p>
 
 <h3 id="remotestate-object-args-any">remote(state: object, …args: any)</h3>
+<p>##### Required</p>
 
 <p>This function is called whenever we need to fetch a value remotely. <code>remote</code> is only called if <code>local</code> returns null or undefined as its value, or if <code>shouldFetch</code> returns true.</p>
 
@@ -266,11 +268,23 @@ const SearchSource = {
 SearchStore.performSearch(1, 2, 3);
 </code></pre>
 
-<h3 id="shouldfetchstate-object-args-any">shouldFetch(state: object, …args: any)</h3>
+<h3 id="success">success</h3>
+<p>##### Required</p>
 
-<p>This function determines whether or not remote needs to be called, despite the value returned by <code>local</code>. If <code>shouldFetch</code> returns true, it will always get the data from <code>remote</code> and if it returns false, it will always use the value from <code>local</code>.</p>
+<p>Must be an action. Called whenever a value resolves.</p>
+
+<h3 id="error">error</h3>
+<p>##### Required</p>
+
+<p>Must be an action. Called whenever a value rejects.</p>
+
+<h3 id="shouldfetchstate-object-args-any">shouldFetch(state: object, …args: any)</h3>
+<p><em>Optional</em></p>
+
+<p>This function determines whether or not remote needs to be called, despite the value returned by <code>local</code>. If <code>shouldFetch</code> returns true, it will always get the data from <code>remote</code> and if it returns false, it will always use the value from <code>local</code>. You can omit both <code>shouldFetch</code> and <code>local</code> if you wish to always fetch remotely.</p>
 
 <h3 id="interceptresponseresponse-action-args">interceptResponse(response, action, args)</h3>
+<p><em>Optional</em></p>
 
 <p>This function overrides the value passed to the action. Response is the value returned from the promise in <code>remote</code> or <code>local</code> and null in the case of loading action, action is the action to be called, args are the arguments (as an array) passed to the data source method.</p>
 
@@ -280,16 +294,9 @@ SearchStore.performSearch(1, 2, 3);
 </code></pre>
 
 <h3 id="loading">loading</h3>
+<p><em>Optional</em></p>
 
-<p>Must be an action. Called before <code>remote</code> is called.</p>
-
-<h3 id="success">success</h3>
-
-<p>Must be an action. Called whenever a value resolves.</p>
-
-<h3 id="error">error</h3>
-
-<p>Must be an action. Called whenever a value rejects.</p>
+<p>Must be an action. This function will be called immediately prior to the <code>remote</code> function. This call is a synchronous  and is not related to the <code>isLoading()</code> method of the store.</p>
 
 <h2 id="decorator">Decorator</h2>
 
@@ -300,7 +307,7 @@ SearchStore.performSearch(1, 2, 3);
 @datasource(SearchSource);
 class SearchStore {
   constructor() {
-    this.value = '';
+    this.state = { value: '' };
   }
 }
 </code></pre>

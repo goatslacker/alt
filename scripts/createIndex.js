@@ -57,7 +57,9 @@ function fromDirectory(dir) {
   }, [])
 }
 
-const documents = fromDirectory('../docs').map(addDocument)
+const documents = fromDirectory('../docs')
+  .concat(fromDirectory('../guides'))
+  .map(addDocument)
 
 const searchData = {
   docs: documents,

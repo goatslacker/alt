@@ -182,10 +182,10 @@
             <h1 id="createactions">createActions</h1>
 
 <blockquote>
-  <p>(ActionsClass: function, exportObj: ?object): <a href="/docs/actions">Actions</a></p>
+  <p>(ActionsClass: function, exportObj: ?object, …constructorArgs): <a href="/docs/actions">Actions</a></p>
 </blockquote>
 
-<p>This is a function that takes in a class of actions and returns back an object with those actions defined. The second argument <code>exportObj</code> is optional and provides a way to export to a specific object. This is useful when you have circular dependencies you can either export to an app managed global or straight to <code>exports</code>.</p>
+<p>This is a function that takes in a class of actions and returns back an object with those actions defined. The second argument <code>exportObj</code> is optional and provides a way to export to a specific object. This is useful when you have circular dependencies you can either export to an app managed global or straight to <code>exports</code>. <code>constructorArgs</code> are passed to the <code>ActionClass</code> constructor.</p>
 
 <h1 id="generateactions">generateActions</h1>
 
@@ -195,7 +195,7 @@
 
 <p>If all of your actions are just straight through dispatches you can shorthand generate them using this function.</p>
 
-<pre><code class="language-js">var MyActions = alt.generateActions('foo', 'bar', 'baz');
+<pre><code class="language-js">const MyActions = alt.generateActions('foo', 'bar', 'baz');
 </code></pre>
 
 <p>Which could then be used like this:</p>
@@ -210,10 +210,10 @@ MyActions.baz();
 <h2 id="actionsclassconstructor">ActionsClass#constructor</h2>
 
 <blockquote>
-  <p>(alt: Alt): ActionsClass</p>
+  <p>(…args): ActionsClass</p>
 </blockquote>
 
-<p>The constructor of your actions receives the alt instance as its first and only argument. Inside the constructor any instance properties you define will be available as actions.</p>
+<p>The constructor of your actions receives any constructor arguments passed through the <a href="#createActions"><code>createActions</code></a> function. Inside the constructor any instance properties you define will be available as actions.</p>
 
 <h2 id="actionsclassgenerateactions">ActionsClass#generateActions</h2>
 
@@ -226,7 +226,7 @@ MyActions.baz();
 <p>Actions like these:</p>
 
 <pre><code class="language-js">ActionsClass.prototype.myAction = function (data) {
-  this.dispatch(data);
+  return data;
 };
 </code></pre>
 
@@ -245,7 +245,12 @@ MyActions.baz();
   <p>(data: mixed): undefined</p>
 </blockquote>
 
-<p>This method is available inside every action. It is a method that is unique to every action which lets the dispatcher know where each dispatch is coming from.</p>
+<p>This method is available inside every action. It’s a method you may call rather than returning from each dispatch. It is unique to every action and lets the dispatcher know where each dispatch is coming from.</p>
+
+<pre><code class="language-js">ActionsClass.prototype.myActionFail = function (data) {
+  this.dispatch(data);
+};
+</code></pre>
 
 <h2 id="actionsclassactions">ActionsClass#actions</h2>
 

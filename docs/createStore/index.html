@@ -182,10 +182,10 @@
             <h1 id="createstore">createStore</h1>
 
 <blockquote>
-  <p>(StoreModel: function, iden: ?string, saveStore = true: boolean): <a href="/docs/stores">AltStore</a></p>
+  <p>(StoreModel: function, iden: ?string, saveStore = true: boolean, …constructorArgs): <a href="/docs/stores">AltStore</a></p>
 </blockquote>
 
-<p>This is a function that takes in a class of your store and returns back the singleton store. The second parameter <code>iden</code> is a string that is used as a unique identifier for serializing/deserializing your store. The name of the store comes from the class name but on production due to heavy minification it is a good idea to provide your own name to avoid collisions. The third parameter <code>saveStore</code> is to tell alt whether to save a reference to the store for later when using <a href="/docs/bootstrap">bootstrap</a> or <a href="/docs/takeSnapshot">snapshots</a>.</p>
+<p>This is a function that takes in a class of your store and returns back the singleton store. The second parameter <code>iden</code> is a string that is used as a unique identifier for serializing/deserializing your store. The name of the store comes from the class name but on production due to heavy minification it is a good idea to provide your own name to avoid collisions. The third parameter <code>saveStore</code> is to tell alt whether to save a reference to the store for later when using <a href="/docs/bootstrap">bootstrap</a> or <a href="/docs/takeSnapshot">snapshots</a>. <code>constructorArgs</code> are passed to the <code>StoreModel</code> constructor (if <code>StoreModel</code> is a class).</p>
 
 <h1 id="storemodel">StoreModel</h1>
 
@@ -243,10 +243,10 @@
 <h2 id="storemodelconstructor">StoreModel#constructor</h2>
 
 <blockquote>
-  <p>(alt: Alt): StoreModel</p>
+  <p>(…args): StoreModel</p>
 </blockquote>
 
-<p>The constructor of your store definition receieves the alt instance as its first and only argument. All instance variables, values assigned to <code>this</code>, in any part of the StoreModel will become part of state.</p>
+<p>The constructor of your store definition receives any constructor arguments passed through the <a href="#createStore"><code>createStore</code></a> function. All instance variables, values assigned to <code>this</code>, in any part of the StoreModel will become part of state.</p>
 
 <h2 id="storemodelon">StoreModel#on</h2>
 
@@ -371,7 +371,7 @@
 
 <pre><code class="language-js">class MyStore {
   handleFoo() {
-    this.foo = 0;
+    this.state = { foo: 0 };
 
     setTimeout(() =&gt; {
       // set foo to 1 and emit a change.
@@ -381,7 +381,7 @@
     }, 100);
 
     // supress emitting a change.
-    return false;
+    this.preventDefault();
   }
 }
 </code></pre>
@@ -428,15 +428,14 @@ class Store extends StoreBase {
 <p>This method retrieves the store instance which contains any of the public methods you’ve exported as well as the listen/unlisten methods.</p>
 
 <pre><code class="language-js">class MyStore {
+  constructor() {
+    this.exportPublicMethods({
+      accessToPublicMethod: () =&gt; 2
+    });
+  }
+
   handleFoo() {
-
-    setTimeout(() =&gt; {
-      // emit change later via the store instance.
-      this.getInstance().emitChange();
-    }, 100);
-
-    // supress emitting a change.
-    return false;
+    this.getInstance().accessToPublicMethod();
   }
 }
 </code></pre>
@@ -456,7 +455,7 @@ class Store extends StoreBase {
     }, 100);
 
     // supress emitting a change.
-    return false;
+    this.preventDefault();
   }
 }
 </code></pre>
@@ -476,7 +475,7 @@ class Store extends StoreBase {
 
 <pre><code class="language-js">class MyStore {
   constructor() {
-    var actions = this.alt.getActions('MyActions');
+    const actions = this.alt.getActions('MyActions');
   }
 }
 </code></pre>
@@ -493,6 +492,23 @@ class Store extends StoreBase {
 
 <p>This is a method you can implement in your store in order to receive all dispatches that are not currently being handled in your store explicitly via bindActions, bindAction, or bindListeners. This is similar to guards matching in Haskell.</p>
 
+<h2 id="storemodeloutput">StoreModel#output</h2>
+
+<blockquote>
+  <p>output(state): {}</p>
+</blockquote>
+
+<p>A method you can use to control the output of what gets sent down to <code>listen()</code> as “state”.</p>
+
+<pre><code class="language-js">output(state) {
+  return { foo: 'bar' }
+}
+
+store.listen((state) =&gt; {
+  state.foo === 'bar'
+})
+</code></pre>
+
 <h2 id="storemodelreduce">StoreModel#reduce</h2>
 
 <blockquote>
@@ -503,7 +519,7 @@ class Store extends StoreBase {
 
 <h2 id="storemodelpreventdefault">StoreModel#preventDefault</h2>
 
-<p>Rather than returning false to suppress a change event from your store you may call this method and the change event will not happen.</p>
+<p>You may call this method in order to suppress a change event from being pushed. Alternatively, you can just return <code>false</code> from your action handler in your store.</p>
 
 <h2 id="storemodelobserve">StoreModel#observe</h2>
 

@@ -231,23 +231,6 @@
 <pre><code class="language-js">MyStore.emitChange();
 </code></pre>
 
-<h2 id="storegeteventemitter">Store#getEventEmitter</h2>
-
-<blockquote>
-  <p>(): EventEmitter</p>
-</blockquote>
-
-<p>Returns the eventemitter used internally to emit changes. This affords you the flexibility to create custom events, listen to them, and emit those events within your store or across different stores.</p>
-
-<pre><code class="language-js">var ee = MyStore.getEventEmitter();
-
-ee.on('foo', function () {
-  console.log('hi');
-});
-
-ee.emit('foo');
-</code></pre>
-
           </div>
         </div>
       </div>
