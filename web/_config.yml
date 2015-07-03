@@ -50,6 +50,8 @@ guidenav:
   url: /guide/async/
 - title: Data Dependencies
   url: /guide/wait-for/
+- title: Container Components
+  url: /guide/container-components
 - title: Using Alt with ES5
   url: /guides/es5/
 
