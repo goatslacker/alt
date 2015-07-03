@@ -46,6 +46,7 @@ const UserStore = alt.createStore(function () {
     }
   },
 
+  // if something failed on the server you might want to retry fetching on the client...
   failed() {
     return <div>Uh oh</div>
   }
@@ -62,8 +63,8 @@ export default {
     return new Render(alt).toString(App, props)
   },
 
-  client(state, props, node) {
+  client(state, props, node, meta) {
     alt.bootstrap(state)
-    new Render(alt).toDOM(App, props, node)
+    new Render(alt).toDOM(App, props, node, meta)
   }
 }

@@ -241,28 +241,23 @@ export default class Render {
         },
 
         componentWillReceiveProps(nextProps) {
+          if (Spec.resolveAsync) this.resolveAsyncClient()
+
           if (Spec.willReceiveProps) {
             Spec.willReceiveProps(nextProps, this.props, this.context)
           }
         },
 
         componentWillMount() {
-          // XXX I would like to have the loading and async resolving stuff client side whenever new props are passed...
-          // how do i get this behavior?
-          if (Spec.resolveAsync && this.state.status === STAT.READY) {
-            const promise = Spec.resolveAsync(this.props, this.context)
-
-            // client side we setup a listener for loading and done
-            if (typeof window !== 'undefined') {
-              this.setState({ status: STAT.LOADING })
-              promise.then(
-                () => this.setState({ status: STAT.DONE }),
-                () => this.setState({ status: STAT.FAILED })
-              )
-
-            // server side we push it into our buffer
-            } else {
-              this.context.buffer.push(this.context.universalId, promise)
+          if (Spec.resolveAsync) {
+            // if we are client side and it's either ready or failed then we fetch
+            // server side we only fetch on ready
+            if (this.state.status === STAT.READY || this.state.status === STAT.FAILED) {
+              if (typeof window !== 'undefined') {
+                this.resolveAsyncClient()
+              } else if (this.state.status === STAT.READY) {
+                this.resolveAsyncServer()
+              }
             }
           }
 
@@ -286,6 +281,23 @@ export default class Render {
           this.setState({
             props: Spec.reduceProps(this.props, this.context)
           })
+        },
+
+        resolveAsyncClient() {
+          // client side we setup a listener for loading and done
+          const promise = Spec.resolveAsync(this.props, this.context)
+
+          this.setState({ status: STAT.LOADING })
+          promise.then(
+            () => this.setState({ status: STAT.DONE }),
+            () => this.setState({ status: STAT.FAILED })
+          )
+        },
+
+        resolveAsyncServer() {
+          // server side we push it into our buffer
+          const promise = Spec.resolveAsync(this.props, this.context)
+          this.context.buffer.push(this.context.universalId, promise)
         },
 
         renderIfValid(val) {

@@ -12,7 +12,7 @@ var _iso = require('iso');
 var _iso2 = _interopRequireDefault(_iso);
 
 _iso2['default'].bootstrap(function (state, meta, node) {
-  _foo2['default'].client(state, { id: 1 }, node);
+  _foo2['default'].client(state, { id: 1 }, node, meta);
 });
 
 },{"./foo":2,"iso":13}],2:[function(require,module,exports){
@@ -133,9 +133,9 @@ exports['default'] = {
     return new _utilsRender2['default'](alt).toString(App, props);
   },
 
-  client: function client(state, props, node) {
+  client: function client(state, props, node, meta) {
     alt.bootstrap(state);
-    new _utilsRender2['default'](alt).toDOM(App, props, node);
+    new _utilsRender2['default'](alt).toDOM(App, props, node, meta);
   }
 };
 module.exports = exports['default'];
@@ -21675,7 +21675,6 @@ var DispatchBuffer = (function () {
 
           return _this2.render(alt, Element, info);
         })['catch'](function (error) {
-          console.log('Im here....');
           return _this2.resolve(error, html, alt, Element, i);
         });
       } else {
