@@ -1,7 +1,7 @@
 ---
 layout: guide
 title: Fetching Data
-description: Learn about flux and alt
+description: Asynchronous flow control and flux state
 permalink: /guide/async/
 ---
 

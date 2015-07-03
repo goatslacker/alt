@@ -1,7 +1,7 @@
 ---
 layout: guide
 title: Data Dependencies
-description: Learn about flux and alt
+description: How to deal with derived data within your stores
 permalink: /guide/wait-for/
 ---
 

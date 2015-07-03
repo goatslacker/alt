@@ -1,7 +1,7 @@
 ---
 layout: guide
 title: Using your View
-description: Learn about flux and alt
+description: React components and how they fit into a flux architecture
 permalink: /guide/view/
 ---
 

@@ -1,7 +1,7 @@
 ---
 layout: guide
 title: Creating a Store
-description: Learn about flux and alt
+description: Store manages the state and is shared across your components
 permalink: /guide/store/
 ---
 

@@ -1,7 +1,7 @@
 ---
 layout: guide
 title: Creating Actions
-description: Learn about flux and alt
+description: How to create actions for managing state
 permalink: /guide/actions/
 ---
 
