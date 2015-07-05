@@ -173,7 +173,7 @@ You can inject these actions into BlogPost like so:
 <AltContainer
   store={BlogStore}
   actions={ { MyActions: BlogActions } }
-/>
+>
   <BlogPost className="my-awesome-post" />
 </AltContainer>
 ```
@@ -186,7 +186,7 @@ You can inject these actions directly on the props themselves:
 <AltContainer
   store={BlogStore}
   actions={BlogActions}
-/>
+>
   <BlogPost className="my-awesome-post" />
 </AltContainer>
 ```
@@ -208,8 +208,7 @@ Similar to stores and store the actions prop also accepts a function where you c
         return BlogActions.makePost(postText)
       }
     }
-  }}
-/>
+  }}>
   <BlogPost className="my-awesome-post" />
 </AltContainer>
 ```
