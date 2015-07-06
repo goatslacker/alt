@@ -336,7 +336,7 @@ function blogStoreFetcher(props) {
 <pre><code class="language-js">&lt;AltContainer
   store={BlogStore}
   actions={ { MyActions: BlogActions } }
-/&gt;
+&gt;
   &lt;BlogPost className="my-awesome-post" /&gt;
 &lt;/AltContainer&gt;
 </code></pre>
@@ -348,7 +348,7 @@ function blogStoreFetcher(props) {
 <pre><code class="language-js">&lt;AltContainer
   store={BlogStore}
   actions={BlogActions}
-/&gt;
+&gt;
   &lt;BlogPost className="my-awesome-post" /&gt;
 &lt;/AltContainer&gt;
 </code></pre>
@@ -369,8 +369,7 @@ function blogStoreFetcher(props) {
         return BlogActions.makePost(postText)
       }
     }
-  }}
-/&gt;
+  }}&gt;
   &lt;BlogPost className="my-awesome-post" /&gt;
 &lt;/AltContainer&gt;
 </code></pre>
