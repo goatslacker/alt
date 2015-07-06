@@ -7,8 +7,8 @@ permalink: /guide/container-components/
 
 # Container Components
 
-Now that we've learned the basics on how to [create actions](/guide/actions.md), [create stores](/guide/stores.md),
-and then [listen to them in the view](/guide/view.md); it's time to learn some more advanced topics like container components.
+Now that we've learned the basics on how to [create actions](actions.md), [create stores](store.md),
+and then [listen to them in the view](view.md); it's time to learn some more advanced topics like container components.
 
 What are [container components](https://medium.com/@learnreact/container-components-c0e67432e005)?
 
