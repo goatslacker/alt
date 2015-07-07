@@ -31,7 +31,8 @@ export default function makeAction(alt, namespace, name, implementation, obj) {
   const action = (...args) => {
     newAction.dispatched = false
     const result = newAction._dispatch(...args)
-    if (!newAction.dispatched && result !== undefined) {
+    // async functions that return promises should not be dispatched
+    if (!newAction.dispatched && result !== undefined && !fn.isPromise(result)) {
       if (fn.isFunction(result)) {
         result(dispatch)
       } else {
