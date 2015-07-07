@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.17.1
+
+### Changed
+
+* Returning a promise from action no longer makes the action dispatch by default. [commit](https://github.com/goatslacker/alt/commit/bcda4fb)
+
 ## 0.17.0
 
 ### Breaking Changes
