@@ -57,7 +57,22 @@ class SearchStore {
 }
 ```
 
-Now we'll have a few methods available for use: `SearchStore.performSearch()`, and `SearchStore.isLoading()`.
+Now we'll have a few methods available for use: `SearchStore.performSearch()`, and `SearchStore.isLoading()`. We can use them in `SearchStore` by `this.getInstance().performSearch()` and `this.getInstance().isLoading()`
+
+``` js
+class SearchStore {
+  constructor() {
+    this.state = { value: '' };
+
+    this.registerAsync(SearchSource);
+  }
+  onSearch() {
+    if (!this.getInstance().isLoading()) {
+      this.getInstance().performSearch();
+    }
+  }
+}
+```
 
 ## API
 
