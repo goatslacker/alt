@@ -4,18 +4,16 @@
   "description": "A flux implementation",
   "main": "lib",
   "dependencies": {
-    "babel": "5.6.14",
-    "babel-core": "5.6.14",
-    "babelify": "6.1.2",
     "flux": "2.0.3",
     "transmitter": "1.0.2"
   },
   "devDependencies": {
     "alt-search-docs": "1.0.6",
-    "babel": "^5.6.6",
-    "babel-core": "^5.6.6",
+    "babel": "5.6.14",
+    "babel-core": "5.6.15",
     "babel-eslint": "3.1.18",
     "babel-loader": "^5.1.4",
+    "babelify": "6.1.2",
     "chai": "^2.3.0",
     "coveralls": "^2.11.2",
     "envify": "^3.4.0",
