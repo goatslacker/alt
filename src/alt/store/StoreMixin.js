@@ -34,14 +34,9 @@ const StoreMixin = {
 
     const intercept = spec.interceptResponse || (x => x)
 
-    const makeActionHandler = (action, isError) => {
-      return (x) => {
-        const fire = () => {
-          action(intercept(x, action))
-          if (isError) throw x
-        }
-        return this.alt.buffer ? (() => fire()) : fire()
-      }
+    const handleAction = (action, x) => {
+      const fire = () => action(intercept(x, action))
+      return this.alt.buffer ? (() => fire()) : fire()
     }
 
     // if we don't have it in cache then fetch it
@@ -49,8 +44,8 @@ const StoreMixin = {
       /* istanbul ignore else */
       if (spec.loading) spec.loading(intercept(null, spec.loading))
       return spec.remote().then(
-        makeActionHandler(spec.success),
-        makeActionHandler(spec.error, 1)
+        x => Promise.resolve(handleAction(spec.success, x)),
+        e => Promise.reject(handleAction(spec.error, e))
       )
     } else {
       // otherwise emit the change now

@@ -118,9 +118,12 @@ class DispatchBuffer {
         info.i = i + 1
         info.time = info.time + (Date.now() - startTime)
 
-        return this.render(alt, Element, info)
+        // this takes the rendering out of a Promise context
+        // TODO test this concurrently
+        return setTimeout(() => this.render(alt, Element, info))
       }).catch((error) => {
-        return this.resolve(error, html, alt, Element, i)
+        const errorHtml = this.renderStrategy(Element)
+        return this.resolve(error, errorHtml, alt, Element, i)
       })
     } else {
       return this.resolve(null, html, alt, Element, i)
@@ -241,6 +244,7 @@ export default class Render {
         },
 
         componentWillReceiveProps(nextProps) {
+          // resolve whenever props change
           if (Spec.resolveAsync) this.resolveAsyncClient()
 
           if (Spec.willReceiveProps) {
@@ -249,16 +253,13 @@ export default class Render {
         },
 
         componentWillMount() {
-          if (Spec.resolveAsync) {
-            // if we are client side and it's either ready or failed then we fetch
-            // server side we only fetch on ready
-            if (this.state.status === STAT.READY || this.state.status === STAT.FAILED) {
-              if (typeof window !== 'undefined') {
-                this.resolveAsyncClient()
-              } else if (this.state.status === STAT.READY) {
-                this.resolveAsyncServer()
-              }
-            }
+          // resolve when ready on server
+          if (
+            Spec.resolveAsync &&
+            typeof window === 'undefined' &&
+            this.state.status === STAT.READY
+          ) {
+            this.resolveAsyncServer()
           }
 
           if (Spec.willMount) Spec.willMount(this.props, this.context)
@@ -269,6 +270,11 @@ export default class Render {
           this.storeListeners = stores.map((store) => {
             return store.listen(this.onChange)
           })
+
+          // resolve on client if failed from server
+          if (Spec.resolveAsync && this.state.status === STAT.FAILED) {
+            this.resolveAsyncClient()
+          }
 
           if (Spec.didMount) Spec.didMount(this.props, this.context)
         },

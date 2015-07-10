@@ -5,9 +5,14 @@ import Iso from 'iso'
 const app = express()
 
 app.get('/', (req, res) => {
-  foo.server({ id: 1 }).then((obj) => {
+  const props = { id: 2 }
+
+  foo.server(props).then((obj) => {
     console.log('Server done...', obj)
-    const html = Iso.render(obj.html, obj.state, obj.buffer)
+    const html = Iso.render(obj.html, obj.state, {
+      props,
+      buffer: obj.buffer
+    })
 
     res.send(`
       <html>
@@ -31,4 +36,4 @@ app.get('/build.js', (req, res) => {
   res.send(buildjs)
 })
 
-app.listen(3000, stat => console.log('Listening', stat))
+app.listen(3000, stat => console.log('Listening', 3000))

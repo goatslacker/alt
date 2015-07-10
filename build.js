@@ -12,7 +12,8 @@ var _iso = require('iso');
 var _iso2 = _interopRequireDefault(_iso);
 
 _iso2['default'].bootstrap(function (state, meta, node) {
-  _foo2['default'].client(state, { id: 1 }, node, meta);
+  console.log(meta);
+  _foo2['default'].client(state, meta.props, node, meta.buffer);
 });
 
 },{"./foo":2,"iso":13}],2:[function(require,module,exports){
@@ -139,6 +140,7 @@ exports['default'] = {
   }
 };
 module.exports = exports['default'];
+// if something failed on the server you might want to retry fetching on the client...
 
 },{"./":4,"./utils/Render":171,"react":169}],3:[function(require,module,exports){
 'use strict';
@@ -850,23 +852,24 @@ var StoreMixin = {
       return x;
     };
 
-    var makeActionHandler = function makeActionHandler(action, isError) {
-      return function (x) {
-        var fire = function fire() {
-          action(intercept(x, action));
-          if (isError) throw x;
-        };
-        return _this.alt.buffer ? function () {
-          return fire();
-        } : fire();
+    var handleAction = function handleAction(action, x) {
+      var fire = function fire() {
+        return action(intercept(x, action));
       };
+      return _this.alt.buffer ? function () {
+        return fire();
+      } : fire();
     };
 
     // if we don't have it in cache then fetch it
     if (shouldFetch) {
       /* istanbul ignore else */
       if (spec.loading) spec.loading(intercept(null, spec.loading));
-      return spec.remote().then(makeActionHandler(spec.success), makeActionHandler(spec.error, 1));
+      return spec.remote().then(function (x) {
+        return Promise.resolve(handleAction(spec.success, x));
+      }, function (e) {
+        return Promise.reject(handleAction(spec.error, e));
+      });
     } else {
       // otherwise emit the change now
       this.emitChange();
@@ -1757,15 +1760,28 @@ module.exports = Iso;
 
 
 },{"escape-html":14}],14:[function(require,module,exports){
+/*!
+ * escape-html
+ * Copyright(c) 2012-2013 TJ Holowaychuk
+ * MIT Licensed
+ */
+
+/**
+ * Module exports.
+ * @public
+ */
+
+module.exports = escapeHtml;
+
 /**
  * Escape special characters in the given string of html.
  *
- * @param  {String} html
- * @return {String}
- * @api private
+ * @param  {string} str The string to escape for inserting into HTML
+ * @return {string}
+ * @public
  */
 
-module.exports = function(html) {
+function escapeHtml(html) {
   return String(html)
     .replace(/&/g, '&amp;')
     .replace(/"/g, '&quot;')
@@ -21673,9 +21689,14 @@ var DispatchBuffer = (function () {
           info.i = i + 1;
           info.time = info.time + (Date.now() - startTime);
 
-          return _this2.render(alt, Element, info);
+          // this takes the rendering out of a Promise context
+          // TODO test this concurrently
+          return setTimeout(function () {
+            return _this2.render(alt, Element, info);
+          });
         })['catch'](function (error) {
-          return _this2.resolve(error, html, alt, Element, i);
+          var errorHtml = _this2.renderStrategy(Element);
+          return _this2.resolve(error, errorHtml, alt, Element, i);
         });
       } else {
         return this.resolve(null, html, alt, Element, i);
@@ -21803,42 +21824,35 @@ var Render = (function () {
           },
 
           componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+            // resolve whenever props change
+            if (Spec.resolveAsync) this.resolveAsyncClient();
+
             if (Spec.willReceiveProps) {
               Spec.willReceiveProps(nextProps, this.props, this.context);
             }
           },
 
           componentWillMount: function componentWillMount() {
-            var _this3 = this;
-
-            // XXX I would like to have the loading and async resolving stuff client side whenever new props are passed...
-            // how do i get this behavior?
-            if (Spec.resolveAsync && this.state.status === STAT.READY) {
-              var promise = Spec.resolveAsync(this.props, this.context);
-
-              // client side we setup a listener for loading and done
-              if (typeof window !== 'undefined') {
-                this.setState({ status: STAT.LOADING });
-                promise.then(function () {
-                  return _this3.setState({ status: STAT.DONE });
-                }, function () {
-                  return _this3.setState({ status: STAT.FAILED });
-                });
-              } else {
-                this.context.buffer.push(this.context.universalId, promise);
-              }
+            // resolve when ready on server
+            if (Spec.resolveAsync && typeof window === 'undefined' && this.state.status === STAT.READY) {
+              this.resolveAsyncServer();
             }
 
             if (Spec.willMount) Spec.willMount(this.props, this.context);
           },
 
           componentDidMount: function componentDidMount() {
-            var _this4 = this;
+            var _this3 = this;
 
             var stores = Spec.listenTo(this.props, this.context);
             this.storeListeners = stores.map(function (store) {
-              return store.listen(_this4.onChange);
+              return store.listen(_this3.onChange);
             });
+
+            // resolve on client if failed from server
+            if (Spec.resolveAsync && this.state.status === STAT.FAILED) {
+              this.resolveAsyncClient();
+            }
 
             if (Spec.didMount) Spec.didMount(this.props, this.context);
           },
@@ -21853,6 +21867,26 @@ var Render = (function () {
             this.setState({
               props: Spec.reduceProps(this.props, this.context)
             });
+          },
+
+          resolveAsyncClient: function resolveAsyncClient() {
+            var _this4 = this;
+
+            // client side we setup a listener for loading and done
+            var promise = Spec.resolveAsync(this.props, this.context);
+
+            this.setState({ status: STAT.LOADING });
+            promise.then(function () {
+              return _this4.setState({ status: STAT.DONE });
+            }, function () {
+              return _this4.setState({ status: STAT.FAILED });
+            });
+          },
+
+          resolveAsyncServer: function resolveAsyncServer() {
+            // server side we push it into our buffer
+            var promise = Spec.resolveAsync(this.props, this.context);
+            this.context.buffer.push(this.context.universalId, promise);
           },
 
           renderIfValid: function renderIfValid(val) {
@@ -21888,7 +21922,6 @@ var Render = (function () {
 
 exports['default'] = Render;
 module.exports = exports['default'];
-// server side we push it into our buffer
 
 },{"react":169}],172:[function(require,module,exports){
 'use strict';
