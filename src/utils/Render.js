@@ -239,7 +239,7 @@ export default class Render {
         getInitialState() {
           return {
             status: this.context.buffer.getStatus(this.context.universalId),
-            props: Spec.reduceProps(this.props, this.context)
+            props: Spec.reduceProps(this.props, this.context) || {}
           }
         },
 
@@ -266,10 +266,12 @@ export default class Render {
         },
 
         componentDidMount() {
-          const stores = Spec.listenTo(this.props, this.context)
-          this.storeListeners = stores.map((store) => {
-            return store.listen(this.onChange)
-          })
+          if (Spec.listenTo) {
+            const stores = Spec.listenTo(this.props, this.context)
+            this.storeListeners = stores.map((store) => {
+              return store.listen(this.onChange)
+            })
+          }
 
           // resolve on client if failed from server
           if (Spec.resolveAsync && this.state.status === STAT.FAILED) {
@@ -285,7 +287,7 @@ export default class Render {
 
         onChange() {
           this.setState({
-            props: Spec.reduceProps(this.props, this.context)
+            props: Spec.reduceProps(this.props, this.context) || {}
           })
         },
 
@@ -293,17 +295,21 @@ export default class Render {
           // client side we setup a listener for loading and done
           const promise = Spec.resolveAsync(this.props, this.context)
 
-          this.setState({ status: STAT.LOADING })
-          promise.then(
-            () => this.setState({ status: STAT.DONE }),
-            () => this.setState({ status: STAT.FAILED })
-          )
+          if (promise) {
+            this.setState({ status: STAT.LOADING })
+            promise.then(
+              () => this.setState({ status: STAT.DONE }),
+              () => this.setState({ status: STAT.FAILED })
+            )
+          }
         },
 
         resolveAsyncServer() {
           // server side we push it into our buffer
           const promise = Spec.resolveAsync(this.props, this.context)
-          this.context.buffer.push(this.context.universalId, promise)
+          if (promise) {
+            this.context.buffer.push(this.context.universalId, promise)
+          }
         },
 
         renderIfValid(val) {
