@@ -5,7 +5,7 @@ import Iso from 'iso'
 const app = express()
 
 app.get('/', (req, res) => {
-  const props = { id: 2 }
+  const props = {}
 
   foo.server(props).then((obj) => {
     console.log('Server done...', obj)
@@ -13,6 +13,8 @@ app.get('/', (req, res) => {
       props,
       buffer: obj.buffer
     })
+
+    if (obj.error) console.log(obj.error.stack)
 
     res.send(`
       <html>
@@ -24,7 +26,7 @@ app.get('/', (req, res) => {
       </html>
     `)
   }).catch((e) => {
-    res.send(':(')
+    res.send(`:(<br />${e}`)
   })
 })
 

@@ -322,11 +322,11 @@ export default class Render {
               return <Component {...this.state.props} />
             case STAT.LOADING:
               return Spec.loading
-                ? this.renderIfValid(Spec.loading(this.props))
+                ? this.renderIfValid(Spec.loading(this.props, this.context))
                 : null
             case STAT.FAILED:
               return Spec.failed
-                ? this.renderIfValid(Spec.failed(this.state.error))
+                ? this.renderIfValid(Spec.failed(this.props, this.context))
                 : null
           }
         }
