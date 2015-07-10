@@ -38,10 +38,6 @@ the [Airbnb JS style guide](https://github.com/airbnb/javascript) with a few
 notable exceptions.
 
 * You shouldn't have to use [semicolons](https://medium.com/@goatslacker/no-you-dont-need-semicolons-148d936b9cf2). The build file adds them in anyway.
-* Please add braces around `if`, `for`, `while`, etc.
-* Use the new features in ES6 when you can.
-* Use `const` over `var` and `let`. But if you must mutate, use `let`.
-* Don't concatenate strings, use template literals.
 * Do not rely on any ES6 shim/sham features (Map, WeakMap, Proxy, etc).
 * Use `//` for comments. And comment anything you feel isn't obvious.
 
