@@ -243,7 +243,19 @@ and then <a href="/guide/view">listen to them in the view</a>; it’s time to le
 }))
 </code></pre>
 
-<p>As you can see, locations can now be re-used in other places since it’s not tied to a particular store. All locations will do is accept an array of locations and concern itself with rendering them. This may seem like extra boilerplate but you’ll be grateful for it later on when coming back to the app to maintain it. As a bonus, connectToStores handles the listening and unlistening of your stores. Every time a store changes, <code>getPropsFromStores</code> is called and the result of it is passed down as props to the connected component.</p>
+<p>As you can see, locations can now be re-used in other places since it’s not tied to a particular store. All locations will do is accept an array of locations and concern itself with rendering them. This may seem like extra boilerplate but you’ll be grateful for it later on when coming back to the app to maintain it. As a bonus, <code>connectToStores</code> handles the listening and unlistening of your stores. Every time a store changes, <code>getPropsFromStores</code> is called and the result of it is passed down as props to the connected component.</p>
+
+<p>Please note that as mentioned above, <code>connectToStores</code> is actually wrapping your React component with a container component that handles the listening to stores and passing that state down as props to your component. If you are using <code>connectToStores</code> as a decorator you will need to make sure it is the outermost decorator to ensure that your other decorators are applied to your actual component rather than the wrapped component. For example:</p>
+
+<pre><code class="language-js">@connectToStores
+@someDecorator
+@anotherDecorator
+class MyComponent extends React.Component {
+  // ...
+}
+
+// equivalent to connectToStores(someDecorator(anotherDecorator(MyComponent)))
+</code></pre>
 
 <h3 id="altcontainer">AltContainer</h3>
 

@@ -229,7 +229,21 @@ const SearchSource = {
 }
 </code></pre>
 
-<p>Now we’ll have a few methods available for use: <code>SearchStore.performSearch()</code>, and <code>SearchStore.isLoading()</code>.</p>
+<p>Now we’ll have a few methods available for use: <code>SearchStore.performSearch()</code>, and <code>SearchStore.isLoading()</code>. We can use them in <code>SearchStore</code> by <code>this.getInstance().performSearch()</code> and <code>this.getInstance().isLoading()</code></p>
+
+<pre><code class="language-js">class SearchStore {
+  constructor() {
+    this.state = { value: '' };
+
+    this.registerAsync(SearchSource);
+  }
+  onSearch() {
+    if (!this.getInstance().isLoading()) {
+      this.getInstance().performSearch();
+    }
+  }
+}
+</code></pre>
 
 <h2 id="api">API</h2>
 
