@@ -120,7 +120,8 @@ class DispatchBuffer {
 
         // this takes the rendering out of a Promise context
         // TODO test this concurrently
-        return setTimeout(() => this.render(alt, Element, info))
+        return this.render(alt, Element, info)
+//        return setTimeout(() => this.render(alt, Element, info))
       }).catch((error) => {
         const errorHtml = this.renderStrategy(Element)
         return this.resolve(error, errorHtml, alt, Element, i)
@@ -196,7 +197,7 @@ export function connect(Spec, MaybeComponent) {
 
       componentWillReceiveProps(nextProps) {
         // resolve whenever props change
-        if (Spec.resolveAsync) this.resolveAsyncClient()
+        if (Spec.resolveAsync) this.resolveAsyncClient(nextProps)
 
         if (Spec.willReceiveProps) {
           Spec.willReceiveProps(nextProps, this.props, this.context)
@@ -226,7 +227,7 @@ export function connect(Spec, MaybeComponent) {
 
         // resolve on client if failed from server
         if (Spec.resolveAsync && this.state.status === STAT.FAILED) {
-          this.resolveAsyncClient()
+          this.resolveAsyncClient(this.props)
         }
 
         if (Spec.didMount) Spec.didMount(this.props, this.context)
@@ -242,9 +243,9 @@ export function connect(Spec, MaybeComponent) {
         })
       },
 
-      resolveAsyncClient() {
+      resolveAsyncClient(props) {
         // client side we setup a listener for loading and done
-        const promise = Spec.resolveAsync(this.props, this.context)
+        const promise = Spec.resolveAsync(props, this.context)
 
         if (promise) {
           this.setState({ status: STAT.LOADING })
