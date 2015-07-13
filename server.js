@@ -26,7 +26,7 @@ app.get('/', (req, res) => {
       </html>
     `)
   }).catch((e) => {
-    res.send(`:(<br />${e}`)
+    res.send(`:(<br />${e.stack}`)
   })
 })
 

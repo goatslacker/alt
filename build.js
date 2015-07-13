@@ -56,11 +56,12 @@ var actions = alt.generateActions('yes', 'no');
 var UserStore = alt.createStore(function () {
   var _this = this;
 
-  this.state = { users: null };
+  this.state = { users: [] };
 
   this.bindAction(actions.yes, function (users) {
     return _this.setState({ users: users });
   });
+  //  this.bindAction(actions.yes, users => console.log('data', users))
 
   this.exportPublicMethods({
     getUsers: function getUsers() {
@@ -162,7 +163,7 @@ var Stargazers = (function (_React$Component) {
 
     reduceProps: function reduceProps(props, context) {
       return {
-        user: UserStore.getUsers()
+        users: UserStore.getUsers()
       };
     },
 
@@ -23482,6 +23483,8 @@ var _createClass = (function () {
   };
 })();
 
+exports.connect = connect;
+
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : { 'default': obj };
 }
@@ -23669,6 +23672,134 @@ function renderWithStrategy(strategy) {
   };
 }
 
+function connect(Spec, MaybeComponent) {
+  function bind(Component) {
+    return _react2['default'].createClass({
+      contextTypes: {
+        universalId: _react2['default'].PropTypes.string.isRequired,
+        buffer: _react2['default'].PropTypes.object.isRequired
+      },
+
+      childContextTypes: {
+        universalId: _react2['default'].PropTypes.string.isRequired,
+        buffer: _react2['default'].PropTypes.object.isRequired
+      },
+
+      getChildContext: function getChildContext() {
+        var children = this.props.children || [];
+        var universalId = this.context.universalId + '.' + children.length;
+        return {
+          universalId: universalId,
+          buffer: this.context.buffer
+        };
+      },
+
+      getInitialState: function getInitialState() {
+        return {
+          status: this.context.buffer.getStatus(this.context.universalId),
+          props: Spec.reduceProps(this.props, this.context) || {}
+        };
+      },
+
+      componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
+        // resolve whenever props change
+        if (Spec.resolveAsync) this.resolveAsyncClient();
+
+        if (Spec.willReceiveProps) {
+          Spec.willReceiveProps(nextProps, this.props, this.context);
+        }
+      },
+
+      componentWillMount: function componentWillMount() {
+        // resolve when ready on server
+        if (Spec.resolveAsync && typeof window === 'undefined' && this.state.status === STAT.READY) {
+          this.resolveAsyncServer();
+        }
+
+        if (Spec.willMount) Spec.willMount(this.props, this.context);
+      },
+
+      componentDidMount: function componentDidMount() {
+        var _this3 = this;
+
+        if (Spec.listenTo) {
+          var stores = Spec.listenTo(this.props, this.context);
+          this.storeListeners = stores.map(function (store) {
+            return store.listen(_this3.onChange);
+          });
+        }
+
+        // resolve on client if failed from server
+        if (Spec.resolveAsync && this.state.status === STAT.FAILED) {
+          this.resolveAsyncClient();
+        }
+
+        if (Spec.didMount) Spec.didMount(this.props, this.context);
+      },
+
+      componentWillUnmount: function componentWillUnmount() {
+        this.storeListeners.forEach(function (unlisten) {
+          return unlisten();
+        });
+      },
+
+      onChange: function onChange() {
+        this.setState({
+          props: Spec.reduceProps(this.props, this.context) || {}
+        });
+      },
+
+      resolveAsyncClient: function resolveAsyncClient() {
+        var _this4 = this;
+
+        // client side we setup a listener for loading and done
+        var promise = Spec.resolveAsync(this.props, this.context);
+
+        if (promise) {
+          this.setState({ status: STAT.LOADING });
+          promise.then(function () {
+            return _this4.setState({ status: STAT.DONE });
+          }, function () {
+            return _this4.setState({ status: STAT.FAILED });
+          });
+        }
+      },
+
+      resolveAsyncServer: function resolveAsyncServer() {
+        // server side we push it into our buffer
+        var promise = Spec.resolveAsync(this.props, this.context);
+        if (promise) {
+          this.context.buffer.push(this.context.universalId, promise);
+        }
+      },
+
+      renderIfValid: function renderIfValid(val) {
+        return _react2['default'].isValidElement(val) ? val : _react2['default'].createElement(Component, val);
+      },
+
+      render: function render() {
+        var status = this.state.status;
+
+        switch (status) {
+          case STAT.READY:
+            return null;
+          case STAT.DONE:
+            return _react2['default'].createElement(Component, this.state.props);
+          case STAT.LOADING:
+            return Spec.loading ? this.renderIfValid(Spec.loading(this.props, this.context)) : null;
+          case STAT.FAILED:
+            return Spec.failed ? this.renderIfValid(Spec.failed(this.props, this.context)) : null;
+        }
+      }
+    });
+  }
+
+  // works as a decorator or as a function
+  return MaybeComponent ? bind(MaybeComponent) : function (Component) {
+    return bind(Component);
+  };
+}
+
 var Render = (function () {
   function Render(alt) {
     var options = arguments[1] === undefined ? {} : arguments[1];
@@ -23722,134 +23853,14 @@ var Render = (function () {
     }
   }], [{
     key: 'connect',
-    value: function connect(Spec, MaybeComponent) {
-      function bind(Component) {
-        return _react2['default'].createClass({
-          contextTypes: {
-            universalId: _react2['default'].PropTypes.string.isRequired,
-            buffer: _react2['default'].PropTypes.object.isRequired
-          },
-
-          childContextTypes: {
-            universalId: _react2['default'].PropTypes.string.isRequired,
-            buffer: _react2['default'].PropTypes.object.isRequired
-          },
-
-          getChildContext: function getChildContext() {
-            var children = this.props.children || [];
-            var universalId = this.context.universalId + '.' + children.length;
-            return {
-              universalId: universalId,
-              buffer: this.context.buffer
-            };
-          },
-
-          getInitialState: function getInitialState() {
-            return {
-              status: this.context.buffer.getStatus(this.context.universalId),
-              props: Spec.reduceProps(this.props, this.context)
-            };
-          },
-
-          componentWillReceiveProps: function componentWillReceiveProps(nextProps) {
-            // resolve whenever props change
-            if (Spec.resolveAsync) this.resolveAsyncClient();
-
-            if (Spec.willReceiveProps) {
-              Spec.willReceiveProps(nextProps, this.props, this.context);
-            }
-          },
-
-          componentWillMount: function componentWillMount() {
-            // resolve when ready on server
-            if (Spec.resolveAsync && typeof window === 'undefined' && this.state.status === STAT.READY) {
-              this.resolveAsyncServer();
-            }
-
-            if (Spec.willMount) Spec.willMount(this.props, this.context);
-          },
-
-          componentDidMount: function componentDidMount() {
-            var _this3 = this;
-
-            var stores = Spec.listenTo(this.props, this.context);
-            this.storeListeners = stores.map(function (store) {
-              return store.listen(_this3.onChange);
-            });
-
-            // resolve on client if failed from server
-            if (Spec.resolveAsync && this.state.status === STAT.FAILED) {
-              this.resolveAsyncClient();
-            }
-
-            if (Spec.didMount) Spec.didMount(this.props, this.context);
-          },
-
-          componentWillUnmount: function componentWillUnmount() {
-            this.storeListeners.forEach(function (unlisten) {
-              return unlisten();
-            });
-          },
-
-          onChange: function onChange() {
-            this.setState({
-              props: Spec.reduceProps(this.props, this.context)
-            });
-          },
-
-          resolveAsyncClient: function resolveAsyncClient() {
-            var _this4 = this;
-
-            // client side we setup a listener for loading and done
-            var promise = Spec.resolveAsync(this.props, this.context);
-
-            this.setState({ status: STAT.LOADING });
-            promise.then(function () {
-              return _this4.setState({ status: STAT.DONE });
-            }, function () {
-              return _this4.setState({ status: STAT.FAILED });
-            });
-          },
-
-          resolveAsyncServer: function resolveAsyncServer() {
-            // server side we push it into our buffer
-            var promise = Spec.resolveAsync(this.props, this.context);
-            this.context.buffer.push(this.context.universalId, promise);
-          },
-
-          renderIfValid: function renderIfValid(val) {
-            return _react2['default'].isValidElement(val) ? val : _react2['default'].createElement(Component, val);
-          },
-
-          render: function render() {
-            var status = this.state.status;
-
-            switch (status) {
-              case STAT.READY:
-                return null;
-              case STAT.DONE:
-                return _react2['default'].createElement(Component, this.state.props);
-              case STAT.LOADING:
-                return Spec.loading ? this.renderIfValid(Spec.loading(this.props, this.context)) : null;
-              case STAT.FAILED:
-                return Spec.failed ? this.renderIfValid(Spec.failed(this.props, this.context)) : null;
-            }
-          }
-        });
-      }
-
-      // works as a decorator or as a function
-      return MaybeComponent ? bind(MaybeComponent) : function (Component) {
-        return bind(Component);
-      };
-    }
+    value: connect,
+    enumerable: true
   }]);
 
   return Render;
 })();
 
 exports['default'] = Render;
-module.exports = exports['default'];
 
 },{"react":184}],187:[function(require,module,exports){
 'use strict';

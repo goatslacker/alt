@@ -165,6 +165,137 @@ function renderWithStrategy(strategy) {
   }
 }
 
+export function connect(Spec, MaybeComponent) {
+  function bind(Component) {
+    return React.createClass({
+      contextTypes: {
+        universalId: React.PropTypes.string.isRequired,
+        buffer: React.PropTypes.object.isRequired
+      },
+
+      childContextTypes: {
+        universalId: React.PropTypes.string.isRequired,
+        buffer: React.PropTypes.object.isRequired
+      },
+
+      getChildContext() {
+        const children = this.props.children || []
+        const universalId = `${this.context.universalId}.${children.length}`
+        return {
+          universalId,
+          buffer: this.context.buffer
+        }
+      },
+
+      getInitialState() {
+        return {
+          status: this.context.buffer.getStatus(this.context.universalId),
+          props: Spec.reduceProps(this.props, this.context) || {}
+        }
+      },
+
+      componentWillReceiveProps(nextProps) {
+        // resolve whenever props change
+        if (Spec.resolveAsync) this.resolveAsyncClient()
+
+        if (Spec.willReceiveProps) {
+          Spec.willReceiveProps(nextProps, this.props, this.context)
+        }
+      },
+
+      componentWillMount() {
+        // resolve when ready on server
+        if (
+          Spec.resolveAsync &&
+          typeof window === 'undefined' &&
+          this.state.status === STAT.READY
+        ) {
+          this.resolveAsyncServer()
+        }
+
+        if (Spec.willMount) Spec.willMount(this.props, this.context)
+      },
+
+      componentDidMount() {
+        if (Spec.listenTo) {
+          const stores = Spec.listenTo(this.props, this.context)
+          this.storeListeners = stores.map((store) => {
+            return store.listen(this.onChange)
+          })
+        }
+
+        // resolve on client if failed from server
+        if (Spec.resolveAsync && this.state.status === STAT.FAILED) {
+          this.resolveAsyncClient()
+        }
+
+        if (Spec.didMount) Spec.didMount(this.props, this.context)
+      },
+
+      componentWillUnmount() {
+        this.storeListeners.forEach(unlisten => unlisten())
+      },
+
+      onChange() {
+        this.setState({
+          props: Spec.reduceProps(this.props, this.context) || {}
+        })
+      },
+
+      resolveAsyncClient() {
+        // client side we setup a listener for loading and done
+        const promise = Spec.resolveAsync(this.props, this.context)
+
+        if (promise) {
+          this.setState({ status: STAT.LOADING })
+          promise.then(
+            () => this.setState({ status: STAT.DONE }),
+            () => this.setState({ status: STAT.FAILED })
+          )
+        }
+      },
+
+      resolveAsyncServer() {
+        // server side we push it into our buffer
+        const promise = Spec.resolveAsync(this.props, this.context)
+        if (promise) {
+          this.context.buffer.push(this.context.universalId, promise)
+        }
+      },
+
+      renderIfValid(val) {
+        return React.isValidElement(val)
+          ? val
+          : <Component {...val} />
+      },
+
+      render() {
+        const { status } = this.state
+
+        switch (status) {
+          case STAT.READY:
+            return null
+          case STAT.DONE:
+            return <Component {...this.state.props} />
+          case STAT.LOADING:
+            return Spec.loading
+              ? this.renderIfValid(Spec.loading(this.props, this.context))
+              : null
+          case STAT.FAILED:
+            return Spec.failed
+              ? this.renderIfValid(Spec.failed(this.props, this.context))
+              : null
+        }
+      }
+    })
+  }
+
+  // works as a decorator or as a function
+  return MaybeComponent
+    ? bind(MaybeComponent)
+    : Component => bind(Component)
+}
+
 export default class Render {
   constructor(alt, options = {}) {
     this.alt = alt
@@ -214,134 +345,5 @@ export default class Render {
     })
   }
 
-  static connect(Spec, MaybeComponent) {
-    function bind(Component) {
-      return React.createClass({
-        contextTypes: {
-          universalId: React.PropTypes.string.isRequired,
-          buffer: React.PropTypes.object.isRequired
-        },
-
-        childContextTypes: {
-          universalId: React.PropTypes.string.isRequired,
-          buffer: React.PropTypes.object.isRequired
-        },
-
-        getChildContext() {
-          const children = this.props.children || []
-          const universalId = `${this.context.universalId}.${children.length}`
-          return {
-            universalId,
-            buffer: this.context.buffer
-          }
-        },
-
-        getInitialState() {
-          return {
-            status: this.context.buffer.getStatus(this.context.universalId),
-            props: Spec.reduceProps(this.props, this.context) || {}
-          }
-        },
-
-        componentWillReceiveProps(nextProps) {
-          // resolve whenever props change
-          if (Spec.resolveAsync) this.resolveAsyncClient()
-
-          if (Spec.willReceiveProps) {
-            Spec.willReceiveProps(nextProps, this.props, this.context)
-          }
-        },
-
-        componentWillMount() {
-          // resolve when ready on server
-          if (
-            Spec.resolveAsync &&
-            typeof window === 'undefined' &&
-            this.state.status === STAT.READY
-          ) {
-            this.resolveAsyncServer()
-          }
-
-          if (Spec.willMount) Spec.willMount(this.props, this.context)
-        },
-
-        componentDidMount() {
-          if (Spec.listenTo) {
-            const stores = Spec.listenTo(this.props, this.context)
-            this.storeListeners = stores.map((store) => {
-              return store.listen(this.onChange)
-            })
-          }
-
-          // resolve on client if failed from server
-          if (Spec.resolveAsync && this.state.status === STAT.FAILED) {
-            this.resolveAsyncClient()
-          }
-
-          if (Spec.didMount) Spec.didMount(this.props, this.context)
-        },
-
-        componentWillUnmount() {
-          this.storeListeners.forEach(unlisten => unlisten())
-        },
-
-        onChange() {
-          this.setState({
-            props: Spec.reduceProps(this.props, this.context) || {}
-          })
-        },
-
-        resolveAsyncClient() {
-          // client side we setup a listener for loading and done
-          const promise = Spec.resolveAsync(this.props, this.context)
-
-          if (promise) {
-            this.setState({ status: STAT.LOADING })
-            promise.then(
-              () => this.setState({ status: STAT.DONE }),
-              () => this.setState({ status: STAT.FAILED })
-            )
-          }
-        },
-
-        resolveAsyncServer() {
-          // server side we push it into our buffer
-          const promise = Spec.resolveAsync(this.props, this.context)
-          if (promise) {
-            this.context.buffer.push(this.context.universalId, promise)
-          }
-        },
-
-        renderIfValid(val) {
-          return React.isValidElement(val)
-            ? val
-            : <Component {...val} />
-        },
-
-        render() {
-          const { status } = this.state
-
-          switch (status) {
-            case STAT.READY:
-              return null
-            case STAT.DONE:
-              return <Component {...this.state.props} />
-            case STAT.LOADING:
-              return Spec.loading
-                ? this.renderIfValid(Spec.loading(this.props, this.context))
-                : null
-            case STAT.FAILED:
-              return Spec.failed
-                ? this.renderIfValid(Spec.failed(this.props, this.context))
-                : null
-          }
-        }
-      })
-    }
-
-    // works as a decorator or as a function
-    return MaybeComponent
-      ? bind(MaybeComponent)
-      : Component => bind(Component)
-  }
+  static connect = connect
 }

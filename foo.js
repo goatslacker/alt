@@ -8,9 +8,10 @@ const alt = new Alt()
 const actions = alt.generateActions('yes', 'no')
 
 const UserStore = alt.createStore(function () {
-  this.state = { users: null }
+  this.state = { users: [] }
 
   this.bindAction(actions.yes, users => this.setState({ users }))
+//  this.bindAction(actions.yes, users => console.log('data', users))
 
   this.exportPublicMethods({
     getUsers: () => this.state.users,
@@ -40,7 +41,7 @@ const UserStore = alt.createStore(function () {
 
   reduceProps(props, context) {
     return {
-      user: UserStore.getUsers()
+      users: UserStore.getUsers()
     }
   },
 
