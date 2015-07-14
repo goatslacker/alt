@@ -12,9 +12,11 @@ const AltTestingUtils = {
       bindListeners: noop,
       dispatcher: alt.dispatcher,
       emitChange: noop,
+      exportAsync: noop,
       exportPublicMethods: noop,
       getInstance: noop,
       on: noop,
+      registerAsync: noop,
       setState: noop,
       waitFor: noop
     }
