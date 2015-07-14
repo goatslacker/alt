@@ -8,6 +8,7 @@
     "modules": true,
     "jsx": true
   },
+  "parser": "babel-eslint",
   "plugins": [
     "react"
   ],

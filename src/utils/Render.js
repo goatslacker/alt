@@ -121,7 +121,6 @@ class DispatchBuffer {
         // this takes the rendering out of a Promise context
         // TODO test this concurrently
         return this.render(alt, Element, info)
-//        return setTimeout(() => this.render(alt, Element, info))
       }).catch((error) => {
         const errorHtml = this.renderStrategy(Element)
         return this.resolve(error, errorHtml, alt, Element, i)
@@ -286,6 +285,8 @@ export function connect(Spec, MaybeComponent) {
             return Spec.failed
               ? this.renderIfValid(Spec.failed(this.props, this.context))
               : null
+          default:
+            throw new Error('unrecognized status')
         }
       }
     })
