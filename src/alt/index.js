@@ -204,6 +204,15 @@ class Alt {
     return this.stores[name]
   }
 
+  fetch(future, onSuccess, onFailure) {
+    if (!this.buffer) {
+      future.then(onSuccess, onFailure)
+    } else {
+      this.buffer.futures.push(future.then(x => [true, x], e => [false, e]))
+      this.buffer.continuations.push({onSuccess, onFailure})
+    }
+  }
+
   static debug(name, alt) {
     const key = 'alt.js.org'
     if (typeof window !== 'undefined') {

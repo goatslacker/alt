@@ -32,6 +32,9 @@ function createPrototype(proto, alt, key, extras) {
   proto.publicMethods = {}
   proto.handlesOwnErrors = false
 
+  // This doesn't need to be serialized - the data will be enough
+  proto.pendingFetches = {}
+
   return fn.assign(proto, StoreMixin, {
     displayName: key,
     alt: alt,

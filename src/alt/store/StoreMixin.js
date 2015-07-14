@@ -1,5 +1,6 @@
 import transmitter from 'transmitter'
 import * as fn from '../../utils/functions'
+import {PENDING} from '../../utils/sentinels'
 
 const StoreMixin = {
   waitFor(...sources) {
@@ -27,30 +28,36 @@ const StoreMixin = {
       }
     })
 
-    const value = spec.local && spec.local()
+    const id = spec.id
+    if (this.pendingFetches[id]) return PENDING
+
+    const value = spec.local.call(this)
     const shouldFetch = spec.shouldFetch
-      ? spec.shouldFetch()
+      ? spec.shouldFetch.call(this)
       : value == null
 
-    const intercept = spec.interceptResponse || (x => x)
+    if (!shouldFetch) return value
 
-    const handleAction = (action, x) => {
-      const fire = () => action(intercept(x, action))
-      return this.alt.buffer ? (() => fire()) : fire()
-    }
+    this.pendingFetches[id] = true
+    const intercept = spec.interceptResponse || (x => x)
+    const handleAction = (action, x) => action(intercept(x, action))
 
     // if we don't have it in cache then fetch it
-    if (shouldFetch) {
-      /* istanbul ignore else */
-      if (spec.loading) spec.loading(intercept(null, spec.loading))
-      return spec.remote().then(
-        x => Promise.resolve(handleAction(spec.success, x)),
-        e => Promise.reject(handleAction(spec.error, e))
-      )
-    } else {
-      // otherwise emit the change now
-      this.emitChange()
-    }
+    /* istanbul ignore else */
+    if (spec.loading) spec.loading(intercept(null, spec.loading))
+    this.alt.fetch(
+      spec.remote(),
+      x => {
+        delete this.pendingFetches[id]
+        handleAction(spec.success, x)
+      },
+      e => {
+        delete this.pendingFetches[id]
+        handleAction(spec.error, e)
+      }
+    )
+
+    return PENDING
   },
 
   exportPublicMethods(methods) {

@@ -1,6 +1,7 @@
 import Alt from './'
 import React from 'react'
-import Render, { connect } from './utils/Render'
+import createContainer from './utils/createContainer'
+import Render from './utils/Render'
 import axios from 'axios'
 
 const alt = new Alt()
@@ -8,19 +9,26 @@ const alt = new Alt()
 const actions = alt.generateActions('yes', 'no')
 
 const UserStore = alt.createStore(function () {
-  this.state = { users: [] }
+  this.state = {}
 
-  this.bindAction(actions.yes, users => this.setState({ users }))
+  this.bindAction(
+    actions.yes,
+    ([id, users]) => this.setState({ [id]: users })
+  )
 //  this.bindAction(actions.yes, users => console.log('data', users))
 
   this.exportPublicMethods({
-    getUsers: () => this.state.users,
+    getUsers: (user, repo) => {
+      const id = `${user}/${repo}`
 
-    fetchUsers: (user, repo) => {
       return this.fetch({
+        id,
+        local() {
+          return this.state[id]
+        },
         remote() {
           const url = `https://api.github.com/repos/${user}/${repo}/stargazers`
-          return axios({ url }).then(response => response.data)
+          return axios({ url }).then(response => [id, response.data])
         },
 
         success: actions.yes,
@@ -30,29 +38,6 @@ const UserStore = alt.createStore(function () {
   })
 }, 'UserStore')
 
-@connect({
-  listenTo() {
-    return [UserStore]
-  },
-
-  resolveAsync(props) {
-    return UserStore.fetchUsers(props.user, props.repo)
-  },
-
-  reduceProps(props, context) {
-    return {
-      users: UserStore.getUsers()
-    }
-  },
-
-  loading() {
-    return <div>Loading...</div>
-  },
-
-  failed(props, context) {
-    return <div>Uh oh</div>
-  }
-})
 class Stargazers extends React.Component {
   render() {
     return (
@@ -93,6 +78,15 @@ class Stargazers extends React.Component {
     )
   }
 }
+
+Stargazers = createContainer(Stargazers, {
+  listenTo: UserStore,
+  props: {
+    users() {
+      return UserStore.getUsers(this.props.user, this.props.repo)
+    }
+  }
+})
 
 class Count extends React.Component {
   render() {
@@ -140,11 +134,11 @@ class App extends React.Component {
 export default {
   server(props) {
     console.log('Requesting', props)
-    return new Render(alt).toString(App, props)
+    return new Render(alt).toString(<App {...props} />)
   },
 
   client(state, props, node, meta) {
     alt.bootstrap(state)
-    new Render(alt).toDOM(App, props, node, meta)
+    return React.render(<App {...props} />, node)
   }
 }
