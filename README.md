@@ -120,6 +120,7 @@ class TodoView extends Component {
 * [Typeahead](https://github.com/timtyrrell/alt-typeahead)
 * [Isomorphic React Examples](https://github.com/goatslacker/isomorphic-react-examples)
 * [Typescript Project](https://github.com/Shearerbeard/alt-typescript-tutorial)
+* [Why did Social Tables choose Alt?](https://medium.com/social-tables-tech/we-compared-13-top-flux-implementations-you-won-t-believe-who-came-out-on-top-1063db32fe73)
 
 ### Boilerplates
 
