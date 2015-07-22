@@ -17,7 +17,12 @@ function immutable(StoreModel) {
 
     onDeserialize(data) {
       return Immutable.fromJS(data)
+    },
+
+    onBootstrap(state) {
+      return state
     }
+
   }
 
   return StoreModel
