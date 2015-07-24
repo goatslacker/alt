@@ -45,7 +45,13 @@ function createPrototype(proto, alt, key, extras) {
 export function createStoreConfig(globalConfig, StoreModel) {
   StoreModel.config = fn.assign({
     getState(state) {
-      return fn.assign({}, state)
+      if (Array.isArray(state)) {
+        return state.slice()
+      } else if (Object.prototype.toString.call(state) === '[object Object]') {
+        return fn.assign({}, state)
+      } else {
+        return state
+      }
     },
     setState: fn.assign
   }, globalConfig, StoreModel.config)
@@ -93,7 +99,12 @@ export function createStoreFromObject(alt, StoreModel, key) {
 
   // create the instance and fn.assign the public methods to the instance
   storeInstance = fn.assign(
-    new AltStore(alt, StoreProto, StoreProto.state || {}, StoreModel),
+    new AltStore(
+      alt,
+      StoreProto,
+      StoreProto.state !== undefined ? StoreProto.state : {},
+      StoreModel
+    ),
     StoreProto.publicMethods,
     { displayName: key }
   )
@@ -132,7 +143,7 @@ export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
     new AltStore(
       alt,
       store,
-      typeof store.state === 'object' ? store.state : null,
+      store.state !== undefined ? store.state : store,
       StoreModel
     ),
     utils.getInternalMethods(StoreModel),

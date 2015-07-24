@@ -8,7 +8,7 @@ class AltStore {
     this.lifecycle = (event, x) => {
       if (lifecycleEvents[event]) lifecycleEvents[event].push(x)
     }
-    this.state = state || model
+    this.state = state
 
     this.preventDefault = false
     this.displayName = model.displayName
@@ -61,7 +61,7 @@ class AltStore {
 
       if (model.reduce) {
         handleDispatch(() => {
-          model.setState(model.reduce(this.state, payload))
+          this.state = model.reduce(this.state, payload)
         }, payload)
 
         if (!this.preventDefault) this.emitChange()
