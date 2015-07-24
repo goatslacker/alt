@@ -143,5 +143,31 @@ export default {
 
       unsub()
     },
+
+    'stores have a reduce method'() {
+      const alt = new Alt()
+
+      const store = alt.createStore({
+        displayName: 'store',
+
+        state: { x: 0 },
+
+        reduce(state) {
+          return state
+        }
+      })
+
+      const store2 = alt.createStore({
+        displayName: 'store2',
+
+        state: { x: 1 },
+      })
+
+      assert.isFunction(store.reduce)
+      assert.isFunction(store2.reduce)
+
+      assert(store.reduce(store.state).x === 0)
+      assert(store2.reduce(store2.state).x === 1)
+    },
   }
 }

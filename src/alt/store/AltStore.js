@@ -14,6 +14,7 @@ class AltStore {
     this.displayName = model.displayName
     this.boundListeners = model.boundListeners
     this.StoreModel = StoreModel
+    this.reduce = model.reduce || (x => x)
 
     const output = model.output || (x => x)
 
