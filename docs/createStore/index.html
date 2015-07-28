@@ -182,10 +182,10 @@
             <h1 id="createstore">createStore</h1>
 
 <blockquote>
-  <p>(StoreModel: function, iden: ?string, saveStore = true: boolean, …constructorArgs): <a href="/docs/stores">AltStore</a></p>
+  <p>(StoreModel: function, iden: ?string, …constructorArgs): <a href="/docs/stores">AltStore</a></p>
 </blockquote>
 
-<p>This is a function that takes in a class of your store and returns back the singleton store. The second parameter <code>iden</code> is a string that is used as a unique identifier for serializing/deserializing your store. The name of the store comes from the class name but on production due to heavy minification it is a good idea to provide your own name to avoid collisions. The third parameter <code>saveStore</code> is to tell alt whether to save a reference to the store for later when using <a href="/docs/bootstrap">bootstrap</a> or <a href="/docs/takeSnapshot">snapshots</a>. <code>constructorArgs</code> are passed to the <code>StoreModel</code> constructor (if <code>StoreModel</code> is a class).</p>
+<p>This is a function that takes in a class of your store and returns back the singleton store. The second parameter <code>iden</code> is a string that is used as a unique identifier for serializing/deserializing your store. The name of the store comes from the class name but on production due to heavy minification it is a good idea to provide your own name to avoid collisions. <code>constructorArgs</code> are passed to the <code>StoreModel</code> constructor (if <code>StoreModel</code> is a class).</p>
 
 <h1 id="storemodel">StoreModel</h1>
 
