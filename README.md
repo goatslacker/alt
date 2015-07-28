@@ -114,6 +114,7 @@ class TodoView extends Component {
 * [React Router Example](https://github.com/lostpebble/alt-react-router-example)
 * [React Router Loopback](https://github.com/bkniffler/react-router-alt-loopback)
 * [React Webpack Rails Example](https://github.com/justin808/react-webpack-rails-tutorial)
+* [React Webpack Altjs Example](https://underthehood.myob.com/changing-of-the-guard-in-web-technologies/)
 * [React Weather](https://github.com/sapegin/react-weather)
 * [Shopping Cart](https://github.com/voronianski/flux-comparison/tree/master/alt)
 * [Todo](https://github.com/benstokoe/alt-todo)
