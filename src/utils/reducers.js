@@ -4,6 +4,7 @@ function getId(x) {
   return x.id || x
 }
 
+/* istanbul ignore next */
 function shallowEqual(a, b) {
   if (typeof a !== 'object' || typeof b !== 'object') return a === b
   if (a === b) return true

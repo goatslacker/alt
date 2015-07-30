@@ -8,8 +8,12 @@ export function setAppState(instance, data, onStore) {
       const { config } = store.StoreModel
       const state = store.state
       if (config.onDeserialize) obj[key] = config.onDeserialize(value) || value
-      fn.eachObject(k => delete state[k], [state])
-      fn.assign(state, obj[key])
+      if (Object.prototype.toString.call(state) === '[object Object]') {
+        fn.eachObject(k => delete state[k], [state])
+        fn.assign(state, obj[key])
+      } else {
+        store.state = obj[key]
+      }
       onStore(store)
     }
   }, [obj])

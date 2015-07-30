@@ -13,7 +13,7 @@ const store = alt.createStore({
   displayName: 'ValueStore',
 
   reduce: combine(
-    reduceWith([actions.fire], (state, payload) => {
+    reduceWith([actions.fire, actions.BAR], (state, payload) => {
       return state + 1
     })
   )
@@ -32,7 +32,6 @@ export default {
       actions.fire()
       actions.foo()
       actions.bar()
-      actions.fire()
 
       assert(store.getState() === 23, 'state is correct')
       assert.ok(spy.calledTwice, 'spy was only called twice')

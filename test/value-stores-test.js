@@ -16,6 +16,16 @@ const store = alt.createStore({
   }
 })
 
+const store2 = alt.createStore({
+  state: [1, 2, 3],
+
+  displayName: 'Value2Store',
+
+  reduce(state, payload) {
+    return state.concat(state[state.length - 1] + 1)
+  }
+})
+
 export default {
   'value stores': {
     beforeEach() {
@@ -26,8 +36,9 @@ export default {
       assert(store.state === 21, 'store state is value')
       assert(store.getState() === 21, 'getState returns value too')
 
-      store.listen((state) => {
+      const unlisten = store.listen((state) => {
         assert(state === 22, 'incremented store state')
+        unlisten()
         done()
       })
 
@@ -35,5 +46,11 @@ export default {
 
       actions.fire()
     },
+
+    'store with array works too'() {
+      assert.deepEqual(store2.state, [1, 2, 3])
+      actions.fire()
+      assert.deepEqual(store2.state, [1, 2, 3, 4])
+    }
   }
 }
