@@ -65,12 +65,44 @@ There is also a shorthand for this shorthand [available](generateActions.md) on 
 
 > (data: mixed): undefined
 
-This method is available inside every action. It's a method you may call rather than returning from each dispatch. It is unique to every action and lets the dispatcher know where each dispatch is coming from.
+This method is available inside every action. It is unique to every action and lets the dispatcher know where each dispatch is coming from.
 
 ```js
 ActionsClass.prototype.myActionFail = function (data) {
   this.dispatch(data);
 };
+```
+
+You can also simply return a value from an action to dispatch:
+
+```js
+ActionsClass.prototype.myActionFail = function (data) {
+  return data;
+};
+```
+
+There are two exceptions to this, however:
+
+ 1. Returning `undefined` (or omitting `return` altogether) will **not** dispatch the action
+ 2. Returning a Promise will **not** dispatch the action
+
+The special treatment of Promises allows the caller of the action to track its progress, and subsequent success/failure. This is useful when rendering on the server, for instance:
+
+```js
+alt.createActions({
+  fetchUser(id) {
+    this.dispatch(id); // this dispatches the action
+    return http.get('/api/users/' + id) // this does NOT 
+      .then(this.actions.fetchUserSuccess)
+      .catch(this.actions.fetchUserFailure)
+  },
+  fetchUserSuccess: x => x, // equivalent to alt.generateActions('fetchUserSuccess')
+  fetchUserFailure: x => x
+});
+
+alt.actions.fetchUser(123).then(() => {
+  renderToHtml(alt); // we know user fetching has completed successfully, and it's safe to render the app
+});
 ```
 
 ## ActionsClass#actions
