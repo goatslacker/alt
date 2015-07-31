@@ -45,6 +45,7 @@
 
 import React from 'react'
 import { assign, isFunction } from './functions'
+import hoistNonReactStatics from 'hoist-non-react-statics'
 
 function connectToStores(Spec, Component = Spec) {
   // Check for required static methods.
@@ -89,6 +90,8 @@ function connectToStores(Spec, Component = Spec) {
       )
     }
   })
+
+  hoistNonReactStatics(StoreConnection, Component)
 
   return StoreConnection
 }
