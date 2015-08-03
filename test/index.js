@@ -414,7 +414,6 @@ const tests = {
 
     assert(lifecycleStore.getState().bootstrapped === false, 'bootstrap has not been called yet')
     assert(lifecycleStore.getState().snapshotted === false, 'takeSnapshot has not been called yet')
-    assert(lifecycleStore.getState().serialized === false, 'takeSnapshot has not been called yet')
     assert(lifecycleStore.getState().rollback === false, 'rollback has not been called')
     assert(lifecycleStore.getState().init === true, 'init gets called when store initializes')
     assert(lifecycleStore.getState().deserialized === true, 'deserialize has not been called yet')
