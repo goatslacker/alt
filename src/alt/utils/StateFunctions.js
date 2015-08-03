@@ -30,8 +30,12 @@ export function snapshot(instance, storeNames = []) {
 }
 
 export function saveInitialSnapshot(instance, key) {
+  const store = instance.stores[key]
+  const { config } = store.StoreModel
+  const customState = config.onSerialize &&
+    config.onSerialize(store.state)
   const state = instance.deserialize(
-    instance.serialize(instance.stores[key].state)
+    instance.serialize(customState ? customState : store.state)
   )
   instance._initSnapshot[key] = state
   instance._lastSnapshot[key] = state
