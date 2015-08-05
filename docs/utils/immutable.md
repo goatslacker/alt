@@ -43,9 +43,9 @@ If you don't wish to use ES7 decorators then no problem, they're just sugar for 
 
 ```js
 function TodoStore() {
-  this.state = {
+  this.state = Immutable.Map({
     todos: Immutable.Map({})
-  };
+  });
 }
 TodoStore.displayName = 'TodoStore';
 
@@ -61,18 +61,18 @@ Using your ImmutableStore is a bit different from using a regular store:
 
 ```js
 function TodoStore() {
-  this.state = {
+  this.state = Immutable.Map({
     todos: Immutable.Map({})
-  };
+  });
 
   this.bindListeners({
     addTodo: TodoActions.addTodo
   });
 }
 
-TodoStore.properties.addTodo = function (todo) {
+TodoStore.prototype.addTodo = function (todo) {
   var id = String(Math.random());
-  this.setState(this.state.todos.set(id, todo));
+  this.setState(this.state.setIn(['todos', id], todo));
 };
 
 TodoStore.displayName = 'TodoStore';
