@@ -278,6 +278,26 @@ export default {
       actions.rm()
 
       assert.isUndefined(store.getState().toJS().foo, 'foo has been removed')
+
+
+      @immutable
+      class EmptyImmutableStore {
+        constructor() {
+          this.state = Immutable.Map();
+        }
+      }
+
+      const emptyStore = alt.createStore(EmptyImmutableStore, 'EmptyImmutableStore')
+
+      assert.deepEqual(emptyStore.getState().toJS(), {}, 'the store is an empty Map')
+
+      alt.bootstrap(JSON.stringify({
+        EmptyImmutableStore: { foo: 'bar' }
+      }))
+
+      assert(emptyStore.getState().toJS().foo === 'bar', 'foo has been set through bootstrap')
+
+      assert.deepEqual(Immutable.fromJS({}).toJS(), {}, 'the prototype of Immutable.Map is safe')
     },
   }
 }
