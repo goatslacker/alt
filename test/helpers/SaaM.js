@@ -1,15 +1,7 @@
-import actions from './SampleActions'
-
 export const displayName = 'SaaM'
 
-export const bindListeners = {
-  handleClick: actions.FIRE
-}
+export const state = 1
 
-export const state = {
-  data: 1
-}
-
-export function handleClick(data) {
-  this.state.data = data
+export function reduce(state, payload) {
+  return state + 1
 }
