@@ -22,19 +22,19 @@ export default {
       const store1 = alt.createStore(immutable({
         displayName: 'ImmutableStore',
         bindListeners: { addY: action.addY, addX: action.addX },
-        state: Immutable.Map({ x: 1 }),
+        state: Immutable.Map({ x: 1, z: 3 }),
         addY() {
-          this.setState(this.state.set('y', 2))
+          this.setState({y: 2})
         },
         addX() {
-          this.setState(this.state.set('x', 5))
+          this.setState({x: 5})
         }
       }))
 
       const store2 = alt.createStore({
         displayName: 'MutableStore',
         bindListeners: { addY: action.addY, addX: action.addX },
-        state: { x: 1 },
+        state: { x: 1, z: 3 },
         addY() {
           this.setState({ y: 2 })
         },
@@ -90,15 +90,15 @@ export default {
         }
 
         handleUpdateBar(x) {
-          this.setState(this.state.set('bar', x))
+          this.setState({bar: x})
         }
 
         handleReplaceMap(x) {
-          this.setState(this.state.set('map', Immutable.fromJS(x).toMap()))
+          this.setState({map: Immutable.fromJS(x).toMap()})
         }
 
         handleReplaceList(x) {
-          this.setState(this.state.set('list', Immutable.fromJS(x).toList()))
+          this.setState({list: Immutable.fromJS(x).toList()})
         }
       }
 
@@ -161,7 +161,7 @@ export default {
         },
 
         handleFoo: function (x) {
-          this.setState(this.state.set('foo', x))
+          this.setState({foo: x})
         }
       }))
 
@@ -203,7 +203,7 @@ export default {
       }
 
       ImmutableStore.prototype.handleFoo = function (x) {
-        this.setState(this.state.set('foo', x))
+        this.setState({foo: x})
       }
 
       ImmutableStore.displayName = 'ImmutableStore'
@@ -247,11 +247,11 @@ export default {
         }
 
         handleFoo(x) {
-          this.setState(this.state.set('foo', x))
+          this.setState({foo: x})
         }
 
         remove() {
-          this.setState(this.state.delete('foo'))
+          this.setState({foo: null})
         }
       }
 
@@ -277,7 +277,7 @@ export default {
 
       actions.rm()
 
-      assert.isUndefined(store.getState().toJS().foo, 'foo has been removed')
+      assert.isNull(store.getState().toJS().foo, 'foo has been set to null')
     },
   }
 }

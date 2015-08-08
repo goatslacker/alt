@@ -3,7 +3,7 @@ import Immutable from 'immutable'
 function immutable(StoreModel) {
   StoreModel.config = {
     setState(currentState, nextState) {
-      this.state = nextState
+      this.state = currentState.merge(nextState)
       return this.state
     },
 
