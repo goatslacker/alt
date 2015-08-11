@@ -132,6 +132,57 @@ export default {
 
       assert(store.getState().get(0) === 1)
     },
+    
+    'using record'() {
+      const MyRecType = Immutable.Record({ x: 123 });
+      const alt = new Alt()
+      const action = alt.generateActions('addX')
+      const store = alt.createStore(immutable({
+        bindListeners: { addX: action.addX },
+        state: new MyRecType(),
+        addX() {
+          this.setState(this.state.set('x', 456))
+        }
+      }), 'RecordImmutableStore')
+
+      assert(store.getState().x === 123, 'store contains expected initial value 123')
+
+      action.addX()
+      assert(store.getState().x === 456, 'store has updated after action')
+    },
+
+    'bootstrapping map'() {
+      const alt = new Alt()
+      const action = alt.generateActions('addX')
+      const store = alt.createStore(immutable({
+        bindListeners: { addX: action.addX },
+        state: Immutable.Map({ x: 123 }),
+        addX() {
+          this.setState(this.state.set('x', 456))
+        }
+      }), 'MapImmutableStore')
+
+      action.addX()
+      alt.bootstrap(alt.takeSnapshot())
+      assert(store.getState().get('x') === 456, 'store has retained its value after snapshot/bootstrap')
+    },
+
+    'bootstrapping record'() {
+      const MyRecType = Immutable.Record({ x: 123 });
+      const alt = new Alt()
+      const action = alt.generateActions('addX')
+      const store = alt.createStore(immutable({
+        bindListeners: { addX: action.addX },
+        state: new MyRecType(),
+        addX() {
+          this.setState(this.state.set('x', 456))
+        }
+      }), 'RecordImmutableStore')
+
+      action.addX()
+      alt.bootstrap(alt.takeSnapshot())
+      assert(store.getState().x === 456, 'store has retained its value after snapshot/bootstrap')
+    },
 
     'passing args to constructor'() {
       const alt = new Alt()
