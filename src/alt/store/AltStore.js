@@ -86,6 +86,14 @@ class AltStore {
     this.transmitter.unsubscribe(cb)
   }
 
+  addListener(cb){
+    return this.listen(cb)
+  }
+
+  removeListener(cb){
+    this.unlisten(cb)
+  }
+
   getState() {
     return this.StoreModel.config.getState.call(this, this.state)
   }
