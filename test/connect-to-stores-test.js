@@ -152,6 +152,40 @@ export default {
       assert.include(output, 'Foo: Bar')
     },
 
+    'component statics can see context properties'() {
+      const Child = connectToStores(React.createClass({
+        statics: {
+          getStores(props, context) {
+            return [context.store]
+          },
+          getPropsFromStores(props, context) {
+            return context.store.getState()
+          }
+        },
+        contextTypes: {
+          store: React.PropTypes.object
+        },
+        render() {
+          return <span>Foo: {this.props.foo}</span>
+        }
+      }))
+
+      const ContextComponent = React.createClass({
+        getChildContext() {
+          return { store: testStore }
+        },
+        childContextTypes: {
+          store: React.PropTypes.object
+        },
+        render() {
+          return <Child/>
+        }
+      })
+      const element = React.createElement(ContextComponent)
+      const output = React.renderToStaticMarkup(element)
+      assert.include(output, 'Foo: Bar')
+    },
+
     'component can get use stores from props'() {
       const LegacyComponent = React.createClass({
         statics: {

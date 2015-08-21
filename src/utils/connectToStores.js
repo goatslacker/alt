@@ -89,6 +89,9 @@ function connectToStores(Spec, Component = Spec) {
       )
     }
   })
+  if (Component.contextTypes) {
+    StoreConnection.contextTypes = Component.contextTypes
+  }
 
   return StoreConnection
 }
