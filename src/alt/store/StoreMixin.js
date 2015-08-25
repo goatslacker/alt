@@ -72,6 +72,7 @@ const StoreMixin = {
         } else {
           // otherwise emit the change now
           this.emitChange()
+          return value
         }
       }
 
