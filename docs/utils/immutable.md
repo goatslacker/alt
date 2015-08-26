@@ -57,8 +57,9 @@ alt.createStore(immutable(TodoStore));
 A few things to note about immutable stores about this approach:
 
 * You use `this.state` to create your state rather than assigning directly to instance properties.
-* You specify your own Immutable data structure you wish to use, as long as it supports `merge`. In this example we're using Map.
-
+* It is highly recommended that you use an `Immutable.Map` as the top level state.
+  * `merge` will be called whenever calling `this.setState`, so other structures can be used as long they support `merge`
+  * WARNING: `Immutable.List` will likely not behave as you expect when calling `setState` in the current version of `Immutable`.  See [this issue](https://github.com/facebook/immutable-js/issues/406) for more information.  Instead it is recommended to nest the `List` in a `Map` as shown above.
 
 Changing the state of your ImmutableStore is a bit different from using a regular store:
 
