@@ -67,6 +67,9 @@ class Alt {
       ? store.createStoreFromClass(this, Store, key, ...args)
       : store.createStoreFromObject(this, Store, key)
 
+    /*istanbul ignore next*/
+    if (module.hot) delete this.stores[key]
+
     this.stores[key] = storeInstance
     StateFunctions.saveInitialSnapshot(this, key)
 
