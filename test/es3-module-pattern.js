@@ -29,7 +29,7 @@ function MyStore() {
     },
 
     handleFire: function (data) {
-      this.state.data = data
+      this.setState({ data })
     }
   }
 }

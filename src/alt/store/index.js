@@ -26,12 +26,6 @@ function doSetState(store, storeInstance, state) {
 }
 
 function createPrototype(proto, alt, key, extras) {
-  proto.boundListeners = []
-  proto.lifecycleEvents = {}
-  proto.actionListeners = {}
-  proto.publicMethods = {}
-  proto.handlesOwnErrors = false
-
   return fn.assign(proto, StoreMixin, {
     displayName: key,
     alt: alt,
@@ -39,6 +33,11 @@ function createPrototype(proto, alt, key, extras) {
     preventDefault() {
       this.getInstance().preventDefault = true
     },
+    boundListeners: [],
+    lifecycleEvents: {},
+    actionListeners: {},
+    publicMethods: {},
+    handlesOwnErrors: false,
   }, extras)
 }
 
@@ -47,18 +46,17 @@ export function createStoreConfig(globalConfig, StoreModel) {
     getState(state) {
       if (Array.isArray(state)) {
         return state.slice()
-      } else if (Object.prototype.toString.call(state) === '[object Object]') {
+      } else if (fn.isPojo(state)) {
         return fn.assign({}, state)
       }
 
       return state
     },
     setState(currentState, nextState) {
-      if (Object.prototype.toString.call(nextState) === '[object Object]') {
+      if (fn.isPojo(nextState)) {
         return fn.assign(currentState, nextState)
-      } else {
-        return nextState
       }
+      return nextState
     },
   }, globalConfig, StoreModel.config)
 }
@@ -132,6 +130,7 @@ export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
   }
 
   createPrototype(Store.prototype, alt, key, {
+    type: 'AltStore',
     getInstance() {
       return storeInstance
     },
