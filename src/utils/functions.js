@@ -1,5 +1,18 @@
 export const isFunction = x => typeof x === 'function'
 
+export function isPojo(target) {
+  const Ctor = target.constructor
+  return (
+    !!target
+    &&
+    typeof target === 'object'
+    &&
+    Object.prototype.toString.call(target) === '[object Object]'
+    &&
+    (isFunction(Ctor) && !(Ctor instanceof Ctor))
+  )
+}
+
 export function isPromise(obj) {
   return !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function'
 }

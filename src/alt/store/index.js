@@ -26,12 +26,6 @@ function doSetState(store, storeInstance, state) {
 }
 
 function createPrototype(proto, alt, key, extras) {
-  proto.boundListeners = []
-  proto.lifecycleEvents = {}
-  proto.actionListeners = {}
-  proto.publicMethods = {}
-  proto.handlesOwnErrors = false
-
   return fn.assign(proto, StoreMixin, {
     displayName: key,
     alt: alt,
@@ -39,6 +33,11 @@ function createPrototype(proto, alt, key, extras) {
     preventDefault() {
       this.getInstance().preventDefault = true
     },
+    boundListeners: [],
+    lifecycleEvents: {},
+    actionListeners: {},
+    publicMethods: {},
+    handlesOwnErrors: false,
   }, extras)
 }
 
