@@ -46,6 +46,15 @@ class Alt {
   }
 
   createStore(StoreModel, iden, ...args) {
+    // allow hot loading for development usage
+    if (process.env.NODE_ENV !== 'production') {
+      if (module.hot) {
+        module.hot.dispose(() => {
+          delete this.stores[name]
+        })
+      }
+    }
+
     let key = iden || StoreModel.displayName || StoreModel.name || ''
     store.createStoreConfig(this.config, StoreModel)
     const Store = store.transformStore(this.storeTransforms, StoreModel)
