@@ -132,7 +132,7 @@ export default {
 
       assert(store.getState().get(0) === 1)
     },
-    
+
     'using record'() {
       const MyRecType = Immutable.Record({ x: 123 });
       const alt = new Alt()
@@ -176,6 +176,10 @@ export default {
         state: new MyRecType(),
         addX() {
           this.setState(this.state.set('x', 456))
+        }
+      }, {
+        onDeserialize(state) {
+          return new Immutable.Record(state)()
         }
       }), 'RecordImmutableStore')
 

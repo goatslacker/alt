@@ -2,6 +2,7 @@ export const isFunction = x => typeof x === 'function'
 
 export function isPojo(target) {
   const Ctor = target.constructor
+
   return (
     !!target
     &&
@@ -9,7 +10,9 @@ export function isPojo(target) {
     &&
     Object.prototype.toString.call(target) === '[object Object]'
     &&
-    (isFunction(Ctor) && !(Ctor instanceof Ctor))
+    isFunction(Ctor)
+    &&
+    (Ctor instanceof Ctor || target.type === 'AltStore')
   )
 }
 

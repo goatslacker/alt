@@ -46,7 +46,7 @@ export function createStoreConfig(globalConfig, StoreModel) {
     getState(state) {
       if (Array.isArray(state)) {
         return state.slice()
-      } else if (Object.prototype.toString.call(state) === '[object Object]') {
+      } else if (fn.isPojo(state)) {
         return fn.assign({}, state)
       }
 
@@ -125,6 +125,7 @@ export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
   }
 
   createPrototype(Store.prototype, alt, key, {
+    type: 'AltStore',
     getInstance() {
       return storeInstance
     },

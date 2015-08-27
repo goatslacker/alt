@@ -83,8 +83,6 @@ export default {
 
       actions.fire()
 
-      console.log(store1.getState())
-
       assert(store1.getState().x === 1, 'x one')
       assert(store2.getState().y === 1, 'y one')
 
