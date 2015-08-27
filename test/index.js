@@ -1385,6 +1385,12 @@ const tests = {
 
     AsyncAction.fire(2)
   },
+
+  'listen expects function'() {
+    assert.throws(() => {
+      myStore.listen(null)
+    }, TypeError, 'listen expects a function')
+  },
 }
 
 export default tests

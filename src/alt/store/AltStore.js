@@ -77,6 +77,7 @@ class AltStore {
   }
 
   listen(cb) {
+    if (!fn.isFunction(cb)) throw new TypeError('listen expects a function')
     this.transmitter.subscribe(cb)
     return () => this.unlisten(cb)
   }
