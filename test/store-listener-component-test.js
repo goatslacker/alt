@@ -562,11 +562,12 @@ export default {
         }
       })
 
+      const foo = sinon.spy()
 
       const App = React.createClass({
         render() {
           return (
-            <AltContainer flux={flux}>
+            <AltContainer flux={flux} onMount={foo}>
               <View />
             </AltContainer>
           )
@@ -577,6 +578,8 @@ export default {
       const span = TestUtils.findRenderedDOMComponentWithTag(node, 'span')
 
       assert.instanceOf(span.props.flux, Flux)
+
+      assert.ok(foo.calledOnce, 'onMount hook was called')
     },
   }
 }

@@ -4,6 +4,8 @@
 
 ### Added
 
+* Add `onMount` handler for AltContainer. [commit](https://github.com/goatslacker/alt/commit/189e009)
+
 * Expose a reduce function for every store by default. [commit](https://github.com/goatslacker/alt/commit/ab19ceb)
 
   If you're using reducers then this allows you to not ever use waitFor since you can just call store.reduce(store.getState(), payload) in order to derive data.
