@@ -68,15 +68,12 @@ class AltStore {
         if (result !== false && !this.preventDefault) this.emitChange()
       }
 
-
-
       if (model.reduce) {
         handleDispatch(() => {
           this.state = model.reduce(this.state, payload)
         }, payload)
         if (!this.preventDefault) this.emitChange()
       }
-
 
       this.lifecycle('afterEach', {
         payload,
