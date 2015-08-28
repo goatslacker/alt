@@ -13,7 +13,7 @@ Where should async go? There is no right answer. You can put it in actions or in
 Create `sources/LocationSource.js`. You can use something like [`fetch`](https://github.com/github/fetch) to fetch some data from a server. For the purposes of this tutorial we will be using `setTimeout` and `Promise` to mimic a request made using `fetch` API.
 Here's some mock data we'll be using:
 ```js
-let mockData = [
+var mockData = [
   { id: 0, name: 'Abu Dhabi' },
   { id: 1, name: 'Berlin' },
   { id: 2, name: 'Bogota' },
@@ -34,7 +34,7 @@ So let's create the `LocationSource`.
 `sources/LocationSource.js`
 
 ```js
-let LocationSource = {
+var LocationSource = {
   fetch: function () {
     // returning a Promise because that is what fetch does.
     return new Promise(function (resolve, reject) {
