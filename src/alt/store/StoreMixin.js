@@ -125,7 +125,8 @@ const StoreMixin = {
 
     // You can pass in the constant or the function itself
     const key = symbol.id ? symbol.id : symbol
-    this.actionListeners[key] = handler.bind(this)
+    this.actionListeners[key] = this.actionListeners[key] || []
+    this.actionListeners[key].push(handler.bind(this))
     this.boundListeners.push(key)
   },
 
