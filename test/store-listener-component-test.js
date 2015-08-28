@@ -327,7 +327,7 @@ export default {
         </AltContainer>
       )
 
-      assert.ok(storeFunction.calledTwice, 'called twice, once for store listening and another for props')
+      assert.ok(storeFunction.calledThrice, 'called thrice, once for store listening, once for initial props, and another for props after mounting')
       assert(storeFunction.args[0].length === 1, 'called with one parameter')
       assert(storeFunction.args[1].length === 1, 'called with one parameter')
       assert.isObject(storeFunction.args[0][0], 'called with the props')
@@ -379,12 +379,12 @@ export default {
 
     'custom rendering'() {
       const render = sinon.stub()
-      render.onCall(0).returns(null)
+      render.returns(<span />)
       TestUtils.renderIntoDocument(
         <AltContainer render={render} />
       )
 
-      assert.ok(render.calledOnce, 'render was called')
+      assert.ok(render.calledTwice, 'render was called twice, initially and after post-mount setState')
 
       const node = TestUtils.renderIntoDocument(
         <AltContainer
@@ -493,7 +493,7 @@ export default {
       )
 
       action.sup()
-      assert.ok(scu.calledOnce, 'custom shouldComponentUpdate was called')
+      assert.ok(scu.calledTwice, 'custom shouldComponentUpdate was called twice, once on initial render, and another after post-mount setState')
       assert(scu.args[0].length === 1, 'only one arg is passed, the props')
       assert.isDefined(scu.args[0][0].x, 'x prop exists')
     },

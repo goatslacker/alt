@@ -46,6 +46,7 @@ function mixinContainer(React) {
 
     componentDidMount: function () {
       this.registerStores(this.props)
+      this.altSetState(this.props)
     },
 
     componentWillUnmount: function () {
