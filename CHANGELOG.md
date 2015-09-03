@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.17.3
+
+### Changed
+
+* Moved hot load delete of stores up to remove the warning shown in console. [commit](https://github.com/goatslacker/alt/commit/d3befc5)
+
 ## 0.17.2
 
 ### Added
