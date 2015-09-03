@@ -204,7 +204,7 @@ var foodStore = alt.createStore(FoodStore);
     foods: []
   },
   
-  pubilcMethods: {
+  publicMethods: {
     hasFood: function () {
       return !!this.getState().foods.length;
     }
@@ -240,7 +240,7 @@ var foodStore = alt.createStore(FoodStore);
     state: {
       foods: foods
     },
-    pubilcMethods: {
+    publicMethods: {
       hasFood: function () {
         return foods.length;
       }

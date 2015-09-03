@@ -161,13 +161,13 @@
           <div class="sp-horiz-md">
             <h1 id="fetching-data">Fetching Data</h1>
 
-<p>The age old debate, where should async go? There is no right answer right now and don’t feel bad if you’re putting it in actions or in stores. In this tutorial, we’ll be calling async from the actions and the data fetching will exist in a new folder <code>utils</code>. This tutorial will handle fetching the data and failure states.</p>
+<p>This tutorial shows how to fetch data and handle a failure.</p>
 
-<p>So we create <code>utils/LocationsFetcher.js</code>. We can use something like <a href="https://github.com/github/fetch">fetch</a> to fetch some data from a server, but for the purposes of this tutorial we’ll just simulate an XHR with good ol’ <code>setTimeout</code> and <code>Promise</code> so we copy fetch’s API.</p>
-
-<p>Here’s some mock data we’ll be using</p>
-
-<pre><code class="language-js">var mockData = [
+<p>Where should async go? There is no right answer. You can put it in actions or in stores. In this tutorial, we’ll be calling async from the actions and the data fetching will exist in a new folder <code>sources</code>.<br />
+Create <code>sources/LocationSource.js</code>. You can use something like <a href="https://github.com/github/fetch"><code>fetch</code></a> to fetch some data from a server. For the purposes of this tutorial we will be using <code>setTimeout</code> and <code>Promise</code> to mimic a request made using <code>fetch</code> API.<br />
+Here’s some mock data we’ll be using:<br />
+<code>js
+var mockData = [
   { id: 0, name: 'Abu Dhabi' },
   { id: 1, name: 'Berlin' },
   { id: 2, name: 'Bogota' },
@@ -182,20 +182,18 @@
   { id: 11, name: 'Paris' },
   { id: 12, name: 'San Francisco' }
 ];
-</code></pre>
+</code><br />
+So let’s create the <code>LocationSource</code>.</p>
 
-<p>So let’s create the LocationsFetcher.</p>
+<p><code>sources/LocationSource.js</code></p>
 
-<p><code>utils/LocationsFetcher.js</code></p>
-
-<pre><code class="language-js">var LocationsFetcher = {
+<pre><code class="language-js">var LocationSource = {
   fetch: function () {
     // returning a Promise because that is what fetch does.
     return new Promise(function (resolve, reject) {
       // simulate an asynchronous action where data is fetched on
       // a remote server somewhere.
       setTimeout(function () {
-
         // resolve with some mock data
         resolve(mockData);
       }, 250);
@@ -204,15 +202,13 @@
 };
 </code></pre>
 
-<p>Next, we’ll need to change the actions to use this new method we created. We will add an action called <code>fetchLocations</code> which will fetch the locations and then call <code>updateLocations</code> when it successfully completes. A new action is also added, <code>locationsFailed</code> which deals with the locations not being available. Add these methods to the class.</p>
-
-<p><code>actions/LocationActions.js</code></p>
-
-<pre><code class="language-js">fetchLocations() {
+<p>Next, we’ll need to change the actions to use this new method we created. We will add an action called <code>fetchLocations</code> which will fetch the locations and then call <code>updateLocations</code> when it successfully completes. A new action <code>locationsFailed</code> deals with the locations not being available. Add these methods to the class.<br />
+<code>actions/LocationActions.js</code><br />
+<code>js
+fetchLocations() {
   // we dispatch an event here so we can have "loading" state.
   this.dispatch();
-
-  LocationsFetcher.fetch()
+  LocationSource.fetch()
     .then((locations) =&gt; {
       // we can access other actions within our action through `this.actions`
       this.actions.updateLocations(locations);
@@ -221,81 +217,73 @@
       this.actions.locationsFailed(errorMessage);
     });
 }
-
 locationsFailed(errorMessage) {
   this.dispatch(errorMessage);
 }
-</code></pre>
+</code><br />
+Next we’ll update our store to handle these new actions. It’s just a matter of adding the new actions and their handlers to <code>bindListeners</code>. A new state ‘errorMessage’ is added to deal with a potential error message.<br />
+<code>stores/LocationStore.js</code><br />
+```js<br />
+class LocationStore {<br />
+  constructor() {<br />
+    this.locations = [];<br />
+    this.errorMessage = null;<br />
+    this.bindListeners({<br />
+      handleUpdateLocations: LocationActions.UPDATE_LOCATIONS,<br />
+      handleFetchLocations: LocationActions.FETCH_LOCATIONS,<br />
+      handleLocationsFailed: LocationActions.LOCATIONS_FAILED<br />
+    });<br />
+  }<br />
+  handleUpdateLocations(locations) {<br />
+    this.locations = locations;<br />
+    this.errorMessage = null;<br />
+  }<br />
+  handleFetchLocations() {<br />
+    // reset the array while we’re fetching new locations so React can<br />
+    // be smart and render a spinner for us since the data is empty.<br />
+    this.locations = [];<br />
+  }</p>
 
-<p>Next we’ll update our store to handle these new actions. It’s just a matter of adding the new actions and their handlers to <code>bindListeners</code>. We’ll be adding a new piece of state though, ‘errorMessage’ to deal with any potential error messages.</p>
+<p>handleLocationsFailed(errorMessage) {<br />
+    this.errorMessage = errorMessage;<br />
+  }<br />
+}<br />
+<code>
+And finally, the view will change slightly. We'll be displaying an error message if it exists and showing a spinner if the content is loading.
+</code>js<br />
+componentDidMount() {<br />
+  LocationStore.listen(this.onChange);</p>
 
-<p><code>stores/LocationStore.js</code></p>
+<p>LocationActions.fetchLocations();<br />
+},</p>
 
-<pre><code class="language-js">class LocationStore {
-  constructor() {
-    this.locations = [];
-    this.errorMessage = null;
+<p>render() {<br />
+  if (this.state.errorMessage) {<br />
+    return (<br />
+      &lt;div&gt;Something is wrong&lt;/div&gt;<br />
+    );<br />
+  }</p>
 
-    this.bindListeners({
-      handleUpdateLocations: LocationActions.UPDATE_LOCATIONS,
-      handleFetchLocations: LocationActions.FETCH_LOCATIONS,
-      handleLocationsFailed: LocationActions.LOCATIONS_FAILED
-    });
-  }
+<p>if (!this.state.locations.length) {<br />
+    return (<br />
+      &lt;div&gt;<br />
+        <img src="/my-cool-spinner.gif" /><br />
+      &lt;/div&gt;<br />
+    )<br />
+  }</p>
 
-  handleUpdateLocations(locations) {
-    this.locations = locations;
-    this.errorMessage = null;
-  }
-
-  handleFetchLocations() {
-    // reset the array while we're fetching new locations so React can
-    // be smart and render a spinner for us since the data is empty.
-    this.locations = [];
-  }
-
-  handleLocationsFailed(errorMessage) {
-    this.errorMessage = errorMessage;
-  }
-}
-</code></pre>
-
-<p>And finally, the view will change slightly. We’ll be displaying an error message if it exists and showing a spinner if the content is loading.</p>
-
-<pre><code class="language-js">componentDidMount() {
-  LocationStore.listen(this.onChange);
-
-  LocationActions.fetchLocations();
-},
-
-render() {
-  if (this.state.errorMessage) {
-    return (
-      &lt;div&gt;Something is wrong&lt;/div&gt;
-    );
-  }
-
-  if (!this.state.locations.length) {
-    return (
-      &lt;div&gt;
-        &lt;img src="/my-cool-spinner.gif" /&gt;
-      &lt;/div&gt;
-    )
-  }
-
-  return (
-    &lt;ul&gt;
-      {this.state.locations.map((location) =&gt; {
-        return (
-          &lt;li&gt;{location.name}&lt;/li&gt;
-        );
-      })}
-    &lt;/ul&gt;
-  );
-}
-</code></pre>
-
-<p><a href="/guide/wait-for">Continue to next step…</a></p>
+<p>return (<br />
+    &lt;ul&gt;<br />
+      {this.state.locations.map((location) =&gt; {<br />
+        return (<br />
+          &lt;li&gt;{location.name}&lt;/li&gt;<br />
+        );<br />
+      })}<br />
+    &lt;/ul&gt;<br />
+  );<br />
+}<br />
+```<br />
+<a href="/guide/wait-for">Continue to next step…</a></p>
 
           </div>
         </div>

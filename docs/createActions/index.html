@@ -245,11 +245,43 @@ MyActions.baz();
   <p>(data: mixed): undefined</p>
 </blockquote>
 
-<p>This method is available inside every action. It’s a method you may call rather than returning from each dispatch. It is unique to every action and lets the dispatcher know where each dispatch is coming from.</p>
+<p>This method is available inside every action. It is unique to every action and lets the dispatcher know where each dispatch is coming from.</p>
 
 <pre><code class="language-js">ActionsClass.prototype.myActionFail = function (data) {
   this.dispatch(data);
 };
+</code></pre>
+
+<p>You can also simply return a value from an action to dispatch:</p>
+
+<pre><code class="language-js">ActionsClass.prototype.myActionFail = function (data) {
+  return data;
+};
+</code></pre>
+
+<p>There are two exceptions to this, however:</p>
+
+<ol>
+  <li>Returning <code>undefined</code> (or omitting <code>return</code> altogether) will <strong>not</strong> dispatch the action</li>
+  <li>Returning a Promise will <strong>not</strong> dispatch the action</li>
+</ol>
+
+<p>The special treatment of Promises allows the caller of the action to track its progress, and subsequent success/failure. This is useful when rendering on the server, for instance:</p>
+
+<pre><code class="language-js">alt.createActions({
+  fetchUser(id) {
+    this.dispatch(id); // this dispatches the action
+    return http.get('/api/users/' + id) // this does NOT 
+      .then(this.actions.fetchUserSuccess)
+      .catch(this.actions.fetchUserFailure)
+  },
+  fetchUserSuccess: x =&gt; x, // equivalent to alt.generateActions('fetchUserSuccess')
+  fetchUserFailure: x =&gt; x
+});
+
+alt.actions.fetchUser(123).then(() =&gt; {
+  renderToHtml(alt); // we know user fetching has completed successfully, and it's safe to render the app
+});
 </code></pre>
 
 <h2 id="actionsclassactions">ActionsClass#actions</h2>
