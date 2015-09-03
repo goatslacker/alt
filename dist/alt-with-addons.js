@@ -178,6 +178,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      var storeInstance = fn.isFunction(Store) ? store.createStoreFromClass.apply(store, [this, Store, key].concat(args)) : store.createStoreFromObject(this, Store, key);
 
+	      /*istanbul ignore next*/
+	      if (false) delete this.stores[key];
+
 	      this.stores[key] = storeInstance;
 	      StateFunctions.saveInitialSnapshot(this, key);
 
@@ -459,7 +462,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	function createStoreConfig(globalConfig, StoreModel) {
 	  StoreModel.config = fn.assign({
 	    getState: function getState(state) {
-	      return fn.assign({}, state);
+	      if (Array.isArray(state)) {
+	        return state.slice();
+	      } else if (Object.prototype.toString.call(state) === '[object Object]') {
+	        return fn.assign({}, state);
+	      } else {
+	        return state;
+	      }
 	    },
 	    setState: fn.assign
 	  }, globalConfig, StoreModel.config);
@@ -502,7 +511,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  // create the instance and fn.assign the public methods to the instance
-	  storeInstance = fn.assign(new _AltStore2['default'](alt, StoreProto, StoreProto.state || {}, StoreModel), StoreProto.publicMethods, { displayName: key });
+	  storeInstance = fn.assign(new _AltStore2['default'](alt, StoreProto, StoreProto.state !== undefined ? StoreProto.state : {}, StoreModel), StoreProto.publicMethods, { displayName: key });
 
 	  return storeInstance;
 	}
@@ -549,7 +558,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  if (config.bindListeners) store.bindListeners(config.bindListeners);
 	  if (config.datasource) store.registerAsync(config.datasource);
 
-	  storeInstance = fn.assign(new _AltStore2['default'](alt, store, typeof store.state === 'object' ? store.state : null, StoreModel), utils.getInternalMethods(StoreModel), config.publicMethods, { displayName: key });
+	  storeInstance = fn.assign(new _AltStore2['default'](alt, store, store.state !== undefined ? store.state : store, StoreModel), utils.getInternalMethods(StoreModel), config.publicMethods, { displayName: key });
 
 	  return storeInstance;
 	}
@@ -697,12 +706,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.lifecycle = function (event, x) {
 	      if (lifecycleEvents[event]) lifecycleEvents[event].push(x);
 	    };
-	    this.state = state || model;
+	    this.state = state;
 
 	    this.preventDefault = false;
 	    this.displayName = model.displayName;
 	    this.boundListeners = model.boundListeners;
 	    this.StoreModel = StoreModel;
+	    this.reduce = model.reduce || function (x) {
+	      return x;
+	    };
 
 	    var output = model.output || function (x) {
 	      return x;
@@ -740,21 +752,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	        state: _this.state
 	      });
 
-	      var actionHandler = model.actionListeners[payload.action] || model.otherwise;
+	      var actionHandlers = model.actionListeners[payload.action];
 
-	      if (actionHandler) {
-	        var result = handleDispatch(function () {
-	          return actionHandler.call(model, payload.data, payload.action);
-	        }, payload);
+	      if (actionHandlers || model.otherwise) {
+	        var result = undefined;
+
+	        if (actionHandlers) {
+	          result = handleDispatch(function () {
+	            return actionHandlers.filter(Boolean).every(function (handler) {
+	              return handler.call(model, payload.data, payload.action) !== false;
+	            });
+	          }, payload);
+	        } else {
+	          result = handleDispatch(function () {
+	            return model.otherwise(payload.data, payload.action);
+	          }, payload);
+	        }
 
 	        if (result !== false && !_this.preventDefault) _this.emitChange();
 	      }
 
 	      if (model.reduce) {
 	        handleDispatch(function () {
-	          model.setState(model.reduce(_this.state, payload));
+	          _this.state = model.reduce(_this.state, payload);
 	        }, payload);
-
 	        if (!_this.preventDefault) _this.emitChange();
 	      }
 
@@ -772,6 +793,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function listen(cb) {
 	      var _this2 = this;
 
+	      if (!fn.isFunction(cb)) throw new TypeError('listen expects a function');
 	      this.transmitter.subscribe(cb);
 	      return function () {
 	        return _this2.unlisten(cb);
@@ -929,6 +951,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        } else {
 	          // otherwise emit the change now
 	          _this.emitChange();
+	          return value;
 	        }
 	      };
 
@@ -980,7 +1003,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    // You can pass in the constant or the function itself
 	    var key = symbol.id ? symbol.id : symbol;
-	    this.actionListeners[key] = handler.bind(this);
+	    this.actionListeners[key] = this.actionListeners[key] || [];
+	    this.actionListeners[key].push(handler.bind(this));
 	    this.boundListeners.push(key);
 	  },
 
@@ -1396,10 +1420,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        var state = store.state;
 	        if (config.onDeserialize) obj[key] = config.onDeserialize(value) || value;
-	        fn.eachObject(function (k) {
-	          return delete state[k];
-	        }, [state]);
-	        fn.assign(state, obj[key]);
+	        if (Object.prototype.toString.call(state) === '[object Object]') {
+	          fn.eachObject(function (k) {
+	            return delete state[k];
+	          }, [state]);
+	          fn.assign(state, obj[key]);
+	        } else {
+	          store.state = obj[key];
+	        }
 	        onStore(store);
 	      })();
 	    }
@@ -1678,7 +1706,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    var StoreConnection = _react2['default'].createClass({
-	      displayName: 'StoreConnection',
+	      displayName: 'Stateful' + (Component.displayName || Component.name || 'Container'),
 
 	      getInitialState: function getInitialState() {
 	        return Spec.getPropsFromStores(this.props, this.context);
@@ -2386,6 +2414,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    componentDidMount: function componentDidMount() {
 	      this.registerStores(this.props);
+	      if (this.props.onMount) this.props.onMount(this.props, this.context);
 	    },
 
 	    componentWillUnmount: function componentWillUnmount() {
