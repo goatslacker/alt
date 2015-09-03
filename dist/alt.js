@@ -162,6 +162,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      store.createStoreConfig(this.config, StoreModel);
 	      var Store = store.transformStore(this.storeTransforms, StoreModel);
 
+	      /*istanbul ignore next*/
+	      if (false) delete this.stores[key];
+
 	      if (this.stores[key] || !key) {
 	        if (this.stores[key]) {
 	          utils.warn('A store named ' + key + ' already exists, double check your store ' + 'names or pass in your own custom identifier for each store');
@@ -177,9 +180,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 
 	      var storeInstance = fn.isFunction(Store) ? store.createStoreFromClass.apply(store, [this, Store, key].concat(args)) : store.createStoreFromObject(this, Store, key);
-
-	      /*istanbul ignore next*/
-	      if (false) delete this.stores[key];
 
 	      this.stores[key] = storeInstance;
 	      StateFunctions.saveInitialSnapshot(this, key);
