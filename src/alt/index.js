@@ -50,6 +50,9 @@ class Alt {
     store.createStoreConfig(this.config, StoreModel)
     const Store = store.transformStore(this.storeTransforms, StoreModel)
 
+    /*istanbul ignore next*/
+    if (module.hot) delete this.stores[key]
+
     if (this.stores[key] || !key) {
       if (this.stores[key]) {
         utils.warn(
@@ -66,9 +69,6 @@ class Alt {
     const storeInstance = fn.isFunction(Store)
       ? store.createStoreFromClass(this, Store, key, ...args)
       : store.createStoreFromObject(this, Store, key)
-
-    /*istanbul ignore next*/
-    if (module.hot) delete this.stores[key]
 
     this.stores[key] = storeInstance
     StateFunctions.saveInitialSnapshot(this, key)
