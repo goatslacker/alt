@@ -165,9 +165,9 @@
 
 <p>Where should async go? There is no right answer. You can put it in actions or in stores. In this tutorial, we’ll be calling async from the actions and the data fetching will exist in a new folder <code>sources</code>.<br />
 Create <code>sources/LocationSource.js</code>. You can use something like <a href="https://github.com/github/fetch"><code>fetch</code></a> to fetch some data from a server. For the purposes of this tutorial we will be using <code>setTimeout</code> and <code>Promise</code> to mimic a request made using <code>fetch</code> API.<br />
-Here’s some mock data we’ll be using:<br />
-<code>js
-var mockData = [
+Here’s some mock data we’ll be using:</p>
+
+<pre><code class="language-js">var mockData = [
   { id: 0, name: 'Abu Dhabi' },
   { id: 1, name: 'Berlin' },
   { id: 2, name: 'Bogota' },
@@ -182,8 +182,9 @@ var mockData = [
   { id: 11, name: 'Paris' },
   { id: 12, name: 'San Francisco' }
 ];
-</code><br />
-So let’s create the <code>LocationSource</code>.</p>
+</code></pre>
+
+<p>So let’s create the <code>LocationSource</code>.</p>
 
 <p><code>sources/LocationSource.js</code></p>
 
@@ -203,9 +204,9 @@ So let’s create the <code>LocationSource</code>.</p>
 </code></pre>
 
 <p>Next, we’ll need to change the actions to use this new method we created. We will add an action called <code>fetchLocations</code> which will fetch the locations and then call <code>updateLocations</code> when it successfully completes. A new action <code>locationsFailed</code> deals with the locations not being available. Add these methods to the class.<br />
-<code>actions/LocationActions.js</code><br />
-<code>js
-fetchLocations() {
+<code>actions/LocationActions.js</code></p>
+
+<pre><code class="language-js">fetchLocations() {
   // we dispatch an event here so we can have "loading" state.
   this.dispatch();
   LocationSource.fetch()
@@ -220,70 +221,73 @@ fetchLocations() {
 locationsFailed(errorMessage) {
   this.dispatch(errorMessage);
 }
-</code><br />
-Next we’ll update our store to handle these new actions. It’s just a matter of adding the new actions and their handlers to <code>bindListeners</code>. A new state ‘errorMessage’ is added to deal with a potential error message.<br />
-<code>stores/LocationStore.js</code><br />
-```js<br />
-class LocationStore {<br />
-  constructor() {<br />
-    this.locations = [];<br />
-    this.errorMessage = null;<br />
-    this.bindListeners({<br />
-      handleUpdateLocations: LocationActions.UPDATE_LOCATIONS,<br />
-      handleFetchLocations: LocationActions.FETCH_LOCATIONS,<br />
-      handleLocationsFailed: LocationActions.LOCATIONS_FAILED<br />
-    });<br />
-  }<br />
-  handleUpdateLocations(locations) {<br />
-    this.locations = locations;<br />
-    this.errorMessage = null;<br />
-  }<br />
-  handleFetchLocations() {<br />
-    // reset the array while we’re fetching new locations so React can<br />
-    // be smart and render a spinner for us since the data is empty.<br />
-    this.locations = [];<br />
-  }</p>
+</code></pre>
 
-<p>handleLocationsFailed(errorMessage) {<br />
-    this.errorMessage = errorMessage;<br />
-  }<br />
-}<br />
-<code>
-And finally, the view will change slightly. We'll be displaying an error message if it exists and showing a spinner if the content is loading.
-</code>js<br />
-componentDidMount() {<br />
-  LocationStore.listen(this.onChange);</p>
+<p>Next we’ll update our store to handle these new actions. It’s just a matter of adding the new actions and their handlers to <code>bindListeners</code>. A new state ‘errorMessage’ is added to deal with a potential error message.<br />
+<code>stores/LocationStore.js</code></p>
 
-<p>LocationActions.fetchLocations();<br />
-},</p>
+<pre><code class="language-js">class LocationStore {
+  constructor() {
+    this.locations = [];
+    this.errorMessage = null;
+    this.bindListeners({
+      handleUpdateLocations: LocationActions.UPDATE_LOCATIONS,
+      handleFetchLocations: LocationActions.FETCH_LOCATIONS,
+      handleLocationsFailed: LocationActions.LOCATIONS_FAILED
+    });
+  }
+  handleUpdateLocations(locations) {
+    this.locations = locations;
+    this.errorMessage = null;
+  }
+  handleFetchLocations() {
+    // reset the array while we're fetching new locations so React can
+    // be smart and render a spinner for us since the data is empty.
+    this.locations = [];
+  }
 
-<p>render() {<br />
-  if (this.state.errorMessage) {<br />
-    return (<br />
-      &lt;div&gt;Something is wrong&lt;/div&gt;<br />
-    );<br />
-  }</p>
+  handleLocationsFailed(errorMessage) {
+    this.errorMessage = errorMessage;
+  }
+}
+</code></pre>
 
-<p>if (!this.state.locations.length) {<br />
-    return (<br />
-      &lt;div&gt;<br />
-        <img src="/my-cool-spinner.gif" /><br />
-      &lt;/div&gt;<br />
-    )<br />
-  }</p>
+<p>And finally, the view will change slightly. We’ll be displaying an error message if it exists and showing a spinner if the content is loading.</p>
 
-<p>return (<br />
-    &lt;ul&gt;<br />
-      {this.state.locations.map((location) =&gt; {<br />
-        return (<br />
-          &lt;li&gt;{location.name}&lt;/li&gt;<br />
-        );<br />
-      })}<br />
-    &lt;/ul&gt;<br />
-  );<br />
-}<br />
-```<br />
-<a href="/guide/wait-for">Continue to next step…</a></p>
+<pre><code class="language-js">componentDidMount() {
+  LocationStore.listen(this.onChange);
+
+  LocationActions.fetchLocations();
+},
+
+render() {
+  if (this.state.errorMessage) {
+    return (
+      &lt;div&gt;Something is wrong&lt;/div&gt;
+    );
+  }
+
+  if (!this.state.locations.length) {
+    return (
+      &lt;div&gt;
+        &lt;img src="/my-cool-spinner.gif" /&gt;
+      &lt;/div&gt;
+    )
+  }
+
+  return (
+    &lt;ul&gt;
+      {this.state.locations.map((location) =&gt; {
+        return (
+          &lt;li&gt;{location.name}&lt;/li&gt;
+        );
+      })}
+    &lt;/ul&gt;
+  );
+}
+</code></pre>
+
+<p><a href="/guide/wait-for">Continue to next step…</a></p>
 
           </div>
         </div>
