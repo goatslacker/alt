@@ -12,6 +12,7 @@ This tutorial shows how to fetch data and handle a failure.
 Where should async go? There is no right answer. You can put it in actions or in stores. In this tutorial, we'll be calling async from the actions and the data fetching will exist in a new folder `sources`.
 Create `sources/LocationSource.js`. You can use something like [`fetch`](https://github.com/github/fetch) to fetch some data from a server. For the purposes of this tutorial we will be using `setTimeout` and `Promise` to mimic a request made using `fetch` API.
 Here's some mock data we'll be using:
+
 ```js
 var mockData = [
   { id: 0, name: 'Abu Dhabi' },
@@ -29,6 +30,7 @@ var mockData = [
   { id: 12, name: 'San Francisco' }
 ];
 ```
+
 So let's create the `LocationSource`.
 
 `sources/LocationSource.js`
@@ -51,6 +53,7 @@ var LocationSource = {
 
 Next, we'll need to change the actions to use this new method we created. We will add an action called `fetchLocations` which will fetch the locations and then call `updateLocations` when it successfully completes. A new action `locationsFailed` deals with the locations not being available. Add these methods to the class.
 `actions/LocationActions.js`
+
 ```js
 fetchLocations() {
   // we dispatch an event here so we can have "loading" state.
@@ -68,8 +71,10 @@ locationsFailed(errorMessage) {
   this.dispatch(errorMessage);
 }
 ```
+
 Next we'll update our store to handle these new actions. It's just a matter of adding the new actions and their handlers to `bindListeners`. A new state 'errorMessage' is added to deal with a potential error message.
 `stores/LocationStore.js`
+
 ```js
 class LocationStore {
   constructor() {
@@ -96,7 +101,9 @@ class LocationStore {
   }
 }
 ```
+
 And finally, the view will change slightly. We'll be displaying an error message if it exists and showing a spinner if the content is loading.
+
 ```js
 componentDidMount() {
   LocationStore.listen(this.onChange);
@@ -130,4 +137,5 @@ render() {
   );
 }
 ```
+
 [Continue to next step...](wait-for.md)
