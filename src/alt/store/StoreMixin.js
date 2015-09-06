@@ -144,14 +144,9 @@ const StoreMixin = {
           `You have multiple action handlers bound to an action: ` +
           `${action} and ${assumedEventHandler}`
         )
-      } else if (this[action]) {
-        // action
-        handler = this[action]
-      } else if (this[assumedEventHandler]) {
-        // onAction
-        handler = this[assumedEventHandler]
+      } else {
+        handler = this[action] || this[assumedEventHandler]
       }
-
       if (handler) {
         this.bindAction(symbol, handler)
       }
