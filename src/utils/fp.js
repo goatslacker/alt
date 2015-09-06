@@ -1,7 +1,7 @@
 const { push } = Array.prototype
 
 // Disabling no-shadow so we can sanely curry
-/*eslint-disable no-shadow*/
+/* eslint-disable no-shadow */
 export function map(fn, stores) {
   return stores
     ? stores.map(store => fn(store.state))

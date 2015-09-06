@@ -1,4 +1,4 @@
-/*global window*/
+/* global window */
 import { Dispatcher } from 'flux'
 
 import * as StateFunctions from './utils/StateFunctions'
