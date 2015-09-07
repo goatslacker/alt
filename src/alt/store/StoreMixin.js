@@ -136,7 +136,6 @@ const StoreMixin = {
       const assumedEventHandler = action.replace(matchFirstCharacter, (x) => {
         return `on${x[0].toUpperCase()}`
       })
-      let handler = null
 
       if (this[action] && this[assumedEventHandler]) {
         // If you have both action and onAction
@@ -144,9 +143,9 @@ const StoreMixin = {
           `You have multiple action handlers bound to an action: ` +
           `${action} and ${assumedEventHandler}`
         )
-      } else {
-        handler = this[action] || this[assumedEventHandler]
       }
+
+      const handler = this[action] || this[assumedEventHandler]
       if (handler) {
         this.bindAction(symbol, handler)
       }
