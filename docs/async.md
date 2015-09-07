@@ -78,7 +78,7 @@ class SearchStore {
 
 The data source is an object or a function that returns an object where the keys correspond to methods that will be available to the supplied Store. The values of the keys are an object that describes the behavior of calling that method.
 
-If you are using the no-singletons approach then you'd use the function form of data sources an use the first and only parameter `alt` that is passed to retrieve the actions to listen to them.
+If you are using the no-singletons approach then you'd use the function form of data sources and use the first and only parameter `alt` that is passed to retrieve the actions to listen to them.
 
 ```js
 const SearchSource = (alt) => {
