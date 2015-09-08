@@ -14,8 +14,13 @@ Your patch should adhere to these guidelines:
 
 ## How to get set up
 
-Fork the project and clone it to your computer. Then you'll need npm to install
-the project's dependencies. Just run:
+Fork the project and clone it to your computer. Then you'll need to isntall a few global dependencies:
+
+```bash
+npm install -g eslint@~1.3.1 eslint-plugin-react@~3.3.1 babel babel-eslint browserify
+```
+
+Followed by installing the rest of the project's dependencies:
 
 ```bash
 npm install

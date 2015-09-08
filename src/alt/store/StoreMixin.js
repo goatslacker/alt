@@ -56,7 +56,7 @@ const StoreMixin = {
               action(intercept(x, action, args))
               if (isError) throw x
             }
-            return this.alt.trapAsync ? (() => fire()) : fire()
+            return this.alt.trapAsync ? () => fire() : fire()
           }
         }
 

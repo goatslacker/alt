@@ -38,5 +38,5 @@ function FinalStore() {
 export default function makeFinalStore(alt) {
   return alt.FinalStore
     ? alt.FinalStore
-    : (alt.FinalStore = alt.createUnsavedStore(FinalStore))
+    : alt.FinalStore = alt.createUnsavedStore(FinalStore)
 }
