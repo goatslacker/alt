@@ -57,6 +57,7 @@ function connectToStores(Spec, Component = Spec) {
 
   const StoreConnection = React.createClass({
     displayName: `Stateful${Component.displayName || Component.name || 'Container'}`,
+    contextTypes: Spec.contextTypes,
 
     getInitialState() {
       return Spec.getPropsFromStores(this.props, this.context)
