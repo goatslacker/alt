@@ -85,6 +85,38 @@ const StoreMixin = {
     })
   },
 
+  fetch(spec) {
+    const validHandlers = ['success', 'error', 'before', 'after']
+    validHandlers.forEach((handler) => {
+      if (spec[handler] && !spec[handler].id) {
+        throw new Error(`${handler} handler must be an action function`)
+      }
+    })
+
+    const handleAction = (action, x) => {
+      const fire = () => {
+        action(x)
+        if (spec.after) spec.after()
+      }
+      return this.alt.trapAsync ? fire : fire()
+    }
+
+    const shouldFetch = spec.shouldFetch ? spec.shouldFetch() : true
+
+    // if we don't have it in cache then fetch it
+    if (shouldFetch) {
+      /* istanbul ignore else */
+      if (spec.before) spec.before()
+      return spec.remote().then(
+        x => Promise.resolve(handleAction(spec.success, x)),
+        e => Promise.reject(handleAction(spec.error, e))
+      )
+    } else {
+      // otherwise emit the change now
+      this.emitChange()
+    }
+  },
+
   exportPublicMethods(methods) {
     fn.eachObject((methodName, value) => {
       if (!fn.isFunction(value)) {
