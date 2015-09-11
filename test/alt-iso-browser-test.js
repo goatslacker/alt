@@ -129,7 +129,6 @@ export default {
     afterEach() {
       delete global.document
       delete global.window
-      delete global.navigator
     },
 
     'browser requests'(done) {
@@ -137,8 +136,7 @@ export default {
         global.document = jsdom(
           `<!doctype html><html><body>${obj.html}</body></html>`
         )
-        global.window = global.document.parentWindow
-        global.navigator = global.window.navigator
+        global.window = global.document.defaultView
       }).then(() => {
         return AltIso.render(alt, App, { id: 0, name: 'Z' })
       }).then((data) => {
@@ -152,8 +150,7 @@ export default {
 
     'works with connectToStores'(done) {
       global.document = jsdom('<!doctype html><html><body></body></html>')
-      global.window = global.document.parentWindow
-      global.navigator = global.window.navigator
+      global.window = global.document.defaultView
 
       const alt = new Alt()
 
