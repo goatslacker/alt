@@ -53,7 +53,13 @@ export function createStoreConfig(globalConfig, StoreModel) {
 
       return state
     },
-    setState: fn.assign,
+    setState(currentState, nextState) {
+      if (Object.prototype.toString.call(nextState) === '[object Object]') {
+        return fn.assign(currentState, nextState)
+      } else {
+        return nextState
+      }
+    },
   }, globalConfig, StoreModel.config)
 }
 
