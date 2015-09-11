@@ -66,8 +66,7 @@ export default {
   'AltContainer': {
     beforeEach() {
       global.document = jsdom('<!doctype html><html><body></body></html>')
-      global.window = global.document.parentWindow
-      global.navigator = global.window.navigator
+      global.window = global.document.defaultView
 
       alt.recycle()
     },
@@ -75,7 +74,6 @@ export default {
     afterEach() {
       delete global.document
       delete global.window
-      delete global.navigator
     },
 
     'element mounts and unmounts'() {

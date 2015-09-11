@@ -27,8 +27,7 @@ export default {
   'connectToStores wrapper': {
     beforeEach() {
       global.document = jsdom('<!doctype html><html><body></body></html>')
-      global.window = global.document.parentWindow
-      global.navigator = global.window.navigator
+      global.window = global.document.defaultView
       require('react/lib/ExecutionEnvironment').canUseDOM = true
 
       alt.recycle()
@@ -37,7 +36,6 @@ export default {
     afterEach() {
       delete global.document
       delete global.window
-      delete global.navigator
     },
 
     'resolve props on re-render'() {
