@@ -46,7 +46,9 @@ const StoreMixin = {
         const value = spec.local && spec.local(state, ...args)
         const shouldFetch = spec.shouldFetch
           ? spec.shouldFetch(state, ...args)
+          /*eslint-disable*/
           : value == null
+          /*eslint-enable*/
         const intercept = spec.interceptResponse || (x => x)
 
         const makeActionHandler = (action, isError) => {
@@ -56,7 +58,7 @@ const StoreMixin = {
               action(intercept(x, action, args))
               if (isError) throw x
             }
-            return this.alt.trapAsync ? (() => fire()) : fire()
+            return this.alt.trapAsync ? () => fire() : fire()
           }
         }
 
@@ -69,11 +71,11 @@ const StoreMixin = {
             makeActionHandler(spec.success),
             makeActionHandler(spec.error, 1)
           )
-        } else {
-          // otherwise emit the change now
-          this.emitChange()
-          return value
         }
+
+        // otherwise emit the change now
+        this.emitChange()
+        return value
       }
 
       return publicMethods
@@ -81,7 +83,7 @@ const StoreMixin = {
 
     this.exportPublicMethods(toExport)
     this.exportPublicMethods({
-      isLoading: () => loadCounter > 0
+      isLoading: () => loadCounter > 0,
     })
   },
 
@@ -170,7 +172,7 @@ const StoreMixin = {
         this.bindAction(symbol, listener)
       }
     }, [obj])
-  }
+  },
 }
 
 export default StoreMixin

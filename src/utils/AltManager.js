@@ -53,8 +53,8 @@ export default class AltManager {
   }
 
   findWhere(regex) {
-    let results = {}
-    for (let i in this.alts) {
+    const results = {}
+    for (const i in this.alts) {
       if (regex.exec(i) === null) {
         continue
       }

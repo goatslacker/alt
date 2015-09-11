@@ -38,11 +38,11 @@ export default function IsomorphicRenderer(alt, App) {
       alt.flush()
       return markup
     }
-  } else {
-    Iso.bootstrap((state, _, node) => {
-      const app = React.createElement(App)
-      alt.bootstrap(state)
-      React.render(app, node)
-    })
   }
+
+  Iso.bootstrap((state, _, node) => {
+    const app = React.createElement(App)
+    alt.bootstrap(state)
+    React.render(app, node)
+  })
 }

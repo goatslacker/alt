@@ -1,7 +1,7 @@
 const { push } = Array.prototype
 
 // Disabling no-shadow so we can sanely curry
-/*eslint-disable no-shadow*/
+/* eslint-disable no-shadow */
 export function map(fn, stores) {
   return stores
     ? stores.map(store => fn(store.state))
@@ -24,7 +24,7 @@ export function flatMap(fn, stores) {
   if (!stores) return (stores) => flatMap(fn, stores)
 
   return stores.reduce((result, store) => {
-    let value = fn(store.state)
+    const value = fn(store.state)
     if (Array.isArray(value)) {
       push.apply(result, value)
     } else {

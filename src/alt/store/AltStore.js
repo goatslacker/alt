@@ -28,12 +28,12 @@ class AltStore {
           this.lifecycle('error', {
             error: e,
             payload,
-            state: this.state
+            state: this.state,
           })
           return false
-        } else {
-          throw e
         }
+
+        throw e
       }
     }
 
@@ -45,7 +45,7 @@ class AltStore {
 
       this.lifecycle('beforeEach', {
         payload,
-        state: this.state
+        state: this.state,
       })
 
       const actionHandlers = model.actionListeners[payload.action]
@@ -77,7 +77,7 @@ class AltStore {
 
       this.lifecycle('afterEach', {
         payload,
-        state: this.state
+        state: this.state,
       })
     })
 
