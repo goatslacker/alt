@@ -89,7 +89,7 @@ function connectToStores(Spec, Component = Spec) {
         Component,
         assign({}, this.props, this.state)
       )
-    }
+    },
   })
   if (Component.contextTypes) {
     StoreConnection.contextTypes = Component.contextTypes

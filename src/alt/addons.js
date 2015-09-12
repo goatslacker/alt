@@ -21,7 +21,7 @@ Alt.addons = {
   chromeDebug,
   connectToStores,
   makeFinalStore,
-  withAltContext
+  withAltContext,
 }
 
 export default Alt

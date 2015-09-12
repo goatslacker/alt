@@ -1,17 +1,22 @@
 import AltStore from './debug/AltStore'
 import DebugActions from './debug/DebugActions'
-import React from 'react'
+import React, { PropTypes } from 'react'
 import connectToStores from './connectToStores'
 
 class StoreExplorer extends React.Component {
-  constructor() {
-    super()
-
-    this.selectStore = this.selectStore.bind(this)
+  static propTypes = {
+    alt: PropTypes.obj.isRequired,
+    stores: PropTypes.array.isRequired,
   }
 
   componentDidMount() {
     DebugActions.setAlt(this.props.alt)
+  }
+
+  constructor() {
+    super()
+
+    this.selectStore = this.selectStore.bind(this)
   }
 
   selectStore(ev) {
@@ -46,11 +51,11 @@ class StoreExplorer extends React.Component {
 export default connectToStores({
   getPropsFromStores() {
     return {
-      stores: AltStore.stores()
+      stores: AltStore.stores(),
     }
   },
 
   getStores() {
     return [AltStore]
-  }
+  },
 }, StoreExplorer)

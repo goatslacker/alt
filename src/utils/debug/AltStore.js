@@ -7,9 +7,9 @@ export default alt.createStore(class {
   static config = {
     getState(state) {
       return {
-        stores: state.stores
+        stores: state.stores,
       }
-    }
+    },
   }
 
   constructor() {

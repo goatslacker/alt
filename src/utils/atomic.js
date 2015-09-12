@@ -21,7 +21,7 @@ function makeAtomicObject(alt, StoreModel) {
 }
 
 export default function atomic(alt) {
-  var finalStore = makeFinalStore(alt)
+  const finalStore = makeFinalStore(alt)
 
   finalStore.listen(() => alt.takeSnapshot())
 

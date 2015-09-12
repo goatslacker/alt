@@ -1,4 +1,4 @@
-/*global window*/
+/* global window */
 import { Dispatcher } from 'flux'
 
 import * as StateFunctions from './utils/StateFunctions'
@@ -30,7 +30,7 @@ class Alt {
         id,
         action,
         data,
-        details
+        details,
       })
     })
   }
@@ -50,7 +50,7 @@ class Alt {
     store.createStoreConfig(this.config, StoreModel)
     const Store = store.transformStore(this.storeTransforms, StoreModel)
 
-    /*istanbul ignore next*/
+    /* istanbul ignore next */
     if (module.hot) delete this.stores[key]
 
     if (this.stores[key] || !key) {

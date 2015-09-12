@@ -1,10 +1,10 @@
 import React from 'react'
 
 export default function withAltContext(flux) {
-  return function (Component) {
+  return (Component) => {
     return React.createClass({
       childContextTypes: {
-        flux: React.PropTypes.object
+        flux: React.PropTypes.object,
       },
 
       getChildContext() {
@@ -13,7 +13,7 @@ export default function withAltContext(flux) {
 
       render() {
         return React.createElement(Component, this.props)
-      }
+      },
     })
   }
 }
