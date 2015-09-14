@@ -27,8 +27,7 @@ export default {
   'connectToStores wrapper': {
     beforeEach() {
       global.document = jsdom('<!doctype html><html><body></body></html>')
-      global.window = global.document.parentWindow
-      global.navigator = global.window.navigator
+      global.window = global.document.defaultView
       require('react/lib/ExecutionEnvironment').canUseDOM = true
 
       alt.recycle()
@@ -37,7 +36,6 @@ export default {
     afterEach() {
       delete global.document
       delete global.window
-      delete global.navigator
     },
 
     'resolve props on re-render'() {
@@ -148,6 +146,40 @@ export default {
 
       const WrappedComponent = connectToStores(LegacyComponent)
       const element = React.createElement(WrappedComponent, {delim: ': '})
+      const output = React.renderToStaticMarkup(element)
+      assert.include(output, 'Foo: Bar')
+    },
+
+    'component statics can see context properties'() {
+      const Child = connectToStores(React.createClass({
+        statics: {
+          getStores(props, context) {
+            return [context.store]
+          },
+          getPropsFromStores(props, context) {
+            return context.store.getState()
+          }
+        },
+        contextTypes: {
+          store: React.PropTypes.object
+        },
+        render() {
+          return <span>Foo: {this.props.foo}</span>
+        }
+      }))
+
+      const ContextComponent = React.createClass({
+        getChildContext() {
+          return { store: testStore }
+        },
+        childContextTypes: {
+          store: React.PropTypes.object
+        },
+        render() {
+          return <Child/>
+        }
+      })
+      const element = React.createElement(ContextComponent)
       const output = React.renderToStaticMarkup(element)
       assert.include(output, 'Foo: Bar')
     },

@@ -67,7 +67,7 @@ class TodoActions {
 module.exports = alt.createActions(TodoActions)
 ```
 
-The store on flux closk in at ~160 LOC. In alt the store is 80 LOC.
+The store on flux clocks in at ~160 LOC. In alt the store is 80 LOC.
 
 Here's the store:
 

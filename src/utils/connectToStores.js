@@ -56,6 +56,8 @@ function connectToStores(Spec, Component = Spec) {
   }
 
   const StoreConnection = React.createClass({
+    displayName: `Stateful${Component.displayName || Component.name || 'Container'}`,
+
     getInitialState() {
       return Spec.getPropsFromStores(this.props, this.context)
     },
@@ -87,8 +89,11 @@ function connectToStores(Spec, Component = Spec) {
         Component,
         assign({}, this.props, this.state)
       )
-    }
+    },
   })
+  if (Component.contextTypes) {
+    StoreConnection.contextTypes = Component.contextTypes
+  }
 
   return StoreConnection
 }

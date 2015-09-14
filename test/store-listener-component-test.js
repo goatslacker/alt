@@ -66,8 +66,7 @@ export default {
   'AltContainer': {
     beforeEach() {
       global.document = jsdom('<!doctype html><html><body></body></html>')
-      global.window = global.document.parentWindow
-      global.navigator = global.window.navigator
+      global.window = global.document.defaultView
 
       alt.recycle()
     },
@@ -75,7 +74,6 @@ export default {
     afterEach() {
       delete global.document
       delete global.window
-      delete global.navigator
     },
 
     'element mounts and unmounts'() {
@@ -562,11 +560,12 @@ export default {
         }
       })
 
+      const foo = sinon.spy()
 
       const App = React.createClass({
         render() {
           return (
-            <AltContainer flux={flux}>
+            <AltContainer flux={flux} onMount={foo}>
               <View />
             </AltContainer>
           )
@@ -577,6 +576,8 @@ export default {
       const span = TestUtils.findRenderedDOMComponentWithTag(node, 'span')
 
       assert.instanceOf(span.props.flux, Flux)
+
+      assert.ok(foo.calledOnce, 'onMount hook was called')
     },
   }
 }

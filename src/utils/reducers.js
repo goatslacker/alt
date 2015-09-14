@@ -9,12 +9,12 @@ function shallowEqual(a, b) {
   if (typeof a !== 'object' || typeof b !== 'object') return a === b
   if (a === b) return true
   if (!a || !b) return false
-  for (let k in a) {
+  for (const k in a) {
     if (a.hasOwnProperty(k) && (!b.hasOwnProperty(k) || a[k] !== b[k])) {
       return false
     }
   }
-  for (let k in b) {
+  for (const k in b) {
     if (b.hasOwnProperty(k) && !a.hasOwnProperty(k)) {
       return false
     }
@@ -24,7 +24,7 @@ function shallowEqual(a, b) {
 
 export function combine(...restReducers) {
   const reducers = assign.apply(null, [{}].concat(restReducers))
-  return function (state, payload) {
+  return function combinedReducer(state, payload) {
     const newState = reducers.hasOwnProperty(payload.action)
       ? reducers[payload.action](state, payload.data)
       : state

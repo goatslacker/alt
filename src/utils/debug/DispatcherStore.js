@@ -15,7 +15,7 @@ export default alt.createStore(class {
         isReplaying: state.isReplaying,
         mtime: state.mtime,
       }
-    }
+    },
   }
 
   constructor() {
@@ -109,7 +109,9 @@ export default alt.createStore(class {
   }
 
   saveRecording() {
+    /*eslint-disable*/
     console.log(JSON.stringify(this.dispatches))
+    /*eslint-enable*/
   }
 
   startReplay() {

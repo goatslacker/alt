@@ -36,7 +36,7 @@ export function decorate(context) {
 
     Store.config = assign({
       bindListeners,
-      publicMethods
+      publicMethods,
     }, Store.config)
 
     return Store
@@ -44,13 +44,13 @@ export function decorate(context) {
 }
 
 export function createActions(alt, ...args) {
-  return function (Actions) {
+  return (Actions) => {
     return alt.createActions(Actions, {}, ...args)
   }
 }
 
 export function createStore(alt, ...args) {
-  return function (Store) {
+  return (Store) => {
     return alt.createStore(decorate(alt)(Store), undefined, ...args)
   }
 }
@@ -73,7 +73,7 @@ export function expose(obj, name, description) {
 
 export function datasource(...sources) {
   const source = assign(...sources)
-  return function (Store) {
+  return (Store) => {
     Store.config = assign({ datasource: source }, Store.config)
     return Store
   }

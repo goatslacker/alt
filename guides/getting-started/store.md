@@ -17,7 +17,7 @@ class LocationStore {
 ```
 
 
-Instance variables defined anywhere in the store will become the state. This resembles how we reason about and build normal JS classes. You can initiaize these in the constructor and then update them directly in the prototype methods.
+Instance variables defined anywhere in the store will become the state. This resembles how we reason about and build normal JS classes. You can initialize these in the constructor and then update them directly in the prototype methods.
 
 ```js
 this.locations = [];

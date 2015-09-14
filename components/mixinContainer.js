@@ -1,3 +1,4 @@
+/*eslint-disable*/
 var Subscribe = require('../mixins/Subscribe')
 var assign = require('../utils/functions').assign
 
@@ -46,6 +47,7 @@ function mixinContainer(React) {
 
     componentDidMount: function () {
       this.registerStores(this.props)
+      if (this.props.onMount) this.props.onMount(this.props, this.context)
     },
 
     componentWillUnmount: function () {

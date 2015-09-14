@@ -1,5 +1,47 @@
 # Changelog
 
+## 0.17.3
+
+### Changed
+
+* Moved hot load delete of stores up to remove the warning shown in console. [commit](https://github.com/goatslacker/alt/commit/d3befc5)
+
+## 0.17.2
+
+### Added
+
+* Add `onMount` handler for AltContainer. [commit](https://github.com/goatslacker/alt/commit/189e009)
+
+* Expose a reduce function for every store by default. [commit](https://github.com/goatslacker/alt/commit/ab19ceb)
+
+  If you're using reducers then this allows you to not ever use waitFor since you can just call store.reduce(store.getState(), payload) in order to derive data.
+
+* Allow values for store state. [commit](https://github.com/goatslacker/alt/commit/5e18e9c)
+
+  this.state can now be any valid JS value rather than always being an object.
+
+* Add some reducer utils. [commit](https://github.com/goatslacker/alt/commit/f672938)
+
+  These reducer utils can be used for easily working with reducer only stores
+
+
+### Changed
+
+* Return value from sources local method. [commit](https://github.com/goatslacker/alt/commit/3e8bb8a)
+
+* Delete stores on hot reload. [commit](https://github.com/goatslacker/alt/commit/8485eee)
+
+  Working with react hot loader is now simpler.
+
+* Make fp tools faster by pulling directly from state. [commit](https://github.com/goatslacker/alt/commit/2b5adb3)
+
+* Throw if listen does not get a function. [commit](https://github.com/goatslacker/alt/commit/193206f)
+
+* Change the connectToStores displayName. [commit](https://github.com/goatslacker/alt/commit/b2c0b31)
+
+* Allow listening to same action with multiple methods. [commit](https://github.com/goatslacker/alt/commit/a57d062)
+
+
 ## 0.17.1
 
 ### Changed

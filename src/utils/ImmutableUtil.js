@@ -17,7 +17,7 @@ function immutable(StoreModel) {
 
     onDeserialize(data) {
       return Immutable.fromJS(data)
-    }
+    },
   }
 
   return StoreModel

@@ -1,6 +1,6 @@
 import { assign } from './functions'
 
-const noop = function () { }
+function noop() { }
 
 const AltTestingUtils = {
   createStoreSpy: (alt) => {
@@ -18,7 +18,7 @@ const AltTestingUtils = {
       on: noop,
       registerAsync: noop,
       setState: noop,
-      waitFor: noop
+      waitFor: noop,
     }
   },
 
@@ -37,9 +37,9 @@ const AltTestingUtils = {
     return {
       getState: () => {
         return state
-      }
+      },
     }
-  }
+  },
 }
 
 module.exports = AltTestingUtils

@@ -28,12 +28,12 @@ class AltStore {
           this.lifecycle('error', {
             error: e,
             payload,
-            state: this.state
+            state: this.state,
           })
           return false
-        } else {
-          throw e
         }
+
+        throw e
       }
     }
 
@@ -45,16 +45,25 @@ class AltStore {
 
       this.lifecycle('beforeEach', {
         payload,
-        state: this.state
+        state: this.state,
       })
 
-      const actionHandler = model.actionListeners[payload.action] ||
-        model.otherwise
+      const actionHandlers = model.actionListeners[payload.action]
 
-      if (actionHandler) {
-        const result = handleDispatch(() => {
-          return actionHandler.call(model, payload.data, payload.action)
-        }, payload)
+      if (actionHandlers || model.otherwise) {
+        let result
+
+        if (actionHandlers) {
+          result = handleDispatch(() => {
+            return actionHandlers.filter(Boolean).every((handler) => {
+              return handler.call(model, payload.data, payload.action) !== false
+            })
+          }, payload)
+        } else {
+          result = handleDispatch(() => {
+            return model.otherwise(payload.data, payload.action)
+          }, payload)
+        }
 
         if (result !== false && !this.preventDefault) this.emitChange()
       }
@@ -63,13 +72,12 @@ class AltStore {
         handleDispatch(() => {
           this.state = model.reduce(this.state, payload)
         }, payload)
-
         if (!this.preventDefault) this.emitChange()
       }
 
       this.lifecycle('afterEach', {
         payload,
-        state: this.state
+        state: this.state,
       })
     })
 
@@ -77,6 +85,7 @@ class AltStore {
   }
 
   listen(cb) {
+    if (!fn.isFunction(cb)) throw new TypeError('listen expects a function')
     this.transmitter.subscribe(cb)
     return () => this.unlisten(cb)
   }

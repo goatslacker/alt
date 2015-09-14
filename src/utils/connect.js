@@ -55,7 +55,7 @@ function connect(Spec, MaybeComponent) {
 
       render() {
         return <Component {...this.props} {...this.state} />
-      }
+      },
     })
   }
 

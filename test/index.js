@@ -1385,6 +1385,41 @@ const tests = {
 
     AsyncAction.fire(2)
   },
+
+  'listen expects function'() {
+    assert.throws(() => {
+      myStore.listen(null)
+    }, TypeError, 'listen expects a function')
+  },
+
+  'lots of listens'() {
+    const ImportKeysActions = alt.generateActions('change', 'saved')
+
+    const call = sinon.spy()
+
+    const BalanceClaimStore = alt.createStore(class {
+      constructor() {
+        this.bindListeners({
+          onRefreshBalanceClaims: ImportKeysActions.saved,
+          onLoadMyAccounts: [
+            ImportKeysActions.change, ImportKeysActions.saved
+          ]
+        })
+      }
+
+      onRefreshBalanceClaims() {
+        call()
+      }
+
+      onLoadMyAccounts() {
+        call()
+      }
+    })
+
+    ImportKeysActions.saved()
+
+    assert(call.calledTwice, 'multiple action handlers are ok')
+  },
 }
 
 export default tests

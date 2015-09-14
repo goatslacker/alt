@@ -4,11 +4,11 @@ export function withData(fetch, MaybeComponent) {
   function bind(Component) {
     return React.createClass({
       contextTypes: {
-        buffer: React.PropTypes.object.isRequired
+        buffer: React.PropTypes.object.isRequired,
       },
 
       childContextTypes: {
-        buffer: React.PropTypes.object.isRequired
+        buffer: React.PropTypes.object.isRequired,
       },
 
       getChildContext() {
@@ -27,7 +27,7 @@ export function withData(fetch, MaybeComponent) {
         return this.context.buffer.locked
           ? React.createElement(Component, this.props)
           : null
-      }
+      },
     })
   }
 
@@ -38,7 +38,7 @@ export function withData(fetch, MaybeComponent) {
 function usingDispatchBuffer(buffer, Component) {
   return React.createClass({
     childContextTypes: {
-      buffer: React.PropTypes.object.isRequired
+      buffer: React.PropTypes.object.isRequired,
     },
 
     getChildContext() {
@@ -47,7 +47,7 @@ function usingDispatchBuffer(buffer, Component) {
 
     render() {
       return React.createElement(Component, this.props)
-    }
+    },
   })
 }
 
@@ -85,13 +85,13 @@ class DispatchBuffer {
       return {
         html: this.renderStrategy(Element),
         state: alt.flush(),
-        element: Element
+        element: Element,
       }
     }).catch((err) => {
       return Promise.reject({
         err,
         state: alt.flush(),
-        element: Element
+        element: Element,
       })
     })
   }

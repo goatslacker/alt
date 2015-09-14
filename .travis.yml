@@ -2,6 +2,4 @@ language: node_js
 script: npm run lint && npm run coverage
 after_script: cat ./coverage/lcov.info | coveralls
 node_js:
-  - "0.10"
-  - "0.12"
-  - iojs-v1.8.1
+  - "stable"

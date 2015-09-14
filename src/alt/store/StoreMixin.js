@@ -46,7 +46,9 @@ const StoreMixin = {
         const value = spec.local && spec.local(state, ...args)
         const shouldFetch = spec.shouldFetch
           ? spec.shouldFetch(state, ...args)
+          /*eslint-disable*/
           : value == null
+          /*eslint-enable*/
         const intercept = spec.interceptResponse || (x => x)
 
         const makeActionHandler = (action, isError) => {
@@ -56,7 +58,7 @@ const StoreMixin = {
               action(intercept(x, action, args))
               if (isError) throw x
             }
-            return this.alt.trapAsync ? (() => fire()) : fire()
+            return this.alt.trapAsync ? () => fire() : fire()
           }
         }
 
@@ -69,10 +71,11 @@ const StoreMixin = {
             makeActionHandler(spec.success),
             makeActionHandler(spec.error, 1)
           )
-        } else {
-          // otherwise emit the change now
-          this.emitChange()
         }
+
+        // otherwise emit the change now
+        this.emitChange()
+        return value
       }
 
       return publicMethods
@@ -80,7 +83,7 @@ const StoreMixin = {
 
     this.exportPublicMethods(toExport)
     this.exportPublicMethods({
-      isLoading: () => loadCounter > 0
+      isLoading: () => loadCounter > 0,
     })
   },
 
@@ -124,7 +127,8 @@ const StoreMixin = {
 
     // You can pass in the constant or the function itself
     const key = symbol.id ? symbol.id : symbol
-    this.actionListeners[key] = handler.bind(this)
+    this.actionListeners[key] = this.actionListeners[key] || []
+    this.actionListeners[key].push(handler.bind(this))
     this.boundListeners.push(key)
   },
 
@@ -134,7 +138,6 @@ const StoreMixin = {
       const assumedEventHandler = action.replace(matchFirstCharacter, (x) => {
         return `on${x[0].toUpperCase()}`
       })
-      let handler = null
 
       if (this[action] && this[assumedEventHandler]) {
         // If you have both action and onAction
@@ -142,14 +145,9 @@ const StoreMixin = {
           `You have multiple action handlers bound to an action: ` +
           `${action} and ${assumedEventHandler}`
         )
-      } else if (this[action]) {
-        // action
-        handler = this[action]
-      } else if (this[assumedEventHandler]) {
-        // onAction
-        handler = this[assumedEventHandler]
       }
 
+      const handler = this[action] || this[assumedEventHandler]
       if (handler) {
         this.bindAction(symbol, handler)
       }
@@ -174,7 +172,7 @@ const StoreMixin = {
         this.bindAction(symbol, listener)
       }
     }, [obj])
-  }
+  },
 }
 
 export default StoreMixin

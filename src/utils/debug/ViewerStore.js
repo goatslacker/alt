@@ -7,9 +7,9 @@ export default alt.createStore(class {
   static config = {
     getState(state) {
       return {
-        selectedData: state.selectedData
+        selectedData: state.selectedData,
       }
-    }
+    },
   }
 
   constructor() {
@@ -20,6 +20,8 @@ export default alt.createStore(class {
 
   selectData(data) {
     this.selectedData = data
+    /*eslint-disable*/
     console.log(data)
+    /*eslint-enable*/
   }
 })
