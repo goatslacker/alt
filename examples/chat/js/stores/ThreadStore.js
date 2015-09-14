@@ -17,7 +17,11 @@ class ThreadStore {
     this.currentID = threadID
     this.threads[this.currentID].lastMessage.isRead = true
   }
-
+  //to update the current thread ,so update the last message.
+  onReceiveCreatedMessage(message) {
+    this.threads[message.threadID].lastMessage=ChatMessageUtils.convertRawMessage(message, this.currentID);
+    
+  }
   onReceiveAll(rawMessages) {
     this._init(rawMessages)
   }
