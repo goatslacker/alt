@@ -9,7 +9,7 @@ permalink: /docs/prepare/
 
 > (Store: AltStore, payload: mixed): string
 
-Given a store and a payload this functions returns a serialized string you can use to bootstrap that particular store.
+Given a store and a payload this function returns a serialized string you can use to bootstrap that particular store.
 
 ```js
 const data = alt.prepare(TodoStore, {
