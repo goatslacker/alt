@@ -23,7 +23,7 @@ MyActions.updateName('Zack');
 
 > (data: mixed): undefined
 
-This is a method that faciliates calling multiple actions in another actions. Since multiple actions cannot be fired until the dispatch loop has finished this helper function waits for the dispatch loop to finish and then fires off the action. It is not recommended but it is available anyway.
+This is a method that faciliates calling multiple actions in another action. Since multiple actions cannot be fired until the dispatch loop has finished this helper function waits for the dispatch loop to finish and then fires off the action. It is not recommended but it is available anyway.
 
 ```js
 MyActions.updateName.defer('Zack');
