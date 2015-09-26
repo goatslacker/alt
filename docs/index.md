@@ -71,7 +71,7 @@ This is an array of functions you can provide which will be executed every time 
 
 ## Instances
 
-Alternatively, you can [create instances](/docs/altInstances/) of the entire alt universe including stores.
+Alternatively, you can [create instances](/docs/altInstances.md) of the entire alt universe including stores.
 
 ```js
 class Flux extends Alt {
