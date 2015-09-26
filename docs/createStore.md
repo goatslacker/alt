@@ -326,4 +326,4 @@ You may call this method in order to suppress a change event from being pushed. 
 
 > observe(alt): {}
 
-A method you can implment in your stores, mostly useful when using plain objects to create a store. This method will receive the current alt instance and returns an object containing the methods/actions it'll handle.
+A method you can implement in your stores, mostly useful when using plain objects to create a store. This method will receive the current alt instance and returns an object containing the methods/actions it'll handle.
