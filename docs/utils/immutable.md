@@ -2,7 +2,7 @@
 layout: docs
 title: Alt and ImmutableJS
 description: Flux and Immutable Stores using ImmutableJS
-permalink: /docs/utils/immutable
+permalink: /docs/utils/immutable/
 ---
 
 # Using Immutable Data Structures
