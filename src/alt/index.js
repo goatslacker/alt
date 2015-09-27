@@ -34,15 +34,20 @@ class Alt {
         const actionId = action.id
         const namespace = actionId
         const name = actionId
+        const actionDetails = {
+          id: actionId,
+          namespace,
+          name,
+        }
+        const dispatchLater = payload => this.dispatch(actionId, payload, actionDetails)
+
+        if (fn.isFunction(dispatchData)) return dispatchData(dispatchLater)
+
         return this.dispatcher.dispatch({
           id,
           action: actionId,
           data: action.dispatch(data),
-          details: {
-            id: actionId,
-            namespace,
-            name,
-          }
+          details: actionDetails,
         })
       }
 
