@@ -41,7 +41,7 @@ class Alt {
         }
         const dispatchLater = payload => this.dispatch(actionId, payload, actionDetails)
 
-        if (fn.isFunction(dispatchData)) return dispatchData(dispatchLater)
+        if (fn.isFunction(dispatchData)) return dispatchData(dispatchLater, this)
 
         return this.dispatcher.dispatch({
           id,

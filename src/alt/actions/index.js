@@ -34,7 +34,7 @@ export default function makeAction(alt, namespace, name, implementation, obj) {
     // async functions that return promises should not be dispatched
     if (!newAction.dispatched && result !== undefined && !fn.isPromise(result)) {
       if (fn.isFunction(result)) {
-        result(dispatch)
+        result(dispatch, alt)
       } else {
         dispatch(result)
       }
