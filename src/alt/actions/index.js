@@ -39,6 +39,13 @@ export default function makeAction(alt, namespace, name, implementation, obj) {
         dispatch(result)
       }
     }
+
+    if (!newAction.dispatched && result === undefined) {
+      if (typeof console !== 'undefined') {
+        console.warn('An action was called but nothing was dispatched')
+      }
+    }
+
     return result
   }
   action.defer = (...args) => {
