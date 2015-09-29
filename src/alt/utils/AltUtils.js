@@ -1,3 +1,5 @@
+import * as fn from '../../utils/functions'
+
 /*eslint-disable*/
 const builtIns = Object.getOwnPropertyNames(NoopClass)
 const builtInProto = Object.getOwnPropertyNames(NoopClass.prototype)
@@ -42,6 +44,27 @@ export function formatAsConstant(name) {
 
 export function dispatchIdentity(x, ...a) {
   this.dispatch(a.length ? [x].concat(a) : x)
+}
+
+export function dispatch(id, actionObj, payload, alt) {
+  const data = actionObj.dispatch(payload)
+  if (data === undefined) return null
+
+  const type = actionObj.id
+  const namespace = type
+  const name = type
+  const details = { id: type, namespace, name }
+
+  const dispatchLater = x => alt.dispatch(type, x, details)
+
+  if (fn.isFunction(data)) return data(dispatchLater, alt)
+
+  return alt.dispatcher.dispatch({
+    id,
+    action: type,
+    data,
+    details,
+  })
 }
 
 /* istanbul ignore next */

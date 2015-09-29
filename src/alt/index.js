@@ -28,27 +28,7 @@ class Alt {
       const id = Math.random().toString(18).substr(2, 16)
 
       if (action.id && action.dispatch) {
-        const dispatchData = action.dispatch(data)
-        if (dispatchData === undefined) return
-
-        const actionId = action.id
-        const namespace = actionId
-        const name = actionId
-        const actionDetails = {
-          id: actionId,
-          namespace,
-          name,
-        }
-        const dispatchLater = payload => this.dispatch(actionId, payload, actionDetails)
-
-        if (fn.isFunction(dispatchData)) return dispatchData(dispatchLater, this)
-
-        return this.dispatcher.dispatch({
-          id,
-          action: actionId,
-          data: action.dispatch(data),
-          details: actionDetails,
-        })
+        return utils.dispatch(id, action, data, this)
       }
 
       return this.dispatcher.dispatch({
