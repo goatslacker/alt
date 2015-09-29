@@ -1420,6 +1420,68 @@ const tests = {
 
     assert(call.calledTwice, 'multiple action handlers are ok')
   },
+
+  'dispatching action creators'() {
+    const action = {
+      id: 'hello',
+      dispatch(data) {
+        return data
+      }
+    }
+
+    const alt = new Alt()
+
+    class Store {
+      constructor() {
+        this.bindAction(action, this.hello.bind(this))
+        this.state = { x: null }
+      }
+
+      hello(data) {
+        this.setState({ x: data })
+      }
+    }
+
+    const store = alt.createStore(Store)
+
+    assert(store.getState().x === null, 'x is null')
+
+    alt.dispatch(action, 3)
+
+    assert(store.getState().x === 3, '3 was dispatched')
+
+    alt.dispatch(action, 4)
+
+    assert(store.getState().x === 4, '4 was dispatched')
+
+    alt.dispatch(action, undefined)
+
+    assert(store.getState().x === 4, 'undefined means it wont dispatch')
+  },
+
+  'dispatching async action creators'(done) {
+    const action = {
+      id: 'hello',
+      dispatch(data) {
+        return dispatch => dispatch(done)
+      }
+    }
+
+    const alt = new Alt()
+
+    class Store {
+      constructor() {
+        this.bindAction(action, this.hello)
+      }
+
+      hello(done) {
+        done()
+      }
+    }
+
+    const store = alt.createStore(Store)
+    alt.dispatch(action)
+  },
 }
 
 export default tests

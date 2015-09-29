@@ -10,6 +10,7 @@ class AltStore {
     }
     this.state = state
 
+    this.alt = alt
     this.preventDefault = false
     this.displayName = model.displayName
     this.boundListeners = model.boundListeners

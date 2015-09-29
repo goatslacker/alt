@@ -26,6 +26,11 @@ class Alt {
   dispatch(action, data, details) {
     this.batchingFunction(() => {
       const id = Math.random().toString(18).substr(2, 16)
+
+      if (action.id && action.dispatch) {
+        return utils.dispatch(id, action, data, this)
+      }
+
       return this.dispatcher.dispatch({
         id,
         action,
