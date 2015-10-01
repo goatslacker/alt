@@ -185,8 +185,8 @@ class Alt {
   }
 
   bootstrap(data) {
-    StateFunctions.setAppState(this, data, (storeInst) => {
-      storeInst.lifecycle('bootstrap')
+    StateFunctions.setAppState(this, data, (storeInst, state) => {
+      storeInst.lifecycle('bootstrap', state)
       storeInst.emitChange()
     })
   }

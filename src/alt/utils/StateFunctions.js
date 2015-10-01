@@ -14,7 +14,7 @@ export function setAppState(instance, data, onStore) {
       } else {
         store.state = obj[key]
       }
-      onStore(store)
+      onStore(store, store.state)
     }
   }, [obj])
 }
