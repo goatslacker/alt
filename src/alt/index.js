@@ -122,9 +122,7 @@ class Alt {
     this.actions[key] = this.actions[key] || {}
 
     fn.eachObject((actionName, action) => {
-      if (!fn.isFunction(action)) {
-        return
-      }
+      if (!fn.isFunction(action)) return
 
       // create the action
       exportObj[actionName] = makeAction(
@@ -139,6 +137,7 @@ class Alt {
       const constant = utils.formatAsConstant(actionName)
       exportObj[constant] = exportObj[actionName].id
     }, [actions])
+
     return exportObj
   }
 
