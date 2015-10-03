@@ -27,12 +27,12 @@ class MyActions {
     this.generateActions('anotherAction')
 
     this.actionOnThis = function (x) {
-      return x;;
+      return x
     }
   }
 
   updateName(name) {
-    return name;;
+    return name
   }
 
   justTestingInternalActions() {
@@ -43,19 +43,19 @@ class MyActions {
   }
 
   moreActions() {
-    return function(dispatch) {
+    return (dispatch) => {
       dispatch(1)
       this.moreActions2.defer(2)
       this.moreActions3.defer(3)
-    };
+    }
   }
 
   updateTwo(a, b) {
-    return { a, b };;
+    return { a, b }
   }
 
   updateThree(a, b, c) {
-    return { a, b, c };;
+    return { a, b, c }
   }
 
 }
@@ -348,7 +348,7 @@ const alt2 = new Alt()
 
 function NameActions() { }
 NameActions.prototype.updateName = function (name) {
-  return name;;
+  return name
 }
 
 const nameActions1 = alt1.createActions(NameActions)
@@ -473,7 +473,7 @@ const tests = {
 
   'calling actions'() {
     const actionReturnType = myActions.updateName('bear')
-    assert(actionReturnType === undefined, 'action returns nothing')
+    assert(actionReturnType === 'bear', 'action returns what is dispatched')
 
     assert(myStore.getState().name === 'bear', 'action was called, state was updated properly')
     assert(myStore.getState().calledInternal === false, 'internal method has not been called')
