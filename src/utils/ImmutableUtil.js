@@ -4,7 +4,7 @@ import { assign } from './functions'
 function immutable(StoreModel, overrides) {
   StoreModel.config = assign({
     setState(currentState, nextState) {
-      this.state = nextState
+      this.state = currentState.merge(nextState)
       return this.state
     },
 

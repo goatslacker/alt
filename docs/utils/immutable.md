@@ -30,9 +30,10 @@ class TodoStore {
   static displayName = 'TodoStore'
 
   constructor() {
-    this.state = {
-      todos: Immutable.Map({})
-    };
+    this.state = Immutable.Map({
+      todos: Immutable.List([]),
+      loading: false
+    });
   }
 }
 
@@ -44,7 +45,8 @@ If you don't wish to use ES7 decorators then no problem, they're just sugar for 
 ```js
 function TodoStore() {
   this.state = Immutable.Map({
-    todos: Immutable.Map({})
+    todos: Immutable.List([]),
+    loading: false
   });
 }
 TodoStore.displayName = 'TodoStore';
@@ -55,24 +57,31 @@ alt.createStore(immutable(TodoStore));
 A few things to note about immutable stores about this approach:
 
 * You use `this.state` to create your state rather than assigning directly to instance properties.
-* You specify your own Immutable data structure you wish to use. In this example we're using Map.
+* It is highly recommended that you use an `Immutable.Map` as the top level state.
+  * `merge` will be called whenever calling `this.setState`, so other structures can be used as long they support `merge`
+  * WARNING: `Immutable.List` will likely not behave as you expect when calling `setState` in the current version of `Immutable`.  See [this issue](https://github.com/facebook/immutable-js/issues/406) for more information.  Instead it is recommended to nest the `List` in a `Map` as shown above.
 
-Using your ImmutableStore is a bit different from using a regular store:
+Changing the state of your ImmutableStore is a bit different from using a regular store:
 
 ```js
 function TodoStore() {
   this.state = Immutable.Map({
-    todos: Immutable.Map({})
+    todos: Immutable.List([]),
+    loadingFalse
   });
 
   this.bindListeners({
-    addTodo: TodoActions.addTodo
+    addTodo: TodoActions.ADD_TODO,
+    fetchFromServer, TodoActions.FETCH_FROM_SERVER
   });
 }
 
+TodoStore.prototype.fetchTodos = function() {
+  this.setState({loading: true});
+}
+
 TodoStore.prototype.addTodo = function (todo) {
-  var id = String(Math.random());
-  this.setState(this.state.setIn(['todos', id], todo));
+  this.setState({todos: this.state.get('todos').push(todo)});
 };
 
 TodoStore.displayName = 'TodoStore';
@@ -81,7 +90,8 @@ var todoStore = alt.createStore(immutable(TodoStore));
 ```
 
 * You'll be using `setState` in order to modify state within the store.
-* You can access the immutable object by using the accessor of `this.state`. In this example we're using Map's `set` method to set a new key and value.
+* You can access the immutable object by using the accessor of `this.state`.
+* Anything passed to `setState` will be [merged](https://facebook.github.io/immutable-js/docs/#/Map/merge) with the current state.
 
 ```js
 todoStore.getState() // Immutable.Map
