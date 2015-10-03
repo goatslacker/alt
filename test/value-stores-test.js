@@ -26,6 +26,20 @@ const store2 = alt.createStore({
   }
 })
 
+const store3 = alt.createStore({
+  state: 21,
+
+  displayName: 'ValueStore3',
+
+  bindListeners: {
+    fire: actions.fire
+  },
+
+  fire() {
+    this.setState(this.state + 1)
+  }
+})
+
 export default {
   'value stores': {
     beforeEach() {
@@ -43,6 +57,21 @@ export default {
       })
 
       assert(JSON.parse(alt.takeSnapshot()).ValueStore === 21, 'snapshot ok')
+
+      actions.fire()
+    },
+
+    'stores can contain state as any value (non reduce)'(done) {
+      assert(store3.state === 21, 'store state is value')
+      assert(store3.getState() === 21, 'getState returns value too')
+
+      const unlisten = store3.listen((state) => {
+        assert(state === 22, 'incremented store state')
+        unlisten()
+        done()
+      })
+
+      assert(JSON.parse(alt.takeSnapshot()).ValueStore3 === 21, 'snapshot ok')
 
       actions.fire()
     },

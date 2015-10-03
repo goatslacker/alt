@@ -18,7 +18,7 @@ const store1 = alt.createStore(atom({
   state: { x: 0 },
 
   fire: function () {
-    this.state.x = this.state.x + 1
+    this.setState({ x: this.state.x + 1 })
   }
 }))
 
@@ -32,7 +32,7 @@ const store2 = alt.createStore(atom({
   state: { y: 0 },
 
   fire: function () {
-    this.state.y = this.state.y + 1
+    this.setState({ y: this.state.y + 1 })
 
     if (this.state.y === 2) {
       throw new Error('wtf')
@@ -78,23 +78,23 @@ export default {
     },
 
     'do not update stores if there is an error'() {
-      assert(store1.getState().x === 0)
-      assert(store2.getState().y === 0)
+      assert(store1.getState().x === 0, 'x zero')
+      assert(store2.getState().y === 0, 'y zero')
 
       actions.fire()
 
-      assert(store1.getState().x === 1)
-      assert(store2.getState().y === 1)
+      assert(store1.getState().x === 1, 'x one')
+      assert(store2.getState().y === 1, 'y one')
 
       actions.fire()
 
-      assert(store1.getState().x === 1)
-      assert(store2.getState().y === 1)
+      assert(store1.getState().x === 1, 'still one')
+      assert(store2.getState().y === 1, 'still one')
 
       actions.fire()
 
-      assert(store1.getState().x === 1)
-      assert(store2.getState().y === 1)
+      assert(store1.getState().x === 1, 'still one')
+      assert(store2.getState().y === 1, 'still one')
     }
   },
 

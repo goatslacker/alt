@@ -22,7 +22,7 @@ const TestStore = alt.createStore({
   state: { x: null },
 
   handleSup(x) {
-    this.state.x = x
+    this.setState({ x })
   }
 })
 
@@ -36,7 +36,7 @@ const Store2 = alt.createStore({
   state: { y: null },
 
   onSup(y) {
-    this.state.y = y
+    this.setState({ y })
   }
 })
 
@@ -56,7 +56,7 @@ class Flux extends Alt {
       state: { x: null },
 
       test(x) {
-        this.state.x = x
+        this.setState({ x })
       }
     })
   }
