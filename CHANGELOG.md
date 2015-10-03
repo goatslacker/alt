@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.17.4
+
+### Added
+
+* Allow dispatching action creators. [commit](https://github.com/goatslacker/alt/commit/cd54ed1)
+* Warn if nothing is dispatched. [commit](https://github.com/goatslacker/alt/commit/3430d56)
+* Pass store state to bootstrap lifecycle. [commit](https://github.com/goatslacker/alt/commit/b1a3f7a)
+* setState now handles values. [commit](https://github.com/goatslacker/alt/commit/f6be9c3)
+* ImmutableUtil supports bootstrapping Records and more. [commit](https://github.com/goatslacker/alt/commit/b1d6622)
+
+### Changed
+
+* contextTypes are now copied onto connectToStores. [commit](https://github.com/goatslacker/alt/commit/74f033a)
+* better typescript definitions. [commit](https://github.com/goatslacker/alt/commit/2ef5792)
+
 ## 0.17.3
 
 ### Changed
