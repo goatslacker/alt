@@ -43,7 +43,11 @@ export function formatAsConstant(name) {
 }
 
 export function dispatchIdentity(x, ...a) {
-  this.dispatch(a.length ? [x].concat(a) : x)
+  if (x) {
+    return a.length ? [x].concat(a) : x
+  } else {
+    return null
+  }
 }
 
 export function dispatch(id, actionObj, payload, alt) {
