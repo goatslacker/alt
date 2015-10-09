@@ -1,5 +1,5 @@
 import { jsdom } from 'jsdom'
-import React, { Component } from 'react'
+import React, { Component } from 'react/addons'
 import Alt from '../'
 import AltContainer from '../AltContainer'
 import AltIso from '../utils/AltIso'
