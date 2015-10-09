@@ -122,7 +122,10 @@ class Alt {
     this.actions[key] = this.actions[key] || {}
 
     fn.eachObject((actionName, action) => {
-      if (!fn.isFunction(action)) return
+      if (!fn.isFunction(action)) {
+        exportObj[actionName] = action
+        return
+      }
 
       // create the action
       exportObj[actionName] = makeAction(
