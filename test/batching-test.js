@@ -1,11 +1,12 @@
 import { jsdom } from 'jsdom'
 import Alt from '../'
-import React from 'react/addons'
+import React from 'react'
 import { assert } from 'chai'
 import sinon from 'sinon'
+import TestUtils from 'react-addons-test-utils'
+import ReactDom from 'react-dom'
 
-const { TestUtils } = React.addons
-
+// TOOD action was called but not dispatched?
 const Actions = {
   buttonClick() {
     setTimeout(() => {
@@ -94,7 +95,7 @@ export default {
     },
 
     'allows batching'(done) {
-      const alt = new Alt({ batchingFunction: React.addons.batchedUpdates })
+      const alt = new Alt({ batchingFunction: ReactDom.unstable_batchedUpdates })
       alt.addActions('actions', Actions)
       alt.addStore('store', Store, alt.actions.actions)
 

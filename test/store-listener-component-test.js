@@ -1,12 +1,12 @@
 import { jsdom } from 'jsdom'
 import Alt from '../dist/alt-with-runtime'
-import React from 'react/addons'
+import React from 'react'
 import AltContainer from '../components/AltContainer'
 import withAltContext from '../utils/withAltContext'
 import { assert } from 'chai'
 import sinon from 'sinon'
-
-const { TestUtils } = React.addons
+import TestUtils from 'react-addons-test-utils'
+import ReactDom from 'react-dom'
 
 const alt = new Alt()
 
@@ -78,13 +78,13 @@ export default {
 
     'element mounts and unmounts'() {
       const div = document.createElement('div')
-      React.render(
+      ReactDom.render(
         <AltContainer>
           <div />
         </AltContainer>
       , div)
 
-      React.unmountComponentAtNode(div)
+      ReactDom.unmountComponentAtNode(div)
     },
 
     'many elements mount'() {

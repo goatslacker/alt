@@ -1,11 +1,12 @@
 import { jsdom } from 'jsdom'
 import Alt from '../dist/alt-with-runtime'
-import React from 'react/addons'
+import React from 'react'
+import ReactDom from 'react-dom'
+import ReactDomServer from 'react-dom/server'
 import connectToStores from '../utils/connectToStores'
 import { assert } from 'chai'
 import sinon from 'sinon'
-
-const { TestUtils } = React.addons
+import TestUtils from 'react-addons-test-utils'
 
 const alt = new Alt()
 
@@ -28,7 +29,7 @@ export default {
     beforeEach() {
       global.document = jsdom('<!doctype html><html><body></body></html>')
       global.window = global.document.defaultView
-      require('react/lib/ExecutionEnvironment').canUseDOM = true
+//      require('react/lib/ExecutionEnvironment').canUseDOM = true
 
       alt.recycle()
     },
@@ -77,7 +78,7 @@ export default {
       assert(getPropsFromStores.callCount === 2, 'getPropsFromStores called twice')
 
       const span = TestUtils.findRenderedDOMComponentWithTag(node, 'span')
-      assert(span.getDOMNode().innerHTML === '2', 'prop passed in is correct')
+      assert(span.innerHTML === '2', 'prop passed in is correct')
     },
 
     'missing the static getStores() method should throw'() {
@@ -107,11 +108,11 @@ export default {
         }
       }))
 
-      React.render(
+      ReactDom.render(
         <LegacyComponent />
       , div)
 
-      React.unmountComponentAtNode(div)
+      ReactDom.unmountComponentAtNode(div)
     },
 
     'missing the static getPropsFromStores() method should throw'() {
@@ -146,7 +147,7 @@ export default {
 
       const WrappedComponent = connectToStores(LegacyComponent)
       const element = React.createElement(WrappedComponent, {delim: ': '})
-      const output = React.renderToStaticMarkup(element)
+      const output = ReactDomServer.renderToStaticMarkup(element)
       assert.include(output, 'Foo: Bar')
     },
 
@@ -180,7 +181,7 @@ export default {
         }
       })
       const element = React.createElement(ContextComponent)
-      const output = React.renderToStaticMarkup(element)
+      const output = ReactDomServer.renderToStaticMarkup(element)
       assert.include(output, 'Foo: Bar')
     },
 
@@ -201,14 +202,14 @@ export default {
 
       const WrappedComponent = connectToStores(LegacyComponent)
       const element = React.createElement(WrappedComponent, {delim: ': ', store: testStore})
-      const output = React.renderToStaticMarkup(element)
+      const output = ReactDomServer.renderToStaticMarkup(element)
       assert.include(output, 'Foo: Bar')
     },
 
     'ES6 class component responds to store events'() {
-      class ClassComponent extends React.Component {
+      class ClassComponent1 extends React.Component {
         render() {
-          return <span foo={this.props.foo} />
+          return <span>{this.props.foo}</span>
         }
       }
 
@@ -219,7 +220,7 @@ export default {
         getPropsFromStores(props) {
           return testStore.getState()
         }
-      }, ClassComponent)
+      }, ClassComponent1)
 
       const node = TestUtils.renderIntoDocument(
         <WrappedComponent />
@@ -229,12 +230,12 @@ export default {
 
       const span = TestUtils.findRenderedDOMComponentWithTag(node, 'span')
 
-      assert(span.props.foo === 'Baz')
+      assert(span.innerHTML === 'Baz')
     },
 
     'componentDidConnect hook is called '() {
       let componentDidConnect = false
-      class ClassComponent extends React.Component {
+      class ClassComponent2 extends React.Component {
         render() {
           return <span foo={this.props.foo} />
         }
@@ -249,7 +250,7 @@ export default {
         componentDidConnect() {
           componentDidConnect = true
         }
-      }, ClassComponent)
+      }, ClassComponent2)
       const node = TestUtils.renderIntoDocument(
         <WrappedComponent />
       )
@@ -258,7 +259,7 @@ export default {
 
     'Component receives all updates'(done) {
       let componentDidConnect = false
-      class ClassComponent extends React.Component {
+      class ClassComponent3 extends React.Component {
         static getStores() {
           return [testStore]
         }
@@ -278,7 +279,7 @@ export default {
         }
       }
 
-      const WrappedComponent = connectToStores(ClassComponent)
+      const WrappedComponent = connectToStores(ClassComponent3)
 
       let node = TestUtils.renderIntoDocument(
         <WrappedComponent />
