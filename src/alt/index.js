@@ -101,7 +101,7 @@ class Alt {
     )
 
     if (fn.isFunction(ActionsClass)) {
-      fn.assign(actions, utils.getInternalMethods(ActionsClass, true))
+      fn.assign(actions, utils.getPrototypeChain(ActionsClass))
       class ActionsGenerator extends ActionsClass {
         constructor(...args) {
           super(...args)
