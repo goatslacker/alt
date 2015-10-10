@@ -55,7 +55,7 @@ const StoreMixin = {
           return (x) => {
             const fire = () => {
               loadCounter -= 1
-              action(intercept(x, action, args))
+              action(intercept(x, action, args), ...args)
               if (isError) throw x
             }
             return this.alt.trapAsync ? () => fire() : fire()
@@ -66,7 +66,7 @@ const StoreMixin = {
         if (shouldFetch) {
           loadCounter += 1
           /* istanbul ignore else */
-          if (spec.loading) spec.loading(intercept(null, spec.loading, args))
+          if (spec.loading) spec.loading(intercept(null, spec.loading, args), ...args)
           return spec.remote(state, ...args).then(
             makeActionHandler(spec.success),
             makeActionHandler(spec.error, 1)

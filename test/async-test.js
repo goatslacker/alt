@@ -29,7 +29,21 @@ const local = sinon.stub(api, 'local', (state) => {
   return state.users.length ? state.users : null
 })
 
+const loading = sinon.spy(StargazerActions.fetchingUsers)
+const success = sinon.spy(StargazerActions.usersReceived)
+const error = sinon.spy(StargazerActions.failed)
+
 const StargazerSource = {
+  fetchUsersArgs () {
+    return {
+      remote,
+      local,
+      loading,
+      success,
+      error
+    }
+  },
+
   fetchUsers() {
     return {
       remote,
@@ -137,6 +151,51 @@ export default {
         })
         class Store { }
       }, Error, /handler must be an action function/)
+    },
+
+    'pass args to loading and error actions'() {
+      const spy = sinon.spy()
+      StargazerStore.listen(spy)
+      StargazerStore.listen(source => {
+        if (spy.callCount === 2) {
+          const loadingArgs = loading.firstCall.args
+          const errorArgs = error.firstCall.args
+
+          assert(loadingArgs.length === 3)
+          assert(errorArgs.length === 3)
+
+          assert(loadingArgs[1] === '')
+          assert(errorArgs[1] === '')
+
+          assert(loadingArgs[2] === 'arg2')
+          assert(errorArgs[2] === 'arg2')
+          done()
+        }
+      })
+      StargazerStore.fetchUsersArgs('', 'arg2')
+    },
+
+    'pass args to loading and success actions'() {
+      const spy = sinon.spy()
+      StargazerStore.listen(spy)
+      StargazerStore.listen(source => {
+        if (spy.callCount === 2) {
+          const loadingArgs = loading.firstCall.args
+          const successArgs = success.firstCall.args
+
+          assert(loadingArgs.length === 3)
+          assert(successArgs.length === 3)
+
+          assert(loadingArgs[1] === 'alts')
+          assert(successArgs[1] === 'alts')
+
+          assert(loadingArgs[2] === 'arg2')
+          assert(successArgs[2] === 'arg2')
+
+          done()
+        }
+      })
+      StargazerStore.fetchUsersArgs('alts', 'arg2')
     },
 
     'loading state'(done) {
