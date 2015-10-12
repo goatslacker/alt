@@ -63,6 +63,6 @@ This allows flexibility giving you choice between using the constant form or the
 
 Is the unique id given to the action, you can use this id to identify which dispatch is what.
 
-## action.data
+## action.actionDetails
 
-Some meta data about the action including which action group it belongs to, the name of the action, and the id.
+Some meta data about the action including which action group it belongs to (namespace), the name of the action, and the id.
