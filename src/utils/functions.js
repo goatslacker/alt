@@ -8,6 +8,8 @@ export function isPojo(target) {
     &&
     typeof target === 'object'
     &&
+    !Object.isFrozen(target)
+    &&
     Object.prototype.toString.call(target) === '[object Object]'
     &&
     isFunction(Ctor)
