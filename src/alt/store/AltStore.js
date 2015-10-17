@@ -1,4 +1,4 @@
-import * as fn from '../../utils/functions'
+import * as fn from '../functions'
 import transmitter from 'transmitter'
 
 class AltStore {

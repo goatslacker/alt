@@ -1,5 +1,5 @@
 import * as utils from '../utils/AltUtils'
-import * as fn from '../../utils/functions'
+import * as fn from '../functions'
 import AltStore from './AltStore'
 import StoreMixin from './StoreMixin'
 

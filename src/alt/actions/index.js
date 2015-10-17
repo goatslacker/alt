@@ -1,4 +1,4 @@
-import * as fn from '../../utils/functions'
+import * as fn from '../functions'
 import * as utils from '../utils/AltUtils'
 import isPromise from 'is-promise'
 
