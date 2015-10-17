@@ -50,7 +50,7 @@
     "build": "npm run clean && npm run transpile && npm run build-alt-browser",
     "build-alt": "babel src/alt --out-dir lib",
     "build-alt-browser": "webpack --config dist.config.js && webpack -p --config dist.min.config.js",
-    "clean": "rimraf lib && rimraf utils",
+    "clean": "rimraf lib",
     "coverage": "npm run transpile-cover && istanbul cover node_modules/mocha/bin/_mocha -- -u exports -R tap --require ./test/babel test",
     "lint": "eslint src components",
     "postversion": "git push && git push --tags",
@@ -62,8 +62,8 @@
     "test": "npm run test-node",
     "test-browser": "browserify test/browser/index.js -t babelify --outfile test/browser/tests.js",
     "test-node": "mocha -u exports -R nyan --require ./test/babel test",
-    "transpile": "babel src/alt --out-dir lib && babel src/utils --out-dir utils",
-    "transpile-cover": "babel src/alt --out-dir lib -r && babel src/utils --out-dir utils -r",
+    "transpile": "babel src/alt --out-dir lib",
+    "transpile-cover": "babel src/alt --out-dir lib -r",
     "version": "npm run build"
   },
   "keywords": [
