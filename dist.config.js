@@ -1,8 +1,7 @@
 module.exports = {
   context: __dirname + '/src',
   entry: {
-    'alt': ['./alt/index.js'],
-    'alt-with-addons': ['./alt/addons.js']
+    'alt': ['./index.js'],
   },
   output: {
     path: __dirname + '/dist',
@@ -17,8 +16,4 @@ module.exports = {
       exclude: /node_modules/
     }]
   },
-  externals: {
-    'react': 'react',
-    'react/addons': 'react/addons'
-  }
 };
