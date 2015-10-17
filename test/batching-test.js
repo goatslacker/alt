@@ -10,16 +10,16 @@ import ReactDom from 'react-dom'
 const Actions = {
   buttonClick() {
     setTimeout(() => {
-      this.actions.switchComponent()
+      this.switchComponent()
     }, 10)
   },
 
   switchComponent() {
-    this.dispatch()
+    return null
   },
 
   uhoh() {
-    this.dispatch()
+    return null
   }
 }
 

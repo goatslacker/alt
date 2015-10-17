@@ -5,6 +5,7 @@
   "main": "lib",
   "dependencies": {
     "flux": "2.0.3",
+    "is-promise": "2.1.0",
     "transmitter": "1.0.2"
   },
   "devDependencies": {

@@ -18,6 +18,15 @@ export function getInternalMethods(Obj, isProto) {
   }, {})
 }
 
+export function getPrototypeChain(Obj, methods = {}) {
+  return Obj === Function.prototype
+    ? methods
+    : getPrototypeChain(
+        Object.getPrototypeOf(Obj),
+        fn.assign(methods, getInternalMethods(Obj, true))
+      )
+}
+
 export function warn(msg) {
   /* istanbul ignore else */
   /*eslint-disable*/
@@ -43,7 +52,8 @@ export function formatAsConstant(name) {
 }
 
 export function dispatchIdentity(x, ...a) {
-  this.dispatch(a.length ? [x].concat(a) : x)
+  if (x === undefined) return null
+  return a.length ? [x].concat(a) : x
 }
 
 export function dispatch(id, actionObj, payload, alt) {

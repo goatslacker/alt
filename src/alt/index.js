@@ -101,7 +101,7 @@ class Alt {
     )
 
     if (fn.isFunction(ActionsClass)) {
-      fn.assign(actions, utils.getInternalMethods(ActionsClass, true))
+      fn.assign(actions, utils.getPrototypeChain(ActionsClass))
       class ActionsGenerator extends ActionsClass {
         constructor(...args) {
           super(...args)
@@ -123,6 +123,7 @@ class Alt {
 
     fn.eachObject((actionName, action) => {
       if (!fn.isFunction(action)) {
+        exportObj[actionName] = action
         return
       }
 
@@ -139,6 +140,7 @@ class Alt {
       const constant = utils.formatAsConstant(actionName)
       exportObj[constant] = exportObj[actionName].id
     }, [actions])
+
     return exportObj
   }
 
