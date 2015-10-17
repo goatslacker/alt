@@ -1,5 +1,5 @@
 import * as utils from '../utils/AltUtils'
-import * as fn from '../../utils/functions'
+import * as fn from '../functions'
 import AltStore from './AltStore'
 import StoreMixin from './StoreMixin'
 
@@ -141,7 +141,9 @@ export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
 
   const store = new Store(...argsForClass)
 
+  /* istanbul ignore next */
   if (config.bindListeners) store.bindListeners(config.bindListeners)
+    /* istanbul ignore next */
   if (config.datasource) store.registerAsync(config.datasource)
 
   storeInstance = fn.assign(

@@ -1,4 +1,4 @@
-import * as fn from '../../utils/functions'
+import * as fn from '../functions'
 
 /*eslint-disable*/
 const builtIns = Object.getOwnPropertyNames(NoopClass)

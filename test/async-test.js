@@ -1,5 +1,4 @@
 import Alt from '../'
-import { createStore, datasource } from '../utils/decorators'
 import sinon from 'sinon'
 import { assert } from 'chai'
 import { Promise } from 'es6-promise'
@@ -73,8 +72,7 @@ const StargazerSource = {
   }
 }
 
-@createStore(alt)
-class StargazerStore {
+const StargazerStore = alt.createStore(class {
   static config = {
     stateKey: 'state'
   }
@@ -108,7 +106,7 @@ class StargazerStore {
   receivedUsers(users) {
     this.setState({ users, errorMessage: null })
   }
-}
+})
 
 export default {
   'async': {
@@ -131,11 +129,13 @@ export default {
 
     'data source with no action'() {
       assert.throws(() => {
-        @createStore(alt)
-        @datasource({
-          derp() { return { success: () => null } }
+        const Store = alt.createStore(class {
+          constructor() {
+            this.registerAsync({
+              derp() { return { success: () => null } }
+            })
+          }
         })
-        class Store { }
       }, Error, /handler must be an action function/)
     },
 
@@ -261,26 +261,6 @@ export default {
       assert.isFunction(store.isLoading)
     },
 
-    'as an object'() {
-      const actions = alt.generateActions('test')
-
-      const PojoSource = {
-        justTesting: {
-          success: actions.test,
-          error: actions.test,
-        }
-      }
-
-      class MyStore {
-        static displayName = 'MyStore'
-      }
-
-      const store = alt.createStore(datasource(PojoSource)(MyStore))
-
-      assert.isFunction(store.justTesting)
-      assert.isFunction(store.isLoading)
-    },
-
     'server rendering does not happen unless you lock alt'(done) {
       delete global.window
 
@@ -297,9 +277,11 @@ export default {
         }
       }
 
-      @datasource(PojoSource)
       class MyStore {
         static displayName = 'ServerRenderingStore'
+        constructor() {
+          this.registerAsync(PojoSource)
+        }
       }
 
       const spy = sinon.spy()

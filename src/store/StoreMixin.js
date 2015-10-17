@@ -1,5 +1,5 @@
 import transmitter from 'transmitter'
-import * as fn from '../../utils/functions'
+import * as fn from '../functions'
 
 const StoreMixin = {
   waitFor(...sources) {

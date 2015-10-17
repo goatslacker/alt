@@ -1,4 +1,4 @@
-import * as fn from '../../utils/functions'
+import * as fn from '../functions'
 
 export function setAppState(instance, data, onStore) {
   const obj = instance.deserialize(data)

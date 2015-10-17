@@ -48,9 +48,8 @@
   "license": "MIT",
   "scripts": {
     "build": "npm run clean && npm run transpile && npm run build-alt-browser",
-    "build-alt": "babel src/alt --out-dir lib",
     "build-alt-browser": "webpack --config dist.config.js && webpack -p --config dist.min.config.js",
-    "clean": "rimraf lib && rimraf utils",
+    "clean": "rimraf lib",
     "coverage": "npm run transpile-cover && istanbul cover node_modules/mocha/bin/_mocha -- -u exports -R tap --require ./test/babel test",
     "lint": "eslint src components",
     "postversion": "git push && git push --tags",
@@ -58,12 +57,12 @@
     "pretest": "npm run clean && npm run transpile",
     "preversion": "npm run clean && npm run lint",
     "release": "npm run build && mversion patch -m",
-    "size": "npm run build-alt; browserify flux.js > flux-build.js; uglifyjs -m -c 'comparisons=false,keep_fargs=true,unsafe=true,unsafe_comps=true,warnings=false' flux-build.js  > flux-build.min.js",
+    "size": "npm run transpile; browserify flux.js > flux-build.js; uglifyjs -m -c 'comparisons=false,keep_fargs=true,unsafe=true,unsafe_comps=true,warnings=false' flux-build.js  > flux-build.min.js",
     "test": "npm run test-node",
     "test-browser": "browserify test/browser/index.js -t babelify --outfile test/browser/tests.js",
     "test-node": "mocha -u exports -R nyan --require ./test/babel test",
-    "transpile": "babel src/alt --out-dir lib && babel src/utils --out-dir utils",
-    "transpile-cover": "babel src/alt --out-dir lib -r && babel src/utils --out-dir utils -r",
+    "transpile": "babel src --out-dir lib",
+    "transpile-cover": "babel src --out-dir lib -r",
     "version": "npm run build"
   },
   "keywords": [
