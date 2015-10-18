@@ -24,12 +24,7 @@ export default function makeAction(alt, namespace, name, implementation, obj) {
     }
 
     if (result === undefined) {
-      /* istanbul ignore else */
-      /*eslint-disable*/
-      if (typeof console !== 'undefined') {
-        console.warn('An action was called but nothing was dispatched')
-      }
-      /*eslint-enable*/
+      utils.warn('An action was called but nothing was dispatched')
     }
 
     return result
