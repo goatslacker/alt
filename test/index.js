@@ -728,28 +728,6 @@ const tests = {
     assert.throw(() => waiter.pleaseWait(), ReferenceError, 'Dispatch tokens not provided')
   },
 
-  'unary action warnings'() {
-    class MethodsAreUnary1 {
-      constructor() {
-        this.bindActions(myActions)
-      }
-
-      onUpdateName(name1, name2) { }
-    }
-
-    assert.throw(() => alt.createStore(MethodsAreUnary1), TypeError, /Action handler in store .* was defined with two parameters/)
-
-    class MethodsAreUnary2 {
-      constructor() {
-        this.bindAction(myActions.UPDATE_TWO, this.onUpdateName)
-      }
-
-      onUpdateName(name1, name2) { }
-    }
-
-    assert.throw(() => alt.createStore(MethodsAreUnary2), TypeError, /Action handler in store .* was defined with two parameters/)
-  },
-
   'cancelling emit'() {
     function eventEmittedFail() {
       assert(true === false, 'event was emitted but I did not want it to be')
