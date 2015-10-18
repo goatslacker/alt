@@ -38,5 +38,9 @@ export default function makeAction(alt, namespace, name, implementation, obj) {
   const namespaceId = utils.uid(container, name)
   container[namespaceId] = action
 
+  // generate a constant
+  const constant = utils.formatAsConstant(namespaceId)
+  container[constant] = id
+
   return action
 }
