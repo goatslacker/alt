@@ -1482,6 +1482,21 @@ const tests = {
     const store = alt.createStore(Store)
     alt.dispatch(action)
   },
+
+  'is fsa'(done) {
+    alt.dispatcher.register((x) => {
+      assert.isDefined(x.type, 'there is a type')
+      assert.isDefined(x.payload, 'there is a payload')
+      assert.isDefined(x.meta, 'meta exists')
+      assert.isString(x.meta.dispatchId, 'meta contains a unique dispatch id')
+
+      assert(x.payload === 'Jane', 'the payload is correct')
+
+      done()
+    })
+
+    myActions.updateName('Jane')
+  },
 }
 
 export default tests

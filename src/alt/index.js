@@ -31,12 +31,7 @@ class Alt {
         return utils.dispatch(id, action, data, this)
       }
 
-      return this.dispatcher.dispatch({
-        id,
-        action,
-        data,
-        details,
-      })
+      return this.dispatcher.dispatch(utils.fsa(id, action, data, details))
     })
   }
 
