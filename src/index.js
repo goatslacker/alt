@@ -27,6 +27,18 @@ class Alt {
     this.batchingFunction(() => {
       const id = Math.random().toString(18).substr(2, 16)
 
+      // support straight dispatching of FSA-style actions
+      if (action.type && action.payload) {
+        const fsaDetails = {
+          id: action.type,
+          namespace: action.type,
+          name: action.type,
+        }
+        return this.dispatcher.dispatch(
+          utils.fsa(id, action.type, action.payload, fsaDetails)
+        )
+      }
+
       if (action.id && action.dispatch) {
         return utils.dispatch(id, action, data, this)
       }
