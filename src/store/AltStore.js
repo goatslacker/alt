@@ -1,4 +1,4 @@
-import * as fn from '../../utils/functions'
+import * as fn from '../functions'
 import transmitter from 'transmitter'
 
 class AltStore {
@@ -71,7 +71,8 @@ class AltStore {
 
       if (model.reduce) {
         handleDispatch(() => {
-          this.state = model.reduce(this.state, payload)
+          const value = model.reduce(this.state, payload)
+          if (value !== undefined) this.state = value
         }, payload)
         if (!this.preventDefault) this.emitChange()
       }

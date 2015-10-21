@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.17.6
+
+### Added
+
+* Can dispatch FSA actions directly through alt.dispatch. [commit](https://github.com/goatslacker/alt/commit/243828c)
+
+
+## 0.17.5
+
+### Added
+
+* Makes alt FSA compliant. [commit](https://github.com/goatslacker/alt/commit/f4818db)
+
+### Changed
+
+* Removes the warning if nothing is dispatched. [commit](https://github.com/goatslacker/alt/commit/9dd8e09)
+* Fix regression for not setting state if reduce returns undefined. [commit](https://github.com/goatslacker/alt/commit/cebd8e8)
+
 ## 0.17.4
 
 ### Added

@@ -2,7 +2,7 @@
 import { Dispatcher } from 'flux'
 
 import * as StateFunctions from './utils/StateFunctions'
-import * as fn from '../utils/functions'
+import * as fn from './functions'
 import * as store from './store'
 import * as utils from './utils/AltUtils'
 import makeAction from './actions'
@@ -27,16 +27,23 @@ class Alt {
     this.batchingFunction(() => {
       const id = Math.random().toString(18).substr(2, 16)
 
+      // support straight dispatching of FSA-style actions
+      if (action.type && action.payload) {
+        const fsaDetails = {
+          id: action.type,
+          namespace: action.type,
+          name: action.type,
+        }
+        return this.dispatcher.dispatch(
+          utils.fsa(id, action.type, action.payload, fsaDetails)
+        )
+      }
+
       if (action.id && action.dispatch) {
         return utils.dispatch(id, action, data, this)
       }
 
-      return this.dispatcher.dispatch({
-        id,
-        action,
-        data,
-        details,
-      })
+      return this.dispatcher.dispatch(utils.fsa(id, action, data, details))
     })
   }
 
@@ -101,7 +108,7 @@ class Alt {
     )
 
     if (fn.isFunction(ActionsClass)) {
-      fn.assign(actions, utils.getInternalMethods(ActionsClass, true))
+      fn.assign(actions, utils.getPrototypeChain(ActionsClass))
       class ActionsGenerator extends ActionsClass {
         constructor(...args) {
           super(...args)
@@ -123,6 +130,7 @@ class Alt {
 
     fn.eachObject((actionName, action) => {
       if (!fn.isFunction(action)) {
+        exportObj[actionName] = action
         return
       }
 
@@ -139,6 +147,7 @@ class Alt {
       const constant = utils.formatAsConstant(actionName)
       exportObj[constant] = exportObj[actionName].id
     }, [actions])
+
     return exportObj
   }
 

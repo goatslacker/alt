@@ -1,4 +1,4 @@
-import * as fn from '../../utils/functions'
+import * as fn from '../functions'
 
 /*eslint-disable*/
 const builtIns = Object.getOwnPropertyNames(NoopClass)
@@ -16,6 +16,15 @@ export function getInternalMethods(Obj, isProto) {
     value[m] = obj[m]
     return value
   }, {})
+}
+
+export function getPrototypeChain(Obj, methods = {}) {
+  return Obj === Function.prototype
+    ? methods
+    : getPrototypeChain(
+        Object.getPrototypeOf(Obj),
+        fn.assign(methods, getInternalMethods(Obj, true))
+      )
 }
 
 export function warn(msg) {
@@ -43,7 +52,24 @@ export function formatAsConstant(name) {
 }
 
 export function dispatchIdentity(x, ...a) {
-  this.dispatch(a.length ? [x].concat(a) : x)
+  if (x === undefined) return null
+  return a.length ? [x].concat(a) : x
+}
+
+export function fsa(id, type, payload, details) {
+  return {
+    type,
+    payload,
+    meta: {
+      dispatchId: id,
+      ...details,
+    },
+
+    id,
+    action: type,
+    data: payload,
+    details,
+  }
 }
 
 export function dispatch(id, actionObj, payload, alt) {
@@ -59,12 +85,8 @@ export function dispatch(id, actionObj, payload, alt) {
 
   if (fn.isFunction(data)) return data(dispatchLater, alt)
 
-  return alt.dispatcher.dispatch({
-    id,
-    action: type,
-    data,
-    details,
-  })
+    // XXX standardize this
+  return alt.dispatcher.dispatch(fsa(id, type, data, details))
 }
 
 /* istanbul ignore next */

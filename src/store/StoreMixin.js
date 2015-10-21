@@ -1,5 +1,5 @@
 import transmitter from 'transmitter'
-import * as fn from '../../utils/functions'
+import * as fn from '../functions'
 
 const StoreMixin = {
   waitFor(...sources) {
@@ -114,15 +114,6 @@ const StoreMixin = {
     }
     if (!fn.isFunction(handler)) {
       throw new TypeError('bindAction expects a function')
-    }
-
-    if (handler.length > 1) {
-      throw new TypeError(
-        `Action handler in store ${this.displayName} for ` +
-        `${(symbol.id || symbol).toString()} was defined with ` +
-        `two parameters. Only a single parameter is passed through the ` +
-        `dispatcher, did you mean to pass in an Object instead?`
-      )
     }
 
     // You can pass in the constant or the function itself

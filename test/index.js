@@ -2,13 +2,6 @@ import Alt from '../'
 import { assert } from 'chai'
 import sinon from 'sinon'
 
-import ListenerMixin from '../mixins/ListenerMixin'
-import FluxyMixin from '../mixins/FluxyMixin'
-import ReactStateMagicMixin from '../mixins/ReactStateMagicMixin'
-import IsomorphicMixin from '../mixins/IsomorphicMixin'
-
-import ReactComponent from './helpers/ReactComponent'
-
 const alt = new Alt()
 
 class MyActions {
@@ -27,33 +20,35 @@ class MyActions {
     this.generateActions('anotherAction')
 
     this.actionOnThis = function (x) {
-      this.dispatch(x)
+      return x
     }
   }
 
   updateName(name) {
-    this.dispatch(name)
+    return name
   }
 
   justTestingInternalActions() {
     return {
-      updateThree: this.actions.updateThree,
-      updateName: this.actions.updateName
+      updateThree: this.updateThree,
+      updateName: this.updateName
     }
   }
 
   moreActions() {
-    this.dispatch(1)
-    this.actions.moreActions2.defer(2)
-    this.actions.moreActions3.defer(3)
+    return (dispatch) => {
+      dispatch(1)
+      this.moreActions2.defer(2)
+      this.moreActions3.defer(3)
+    }
   }
 
   updateTwo(a, b) {
-    this.dispatch({ a, b })
+    return { a, b }
   }
 
   updateThree(a, b, c) {
-    this.dispatch({ a, b, c })
+    return { a, b, c }
   }
 
 }
@@ -346,7 +341,7 @@ const alt2 = new Alt()
 
 function NameActions() { }
 NameActions.prototype.updateName = function (name) {
-  this.dispatch(name)
+  return name
 }
 
 const nameActions1 = alt1.createActions(NameActions)
@@ -471,7 +466,7 @@ const tests = {
 
   'calling actions'() {
     const actionReturnType = myActions.updateName('bear')
-    assert(actionReturnType === undefined, 'action returns nothing')
+    assert(actionReturnType === 'bear', 'action returns what is dispatched')
 
     assert(myStore.getState().name === 'bear', 'action was called, state was updated properly')
     assert(myStore.getState().calledInternal === false, 'internal method has not been called')
@@ -731,28 +726,6 @@ const tests = {
     })
 
     assert.throw(() => waiter.pleaseWait(), ReferenceError, 'Dispatch tokens not provided')
-  },
-
-  'unary action warnings'() {
-    class MethodsAreUnary1 {
-      constructor() {
-        this.bindActions(myActions)
-      }
-
-      onUpdateName(name1, name2) { }
-    }
-
-    assert.throw(() => alt.createStore(MethodsAreUnary1), TypeError, /Action handler in store .* was defined with two parameters/)
-
-    class MethodsAreUnary2 {
-      constructor() {
-        this.bindAction(myActions.UPDATE_TWO, this.onUpdateName)
-      }
-
-      onUpdateName(name1, name2) { }
-    }
-
-    assert.throw(() => alt.createStore(MethodsAreUnary2), TypeError, /Action handler in store .* was defined with two parameters/)
   },
 
   'cancelling emit'() {
@@ -1044,200 +1017,6 @@ const tests = {
     assert.isFunction(store.baseMethod, 'ancestor methods via export mixin are made available')
   },
 
-  'listener mixin'() {
-    const handler = () => { }
-
-    // set up
-    ListenerMixin.componentWillMount()
-
-    ListenerMixin.listenTo(myStore, handler)
-
-    assert(ListenerMixin.getListeners().length === 1, 'mixin has one handler')
-
-    ListenerMixin.componentWillUnmount()
-
-    assert(ListenerMixin.getListeners().length === 0, 'mixin was unmounted')
-
-    ListenerMixin.listenToMany([myStore, secondStore], handler)
-
-    assert(ListenerMixin.getListeners().length === 2, 'mixin has two handlers')
-
-    // tear it down
-    ListenerMixin.componentWillUnmount()
-
-    assert(ListenerMixin.getListeners().length === 0, 'mixin was unmounted')
-  },
-
-  'fluxy mixin object pattern'() {
-    let called = false
-
-    class FakeComponent extends ReactComponent {
-      doFoo(storeState) {
-        this.setState({ foo: myStore.getState() })
-      }
-
-      doBar(storeState) { }
-
-      render() {
-        assert(this.state.foo.name === 'Fluxy (object)', 'render was called with right state')
-        called = true
-      }
-    }
-
-    FakeComponent.mixins = [FluxyMixin]
-
-    FakeComponent.statics = {
-      storeListeners: {
-        doFoo: myStore,
-        doBar: secondStore
-      }
-    }
-
-    ReactComponent.test(FakeComponent, () => {
-      myActions.updateName('Fluxy (object)')
-      assert(called === true, 'render was called')
-    })
-  },
-
-  'fluxy mixin array pattern'() {
-    let called = false
-
-    class FakeComponent extends ReactComponent {
-      onChange() {
-        this.setState({ foo: myStore.getState() })
-      }
-
-      render() {
-        assert(this.state.foo.name === 'Fluxy (array)', 'render was called with right state')
-        called = true
-      }
-    }
-
-    FakeComponent.mixins = [FluxyMixin]
-
-    FakeComponent.statics = {
-      storeListeners: [myStore, secondStore]
-    }
-
-    ReactComponent.test(FakeComponent, () => {
-      myActions.updateName('Fluxy (array)')
-      assert(called === true, 'render was called')
-    })
-  },
-
-  'fluxy mixin object errors'() {
-    class FakeComponent extends ReactComponent { }
-
-    FakeComponent.mixins = [FluxyMixin]
-
-    FakeComponent.statics = {
-      storeListeners: {
-        doFoo: myStore
-      }
-    }
-
-    assert.throw(() => ReactComponent.test(FakeComponent), ReferenceError, 'doFoo does not exist in your React component')
-  },
-
-  'fluxy mixin array errors'() {
-    class FakeComponent extends ReactComponent { }
-
-    FakeComponent.mixins = [FluxyMixin]
-
-    FakeComponent.statics = {
-      storeListeners: [myStore]
-    }
-
-    assert.throw(() => ReactComponent.test(FakeComponent), ReferenceError, 'onChange should exist in your React component but is not defined')
-  },
-
-  'isomorphic mixin error'() {
-    class FakeComponent extends ReactComponent { }
-    FakeComponent.mixins = [IsomorphicMixin.create(new Alt())]
-
-    assert.throw(() => ReactComponent.test(FakeComponent), ReferenceError, 'altStores was not provided')
-  },
-
-  'isomorphic mixin'() {
-    class FakeComponent extends ReactComponent {
-      getDefaultProps() {
-        return {
-          altStores: {}
-        }
-      }
-    }
-    FakeComponent.mixins = [IsomorphicMixin.create(new Alt())]
-
-    ReactComponent.test(FakeComponent, null)
-  },
-
-  'the magical mixin'() {
-    let called = false
-
-    let renderCalls = 1
-
-    class FakeComponent extends ReactComponent {
-      render() {
-        if (renderCalls === 1) {
-          assert(this.state.my.name === 'Magic', 'myStore state was updated properly')
-        }
-
-        if (renderCalls === 2) {
-          assert(this.state.sc.name === 'Magic', 'secondStore state was updated properly')
-        }
-
-        called = true
-        renderCalls += 1
-      }
-    }
-
-    FakeComponent.mixins = [ReactStateMagicMixin]
-    FakeComponent.statics = {
-      registerStores: {
-        my: myStore,
-        sc: secondStore
-      }
-    }
-
-    ReactComponent.test(FakeComponent, () => {
-      myActions.updateName('Magic')
-      assert(called === true, 'render was called')
-      assert(renderCalls - 1 === 2, 'render was called twice')
-    })
-  },
-
-  'the magical mixin single'() {
-    let called = false
-
-    class FakeComponent extends ReactComponent {
-      render() {
-        assert(this.state.name === 'Single magic', 'myStore state was updated properly')
-        called = true
-      }
-    }
-
-    FakeComponent.mixins = [ReactStateMagicMixin]
-    FakeComponent.statics = {
-      registerStore: myStore
-    }
-
-    ReactComponent.test(FakeComponent, () => {
-      myActions.updateName('Single magic')
-      assert(called === true, 'render was called')
-    })
-  },
-
-  'the magical mixin errors'() {
-    class FakeComponent extends ReactComponent { }
-    FakeComponent.mixins = [ReactStateMagicMixin]
-    FakeComponent.statics = {
-      registerStores: {},
-      registerStore: myStore
-    }
-
-    assert.throw(() => ReactComponent.test(FakeComponent), ReferenceError, 'You are attempting to use `registerStore` and `registerStores` pick one')
-  },
-
   'binding a listener that does not exist'() {
     class BadListenerStore {
       constructor() {
@@ -1300,7 +1079,7 @@ const tests = {
 
   'creating one off actions'() {
     const action = alt.createAction('hello', function (x) {
-      this.dispatch(x)
+      return x
     })
 
     const store = alt.createStore({
@@ -1481,6 +1260,39 @@ const tests = {
 
     const store = alt.createStore(Store)
     alt.dispatch(action)
+  },
+
+  'is fsa'(done) {
+    const res = alt.dispatcher.register((x) => {
+      assert.isDefined(x.type, 'there is a type')
+      assert.isDefined(x.payload, 'there is a payload')
+      assert.isDefined(x.meta, 'meta exists')
+      assert.isString(x.meta.dispatchId, 'meta contains a unique dispatch id')
+
+      assert(x.payload === 'Jane', 'the payload is correct')
+
+      alt.dispatcher.unregister(res)
+
+      done()
+    })
+
+    myActions.updateName('Jane')
+  },
+
+  'can dispatch fsa'(done) {
+    const res = alt.dispatcher.register((x) => {
+      assert.isDefined(x.type, 'there is a type')
+      assert(x.type === 'owl')
+      assert.isDefined(x.payload, 'there is a payload')
+      assert(x.payload === 'Tawny')
+      assert.isString(x.meta.dispatchId, 'meta contains a unique dispatch id')
+
+      alt.dispatcher.unregister(res)
+
+      done()
+    })
+
+    alt.dispatch({ type: 'owl', payload: 'Tawny' })
   },
 }
 

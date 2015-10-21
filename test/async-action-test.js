@@ -4,14 +4,14 @@ import { assert } from 'chai'
 const alt = new Alt()
 
 const actions = alt.createActions(class AsyncActions {
-  displayName = 'AsyncActions'
+  static displayName = 'AsyncActions'
   fetch() {
     return Promise.resolve('foo')
   }
 })
 
 const store = alt.createStore(class FooStore {
-  displayName = 'FooStore'
+  static displayName = 'FooStore'
   constructor() {
     this.dispatched = false
     this.bindActions(actions)
