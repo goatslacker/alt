@@ -139,12 +139,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	          return utils.dispatch(id, action, data, _this);
 	        }
 
-	        return _this.dispatcher.dispatch({
-	          id: id,
-	          action: action,
-	          data: data,
-	          details: details
-	        });
+	        return _this.dispatcher.dispatch(utils.fsa(id, action, data, details));
 	      });
 	    }
 	  }, {
@@ -1038,11 +1033,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 	exports.getInternalMethods = getInternalMethods;
 	exports.warn = warn;
 	exports.uid = uid;
 	exports.formatAsConstant = formatAsConstant;
 	exports.dispatchIdentity = dispatchIdentity;
+	exports.fsa = fsa;
 	exports.dispatch = dispatch;
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
@@ -1101,6 +1100,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	  this.dispatch(a.length ? [x].concat(a) : x);
 	}
 
+	function fsa(id, type, payload, details) {
+	  return {
+	    type: type,
+	    payload: payload,
+	    meta: _extends({
+	      dispatchId: id
+	    }, details),
+
+	    id: id,
+	    action: type,
+	    data: payload,
+	    details: details
+	  };
+	}
+
 	function dispatch(id, actionObj, payload, alt) {
 	  var data = actionObj.dispatch(payload);
 	  if (data === undefined) return null;
@@ -1116,12 +1130,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  if (fn.isFunction(data)) return data(dispatchLater, alt);
 
-	  return alt.dispatcher.dispatch({
-	    id: id,
-	    action: type,
-	    data: data,
-	    details: details
-	  });
+	  // XXX standardize this
+	  return alt.dispatcher.dispatch(fsa(id, type, data, details));
 	}
 
 	/* istanbul ignore next */
@@ -1233,7 +1243,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      if (model.reduce) {
 	        handleDispatch(function () {
-	          _this.state = model.reduce(_this.state, payload);
+	          var value = model.reduce(_this.state, payload);
+	          if (value !== undefined) _this.state = value;
 	        }, payload);
 	        if (!_this.preventDefault) _this.emitChange();
 	      }
@@ -1587,15 +1598,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      } else {
 	        dispatch(result);
 	      }
-	    }
-
-	    if (!newAction.dispatched && result === undefined) {
-	      /* istanbul ignore else */
-	      /*eslint-disable*/
-	      if (typeof console !== 'undefined') {
-	        console.warn('An action was called but nothing was dispatched');
-	      }
-	      /*eslint-enable*/
 	    }
 
 	    return result;
