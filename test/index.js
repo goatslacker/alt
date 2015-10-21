@@ -1484,7 +1484,7 @@ const tests = {
   },
 
   'is fsa'(done) {
-    alt.dispatcher.register((x) => {
+    const res = alt.dispatcher.register((x) => {
       assert.isDefined(x.type, 'there is a type')
       assert.isDefined(x.payload, 'there is a payload')
       assert.isDefined(x.meta, 'meta exists')
@@ -1492,10 +1492,28 @@ const tests = {
 
       assert(x.payload === 'Jane', 'the payload is correct')
 
+      alt.dispatcher.unregister(res)
+
       done()
     })
 
     myActions.updateName('Jane')
+  },
+
+  'can dispatch fsa'(done) {
+    const res = alt.dispatcher.register((x) => {
+      assert.isDefined(x.type, 'there is a type')
+      assert(x.type === 'owl')
+      assert.isDefined(x.payload, 'there is a payload')
+      assert(x.payload === 'Tawny')
+      assert.isString(x.meta.dispatchId, 'meta contains a unique dispatch id')
+
+      alt.dispatcher.unregister(res)
+
+      done()
+    })
+
+    alt.dispatch({ type: 'owl', payload: 'Tawny' })
   },
 }
 
