@@ -40,15 +40,6 @@ export default function makeAction(alt, namespace, name, implementation, obj) {
       }
     }
 
-    if (!newAction.dispatched && result === undefined) {
-      /* istanbul ignore else */
-      /*eslint-disable*/
-      if (typeof console !== 'undefined') {
-        console.warn('An action was called but nothing was dispatched')
-      }
-      /*eslint-enable*/
-    }
-
     return result
   }
   action.defer = (...args) => {
