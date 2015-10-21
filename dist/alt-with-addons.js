@@ -135,6 +135,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.batchingFunction(function () {
 	        var id = Math.random().toString(18).substr(2, 16);
 
+	        // support straight dispatching of FSA-style actions
+	        if (action.type && action.payload) {
+	          var fsaDetails = {
+	            id: action.type,
+	            namespace: action.type,
+	            name: action.type
+	          };
+	          return _this.dispatcher.dispatch(utils.fsa(id, action.type, action.payload, fsaDetails));
+	        }
+
 	        if (action.id && action.dispatch) {
 	          return utils.dispatch(id, action, data, _this);
 	        }
