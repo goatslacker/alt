@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.17.6
+
+### Added
+
+* Can dispatch FSA actions directly through alt.dispatch. [commit](https://github.com/goatslacker/alt/commit/243828c)
+
+
 ## 0.17.5
 
 ### Added
