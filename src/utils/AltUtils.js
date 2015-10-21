@@ -56,6 +56,22 @@ export function dispatchIdentity(x, ...a) {
   return a.length ? [x].concat(a) : x
 }
 
+export function fsa(id, type, payload, details) {
+  return {
+    type,
+    payload,
+    meta: {
+      dispatchId: id,
+      ...details,
+    },
+
+    id,
+    action: type,
+    data: payload,
+    details,
+  }
+}
+
 export function dispatch(id, actionObj, payload, alt) {
   const data = actionObj.dispatch(payload)
   if (data === undefined) return null
@@ -69,12 +85,8 @@ export function dispatch(id, actionObj, payload, alt) {
 
   if (fn.isFunction(data)) return data(dispatchLater, alt)
 
-  return alt.dispatcher.dispatch({
-    id,
-    action: type,
-    data,
-    details,
-  })
+    // XXX standardize this
+  return alt.dispatcher.dispatch(fsa(id, type, data, details))
 }
 
 /* istanbul ignore next */
