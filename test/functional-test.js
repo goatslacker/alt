@@ -107,10 +107,12 @@ export default {
         state: { x: 0 },
 
         reduce(state) {
+          if (state.x >= 3) return
           return { x: state.x + 1 }
         }
       })
 
+      actions.fire()
       actions.fire()
       actions.fire()
       actions.fire()
