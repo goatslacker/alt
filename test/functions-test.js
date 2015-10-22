@@ -5,32 +5,32 @@ import Alt from '../dist/alt-with-runtime'
 const alt = new Alt()
 
 export default {
-  'test the functions.js isPojo()': {
+  'test the functions.js isMutableObject()': {
     'can import lib/functions'() {
       assert.ok(fn)
-      assert.ok(fn.isPojo)
-      assert(typeof fn.isPojo === 'function', 'isPojo is imported')
+      assert.ok(fn.isMutableObject)
+      assert(typeof fn.isMutableObject === 'function', 'isMutableObject is imported')
     },
 
-    'isPojo works on regular objects'() {
+    'isMutableObject works on regular objects'() {
       const obj = {}
       const obj2 = {foo: 'bar'}
 
-      assert(fn.isPojo(obj) === true, 'regular object should pass')
-      assert(fn.isPojo(obj2) === true, 'regular object with fields should pass')
+      assert(fn.isMutableObject(obj) === true, 'regular object should pass')
+      assert(fn.isMutableObject(obj2) === true, 'regular object with fields should pass')
     },
 
-    'isPojo fails on non-objects'() {
-      assert(fn.isPojo(false) === false, 'boolean should fail')
-      assert(fn.isPojo(1) === false, 'integer should fail')
-      assert(fn.isPojo(new Date()) === false, 'date should fail')
+    'isMutableObject fails on non-objects'() {
+      assert(fn.isMutableObject(false) === false, 'boolean should fail')
+      assert(fn.isMutableObject(1) === false, 'integer should fail')
+      assert(fn.isMutableObject(new Date()) === false, 'date should fail')
     },
 
-    'isPojo works on unfrozen objects'() {
+    'isMutableObject works on frozen objects'() {
       const obj = {}
       Object.freeze(obj)
 
-      assert(fn.isPojo(obj) === false, 'frozen objects should fail')
+      assert(fn.isMutableObject(obj) === false, 'frozen objects should fail')
     },
   },
 

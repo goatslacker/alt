@@ -46,14 +46,14 @@ export function createStoreConfig(globalConfig, StoreModel) {
     getState(state) {
       if (Array.isArray(state)) {
         return state.slice()
-      } else if (fn.isPojo(state)) {
+      } else if (fn.isMutableObject(state)) {
         return fn.assign({}, state)
       }
 
       return state
     },
     setState(currentState, nextState) {
-      if (fn.isPojo(nextState)) {
+      if (fn.isMutableObject(nextState)) {
         return fn.assign(currentState, nextState)
       }
       return nextState
