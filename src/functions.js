@@ -1,6 +1,6 @@
 export const isFunction = x => typeof x === 'function'
 
-export function isPojo(target) {
+export function isMutableObject(target) {
   const Ctor = target.constructor
 
   return (
