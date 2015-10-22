@@ -1,12 +1,14 @@
 export const isFunction = x => typeof x === 'function'
 
-export function isPojo(target) {
+export function isMutableObject(target) {
   const Ctor = target.constructor
 
   return (
     !!target
     &&
     typeof target === 'object'
+    &&
+    !Object.isFrozen(target)
     &&
     Object.prototype.toString.call(target) === '[object Object]'
     &&
