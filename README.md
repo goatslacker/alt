@@ -152,7 +152,7 @@ This has many different use cases like:
 There are also many [utils](/src/utils) available which interface well with alt:
 
 * [ActionListener](/src/utils/ActionListeners.js) lets you listen to individual actions without having to create a store.
-* [AltContainer](/components/AltContainer.js) a higher-order container component that is your swiss army knife for React.
+* [AltContainer](https://github.com/altjs/container/tree/master/src) a higher-order container component that is your swiss army knife for React.
 * [AltIso](/src/utils/AltIso.js) addon that uses [iso](https://github.com/goatslacker/iso) to render your application on both server and client.
 * [atomic](/src/utils/atomic.js) enables your stores for atomic transactions.
 * [connectToStores](/src/utils/connectToStores.js) a higher-order function that wraps your React components for store listening.
