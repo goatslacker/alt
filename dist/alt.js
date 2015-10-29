@@ -755,7 +755,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        var state = store.state;
 	        if (config.onDeserialize) obj[key] = config.onDeserialize(value) || value;
-	        if (fn.isPojo(state)) {
+	        if (fn.isMutableObject(state)) {
 	          fn.eachObject(function (k) {
 	            return delete state[k];
 	          }, [state]);
@@ -811,7 +811,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
-	exports.isPojo = isPojo;
+	exports.isMutableObject = isMutableObject;
 	exports.isPromise = isPromise;
 	exports.eachObject = eachObject;
 	exports.assign = assign;
@@ -821,10 +821,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.isFunction = isFunction;
 
-	function isPojo(target) {
+	function isMutableObject(target) {
 	  var Ctor = target.constructor;
 
-	  return !!target && typeof target === 'object' && Object.prototype.toString.call(target) === '[object Object]' && isFunction(Ctor) && (Ctor instanceof Ctor || target.type === 'AltStore');
+	  return !!target && typeof target === 'object' && !Object.isFrozen(target) && Object.prototype.toString.call(target) === '[object Object]' && isFunction(Ctor) && (Ctor instanceof Ctor || target.type === 'AltStore');
 	}
 
 	function isPromise(obj) {
@@ -929,14 +929,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    getState: function getState(state) {
 	      if (Array.isArray(state)) {
 	        return state.slice();
-	      } else if (fn.isPojo(state)) {
+	      } else if (fn.isMutableObject(state)) {
 	        return fn.assign({}, state);
 	      }
 
 	      return state;
 	    },
 	    setState: function setState(currentState, nextState) {
-	      if (fn.isPojo(nextState)) {
+	      if (fn.isMutableObject(nextState)) {
 	        return fn.assign(currentState, nextState);
 	      }
 	      return nextState;
