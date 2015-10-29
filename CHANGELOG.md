@@ -1,11 +1,18 @@
 # Changelog
 
+## 0.17.7
+
+### Changed
+
+* isPojo renamed to isMutableObject. [commit](https://github.com/goatslacker/alt/commit/69c773e)
+
+- This now checks if an object is frozen or not before attempting to delete keys from it.
+
 ## 0.17.6
 
 ### Added
 
 * Can dispatch FSA actions directly through alt.dispatch. [commit](https://github.com/goatslacker/alt/commit/243828c)
-
 
 ## 0.17.5
 
