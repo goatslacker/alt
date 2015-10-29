@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>TypeScriptSupport</title>
+  <meta name="description" content="A library for managing data within JavaScript applications. Alt is a pure flux implementation that is small, terse, well tested, extremely flexible, and forward thinking.
+">
+
+  <link rel="canonical" href="http://alt.js.org/docs/typescript/">
+  <link rel="alternate" type="application/rss+xml" title="Alt" href="http://alt.js.org/feed.xml" />
+
+  <link type="text/css" rel="stylesheet" href="/assets/bootstrap-navbar.css" />
+  <link type="text/css" rel="stylesheet" href="/assets/lotus.min.css" />
+  <link type="text/css" rel="stylesheet" href="/assets/prism.min.css" />
+  <link type="text/css" rel="stylesheet" href="/assets/styles.css" />
+</head>
+
+
+  <body>
+
+    <nav class="navbar navbar-default sp-horiz-lg">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+
+      <a class="navbar-brand" href="/"><img src="/assets/alt.png" alt="Alt" width="40" /></a>
+    </div>
+
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <div id="alt-search-app"></div>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <a href="/guide/">Getting Started</a>
+        </li>
+        <li class="dropdown">
+          <a href='#' class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">API Documentation <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+            <li>
+              <a href="/docs/">Alt</a>
+            </li>
+            
+            <li>
+              <a href="/docs/createActions">Creating Actions</a>
+            </li>
+            
+            <li>
+              <a href="/docs/actions">Actions</a>
+            </li>
+            
+            <li>
+              <a href="/docs/createStore">Creating Stores</a>
+            </li>
+            
+            <li>
+              <a href="/docs/stores">Stores</a>
+            </li>
+            
+            <li>
+              <a href="/docs/async">Handling Async</a>
+            </li>
+            
+            <li>
+              <a href="/docs/lifecycleListeners">Lifecycle Listeners</a>
+            </li>
+            
+            <li>
+              <a href="/docs/bootstrap">Bootstrap</a>
+            </li>
+            
+            <li>
+              <a href="/docs/takeSnapshot">Take Snapshot</a>
+            </li>
+            
+            <li>
+              <a href="/docs/flush">Flush</a>
+            </li>
+            
+            <li>
+              <a href="/docs/recycle">Recycle</a>
+            </li>
+            
+            <li>
+              <a href="/docs/rollback">Rollback</a>
+            </li>
+            
+            <li>
+              <a href="/docs/altInstances">Alt Instances</a>
+            </li>
+            
+            <li>
+              <a href="/docs/components/altContainer">AltContainer</a>
+            </li>
+            
+          </ul>
+        </li>
+        <li>
+          <a href="/blog/">Blog</a>
+        </li>
+        <li>
+          <a href="https://gitter.im/goatslacker/alt">Support</a>
+        </li>
+        <li>
+          <a href="https://github.com/goatslacker/alt">GitHub</a>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+
+    <div class="main sp-vert-md sp-horiz-lg">
+      <div class="row">
+        <div class="col c2">
+          <ul class="sidenav">
+  
+  <li>
+    <a href="/docs/createActions">Creating Actions</a>
+  </li>
+  
+  <li>
+    <a href="/docs/actions">Actions</a>
+  </li>
+  
+  <li>
+    <a href="/docs/createStore">Creating Stores</a>
+  </li>
+  
+  <li>
+    <a href="/docs/stores">Stores</a>
+  </li>
+  
+  <li>
+    <a href="/docs/async">Handling Async</a>
+  </li>
+  
+  <li>
+    <a href="/docs/lifecycleListeners">Lifecycle Listeners</a>
+  </li>
+  
+  <li>
+    <a href="/docs/bootstrap">Bootstrap</a>
+  </li>
+  
+  <li>
+    <a href="/docs/takeSnapshot">Take Snapshot</a>
+  </li>
+  
+  <li>
+    <a href="/docs/flush">Flush</a>
+  </li>
+  
+  <li>
+    <a href="/docs/recycle">Recycle</a>
+  </li>
+  
+  <li>
+    <a href="/docs/rollback">Rollback</a>
+  </li>
+  
+  <li>
+    <a href="/docs/altInstances">Alt Instances</a>
+  </li>
+  
+  <li>
+    <a href="/docs/components/altContainer">AltContainer</a>
+  </li>
+  
+</ul>
+
+        </div>
+        <div class="col c10">
+          <div class="sp-horiz-md">
+            <p>Defintions are stored in the /typings directory of Alt. To run these you will need to reference the alt.d.ts file from the same directory where you manage your type definitions from <a href="http://definitelytyped.org/tsd/">TSD</a>:<br />
+<code>&lt;reference path="../typings/alt.d.ts" /&gt;</code></p>
+
+<p>The alt definitions depend on react and es6-promise which should be installed with tsd. Once installed reference the Alt library from the Typescript legacy import statement:<br />
+<code>javascript
+import Alt = require("alt");
+</code><br />
+Currently Typescript 1.5 is having some <a href="https://github.com/Microsoft/TypeScript/issues/3218">issues</a> with exporting a top level default class from a module. You can also import the chromeDebug function or AltContainer in a similar manner:<br />
+<code>javascript
+import chromeDebug = "alt/utils/chromeDebug";
+import AltContainer = "alt/AltContainer";
+</code></p>
+
+<p>Using alt from Typescript is nearly the same as vanilla ES6 Javascript other than the need to pass generics through Store and Action Creators and the need to inherit stores and actions from an abstract class because accessing “ghost methods” does not play well with a type system:</p>
+
+<p>example:<br />
+```javascript<br />
+class SomeCoolActions {<br />
+    constructor() {<br />
+        this.generateActions(<br />
+            “firstAction”,<br />
+            “secondAction”,<br />
+            “thirdAction”,<br />
+            “fourthAction<br />
+        );<br />
+    }<br />
+}</p>
+
+<p>```</p>
+
+<p>The above example would not compile as the method <code>SomeCoolActions#generateActions</code> does not yet exist. Generally we would extend<br />
+an empty ActionsClass that contains declarations for ghost methods but no implementation:<br />
+```javascript</p>
+
+<p>/**AltJS is a “ghost module” full of non-instantiable interfaces and typedefs to help you write easier code<br />
+  * included in our alt.d.ts type definitions<br />
+  */</p>
+
+<p>class AbstractActions implements AltJS.ActionsClass {<br />
+     constructor( alt:AltJS.Alt){}<br />
+     actions:any;<br />
+     dispatch: ( …payload:Array<any>) =&gt; void;
+     generateActions:( ...actions:Array<string>) =&gt; void;
+ }</string></any></p>
+
+<p>//This class will now compile!!<br />
+ class SomeCoolActions extends AbstractActions {<br />
+     constructor() {<br />
+         this.generateActions(<br />
+             “firstAction”,<br />
+             “secondAction”,<br />
+             “thirdAction”,<br />
+             “fourthAction<br />
+         );<br />
+     }<br />
+ }<br />
+ ```</p>
+
+<p>Alt from typescript needs a little extra boilerplate to pass actions type definitions down to the generated actions.</p>
+
+<p>```javascript</p>
+
+<p>interface Actions {<br />
+  firstAction(name:string):void;<br />
+  secondAction(num:number):void;<br />
+  thirdAction( …args:Array<any>):void;
+  fourthAction(waves:Array<wave>):void;
+}
+class SomeCoolActions extends AbstractActions {
+     constructor(config) {
+         this.generateActions(
+             "firstAction",
+             "secondAction",
+             "thirdAction",
+             "fourthAction
+         );
+         super(config);
+     }
+ }</wave></any></p>
+
+<p>//passing the interface as a generic enables us to see the methods on the generated class.<br />
+ let someCoolActions = alt.createActions<actions>(SomeCoolActions);</actions></p>
+
+<p>//This works! Would throw a compile error without the generic<br />
+ someCoolActions.firstAction(“Mike”);<br />
+ ```</p>
+
+<p>Stores are handled in much the same way:<br />
+ ```javascript<br />
+ // create an interface to model the “state” in this store</p>
+
+<p>interface State {<br />
+    developers:Array<string>;
+    isBusy:boolean;
+ }</string></p>
+
+<p>//abstract class with no implementation - moving to be included in Alt 0.17 release<br />
+ class AbstractStoreModel<s> implements AltJS.StoreModel<s> {
+   bindActions:( ...actions:Array<object>) =&gt; void;
+   bindAction:( ...args:Array<any>) =&gt; void;
+   bindListeners:(obj:any)=&gt; void;
+   exportPublicMethods:(config:{[key:string]:(...args:Array<any>) =&gt; any}) =&gt; any;
+   exportAsync:( source:any) =&gt; void;
+   waitFor:any;
+   exportConfig:any;
+   getState:() =&gt; S;
+ }</any></any></object></s></s></p>
+
+<p>/** class both extends a model using our state interface and implements the interface it’s self<br />
+  * this way we ensure that state based methods only deal with our declared state model and that<br />
+  * we remember to declare our state in the store model its self<br />
+  */<br />
+ class DeveloperStore extends AbstractStoreModel<state> implements State {
+    developers = ["Mike", "Jordan", "Jose"];
+    isBusy = false;</state></p>
+
+<pre><code>constructor() {
+  super();
+  /** binding to automatically attach methods to
+   * Actions for example the action developerActions#addDeveloper
+   * would automatically call and pass its args to the onAddDeveloperMethod
+   * when a dispatch is called
+   * Alt stores a automatically "emit-change" and inform listening ui components of the update after
+   * State is set
+   **/
+  this.bindActions(developerActions);
+
+  /** different than the above - this takes a single action from an "actions" instance and binds it to whatever method
+   * you specify - really useful when a store has an actions class bound but maybe needs one or two actions from another
+   * as well
+   */
+  this.bindAction(repoActions.working, this.setWorking);
+}
+
+onAddDeveloper(dev:string) {
+   ///details
+}
+
+setWorking() {
+    ////do stuff
+}  }  ```
+</code></pre>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="application/javascript" src="http://alt.js.org/assets/search.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/prism/0.0.1/prism.min.js"></script>
+<script type="text/javascript">
+  // Alias for javascript so syntax highlighting works fine
+  Prism.languages.js = Prism.languages.javascript;
+</script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.2.min.js" ></script>
+<script type="text/javascript" src="/assets/bootstrap-navbar.min.js"></script>
+<script>
+  ((window.gitter = {}).chat = {}).options = {
+    room: 'goatslacker/alt'
+  };
+</script>
+<script src="https://sidecar.gitter.im/dist/sidecar.v1.js" async defer></script>
+
+
+  </body>
+
+</html>
