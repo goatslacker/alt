@@ -110,7 +110,10 @@ export function createStoreFromObject(alt, StoreModel, key) {
       StoreModel
     ),
     StoreProto.publicMethods,
-    { displayName: key }
+    {
+      displayName: key,
+      config: StoreModel.config,
+    }
   )
 
   return storeInstance
