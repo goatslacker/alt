@@ -28,7 +28,7 @@ class Alt {
       const id = Math.random().toString(18).substr(2, 16)
 
       // support straight dispatching of FSA-style actions
-      if (action.type && action.payload) {
+      if (action.hasOwnProperty('type') && action.hasOwnProperty('payload')) {
         const fsaDetails = {
           id: action.type,
           namespace: action.type,
