@@ -135,16 +135,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.batchingFunction(function () {
 	        var id = Math.random().toString(18).substr(2, 16);
 
+	        // support straight dispatching of FSA-style actions
+	        if (action.hasOwnProperty('type') && action.hasOwnProperty('payload')) {
+	          var fsaDetails = {
+	            id: action.type,
+	            namespace: action.type,
+	            name: action.type
+	          };
+	          return _this.dispatcher.dispatch(utils.fsa(id, action.type, action.payload, fsaDetails));
+	        }
+
 	        if (action.id && action.dispatch) {
 	          return utils.dispatch(id, action, data, _this);
 	        }
 
-	        return _this.dispatcher.dispatch({
-	          id: id,
-	          action: action,
-	          data: data,
-	          details: details
-	        });
+	        return _this.dispatcher.dispatch(utils.fsa(id, action, data, details));
 	      });
 	    }
 	  }, {
@@ -752,7 +757,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        var state = store.state;
 	        if (config.onDeserialize) obj[key] = config.onDeserialize(value) || value;
-	        if (fn.isPojo(state)) {
+	        if (fn.isMutableObject(state)) {
 	          fn.eachObject(function (k) {
 	            return delete state[k];
 	          }, [state]);
@@ -808,7 +813,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
-	exports.isPojo = isPojo;
+	exports.isMutableObject = isMutableObject;
 	exports.eachObject = eachObject;
 	exports.assign = assign;
 	var isFunction = function isFunction(x) {
@@ -817,10 +822,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.isFunction = isFunction;
 
-	function isPojo(target) {
+	function isMutableObject(target) {
 	  var Ctor = target.constructor;
 
-	  return !!target && typeof target === 'object' && Object.prototype.toString.call(target) === '[object Object]' && isFunction(Ctor) && (Ctor instanceof Ctor || target.type === 'AltStore');
+	  return !!target && typeof target === 'object' && !Object.isFrozen(target) && Object.prototype.toString.call(target) === '[object Object]' && isFunction(Ctor) && (Ctor instanceof Ctor || target.type === 'AltStore');
 	}
 
 	function eachObject(f, o) {
@@ -921,14 +926,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    getState: function getState(state) {
 	      if (Array.isArray(state)) {
 	        return state.slice();
-	      } else if (fn.isPojo(state)) {
+	      } else if (fn.isMutableObject(state)) {
 	        return fn.assign({}, state);
 	      }
 
 	      return state;
 	    },
 	    setState: function setState(currentState, nextState) {
-	      if (fn.isPojo(nextState)) {
+	      if (fn.isMutableObject(nextState)) {
 	        return fn.assign(currentState, nextState);
 	      }
 	      return nextState;
@@ -973,7 +978,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  // create the instance and fn.assign the public methods to the instance
-	  storeInstance = fn.assign(new _AltStore2['default'](alt, StoreProto, StoreProto.state !== undefined ? StoreProto.state : {}, StoreModel), StoreProto.publicMethods, { displayName: key });
+	  storeInstance = fn.assign(new _AltStore2['default'](alt, StoreProto, StoreProto.state !== undefined ? StoreProto.state : {}, StoreModel), StoreProto.publicMethods, {
+	    displayName: key,
+	    config: StoreModel.config
+	  });
 
 	  return storeInstance;
 	}
@@ -1037,12 +1045,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, '__esModule', {
 	  value: true
 	});
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 	exports.getInternalMethods = getInternalMethods;
 	exports.getPrototypeChain = getPrototypeChain;
 	exports.warn = warn;
 	exports.uid = uid;
 	exports.formatAsConstant = formatAsConstant;
 	exports.dispatchIdentity = dispatchIdentity;
+	exports.fsa = fsa;
 	exports.dispatch = dispatch;
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
@@ -1122,6 +1134,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return a.length ? [x].concat(a) : x;
 	}
 
+	function fsa(id, type, payload, details) {
+	  return {
+	    type: type,
+	    payload: payload,
+	    meta: _extends({
+	      dispatchId: id
+	    }, details),
+
+	    id: id,
+	    action: type,
+	    data: payload,
+	    details: details
+	  };
+	}
+
 	function dispatch(id, actionObj, payload, alt) {
 	  var data = actionObj.dispatch(payload);
 	  if (data === undefined) return null;
@@ -1137,12 +1164,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  if (fn.isFunction(data)) return data(dispatchLater, alt);
 
-	  return alt.dispatcher.dispatch({
-	    id: id,
-	    action: type,
-	    data: data,
-	    details: details
-	  });
+	  // XXX standardize this
+	  return alt.dispatcher.dispatch(fsa(id, type, data, details));
 	}
 
 	/* istanbul ignore next */
@@ -1254,7 +1277,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	      if (model.reduce) {
 	        handleDispatch(function () {
-	          _this.state = model.reduce(_this.state, payload);
+	          var value = model.reduce(_this.state, payload);
+	          if (value !== undefined) _this.state = value;
 	        }, payload);
 	        if (!_this.preventDefault) _this.emitChange();
 	      }
@@ -1480,10 +1504,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      throw new TypeError('bindAction expects a function');
 	    }
 
-	    if (handler.length > 1) {
-	      throw new TypeError('Action handler in store ' + this.displayName + ' for ' + ((symbol.id || symbol).toString() + ' was defined with ') + 'two parameters. Only a single parameter is passed through the ' + 'dispatcher, did you mean to pass in an Object instead?');
-	    }
-
 	    // You can pass in the constant or the function itself
 	    var key = symbol.id ? symbol.id : symbol;
 	    this.actionListeners[key] = this.actionListeners[key] || [];
@@ -1591,12 +1611,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    if (result === undefined) {
-	      /* istanbul ignore else */
-	      /*eslint-disable*/
-	      if (typeof console !== 'undefined') {
-	        console.warn('An action was called but nothing was dispatched');
-	      }
-	      /*eslint-enable*/
+	      utils.warn('An action was called but nothing was dispatched');
 	    }
 
 	    return result;
@@ -1617,6 +1632,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var container = alt.actions[namespace];
 	  var namespaceId = utils.uid(container, name);
 	  container[namespaceId] = action;
+
+	  // generate a constant
+	  var constant = utils.formatAsConstant(namespaceId);
+	  container[constant] = id;
 
 	  return action;
 	}
