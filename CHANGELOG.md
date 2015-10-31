@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.17.8
+
+### Changed
+
+* Fix FSA dispatching [commit](https://github.com/goatslacker/alt/commit/ec3ccd8)
+* Stores created using an Object will now have a config. This gets rid of this [issue](https://github.com/goatslacker/alt-devtool/issues/20). [commit](https://github.com/goatslacker/alt/commit/d72eb9d)
+
 ## 0.17.7
 
 ### Changed

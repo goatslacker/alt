@@ -136,7 +136,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var id = Math.random().toString(18).substr(2, 16);
 
 	        // support straight dispatching of FSA-style actions
-	        if (action.type && action.payload) {
+	        if (action.hasOwnProperty('type') && action.hasOwnProperty('payload')) {
 	          var fsaDetails = {
 	            id: action.type,
 	            namespace: action.type,
@@ -981,7 +981,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 
 	  // create the instance and fn.assign the public methods to the instance
-	  storeInstance = fn.assign(new _AltStore2['default'](alt, StoreProto, StoreProto.state !== undefined ? StoreProto.state : {}, StoreModel), StoreProto.publicMethods, { displayName: key });
+	  storeInstance = fn.assign(new _AltStore2['default'](alt, StoreProto, StoreProto.state !== undefined ? StoreProto.state : {}, StoreModel), StoreProto.publicMethods, {
+	    displayName: key,
+	    config: StoreModel.config
+	  });
 
 	  return storeInstance;
 	}
