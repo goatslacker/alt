@@ -13,22 +13,18 @@ The basic idea is that you have a container that wraps your component, the duty 
 
 AltContainer doesn't just wrap your dumb components into a high-performance store listener but it also serves as a jack-of-all-trades component where you can directly inject any dependencies into your components such as stores, actions, or the flux context.
 
-## react-native
-
-If you're using [`react-native`](http://www.reactnative.com/) then you'll want to use `AltNativeContainer`. It has the same API as AltContainer.
-
 ## Importing
 
 To import `AltContainer`, you may do it like the following:
 
 ```js
-import AltContainer from 'alt/AltContainer';
+import AltContainer from 'alt-container';
 ```
 
 **For CommonJS**:
 
 ```js
-var AltContainer = require('alt/AltContainer');
+var AltContainer = require('alt-container');
 ```
 
 ## `stores`
