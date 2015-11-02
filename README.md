@@ -149,18 +149,18 @@ This has many different use cases like:
 * Isomorphism. You save a snapshot that you send from the server to the client and then bootstrap back on the client.
 * Rolling back to previous stable states.
 
-There are also many [utils](/src/utils) available which interface well with alt:
+There are also many [utils](https://github.com/altjs/utils) available which interface well with alt:
 
-* [ActionListener](/src/utils/ActionListeners.js) lets you listen to individual actions without having to create a store.
-* [AltContainer](https://github.com/altjs/container/tree/master/src) a higher-order container component that is your swiss army knife for React.
-* [AltIso](/src/utils/AltIso.js) addon that uses [iso](https://github.com/goatslacker/iso) to render your application on both server and client.
-* [atomic](/src/utils/atomic.js) enables your stores for atomic transactions.
-* [connectToStores](/src/utils/connectToStores.js) a higher-order function that wraps your React components for store listening.
-* [decorators](/src/utils/decorators.js) a collection of useful ES7 decorators for working with alt.
-* [DispatchRecorder](/src/utils/DispatcherRecorder.js) lets you record all your dispatches and replay them back at a later time.
-* [FinalStore](/src/utils/makeFinalStore.js) is a Store that you can listen to that only emits when all your other stores have received all their data.
-* [ImmutableUtil](/src/utils/ImmutableUtil.js) makes working with immutable-js easy.
-* [TimeTravel](/src/utils/TimeTravel.js) enhances your stores so they are able to travel through different states in time.
+* [ActionListener](https://github.com/altjs/utils/blob/master/src/ActionListeners.js) lets you listen to individual actions without having to create a store.
+* [AltContainer](https://github.com/altjs/container) a higher-order container component that is your swiss army knife for React.
+* [AltIso](https://github.com/altjs/utils/blob/master/src/AltIso.js) addon that uses [iso](https://github.com/goatslacker/iso) to render your application on both server and client.
+* [atomic](https://github.com/altjs/utils/blob/master/src/atomic.js) enables your stores for atomic transactions.
+* [connectToStores](https://github.com/altjs/connect-to-stores) a higher-order function that wraps your React components for store listening.
+* [decorators](https://github.com/altjs/utils/blob/master/src/decorators.js) a collection of useful ES7 decorators for working with alt.
+* [DispatchRecorder](https://github.com/altjs/utils/blob/master/src/DispatcherRecorder.js) lets you record all your dispatches and replay them back at a later time.
+* [FinalStore](https://github.com/altjs/utils/blob/master/src/makeFinalStore.js) is a Store that you can listen to that only emits when all your other stores have received all their data.
+* [ImmutableUtil](https://github.com/altjs/utils/blob/master/src/ImmutableUtil.js) makes working with immutable-js easy.
+* [TimeTravel](https://github.com/altjs/utils/blob/master/src/TimeTravel.js) enhances your stores so they are able to travel through different states in time.
 
 ## Topical Guide
 
