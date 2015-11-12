@@ -6,8 +6,8 @@
 </description>
     <link>http://alt.js.org/</link>
     <atom:link href="http://alt.js.org/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 01 Nov 2015 15:24:03 -0800</pubDate>
-    <lastBuildDate>Sun, 01 Nov 2015 15:24:03 -0800</lastBuildDate>
+    <pubDate>Thu, 12 Nov 2015 16:15:34 -0500</pubDate>
+    <lastBuildDate>Thu, 12 Nov 2015 16:15:34 -0500</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
     
       <item>
@@ -219,7 +219,7 @@ clickThread comes from the &lt;code&gt;ChatThreadActions&lt;/code&gt;, createMes
 
 &lt;p&gt;All done. Converting the tests are a challenge I’ll leave up to you. If you have any questions feel free to open an &lt;a href=&quot;https://github.com/goatslacker/alt/issues&quot;&gt;issue at alt&lt;/a&gt;, or ping me &lt;a href=&quot;https://twitter.com/goatslacker&quot;&gt;@goatslacker&lt;/a&gt;.&lt;/p&gt;
 </description>
-        <pubDate>Thu, 22 Jan 2015 00:00:00 -0800</pubDate>
+        <pubDate>Thu, 22 Jan 2015 00:00:00 -0500</pubDate>
         <link>http://alt.js.org/2015/01/22/how-to-convert-flux-to-alt.html</link>
         <guid isPermaLink="true">http://alt.js.org/2015/01/22/how-to-convert-flux-to-alt.html</guid>
         
