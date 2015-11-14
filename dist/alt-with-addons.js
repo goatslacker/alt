@@ -919,6 +919,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    boundListeners: [],
 	    lifecycleEvents: {},
 	    actionListeners: {},
+	    actionListenerHandlers: {},
 	    publicMethods: {},
 	    handlesOwnErrors: false
 	  }, extras);
@@ -1305,12 +1306,18 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 10 */
 /***/ function(module, exports) {
 
-	"use strict";
+	'use strict';
 
 	function transmitter() {
 	  var subscriptions = [];
+	  var pushing = false;
+	  var toUnsubscribe = [];
 
 	  var unsubscribe = function unsubscribe(onChange) {
+	    if (pushing) {
+	      toUnsubscribe.push(onChange);
+	      return;
+	    }
 	    var id = subscriptions.indexOf(onChange);
 	    if (id >= 0) subscriptions.splice(id, 1);
 	  };
@@ -1324,15 +1331,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 
 	  var push = function push(value) {
-	    subscriptions.forEach(function (subscription) {
-	      return subscription(value);
-	    });
+	    if (pushing) throw new Error('Cannot push while pushing');
+	    pushing = true;
+	    try {
+	      subscriptions.forEach(function (subscription) {
+	        return subscription(value);
+	      });
+	    } finally {
+	      pushing = false;
+	      toUnsubscribe = toUnsubscribe.filter(unsubscribe);
+	    }
 	  };
 
-	  return { subscribe: subscribe, push: push, unsubscribe: unsubscribe };
+	  return { subscribe: subscribe, push: push, unsubscribe: unsubscribe, subscriptions: subscriptions };
 	}
 
 	module.exports = transmitter;
+
+
 
 /***/ },
 /* 11 */
@@ -1490,7 +1506,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // You can pass in the constant or the function itself
 	    var key = symbol.id ? symbol.id : symbol;
 	    this.actionListeners[key] = this.actionListeners[key] || [];
-	    this.actionListeners[key].push(handler.bind(this));
+	    this.actionListenerHandlers[key] = this.actionListenerHandlers[key] || [];
+
+	    if (this.actionListenerHandlers[key].indexOf(handler) === -1) {
+	      this.actionListenerHandlers[key].push(handler);
+	      this.actionListeners[key].push(handler.bind(this));
+	    }
+
 	    this.boundListeners.push(key);
 	  },
 
