@@ -1421,6 +1421,30 @@ const tests = {
     assert(call.calledTwice, 'multiple action handlers are ok')
   },
 
+  'cannot multiple listen to same handler'() {
+    const ImportKeysActions = alt.generateActions('change', 'saved')
+
+    const call = sinon.spy()
+
+    const BalanceClaimStore = alt.createStore(class {
+      constructor() {
+        this.bindActions(ImportKeysActions)
+
+        this.bindListeners({
+          saved: ImportKeysActions.saved,
+        })
+      }
+
+      saved() {
+        call()
+      }
+    })
+
+    ImportKeysActions.saved()
+
+    assert(call.calledOnce, 'handler was only called once')
+  },
+
   'dispatching action creators'() {
     const action = {
       id: 'hello',

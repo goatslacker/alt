@@ -36,6 +36,7 @@ function createPrototype(proto, alt, key, extras) {
     boundListeners: [],
     lifecycleEvents: {},
     actionListeners: {},
+    actionListenerHandlers: {},
     publicMethods: {},
     handlesOwnErrors: false,
   }, extras)
