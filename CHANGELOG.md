@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.17.9
+
+### Changed
+
+* Fixes multiple actions from registering to the same handler [commit](https://github.com/goatslacker/alt/commit/85226f7).
+
 ## 0.17.8
 
 ### Changed
