@@ -6,3 +6,4 @@ npm-debug.log
 src
 test/browser/tests.js
 web
+.babelrc
