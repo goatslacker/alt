@@ -1,5 +1,74 @@
 # Changelog
 
+## 0.18.0
+
+### Breaking Changes
+
+* Removed this.dispatch from Actions [commit](https://github.com/goatslacker/alt/commit/730db950c81bcc6e46d0f943becc2fb063d27365).
+
+  **Upgrade Guide**
+
+  - Use the included codemod to [convert your actions](https://github.com/goatslacker/alt/blob/master/scripts/this-dispatch-to-return.js).
+  - You will need jscodeshift to run the codemod.
+  - `npm install jscodeshift -g`
+  - `jscodeshift  -t scripts/this-dispatch-to-return.js your_file.js`
+  - I recommend you use some source control like `git` this way you can `git diff` your changes and make sure everything is ok.
+
+  - You can manually upgrade by removing `this.dispatch` from your actions and instead return your payload directly.
+  - If you have an async action then you can return a function.
+
+  ```js
+  // from this
+  class MyActions {
+    someAction() {
+      this.dispatch(13)
+    }
+  }
+
+  // to this
+  class MyActions {
+    someAction() {
+      return 13
+    }
+  }
+  ```
+
+  or
+
+  ```js
+  // from this
+  class MyActions {
+    asyncThings() {
+      xhr('foo', () => {
+        this.dispatch(42)
+      })
+    }
+  }
+
+  // to this
+  class MyActions {
+    asyncThings() {
+      return (dispatch) => {
+        xhr('foo', () => {
+          dispatch(42)
+        })
+      }
+    }
+  }
+  ```
+
+* Deleted all of `utils`, `mixins`, `components`, and `addons` from alt package.
+
+  **Upgrade Guide**
+
+  - Use the utils found [here](https://github.com/altjs).
+  - You can install these from npm.
+
+
+### Changed
+
+* isMutableObject checks for frozen Objects before updating them [commit](https://github.com/goatslacker/alt/commit/a279c1983295048730c9cbf2e462c6ad80a414c5).
+
 ## 0.17.9
 
 ### Changed
