@@ -65,6 +65,16 @@
     "transpile-cover": "babel src --out-dir lib -r",
     "version": "npm run build"
   },
+  "files": [
+    "src",
+    "lib",
+    "scripts",
+    "typings",
+    "dist",
+    "docs",
+    "guides",
+    "README.md"
+  ],
   "keywords": [
     "alt",
     "es6",
