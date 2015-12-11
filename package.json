@@ -3,6 +3,7 @@
   "version": "0.18.1",
   "description": "A flux implementation",
   "main": "lib",
+  "jsnext:main": "src",
   "dependencies": {
     "flux": "2.0.3",
     "is-promise": "2.1.0",
