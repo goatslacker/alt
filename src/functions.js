@@ -6,13 +6,11 @@ export function isMutableObject(target) {
   return (
     !!target
     &&
-    typeof target === 'object'
-    &&
-    !Object.isFrozen(target)
-    &&
     Object.prototype.toString.call(target) === '[object Object]'
     &&
     isFunction(Ctor)
+    &&
+    !Object.isFrozen(target)
     &&
     (Ctor instanceof Ctor || target.type === 'AltStore')
   )

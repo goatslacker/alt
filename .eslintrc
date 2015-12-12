@@ -10,12 +10,7 @@
     "modules": true,
     "jsx": true
   },
-  "plugins": [
-    "react"
-  ],
   "rules": {
     "semi": [2, "never"],
-    "no-eq-null": 0,
-    "space-before-function-paren": 2
   }
 }
