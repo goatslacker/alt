@@ -17,7 +17,6 @@ class Alt {
     this.actions = { global: {} }
     this.stores = {}
     this.storeTransforms = config.storeTransforms || []
-    this.trapAsync = false
     this._actionsRegistry = {}
     this._initSnapshot = {}
     this._lastSnapshot = {}
