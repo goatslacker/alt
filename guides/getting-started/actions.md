@@ -22,7 +22,7 @@ var alt = require('../alt');
 
 class LocationActions {
   updateLocations(locations) {
-    this.dispatch(locations);
+    return locations;
   }
 }
 

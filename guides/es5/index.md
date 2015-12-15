@@ -22,7 +22,7 @@ which is the equivalent to
 ```js
 var foodActions = alt.createActions(function () {
   this.addItem = function (item) {
-    this.dispatch(item);
+    return item;
   };
 });
 ```
@@ -32,7 +32,7 @@ or
 ```js
 var foodActions = alt.createActions({
   addItem: function (item) {
-    this.dispatch(item);
+    return item;
   }
 });
 ```
@@ -152,7 +152,7 @@ You can even create instances of alt if you prefer that over singletons. You wou
 // Actions
 var FoodActionsObject = {
   addItem: function (item) {
-    this.dispatch(item);
+    return item;
   }
 };
 
