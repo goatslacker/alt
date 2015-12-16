@@ -39,15 +39,17 @@ class PetActions {
         // adds import charge to cost
         totalCost = importCost + cost;
 
-    this.dispatch({
-      pet,
-      cost: totalCost
-    });
-
-    // checks if pet is legal
-    if(illegalAnimals.indexOf(pet) >= 0) {
-      legalActions.illegalPet(pet);
+    return (dispatch) => {
+      dispatch({
+        pet,
+        cost: totalCost
+      });
+      // checks if pet is legal
+      if(illegalAnimals.indexOf(pet) >= 0) {
+        legalActions.illegalPet(pet);
+      }
     }
+
   }
 }
 

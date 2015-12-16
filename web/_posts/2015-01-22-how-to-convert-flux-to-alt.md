@@ -70,11 +70,11 @@ becomes something like this in alt:
 
 ```js
 clickThread: function(threadID) {
-  this.dispatch(threadID)
+  return threadID;
 }
 ```
 
-Having a function that wraps `this.dispatch` is kind of silly. If you don't need to do anything else in your action, meaning your action just passes through a value, you can use alt's `generateActions` shorthand in the constructor.
+ If you don't need to do anything else in your action, meaning your action just passes through a value, you can use alt's `generateActions` shorthand in the constructor.
 
 ```js
 // js/actions/ChatThreadActionCreators.js
@@ -101,10 +101,10 @@ Dispatch an Object containing the source or some sort of identifier.
 
 ```js
 receiveAll: function(rawMessages) {
-  this.dispatch({
+  return {
     source: 'server-action',
     data: rawMessages
-  });
+  };
 }
 ```
 
@@ -115,7 +115,7 @@ receiveAll: function(rawMessages) {
   // do things with rawMessages here
   log.debug(rawMessages);
 
-  this.dispatch(rawMessages);
+  return rawMessages;
 }
 ```
 
@@ -129,10 +129,11 @@ var ChatMessageDataUtils = require('../utils/ChatMessageDataUtils');
 
 class ChatMessageActions {
   createMessage(text) {
-    this.dispatch(text);
-
-    var message = ChatMessageDataUtils.getCreatedMessageData(text);
-    ChatWebAPIUtils.createMessage(message);
+    return (dispatch) => {
+      dispatch(text);
+      var message = ChatMessageDataUtils.getCreatedMessageData(text);
+      ChatWebAPIUtils.createMessage(message);
+    }
   }
 }
 ```
