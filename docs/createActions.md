@@ -61,17 +61,26 @@ function ActionsClass {
 
 There is also a shorthand for this shorthand [available](generateActions.md) on the alt instance.
 
-## ActionsClass#dispatch
+## ActionsClass.prototype
 
-> (data: mixed): undefined
-
-This method is available inside every action. It is unique to every action and lets the dispatcher know where each dispatch is coming from.
+This is an object which contains a reference to all the other actions created in your ActionsClass. You can use this for calling multiple actions within an action:
 
 ```js
 ActionsClass.prototype.myActionFail = function (data) {
-  this.dispatch(data);
+  return data;
+};
+
+ActionsClass.prototype.myAction = function (data) {
+  if (someValidationFunction(data)) {
+    return data; // returning dispatches the action
+  } else {
+    this.myActionFail(); // calling an action dispatches this action
+    // returning nothing does not dispatch the action
+  }
 };
 ```
+
+### Dispatching
 
 You can also simply return a value from an action to dispatch:
 
@@ -91,13 +100,16 @@ The special treatment of Promises allows the caller of the action to track its p
 ```js
 alt.createActions({
   fetchUser(id) {
-    this.dispatch(id); // this dispatches the action
-    return http.get('/api/users/' + id) // this does NOT 
-      .then(this.actions.fetchUserSuccess)
-      .catch(this.actions.fetchUserFailure)
+    return function (dispatch) {
+      dispatch(id);
+      return http.get('/api/users/' + id)
+        .then(this.fetchUserSuccess.bind(this))
+        .catch(this.fetchUserFailure.bind(this));
+    };
   },
-  fetchUserSuccess: x => x, // equivalent to alt.generateActions('fetchUserSuccess')
-  fetchUserFailure: x => x
+
+  fetchUserSuccess: x => x,
+  fetchUserFailure: x => x,
 });
 
 alt.actions.fetchUser(123).then(() => {
@@ -105,20 +117,3 @@ alt.actions.fetchUser(123).then(() => {
 });
 ```
 
-## ActionsClass#actions
-
-This is an object which contains a reference to all the other actions created in your ActionsClass. You can use this for calling multiple actions within an action:
-
-```js
-ActionsClass.prototype.myActionFail = function (data) {
-  this.dispatch(data);
-};
-
-ActionsClass.prototype.myAction = function (data) {
-  if (someValidationFunction(data)) {
-    this.dispatch(data);
-  } else {
-    this.actions.myActionFail(data);
-  }
-};
-```
