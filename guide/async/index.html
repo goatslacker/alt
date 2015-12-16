@@ -207,19 +207,21 @@ Here’s some mock data we’ll be using:</p>
 <code>actions/LocationActions.js</code></p>
 
 <pre><code class="language-js">fetchLocations() {
-  // we dispatch an event here so we can have "loading" state.
-  this.dispatch();
-  LocationSource.fetch()
-    .then((locations) =&gt; {
-      // we can access other actions within our action through `this.actions`
-      this.actions.updateLocations(locations);
-    })
-    .catch((errorMessage) =&gt; {
-      this.actions.locationsFailed(errorMessage);
-    });
+  return (dispatch) =&gt; {
+    // we dispatch an event here so we can have "loading" state.
+    dispatch();
+    LocationSource.fetch()
+      .then((locations) =&gt; {
+        // we can access other actions within our action through `this.actions`
+        this.updateLocations(locations);
+      })
+      .catch((errorMessage) =&gt; {
+        this.locationsFailed(errorMessage);
+      });
+    }
 }
 locationsFailed(errorMessage) {
-  this.dispatch(errorMessage);
+  return errorMessage;
 }
 </code></pre>
 

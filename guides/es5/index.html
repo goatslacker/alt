@@ -150,7 +150,7 @@
 
 <pre><code class="language-js">var foodActions = alt.createActions(function () {
   this.addItem = function (item) {
-    this.dispatch(item);
+    return item;
   };
 });
 </code></pre>
@@ -159,7 +159,7 @@
 
 <pre><code class="language-js">var foodActions = alt.createActions({
   addItem: function (item) {
-    this.dispatch(item);
+    return item;
   }
 });
 </code></pre>
@@ -275,7 +275,7 @@ FoodStore.hasFood = function() {
 <pre><code class="language-js">// Actions
 var FoodActionsObject = {
   addItem: function (item) {
-    this.dispatch(item);
+    return item;
   }
 };
 

@@ -6,8 +6,8 @@
 </description>
     <link>http://alt.js.org/</link>
     <atom:link href="http://alt.js.org/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 12 Nov 2015 16:15:34 -0500</pubDate>
-    <lastBuildDate>Thu, 12 Nov 2015 16:15:34 -0500</lastBuildDate>
+    <pubDate>Tue, 15 Dec 2015 17:59:33 -0800</pubDate>
+    <lastBuildDate>Tue, 15 Dec 2015 17:59:33 -0800</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
     
       <item>
@@ -66,11 +66,11 @@ module.exports = new Alt();
 &lt;p&gt;becomes something like this in alt:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;clickThread: function(threadID) {
-  this.dispatch(threadID)
+  return threadID;
 }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Having a function that wraps &lt;code&gt;this.dispatch&lt;/code&gt; is kind of silly. If you don’t need to do anything else in your action, meaning your action just passes through a value, you can use alt’s &lt;code&gt;generateActions&lt;/code&gt; shorthand in the constructor.&lt;/p&gt;
+&lt;p&gt;If you don’t need to do anything else in your action, meaning your action just passes through a value, you can use alt’s &lt;code&gt;generateActions&lt;/code&gt; shorthand in the constructor.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;// js/actions/ChatThreadActionCreators.js
 
@@ -94,10 +94,10 @@ ChatThreadActions.clickThread(1, 2); // passes through [1, 2]
 &lt;p&gt;Dispatch an Object containing the source or some sort of identifier.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&quot;language-js&quot;&gt;receiveAll: function(rawMessages) {
-  this.dispatch({
+  return {
     source: &#39;server-action&#39;,
     data: rawMessages
-  });
+  };
 }
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -107,7 +107,7 @@ ChatThreadActions.clickThread(1, 2); // passes through [1, 2]
   // do things with rawMessages here
   log.debug(rawMessages);
 
-  this.dispatch(rawMessages);
+  return rawMessages;
 }
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -120,10 +120,11 @@ var ChatMessageDataUtils = require(&#39;../utils/ChatMessageDataUtils&#39;);
 
 class ChatMessageActions {
   createMessage(text) {
-    this.dispatch(text);
-
-    var message = ChatMessageDataUtils.getCreatedMessageData(text);
-    ChatWebAPIUtils.createMessage(message);
+    return (dispatch) =&amp;gt; {
+      dispatch(text);
+      var message = ChatMessageDataUtils.getCreatedMessageData(text);
+      ChatWebAPIUtils.createMessage(message);
+    }
   }
 }
 &lt;/code&gt;&lt;/pre&gt;
@@ -219,7 +220,7 @@ clickThread comes from the &lt;code&gt;ChatThreadActions&lt;/code&gt;, createMes
 
 &lt;p&gt;All done. Converting the tests are a challenge I’ll leave up to you. If you have any questions feel free to open an &lt;a href=&quot;https://github.com/goatslacker/alt/issues&quot;&gt;issue at alt&lt;/a&gt;, or ping me &lt;a href=&quot;https://twitter.com/goatslacker&quot;&gt;@goatslacker&lt;/a&gt;.&lt;/p&gt;
 </description>
-        <pubDate>Thu, 22 Jan 2015 00:00:00 -0500</pubDate>
+        <pubDate>Thu, 22 Jan 2015 00:00:00 -0800</pubDate>
         <link>http://alt.js.org/2015/01/22/how-to-convert-flux-to-alt.html</link>
         <guid isPermaLink="true">http://alt.js.org/2015/01/22/how-to-convert-flux-to-alt.html</guid>
         

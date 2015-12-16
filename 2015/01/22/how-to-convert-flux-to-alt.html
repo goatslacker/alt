@@ -179,11 +179,11 @@ module.exports = new Alt();
 <p>becomes something like this in alt:</p>
 
 <pre><code class="language-js">clickThread: function(threadID) {
-  this.dispatch(threadID)
+  return threadID;
 }
 </code></pre>
 
-<p>Having a function that wraps <code>this.dispatch</code> is kind of silly. If you don’t need to do anything else in your action, meaning your action just passes through a value, you can use alt’s <code>generateActions</code> shorthand in the constructor.</p>
+<p>If you don’t need to do anything else in your action, meaning your action just passes through a value, you can use alt’s <code>generateActions</code> shorthand in the constructor.</p>
 
 <pre><code class="language-js">// js/actions/ChatThreadActionCreators.js
 
@@ -207,10 +207,10 @@ ChatThreadActions.clickThread(1, 2); // passes through [1, 2]
 <p>Dispatch an Object containing the source or some sort of identifier.</p>
 
 <pre><code class="language-js">receiveAll: function(rawMessages) {
-  this.dispatch({
+  return {
     source: 'server-action',
     data: rawMessages
-  });
+  };
 }
 </code></pre>
 
@@ -220,7 +220,7 @@ ChatThreadActions.clickThread(1, 2); // passes through [1, 2]
   // do things with rawMessages here
   log.debug(rawMessages);
 
-  this.dispatch(rawMessages);
+  return rawMessages;
 }
 </code></pre>
 
@@ -233,10 +233,11 @@ var ChatMessageDataUtils = require('../utils/ChatMessageDataUtils');
 
 class ChatMessageActions {
   createMessage(text) {
-    this.dispatch(text);
-
-    var message = ChatMessageDataUtils.getCreatedMessageData(text);
-    ChatWebAPIUtils.createMessage(message);
+    return (dispatch) =&gt; {
+      dispatch(text);
+      var message = ChatMessageDataUtils.getCreatedMessageData(text);
+      ChatWebAPIUtils.createMessage(message);
+    }
   }
 }
 </code></pre>
