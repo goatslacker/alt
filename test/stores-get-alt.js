@@ -21,6 +21,6 @@ export default {
       }
     }
 
-    alt.createActions(MyActions, undefined, alt)
+    alt.createActions(MyActions, alt)
   }
 }

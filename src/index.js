@@ -6,6 +6,7 @@ import * as fn from './functions'
 import * as store from './store'
 import * as utils from './utils/AltUtils'
 import makeAction from './actions'
+import AltActions from './actions/AltActions'
 
 class Alt {
   constructor(config = {}) {
@@ -99,7 +100,8 @@ class Alt {
     return makeAction(this, 'global', name, implementation, obj)
   }
 
-  createActions(ActionsClass, exportObj = {}, ...argsForConstructor) {
+  createActions(ActionsClass, ...argsForConstructor) {
+    const exportObj = Object.create(new AltActions(this), {})
     const actions = {}
     const key = utils.uid(
       this._actionsRegistry,
@@ -119,6 +121,7 @@ class Alt {
           })
         }
       }
+      ActionsGenerator.prototype.alt = this
 
       fn.assign(actions, new ActionsGenerator(...argsForConstructor))
     } else {
