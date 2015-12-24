@@ -231,9 +231,9 @@ class Alt {
   static debug(name, alt, win) {
     const key = 'alt.js.org'
     win = win || window
-    if (typeof win !== 'undefined') {
-      win[key] = win[key] || []
-      win[key].push({ name, alt })
+    if (typeof (win || window) !== 'undefined') {
+      (win || window)[key] = (win || window)[key] || []
+      (win || window)[key].push({name, alt})
     }
     return alt
   }
