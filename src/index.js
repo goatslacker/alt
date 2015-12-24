@@ -230,7 +230,7 @@ class Alt {
 
   static debug(name, alt, win) {
     const key = 'alt.js.org'
-    let win = win || window;
+    win = win || window
     if (typeof win !== 'undefined') {
       win[key] = win[key] || []
       win[key].push({ name, alt })
