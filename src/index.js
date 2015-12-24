@@ -230,8 +230,8 @@ class Alt {
 
   static debug(name, alt, win) {
     const key = 'alt.js.org'
-    const context = win
-    if(!context && typeof window !== 'undefined') {
+    let context = win
+    if (!context && typeof window !== 'undefined') {
       context = window
     }
     if (typeof context !== 'undefined') {
