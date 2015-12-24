@@ -228,11 +228,12 @@ class Alt {
     return this.stores[name]
   }
 
-  static debug(name, alt) {
+  static debug(name, alt, win) {
     const key = 'alt.js.org'
-    if (typeof window !== 'undefined') {
-      window[key] = window[key] || []
-      window[key].push({ name, alt })
+    var win = win || window;
+    if (typeof win !== 'undefined') {
+      win[key] = win[key] || []
+      win[key].push({ name, alt })
     }
     return alt
   }
