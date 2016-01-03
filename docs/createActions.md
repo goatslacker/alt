@@ -59,7 +59,7 @@ function ActionsClass {
 }
 ```
 
-There is also a shorthand for this shorthand [available](generateActions.md) on the alt instance.
+There is also a shorthand for this shorthand [available](#generateactions) on the alt instance.
 
 ## ActionsClass.prototype
 
@@ -116,4 +116,3 @@ alt.actions.fetchUser(123).then(() => {
   renderToHtml(alt); // we know user fetching has completed successfully, and it's safe to render the app
 });
 ```
-
