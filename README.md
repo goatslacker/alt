@@ -809,11 +809,6 @@ flux.getActions('myActions');
 
 To help facilitate with isomorphism alt recommends you use [iso](https://github.com/goatslacker/iso), a helper function which serializes the data on the server into markup and then parses that data back into usable JavaScript on the client. Iso is a great complement to alt for a full-stack flux approach.
 
-## Examples
-
-* [todomvc](https://github.com/goatslacker/alt/blob/master/examples/todomvc)
-* [chat](https://github.com/goatslacker/alt/tree/master/examples/chat)
-
 ## Converting a flux application to alt
 
 1. [Importing the chat project](https://github.com/goatslacker/alt/commit/1a54de1064fe5bd252979380e47b0409d1306773).
