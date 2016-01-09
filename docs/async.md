@@ -149,9 +149,9 @@ Must be an action. This function will be called immediately prior to the `remote
 There is also a decorator available for convenience for you ES7 folk out there.
 
 ```js
-import { datasource } from 'alt/utils/decorators';
+import { datasource } from 'alt-utils/lib/decorators';
 
-@datasource(SearchSource);
+@datasource(SearchSource)
 class SearchStore {
   constructor() {
     this.state = { value: '' };
