@@ -316,9 +316,9 @@ SearchStore.performSearch(1, 2, 3);
 
 <p>There is also a decorator available for convenience for you ES7 folk out there.</p>
 
-<pre><code class="language-js">import { datasource } from 'alt/utils/decorators';
+<pre><code class="language-js">import { datasource } from 'alt-utils/lib/decorators';
 
-@datasource(SearchSource);
+@datasource(SearchSource)
 class SearchStore {
   constructor() {
     this.state = { value: '' };
