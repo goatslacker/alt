@@ -8,7 +8,7 @@ const test = alt.generateActions('three')
 alt.generateActions('one')
 
 alt.createActions(class FooActions {
-  static displayName = 'FooActions'
+  static displayName = 'FooActions';
   one() {}
   two() {}
 })

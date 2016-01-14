@@ -211,7 +211,7 @@ class LifeCycleStore {
     onDeserialize: (data) => {
       data.deserialized = true
     }
-  }
+  };
 
   constructor() {
     this.bootstrapped = false
@@ -300,7 +300,7 @@ class InterceptSnapshotStore {
       }
       return obj
     }
-  }
+  };
 
   constructor() {
     this.bindAction(myActions.updateAnotherVal, this.onUpdateAnotherVal)
