@@ -83,7 +83,11 @@ var LocationsContainer = connectToStores({
 
   getPropsFromStores() {
     // this is the data that gets passed down as props
-    return LocationStore.getState()
+    // each key in the object returned by this function is added to the `this.props`
+    var locationState = LocationStore.getState()
+    return {
+      locations: locationState.locations
+    }
   }
 }, React.createClass({
   render() {
