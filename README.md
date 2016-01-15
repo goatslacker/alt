@@ -108,12 +108,12 @@ class TodoView extends Component {
 * [Example Tests](https://github.com/jdlehman/alt-example-tests)
 * [Github Example](https://github.com/RookieOne/react-alt-github-example)
 * [Isomorphic Alt](https://github.com/patrickkim/iso-alt)
-* [Jumar's Tindahan](https://github.com/srph/jumars-tindahan)
+* [Jumar's Tindahan](https://github.com/chirigarikku/jumars-tindahan)
 * [Maple.js Webcomponents](https://github.com/Wildhoney/Maple.js/tree/master/example/app)
 * [React Native Example](https://github.com/mrblueblue/react-native-alt-demo)
 * [React Router Example](https://github.com/lostpebble/alt-react-router-example)
 * [React Router Loopback](https://github.com/bkniffler/react-router-alt-loopback)
-* [React Webpack Rails Example](https://github.com/justin808/react-webpack-rails-tutorial)
+* [React Webpack Rails Example](https://github.com/shakacode/react-webpack-rails-tutorial)
 * [React Webpack Altjs Example](https://underthehood.myob.com/changing-of-the-guard-in-web-technologies/)
 * [React Weather](https://github.com/sapegin/react-weather)
 * [Shopping Cart](https://github.com/voronianski/flux-comparison/tree/master/alt)
@@ -184,7 +184,7 @@ const alt = new Alt();
 Alt is written in, and encourages ES6. It is completely optional but it is pleasant to write.
 
 You can use the es6 transpiler that comes with react courtesy of
-[jstransform](https://github.com/facebook/jstransform) or you can use one of the other popular ES6 transpilers:
+[jstransform](https://github.com/facebookarchive/jstransform) or you can use one of the other popular ES6 transpilers:
 [babel](https://babeljs.io/) or [traceur](https://github.com/google/traceur-compiler).
 
 You won't need an [es6-shim](https://github.com/paulmillr/es6-shim) but you can use one for further goodies in your javascripts.
