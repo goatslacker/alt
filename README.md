@@ -67,14 +67,16 @@ class TodoStore {
 export default alt.createStore(TodoStore, 'TodoStore');
 ```
 
-View
+View 
+
+Using the [connectToStores](https://github.com/altjs/utils/blob/master/src/connectToStores.js) util from [alt-utils](https://github.com/altjs/utils) package (`npm install alt-utils`)
 
 ```js
-import connectToStores from 'alt/utils/connectToStores';
+// ES2015 (ES6)
+import connectToStores from 'alt-utils/lib/connectToStores';
 import { Component } from 'react';
 import TodoStore from './TodoStore';
 
-@connectToStores
 class TodoView extends Component {
   static getStores() {
     return [TodoStore];
@@ -95,6 +97,27 @@ class TodoView extends Component {
       </ul>
     );
   }
+}
+export default connectToStores(TodoView);
+```
+or
+```js
+//ES2016 (ES7) using @connectToStores Decorator
+import connectToStores from 'alt-utils/lib/connectToStores';
+import { Component } from 'react';
+import TodoStore from './TodoStore';
+
+@connectToStores
+class TodoView extends Component {
+  static getStores() {
+    return [TodoStore];
+  }
+
+  static getPropsFromStores() {
+    return TodoStore.getState();
+  }
+
+  ...
 }
 ```
 
