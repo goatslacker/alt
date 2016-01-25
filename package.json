@@ -14,6 +14,7 @@
     "babel-cli": "6.3.17",
     "babel-core": "6.3.17",
     "babel-eslint": "5.0.0-beta6",
+    "babel-loader": "^6.2.1",
     "babel-plugin-external-helpers-2": "6.3.13",
     "babel-preset-airbnb": "1.0.1",
     "babel-preset-stage-0": "6.3.13",
@@ -36,6 +37,7 @@
     "react-dom": "0.14.0",
     "rimraf": "^2.3.2",
     "sinon": "^1.14.0",
+    "style-loader": "^0.13.0",
     "webpack": "^1.9.12"
   },
   "repository": {
