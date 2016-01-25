@@ -18,7 +18,7 @@ export default function makeAction(alt, namespace, name, implementation, obj) {
     // async functions that return promises should not be dispatched
     if (invocationResult !== undefined && !isPromise(invocationResult)) {
       if (fn.isFunction(invocationResult)) {
-        // but should return an inner function result
+        // inner function result should be returned as an action result
         actionResult = invocationResult(dispatch, alt)
       } else {
         dispatch(invocationResult)
