@@ -37,6 +37,7 @@
     "react-dom": "0.14.0",
     "rimraf": "^2.3.2",
     "sinon": "^1.14.0",
+    "style-loader": "^0.13.0",
     "webpack": "^1.9.12"
   },
   "repository": {
