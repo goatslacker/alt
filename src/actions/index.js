@@ -12,22 +12,24 @@ export default function makeAction(alt, namespace, name, implementation, obj) {
 
   // the action itself
   const action = (...args) => {
-    const result = implementation.apply(obj, args)
+    const invocationResult = implementation.apply(obj, args)
+    let actionResult = invocationResult
 
     // async functions that return promises should not be dispatched
-    if (result !== undefined && !isPromise(result)) {
-      if (fn.isFunction(result)) {
-        result(dispatch, alt)
+    if (invocationResult !== undefined && !isPromise(invocationResult)) {
+      if (fn.isFunction(invocationResult)) {
+        // inner function result should be returned as an action result
+        actionResult = invocationResult(dispatch, alt)
       } else {
-        dispatch(result)
+        dispatch(invocationResult)
       }
     }
 
-    if (result === undefined) {
+    if (invocationResult === undefined) {
       utils.warn('An action was called but nothing was dispatched')
     }
 
-    return result
+    return actionResult
   }
   action.defer = (...args) => setTimeout(() => action.apply(null, args))
   action.id = id
