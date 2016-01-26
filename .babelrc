@@ -1,3 +1,6 @@
 {
-  "presets": ["airbnb", "stage-0"]
+  "presets": ["airbnb", "stage-0"],
+  "plugins": [
+    "add-module-exports"
+  ]
 }
