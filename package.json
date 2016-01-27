@@ -1,6 +1,6 @@
 {
   "name": "alt",
-  "version": "0.18.1",
+  "version": "0.18.2",
   "description": "A flux implementation",
   "main": "lib",
   "jsnext:main": "src",
