@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.18.2
+
+* Added jsnext:main so you can use [rollup](https://github.com/rollup/rollup/wiki/jsnext:main) to bundle Alt. [commit](https://github.com/goatslacker/alt/commit/cc1f1b6).
+* Fix returning promises from an action. [commit](https://github.com/goatslacker/alt/commit/bff1f53).
+
 ## 0.18.0
 
 ### Breaking Changes
