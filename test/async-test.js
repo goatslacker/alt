@@ -75,7 +75,7 @@ const StargazerSource = {
 const StargazerStore = alt.createStore(class {
   static config = {
     stateKey: 'state'
-  }
+  };
 
   constructor() {
     this.state = {
@@ -248,7 +248,7 @@ export default {
       const FauxSource = sinon.stub().returns({})
 
       class FauxStore {
-        static displayName = 'FauxStore'
+        static displayName = 'FauxStore';
 
         constructor() {
           this.exportAsync(FauxSource)
@@ -278,7 +278,7 @@ export default {
       }
 
       class MyStore {
-        static displayName = 'ServerRenderingStore'
+        static displayName = 'ServerRenderingStore';
         constructor() {
           this.registerAsync(PojoSource)
         }
