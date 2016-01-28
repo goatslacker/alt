@@ -11,7 +11,7 @@ The first actions we create will be simple, they'll take in an array of location
 
 We create an action by creating a class, the class' prototype methods will become the actions. The class syntax is completely optional you can use regular constructors and prototypes.
 
-Inside those actions you can use `this.dispatch` to dispatch your payload through the Dispatcher and onto the stores. Finally, make sure you export the created actions using `alt.createActions`.
+Whatever value you return from your action will be sent through the Dispatcher and onto the stores. Finally, make sure you export the created actions using `alt.createActions`.
 
 ---
 
