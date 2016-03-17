@@ -13,7 +13,7 @@
     "alt-search-docs": "1.0.6",
     "babel-cli": "6.6.5",
     "babel-core": "6.7.4",
-    "babel-eslint": "5.0.0-beta6",
+    "babel-eslint": "5.0.0",
     "babel-loader": "6.2.4",
     "babel-plugin-add-module-exports": "^0.1.2",
     "babel-plugin-external-helpers-2": "6.3.13",

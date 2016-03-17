@@ -57,6 +57,7 @@ const StoreMixin = {
               loadCounter -= 1
               action(intercept(x, action, args))
               if (isError) throw x
+              return x
             }
             return this.alt.trapAsync ? () => fire() : fire()
           }
