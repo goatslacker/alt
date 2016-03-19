@@ -7,7 +7,7 @@
   "dependencies": {
     "flux": "2.1.1",
     "is-promise": "2.1.0",
-    "transmitter": "1.1.0"
+    "transmitter": "2.0.0"
   },
   "devDependencies": {
     "alt-search-docs": "1.0.6",
