@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.18.3
+
+* Removes cannot push while pushing error from transmitter.
+
 ## 0.18.2
 
 * Added jsnext:main so you can use [rollup](https://github.com/rollup/rollup/wiki/jsnext:main) to bundle Alt. [commit](https://github.com/goatslacker/alt/commit/cc1f1b6).
