@@ -87,7 +87,6 @@ declare module AltJS {
 
   export interface ActionsClass {
     generateActions?( ...action:Array<string>):void;
-    dispatch( ...payload:Array<any>):void;
     actions?:Actions;
   }
 
