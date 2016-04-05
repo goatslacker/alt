@@ -149,7 +149,7 @@ class TodoView extends Component {
 ### Boilerplates
 
 * [Isomorphic Flux Boilerplate](https://github.com/iam4x/isomorphic-flux-boilerplate)
-* [React + Webpack + Node](https://github.com/choonkending/react-webpack-node)
+* [React + Webpack + Node](https://github.com/choonkending/react-webpack-node/tree/flux/alt)
 * [Web-React](https://github.com/darul75/web-react)
 * [Generator-React-Webpack-Alt](https://github.com/weblogixx/generator-react-webpack-alt)
 * [Isomorphic Alt Generator](https://www.npmjs.com/package/generator-iso-alt)
