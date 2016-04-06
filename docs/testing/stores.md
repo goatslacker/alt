@@ -84,6 +84,7 @@ export default alt.createActions(PetActions);
 
 ```javascript
 // tests/stores/PetStore_test.js
+import Alt from 'alt'
 import alt from 'MyAlt';
 // wrappedPetStore is alt store, UnwrappedPetStore is UnwrappedPetStore class
 import wrappedPetStore, {UnwrappedPetStore} from 'stores/PetStore';
@@ -95,6 +96,14 @@ import {assert} from 'chai';
 import AltTestingUtils from 'alt/utils/AltTestingUtils';
 
 describe('PetStore', () => {
+
+  // create a new empty instance of the store for each test
+  var petStore
+  beforeEach('Recreate the store',() => {
+      var alt = new Alt()
+      petStore = alt.createStore(UnWrappedStore)
+  });
+  
   it('listens for buy a pet action', () => {
     // get initial state of store
     var oldRevenue = wrappedPetStore.getState().revenue,
