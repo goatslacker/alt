@@ -171,5 +171,24 @@ export default {
       assert(store.reduce(store.state).x === 0)
       assert(store2.reduce(store2.state).x === 1)
     },
+
+    'state returned from reduce is set correctly'() {
+      const alt = new Alt()
+      const actions = alt.generateActions('test');
+
+      const store = alt.createStore({
+        displayName: 'store',
+
+        state: { x: 0 },
+
+        reduce(state) {
+          assert(state === this.state, 'state matches this.state');
+          return { ...state };
+        }
+      })
+
+      actions.test();
+      actions.test();
+    },
   }
 }
