@@ -1,85 +1,74 @@
 import { assert } from 'chai'
 import Alt from '../'
 import sinon from 'sinon'
+import storeFromObject from '../lib/compat/storeFromObject'
 
 const alt = new Alt()
 
-const actions = alt.generateActions('fire')
+const actions = alt.generateActions('', ['fire'])
 
-const store = alt.createStore({
+const store = alt.createStore('ValueStore', storeFromObject({
   state: 21,
-
-  displayName: 'ValueStore',
 
   reduce(state, payload) {
     return state + 1
-  }
-})
+  },
+}))
 
-const store2 = alt.createStore({
+const store2 = alt.createStore('ValueStore2', storeFromObject({
   state: [1, 2, 3],
-
-  displayName: 'Value2Store',
 
   reduce(state, payload) {
     return state.concat(state[state.length - 1] + 1)
-  }
-})
+  },
+}))
 
-const store3 = alt.createStore({
+const store3 = alt.createStore('ValueStore3', storeFromObject({
   state: 21,
 
-  displayName: 'ValueStore3',
-
-  bindListeners: {
-    fire: actions.fire
+  reduce(state, payload) {
+    return state + 1
   },
-
-  fire() {
-    this.setState(this.state + 1)
-  }
-})
+}))
 
 export default {
   'value stores': {
     beforeEach() {
-      alt.recycle()
+      alt.flush()
     },
 
     'stores can contain state as any value'(done) {
-      assert(store.state === 21, 'store state is value')
       assert(store.getState() === 21, 'getState returns value too')
 
-      const unlisten = store.listen((state) => {
+      const sub = store.subscribe((state) => {
         assert(state === 22, 'incremented store state')
-        unlisten()
+        sub.dispose()
         done()
       })
 
-      assert(JSON.parse(alt.takeSnapshot()).ValueStore === 21, 'snapshot ok')
+      assert(JSON.parse(alt.save()).ValueStore === 21, 'snapshot ok')
 
       actions.fire()
     },
 
     'stores can contain state as any value (non reduce)'(done) {
-      assert(store3.state === 21, 'store state is value')
       assert(store3.getState() === 21, 'getState returns value too')
 
-      const unlisten = store3.listen((state) => {
+      const sub = store3.subscribe((state) => {
         assert(state === 22, 'incremented store state')
-        unlisten()
+        sub.dispose()
         done()
       })
 
-      assert(JSON.parse(alt.takeSnapshot()).ValueStore3 === 21, 'snapshot ok')
+      assert(JSON.parse(alt.save()).ValueStore3 === 21, 'snapshot ok')
 
       actions.fire()
     },
 
     'store with array works too'() {
-      assert.deepEqual(store2.state, [1, 2, 3])
+      assert.deepEqual(store2.getState(), [1, 2, 3])
       actions.fire()
-      assert.deepEqual(store2.state, [1, 2, 3, 4])
+      assert.deepEqual(store2.getState(), [1, 2, 3, 4])
     }
   }
 }

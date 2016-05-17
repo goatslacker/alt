@@ -1,16 +1,17 @@
 import { assert } from 'chai'
-import Alt from '../dist/alt-with-runtime'
+import Alt from '../'
+import fromLegacyStore from '../lib/compat/fromLegacyStore'
 import sinon from 'sinon'
 
 export default {
   'catch failed dispatches': {
     'uncaught dispatches result in an error'() {
       const alt = new Alt()
-      const actions = alt.generateActions('fire')
+      const actions = alt.generateActions('', ['fire'])
 
       class Uncaught {
         constructor() {
-          this.bindListeners({ fire: actions.FIRE })
+          this.bindListeners({ fire: actions.fire })
         }
 
         fire() {
@@ -18,19 +19,19 @@ export default {
         }
       }
 
-      const uncaught = alt.createStore(Uncaught)
+      const uncaught = alt.createStore('Uncaught', fromLegacyStore(Uncaught))
 
       assert.throws(() => actions.fire())
     },
 
     'errors can be caught though'() {
       const alt = new Alt()
-      const actions = alt.generateActions('fire')
+      const actions = alt.generateActions('', ['fire'])
 
       class Caught {
         constructor() {
           this.x = 0
-          this.bindListeners({ fire: actions.FIRE })
+          this.bindListeners({ fire: actions.fire })
 
           this.on('error', () => {
             this.x = 1
@@ -42,54 +43,19 @@ export default {
         }
       }
 
-      const caught = alt.createStore(Caught)
+      const caught = alt.createStore('Caught', fromLegacyStore(Caught))
 
       const storeListener = sinon.spy()
 
-      caught.listen(storeListener)
+      const listener = caught.subscribe(storeListener)
 
       assert(caught.getState().x === 0)
       assert.doesNotThrow(() => actions.fire())
       assert(caught.getState().x === 1)
 
-      assert.notOk(storeListener.calledOnce, 'the store did not emit a change')
+      assert.ok(storeListener.calledOnce, 'the store always emits a change')
 
-      caught.unlisten(storeListener)
-    },
-
-    'you have to emit changes yourself'() {
-      const alt = new Alt()
-      const actions = alt.generateActions('fire')
-
-      class CaughtReturn {
-        constructor() {
-          this.x = 0
-          this.bindListeners({ fire: actions.FIRE })
-
-          this.on('error', () => {
-            this.x = 1
-            this.emitChange()
-          })
-        }
-
-        fire() {
-          throw new Error('oops')
-        }
-      }
-
-      const caughtReturn = alt.createStore(CaughtReturn)
-
-      const storeListener = sinon.spy()
-
-      const dispose = caughtReturn.listen(storeListener)
-
-      assert(caughtReturn.getState().x === 0)
-      assert.doesNotThrow(() => actions.fire())
-      assert(caughtReturn.getState().x === 1)
-
-      assert.ok(storeListener.calledOnce)
-
-      dispose()
+      listener.dispose()
     },
   }
 }

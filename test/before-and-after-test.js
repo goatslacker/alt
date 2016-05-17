@@ -1,37 +1,35 @@
 import Alt from '../'
 import { assert } from 'chai'
+import storeFromObject from '../lib/compat/storeFromObject'
 
 import sinon from 'sinon'
 
 const alt = new Alt()
-const action = alt.generateActions('fire')
+const action = alt.generateActions('', ['fire'])
 
 const beforeEach = sinon.spy()
 const afterEach = sinon.spy()
 
-const store = alt.createStore({
-  displayName: 'Store',
-
-  state: { a: 1 },
-
-  bindListeners: {
-    change: action.fire
-  },
-
-  lifecycle: {
-    beforeEach,
-    afterEach
-  },
+class MyStore extends Alt.Store {
+  constructor() {
+    super()
+    this.state = { a: 1 }
+    this.bindListeners({ change: action.fire })
+    this.on('beforeEach', beforeEach)
+    this.on('afterEach', afterEach)
+  }
 
   change(x) {
     this.setState({ a: x })
-  },
-})
+  }
+}
+
+const store = alt.createStore('Store', new MyStore())
 
 export default {
   'Before and After hooks': {
     beforeEach() {
-      alt.recycle()
+      alt.flush()
     },
 
     'before and after hook fire once'() {
@@ -54,16 +52,15 @@ export default {
       assert.ok(beforeEach.args[0].length === 1, '1 arg is passed')
       assert.ok(afterEach.args[0].length === 1, '1 arg is passed')
 
-      assert.ok(beforeEach.args[0][0].payload.data === 2, 'before has payload')
-      assert.ok(afterEach.args[0][0].payload.data === 2, 'after has payload')
+      assert.ok(beforeEach.args[0][0].action.payload === 2, 'before has payload')
+      assert.ok(afterEach.args[0][0].action.payload === 2, 'after has payload')
     },
 
     'before and after get state'() {
       let beforeValue = null
       let afterValue = null
 
-      const store = alt.createStore({
-        displayName: 'SpecialStore',
+      const store = alt.createStore('SpecialStore', storeFromObject({
         state: { a: 1 },
         bindListeners: {
           change: action.fire
@@ -79,7 +76,7 @@ export default {
         change(x) {
           this.setState({ a: x })
         }
-      })
+      }))
 
       action.fire(2)
 

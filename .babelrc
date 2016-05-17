@@ -1,8 +1,7 @@
 {
-  "presets": ["airbnb", "stage-0"],
+  "presets": ["airbnb"],
   "plugins": [
     "add-module-exports",
-    "transform-class-properties",
     ["transform-es2015-classes", { loose: true }],
   ]
 }

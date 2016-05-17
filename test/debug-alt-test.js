@@ -9,10 +9,12 @@ export default {
 
     'enable debug mode'() {
       const alt = new Alt()
+      const alt2 = new Alt()
       Alt.debug('an identifier', alt)
+      Alt.debug('alt2', alt2)
 
       assert.isArray(global.window['alt.js.org'])
-      assert(global.window['alt.js.org'].length === 1)
+      assert(global.window['alt.js.org'].length === 2)
       assert.isString(global.window['alt.js.org'][0].name)
       assert(global.window['alt.js.org'][0].alt === alt)
     },
@@ -25,7 +27,7 @@ export default {
   'isomorphic debug mode': {
     'enable debug mode does not make things explode'() {
       const alt = new Alt()
-      Alt.debug(alt)
+      Alt.debug('hello', alt)
     },
   }
 }

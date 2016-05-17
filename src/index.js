@@ -1,246 +1,240 @@
-/* global window */
-import { Dispatcher } from 'flux'
+import transmitter from 'transmitter'
+import Store from './store'
+import { isFunction, dispatchIdentity, id } from './utils'
 
-import * as StateFunctions from './utils/StateFunctions'
-import * as fn from './functions'
-import * as store from './store'
-import * as utils from './utils/AltUtils'
-import makeAction from './actions'
+const STORES_REF = id()
 
 class Alt {
-  constructor(config = {}) {
-    this.config = config
-    this.serialize = config.serialize || JSON.stringify
-    this.deserialize = config.deserialize || JSON.parse
-    this.dispatcher = config.dispatcher || new Dispatcher()
-    this.batchingFunction = config.batchingFunction || (callback => callback())
-    this.actions = { global: {} }
+  constructor(config) {
+    const bus = transmitter()
+
+    Object.assign(this, {
+      publish: (action) => {
+        if (!action.meta) action.meta = {}
+        action.meta.id = id()
+        bus.publish(action)
+      },
+      subscribe: bus.subscribe,
+      serialize: JSON.stringify,
+      deserialize: JSON.parse,
+    }, config)
+
+    // our internal reference to stores
+    this[STORES_REF] = []
+
+    this.actions = {}
     this.stores = {}
-    this.storeTransforms = config.storeTransforms || []
-    this.trapAsync = false
-    this._actionsRegistry = {}
-    this._initSnapshot = {}
-    this._lastSnapshot = {}
-  }
 
-  dispatch(action, data, details) {
-    this.batchingFunction(() => {
-      const id = Math.random().toString(18).substr(2, 16)
-
-      // support straight dispatching of FSA-style actions
-      if (action.hasOwnProperty('type') && action.hasOwnProperty('payload')) {
-        const fsaDetails = {
-          id: action.type,
-          namespace: action.type,
-          name: action.type,
-        }
-        return this.dispatcher.dispatch(
-          utils.fsa(id, action.type, action.payload, fsaDetails)
-        )
-      }
-
-      if (action.id && action.dispatch) {
-        return utils.dispatch(id, action, data, this)
-      }
-
-      return this.dispatcher.dispatch(utils.fsa(id, action, data, details))
+    this.subscribe(payload => {
+      this[STORES_REF].forEach(store => store.dispatch(payload))
+      this[STORES_REF].forEach(store => store.emitChange())
     })
   }
 
-  createUnsavedStore(StoreModel, ...args) {
-    const key = StoreModel.displayName || ''
-    store.createStoreConfig(this.config, StoreModel)
-    const Store = store.transformStore(this.storeTransforms, StoreModel)
+  createActions(namespace, actions) {
+    const dispatchableActions = Object.keys(actions).reduce((obj, actionName) => {
+      const type = `${namespace}/${actionName}`
 
-    return fn.isFunction(Store)
-      ? store.createStoreFromClass(this, Store, key, ...args)
-      : store.createStoreFromObject(this, Store, key)
-  }
+      const dispatch = payload => this.publish({ type, payload })
 
-  createStore(StoreModel, iden, ...args) {
-    let key = iden || StoreModel.displayName || StoreModel.name || ''
-    store.createStoreConfig(this.config, StoreModel)
-    const Store = store.transformStore(this.storeTransforms, StoreModel)
-
-    /* istanbul ignore next */
-    if (module.hot) delete this.stores[key]
-
-    if (this.stores[key] || !key) {
-      if (this.stores[key]) {
-        utils.warn(
-          `A store named ${key} already exists, double check your store ` +
-          `names or pass in your own custom identifier for each store`
-        )
-      } else {
-        utils.warn('Store name was not specified')
+      obj[actionName] = (...args) => {
+        const payload = actions[actionName](...args)
+        if (isFunction(payload)) {
+          return payload(dispatch, this)
+        } else if (payload !== undefined) {
+          dispatch(payload)
+        }
+        return payload
       }
-
-      key = utils.uid(this.stores, key)
-    }
-
-    const storeInstance = fn.isFunction(Store)
-      ? store.createStoreFromClass(this, Store, key, ...args)
-      : store.createStoreFromObject(this, Store, key)
-
-    this.stores[key] = storeInstance
-    StateFunctions.saveInitialSnapshot(this, key)
-
-    return storeInstance
-  }
-
-  generateActions(...actionNames) {
-    const actions = { name: 'global' }
-    return this.createActions(actionNames.reduce((obj, action) => {
-      obj[action] = utils.dispatchIdentity
+      Object.assign(obj[actionName], { type, actionName })
       return obj
-    }, actions))
+    }, {})
+
+    return (this.actions[namespace] = dispatchableActions)
   }
 
-  createAction(name, implementation, obj) {
-    return makeAction(this, 'global', name, implementation, obj)
-  }
+  createAsyncActions(namespace, actions) {
+    return Object.keys(actions).reduce((obj, actionName) => {
+      const type = `${namespace}/${actionName}`
 
-  createActions(ActionsClass, exportObj = {}, ...argsForConstructor) {
-    const actions = {}
-    const key = utils.uid(
-      this._actionsRegistry,
-      ActionsClass.displayName || ActionsClass.name || 'Unknown'
-    )
+      const dispatch = (payload, opt) => {
+        const meta = {}
+        if (opt.loading) meta.loading = true
+        const action = { type, payload, meta }
+        if (opt.error) action.error = true
 
-    if (fn.isFunction(ActionsClass)) {
-      fn.assign(actions, utils.getPrototypeChain(ActionsClass))
-      class ActionsGenerator extends ActionsClass {
-        constructor(...args) {
-          super(...args)
-        }
-
-        generateActions(...actionNames) {
-          actionNames.forEach((actionName) => {
-            actions[actionName] = utils.dispatchIdentity
-          })
-        }
+        this.publish(action)
+        return action
       }
 
-      fn.assign(actions, new ActionsGenerator(...argsForConstructor))
-    } else {
-      fn.assign(actions, ActionsClass)
+      obj[actionName] = (...args) => {
+        const payload = actions[actionName](...args)
+
+        dispatch(null, { loading: true })
+
+        return Promise.resolve(payload).then(
+          result => dispatch(result, {}),
+          error => dispatch(error, { error: true })
+        )
+      }
+      Object.assign(obj[actionName], { type, actionName })
+      return obj
+    }, {})
+  }
+
+  generateActions(namespace, actionNames) {
+    const arr = Array.isArray(actionNames) ? actionNames : [actionNames]
+    return this.createActions(namespace, arr.reduce((obj, name) => {
+      obj[name] = dispatchIdentity
+      return obj
+    }, {}))
+  }
+
+  createStore(displayName, model) {
+    const bus = transmitter()
+
+    const runLifecycle = (name, action) => {
+      if (!model.lifecycle[name]) return
+      model.lifecycle[name].publish({ state: model.state, action })
     }
 
-    this.actions[key] = this.actions[key] || {}
-
-    fn.eachObject((actionName, action) => {
-      if (!fn.isFunction(action)) {
-        exportObj[actionName] = action
-        return
+    // will attempt to dispatch unless an error is encountered
+    // it will try to call the lifecycle method for errors if it exists
+    const tryDispatching = (dispatch) => {
+      model._noChange = false
+      try {
+        return dispatch()
+      } catch (e) {
+        if (model.lifecycle.error) {
+          runLifecycle('error', e)
+        } else {
+          throw e
+        }
       }
+    }
 
-      // create the action
-      exportObj[actionName] = makeAction(
-        this,
-        key,
-        actionName,
-        action,
-        exportObj
-      )
+    const dispatch = (action) => {
+      // make sure that we don't emit a change unless we've actually attempted
+      // to handle a dispatch
+      model._noChange = true
 
-      // generate a constant
-      const constant = utils.formatAsConstant(actionName)
-      exportObj[constant] = exportObj[actionName].id
-    }, [actions])
+      // run the lifecycle methods for before & after the dispatch
+      runLifecycle('beforeEach', action)
 
-    return exportObj
-  }
-
-  takeSnapshot(...storeNames) {
-    const state = StateFunctions.snapshot(this, storeNames)
-    fn.assign(this._lastSnapshot, state)
-    return this.serialize(state)
-  }
-
-  rollback() {
-    StateFunctions.setAppState(
-      this,
-      this.serialize(this._lastSnapshot),
-      storeInst => {
-        storeInst.lifecycle('rollback')
-        storeInst.emitChange()
+      // handle the action if we're listening to it directly
+      // also handle the 'otherwise' case which acts as a "default"
+      // and also support 'reduce' use case which returns the next state and
+      // replaces the state
+      if (model.dispatchHandlers[action.type]) {
+        tryDispatching(() => {
+          model.dispatchHandlers[action.type].publish(action.payload, action)
+        })
+      } else if (model.otherwise) {
+        tryDispatching(() => {
+          model.otherwise(action.payload, action)
+        })
       }
-    )
-  }
-
-  recycle(...storeNames) {
-    const initialSnapshot = storeNames.length
-      ? StateFunctions.filterSnapshots(
-          this,
-          this._initSnapshot,
-          storeNames
-        )
-      : this._initSnapshot
-
-    StateFunctions.setAppState(
-      this,
-      this.serialize(initialSnapshot),
-      (storeInst) => {
-        storeInst.lifecycle('init')
-        storeInst.emitChange()
+      if (model.reduce) {
+        tryDispatching(() => {
+          const value = model.reduce(model.state, action)
+          if (value !== undefined) model.state = value
+        })
       }
-    )
-  }
+      runLifecycle('afterEach', action)
 
-  flush() {
-    const state = this.serialize(StateFunctions.snapshot(this))
-    this.recycle()
-    return state
-  }
+      return model.state
+    }
 
-  bootstrap(data) {
-    StateFunctions.setAppState(this, data, (storeInst, state) => {
-      storeInst.lifecycle('bootstrap', state)
-      storeInst.emitChange()
+    const emitChange = () => model._noChange || bus.publish(model.state)
+
+    // the internal reference to this store's methods where we can get the
+    // state, run lifecycle methods, bootstrap its internal state, and call
+    // dispatches
+    this[STORES_REF].push({
+      displayName,
+
+      setState: nextState => model.state = nextState,
+
+      getState: () => ({ state: model.state }),
+
+      runLifecycle,
+
+      initialState: this.serialize({ state: model.state }),
+
+      // dispatching...
+      dispatch,
+
+      // change emitter
+      emitChange,
+    })
+
+    // the public interface, just getState and subscribe
+    return (this.stores[displayName] = {
+      displayName,
+
+      dispatch,
+
+      getState: () => model.state,
+
+      subscribe: (f) => {
+        const sub = bus.subscribe(f)
+        return {
+          dispose() {
+            runLifecycle('unlisten')
+            sub.dispose()
+          },
+        }
+      },
+
+      destroy: () => {
+        this[STORES_REF] = this[STORES_REF]
+          .filter(store => store.displayName !== displayName)
+        delete this.stores[displayName]
+      },
     })
   }
 
-  prepare(storeInst, payload) {
-    const data = {}
-    if (!storeInst.displayName) {
-      throw new ReferenceError('Store provided does not have a name')
-    }
-    data[storeInst.displayName] = payload
-    return this.serialize(data)
+  load(snapshot) {
+    const obj = typeof snapshot === 'string' ? this.deserialize(snapshot) : snapshot
+
+    this[STORES_REF].forEach((store) => {
+      if (obj.hasOwnProperty(store.displayName)) {
+        store.setState(obj[store.displayName])
+        store.runLifecycle('load')
+      }
+    })
   }
 
-  // Instance type methods for injecting alt into your application as context
-
-  addActions(name, ActionsClass, ...args) {
-    this.actions[name] = Array.isArray(ActionsClass)
-      ? this.generateActions.apply(this, ActionsClass)
-      : this.createActions(ActionsClass, ...args)
+  save(storeNames) {
+    return this.serialize(this[STORES_REF].reduce((obj, store) => {
+      if (!storeNames || storeNames.hasOwnProperty(store.displayName)) {
+        obj[store.displayName] = store.getState().state
+        store.runLifecycle('save')
+      }
+      return obj
+    }, {}))
   }
 
-  addStore(name, StoreModel, ...args) {
-    this.createStore(StoreModel, name, ...args)
+  flush(storeNames) {
+    const snapshot = this.save(storeNames)
+    this[STORES_REF].forEach((store) => {
+      if (!storeNames || storeNames.hasOwnProperty(store.displayName)) {
+        store.setState(this.deserialize(store.initialState).state)
+      }
+    })
+    return snapshot
   }
 
-  getActions(name) {
-    return this.actions[name]
-  }
-
-  getStore(name) {
-    return this.stores[name]
-  }
-
-  static debug(name, alt, win) {
+  static debug(name, alt) {
     const key = 'alt.js.org'
-    let context = win
-    if (!context && typeof window !== 'undefined') {
-      context = window
-    }
-    if (typeof context !== 'undefined') {
-      context[key] = context[key] || []
-      context[key].push({ name, alt })
+    if (typeof window !== 'undefined') {
+      if (!window[key]) window[key] = []
+      window[key].push({ name, alt })
     }
     return alt
   }
 }
+
+Alt.Store = Store
 
 export default Alt

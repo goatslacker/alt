@@ -1,5 +1,42 @@
 # Changelog
 
+## 1.0.0
+
+### Breaking Changes
+
+1. no more recycle, use flush
+2. takeSnapshot -> save
+3. bootstrap -> load
+4. generateActions takes in an Array
+5. createActions just takes in a POJO now
+6. dispatchIdentity no longer takes a splat? maybe? check splat arg support for node6
+7. otherwise's 2nd argument is now the entire action
+8. no more config dispatcher, or serialize, or deserialize (is this good?)
+9. no more listen/unlisten
+10. no createAction
+11. no getActions/getStore
+12. no dispatcher, its all transmitter now
+13. no dispatch undefined action warnings
+14. no defer
+15. no more promises being returned from actions
+16. purely FSA
+17. no more sources
+18. different interface for stores
+19. createActions now takes 2 args, string name and then the actions obj
+20. createStore now takes 2 args, string name and then the store instance
+21. POJO stores are set up differently
+22. lifecycle method afterEach kicks in BEFORE change event is emitted to all stores
+23. changes emitted after recycle, flush, etc...
+24. lifecycle changes when unlisten/listen?
+25. no export public methods
+26. no more store configs (STORES NEED CONFIG) onSerialize should be renamed to onSave, and onDeserialize should be onLoad
+27. no more flux, no more waitFor
+28. you can no longer emit a change yourself from a store
+29. no more UPPER_CASE_CONSTANTS
+30. no more colliding names are resolved automatically. you pass in your own name
+31. generateActions/createActions on the same namespace overwrites the actions
+32. lifecycle methods get different args...
+
 ## 0.18.4
 
 * Upgrades babel and enables loose mode so IE10 can work again.

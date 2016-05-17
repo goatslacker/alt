@@ -1,52 +1,58 @@
 import Alt from '../'
 import { assert } from 'chai'
-import isPromise from 'is-promise'
 
 const alt = new Alt()
 
-const actions = alt.createActions(class AsyncActions {
-  static displayName = 'AsyncActions';
-  fetch() {
-    return Promise.resolve('foo')
-  }
-
-  fetchAndDispatch() {
-    return (dispatch) => {
-      dispatch()
-      return Promise.resolve('foo')
-    }
-  }
+const actions = alt.createAsyncActions('AsyncActions', {
+  ok: () => Promise.resolve(1),
+  notOk: () => Promise.reject(0),
 })
 
-const store = alt.createStore(class FooStore {
-  static displayName = 'FooStore';
+class FooStore extends Alt.Store {
   constructor() {
-    this.dispatched = false
+    super()
+    this.state = {
+      success: false,
+      error: false,
+      loading: false,
+    }
+
     this.bindActions(actions)
   }
-  onFetch() {
-    this.dispatched = true
+
+  ok(payload, action) {
+    if (!action.meta.loading && !action.error) {
+      this.setState({ success: true })
+    }
+    this.setState({ loading: !!action.meta.loading, error: !!action.error })
   }
-  onFetchAndDispatch() {
-    this.dispatched = true
+
+  notOk(payload, action) {
+    this.setState({ loading: !!action.meta.loading, error: !!action.error })
   }
-})
+}
+
+const store = alt.createStore('FooStore', new FooStore())
 
 export default {
   'async actions': {
     afterEach() {
-      alt.recycle(store)
+      alt.flush(store)
     },
 
-    'are not dispatched automatically'() {
-      actions.fetch()
-      assert(store.state.dispatched === false, 'async action is not automatically dispatched')
+    'dispatched whenever a success is received'() {
+      const res = actions.ok().then(() => {
+        assert.isTrue(store.getState().success)
+      })
+      assert.isFalse(store.getState().success, 'async action is not automatically dispatched')
+      assert.isTrue(store.getState().loading, 'loading has been set to true')
+      return res
     },
 
-    'return the result of inner function invocation'() {
-      const promise = actions.fetchAndDispatch()
-      assert(isPromise(promise), 'async action does not return the result of inner function invocation')
-      assert(store.state.dispatched === true, 'async action is dispatched when the dispatch is invoked manually')
+    'errors are dispatched too with FSA semantics'() {
+      return actions.notOk().catch(() => {
+        assert.isTrue(store.getState().error)
+      })
     },
   },
 }

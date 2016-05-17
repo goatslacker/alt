@@ -1,6 +1,6 @@
 import { assert } from 'chai'
-import * as fn from '../lib/functions'
-import Alt from '../dist/alt-with-runtime'
+import * as fn from '../lib/utils'
+import Alt from '../'
 
 const alt = new Alt()
 
@@ -36,8 +36,9 @@ export default {
 
   'can bootstrap a store with/without frozen state': {
     'normal store state can be bootstrapped'() {
-      class NonFrozenStore {
+      class NonFrozenStore extends Alt.Store {
         constructor() {
+          super()
           this.state = {
             foo: 'bar',
           }
@@ -46,22 +47,17 @@ export default {
         }
       }
 
-      alt.createStore(NonFrozenStore, 'NonFrozenStore', alt)
-      alt.bootstrap('{"NonFrozenStore": {"foo":"bar2"}}')
+      alt.createStore('NonFrozenStore', new NonFrozenStore())
+      alt.load('{"NonFrozenStore": {"foo":"bar2"}}')
 
-      const myStore = alt.getStore('NonFrozenStore')
+      const myStore = alt.stores.NonFrozenStore
       assert(myStore.getState().foo === 'bar2', 'State was bootstrapped with updated bar')
     },
 
     'frozen store state can be bootstrapped'() {
-      class FrozenStateStore {
+      class FrozenStateStore extends Alt.Store {
         constructor() {
-          this.config = {
-            onDeserialize: (data) => {
-              Object.freeze(data)
-              return data
-            },
-          }
+          super()
 
           this.state = {
             foo: 'bar',
@@ -73,10 +69,10 @@ export default {
         }
       }
 
-      alt.createStore(FrozenStateStore, 'FrozenStateStore', alt)
-      alt.bootstrap('{"FrozenStateStore": {"foo":"bar2"}}')
+      alt.createStore('FrozenStateStore', new FrozenStateStore())
+      alt.load('{"FrozenStateStore": {"foo":"bar2"}}')
 
-      const myStore = alt.getStore('FrozenStateStore')
+      const myStore = alt.stores.FrozenStateStore
       assert(myStore.getState().foo === 'bar2', 'State was bootstrapped with updated bar')
     },
   },

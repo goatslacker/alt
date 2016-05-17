@@ -1,11 +1,12 @@
 import assert from 'assert'
 import Alt from '../'
+import storeFromObject from '../lib/compat/storeFromObject'
 
 import * as StoreModel from './helpers/SaaM'
 
 const alt = new Alt()
-const actions = alt.generateActions('increment')
-const store = alt.createStore(StoreModel)
+const actions = alt.generateActions('', ['increment'])
+const store = alt.createStore('store', storeFromObject(StoreModel))
 
 export default {
   'Stores as a Module': {
