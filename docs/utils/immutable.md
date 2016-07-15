@@ -15,11 +15,11 @@ We will focus on Facebook's [Immutable](http://facebook.github.io/immutable-js/)
 
 Alt has first-class support for immutable data structures via the ImmutableUtil.
 
-Getting started is simple, you'll require the utility and pass your pre-wrapped stores to it.
+Getting started is simple, you'll `npm install alt-utils`, require the utility and pass your pre-wrapped stores to it.
 
 ```js
 var alt = new Alt();
-var immutable = require('alt/utils/ImmutableUtil');
+var immutable = require('alt-utils/lib/ImmutableUtil');
 ```
 
 If you're using babel with ES7 Stage 1 [decorator](https://github.com/wycats/javascript-decorators) support then this is sweet.
