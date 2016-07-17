@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.18.5
+
+* Updates transmitter which fixes #665
+
 ## 0.18.4
 
 * Upgrades babel and enables loose mode so IE10 can work again.
