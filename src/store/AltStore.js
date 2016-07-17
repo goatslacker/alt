@@ -6,7 +6,7 @@ class AltStore {
     const lifecycleEvents = model.lifecycleEvents
     this.transmitter = transmitter()
     this.lifecycle = (event, x) => {
-      if (lifecycleEvents[event]) lifecycleEvents[event].push(x)
+      if (lifecycleEvents[event]) lifecycleEvents[event].publish(x)
     }
     this.state = state
 
@@ -16,10 +16,11 @@ class AltStore {
     this.boundListeners = model.boundListeners
     this.StoreModel = StoreModel
     this.reduce = model.reduce || (x => x)
+    this.subscriptions = []
 
     const output = model.output || (x => x)
 
-    this.emitChange = () => this.transmitter.push(output(this.state))
+    this.emitChange = () => this.transmitter.publish(output(this.state))
 
     const handleDispatch = (f, payload) => {
       try {
@@ -88,13 +89,19 @@ class AltStore {
 
   listen(cb) {
     if (!fn.isFunction(cb)) throw new TypeError('listen expects a function')
-    this.transmitter.subscribe(cb)
-    return () => this.unlisten(cb)
+    const { dispose } = this.transmitter.subscribe(cb)
+    this.subscriptions.push({ cb, dispose })
+    return () => {
+      this.lifecycle('unlisten')
+      dispose()
+    }
   }
 
   unlisten(cb) {
     this.lifecycle('unlisten')
-    this.transmitter.unsubscribe(cb)
+    this.subscriptions
+      .filter(subscription => subscription.cb === cb)
+      .forEach(subscription => subscription.dispose())
   }
 
   getState() {

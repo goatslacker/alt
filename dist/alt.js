@@ -1333,7 +1333,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var lifecycleEvents = model.lifecycleEvents;
 	    this.transmitter = (0, _transmitter2.default)();
 	    this.lifecycle = function (event, x) {
-	      if (lifecycleEvents[event]) lifecycleEvents[event].push(x);
+	      if (lifecycleEvents[event]) lifecycleEvents[event].publish(x);
 	    };
 	    this.state = state;
 
@@ -1345,13 +1345,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this.reduce = model.reduce || function (x) {
 	      return x;
 	    };
+	    this.subscriptions = [];
 
 	    var output = model.output || function (x) {
 	      return x;
 	    };
 
 	    this.emitChange = function () {
-	      return _this.transmitter.push(output(_this.state));
+	      return _this.transmitter.publish(output(_this.state));
 	    };
 
 	    var handleDispatch = function handleDispatch(f, payload) {
@@ -1424,9 +1425,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var _this2 = this;
 
 	      if (!fn.isFunction(cb)) throw new TypeError('listen expects a function');
-	      this.transmitter.subscribe(cb);
+
+	      var _transmitter$subscrib = this.transmitter.subscribe(cb);
+
+	      var dispose = _transmitter$subscrib.dispose;
+
+	      this.subscriptions.push({ cb: cb, dispose: dispose });
 	      return function () {
-	        return _this2.unlisten(cb);
+	        _this2.lifecycle('unlisten');
+	        dispose();
 	      };
 	    }
 
@@ -1436,7 +1443,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  AltStore.prototype.unlisten = function () {
 	    function unlisten(cb) {
 	      this.lifecycle('unlisten');
-	      this.transmitter.unsubscribe(cb);
+	      this.subscriptions.filter(function (subscription) {
+	        return subscription.cb === cb;
+	      }).forEach(function (subscription) {
+	        return subscription.dispose();
+	      });
 	    }
 
 	    return unlisten;
@@ -1460,49 +1471,58 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 11 */
 /***/ function(module, exports) {
 
-	'use strict';
+	"use strict";
 
 	function transmitter() {
 	  var subscriptions = [];
-	  var pushing = false;
-	  var toUnsubscribe = [];
+	  var nowDispatching = false;
+	  var toUnsubscribe = {};
 
 	  var unsubscribe = function unsubscribe(onChange) {
-	    if (pushing) {
-	      toUnsubscribe.push(onChange);
+	    var id = subscriptions.indexOf(onChange);
+	    if (id < 0) return;
+	    if (nowDispatching) {
+	      toUnsubscribe[id] = onChange;
 	      return;
 	    }
-	    var id = subscriptions.indexOf(onChange);
-	    if (id >= 0) subscriptions.splice(id, 1);
+	    subscriptions.splice(id, 1);
 	  };
 
 	  var subscribe = function subscribe(onChange) {
-	    subscriptions.push(onChange);
+	    var id = subscriptions.push(onChange);
 	    var dispose = function dispose() {
 	      return unsubscribe(onChange);
 	    };
 	    return { dispose: dispose };
 	  };
 
-	  var push = function push(value) {
-	    if (pushing) throw new Error('Cannot push while pushing');
-	    pushing = true;
+	  var publish = function publish() {
+	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	      args[_key] = arguments[_key];
+	    }
+
+	    nowDispatching = true;
 	    try {
-	      subscriptions.forEach(function (subscription) {
-	        return subscription(value);
+	      subscriptions.forEach(function (subscription, id) {
+	        return toUnsubscribe[id] || subscription.apply(undefined, args);
 	      });
 	    } finally {
-	      pushing = false;
-	      toUnsubscribe = toUnsubscribe.filter(unsubscribe);
+	      nowDispatching = false;
+	      Object.keys(toUnsubscribe).forEach(function (id) {
+	        return unsubscribe(toUnsubscribe[id]);
+	      });
+	      toUnsubscribe = {};
 	    }
 	  };
 
-	  return { subscribe: subscribe, push: push, unsubscribe: unsubscribe, subscriptions: subscriptions };
+	  return {
+	    publish: publish,
+	    subscribe: subscribe,
+	    $subscriptions: subscriptions
+	  };
 	}
 
 	module.exports = transmitter;
-
-
 
 /***/ },
 /* 12 */
