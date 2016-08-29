@@ -23,7 +23,7 @@ export function getPrototypeChain(Obj, methods = {}) {
     ? methods
     : getPrototypeChain(
         Object.getPrototypeOf(Obj),
-        fn.assign(methods, getInternalMethods(Obj, true))
+        fn.assign(getInternalMethods(Obj, true), methods)
       )
 }
 
