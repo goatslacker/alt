@@ -219,7 +219,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  Alt.prototype.createAction = function () {
 	    function createAction(name, implementation, obj) {
-	      return (0, _actions2.default)(this, 'global', name, implementation, obj);
+	      return (0, _actions2['default'])(this, 'global', name, implementation, obj);
 	    }
 
 	    return createAction;
@@ -285,7 +285,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        // create the action
-	        exportObj[actionName] = (0, _actions2.default)(_this3, key, actionName, action, exportObj);
+	        exportObj[actionName] = (0, _actions2['default'])(_this3, key, actionName, action, exportObj);
 
 	        // generate a constant
 	        var constant = utils.formatAsConstant(actionName);
@@ -436,7 +436,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return Alt;
 	}();
 
-	exports.default = Alt;
+	exports['default'] = Alt;
 	module.exports = exports['default'];
 
 /***/ },
@@ -697,14 +697,103 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	// shim for using process in browser
-
 	var process = module.exports = {};
+
+	// cached from whatever global is present so that test runners that stub it
+	// don't break things.  But we need to wrap it in a try catch in case it is
+	// wrapped in strict mode code which doesn't define any globals.  It's inside a
+	// function because try/catches deoptimize in certain engines.
+
+	var cachedSetTimeout;
+	var cachedClearTimeout;
+
+	function defaultSetTimout() {
+	    throw new Error('setTimeout has not been defined');
+	}
+	function defaultClearTimeout () {
+	    throw new Error('clearTimeout has not been defined');
+	}
+	(function () {
+	    try {
+	        if (typeof setTimeout === 'function') {
+	            cachedSetTimeout = setTimeout;
+	        } else {
+	            cachedSetTimeout = defaultSetTimout;
+	        }
+	    } catch (e) {
+	        cachedSetTimeout = defaultSetTimout;
+	    }
+	    try {
+	        if (typeof clearTimeout === 'function') {
+	            cachedClearTimeout = clearTimeout;
+	        } else {
+	            cachedClearTimeout = defaultClearTimeout;
+	        }
+	    } catch (e) {
+	        cachedClearTimeout = defaultClearTimeout;
+	    }
+	} ())
+	function runTimeout(fun) {
+	    if (cachedSetTimeout === setTimeout) {
+	        //normal enviroments in sane situations
+	        return setTimeout(fun, 0);
+	    }
+	    // if setTimeout wasn't available but was latter defined
+	    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+	        cachedSetTimeout = setTimeout;
+	        return setTimeout(fun, 0);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedSetTimeout(fun, 0);
+	    } catch(e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+	            return cachedSetTimeout.call(null, fun, 0);
+	        } catch(e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+	            return cachedSetTimeout.call(this, fun, 0);
+	        }
+	    }
+
+
+	}
+	function runClearTimeout(marker) {
+	    if (cachedClearTimeout === clearTimeout) {
+	        //normal enviroments in sane situations
+	        return clearTimeout(marker);
+	    }
+	    // if clearTimeout wasn't available but was latter defined
+	    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+	        cachedClearTimeout = clearTimeout;
+	        return clearTimeout(marker);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedClearTimeout(marker);
+	    } catch (e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+	            return cachedClearTimeout.call(null, marker);
+	        } catch (e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+	            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+	            return cachedClearTimeout.call(this, marker);
+	        }
+	    }
+
+
+
+	}
 	var queue = [];
 	var draining = false;
 	var currentQueue;
 	var queueIndex = -1;
 
 	function cleanUpNextTick() {
+	    if (!draining || !currentQueue) {
+	        return;
+	    }
 	    draining = false;
 	    if (currentQueue.length) {
 	        queue = currentQueue.concat(queue);
@@ -720,7 +809,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (draining) {
 	        return;
 	    }
-	    var timeout = setTimeout(cleanUpNextTick);
+	    var timeout = runTimeout(cleanUpNextTick);
 	    draining = true;
 
 	    var len = queue.length;
@@ -737,7 +826,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    currentQueue = null;
 	    draining = false;
-	    clearTimeout(timeout);
+	    runClearTimeout(timeout);
 	}
 
 	process.nextTick = function (fun) {
@@ -749,7 +838,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    queue.push(new Item(fun, args));
 	    if (queue.length === 1 && !draining) {
-	        setTimeout(drainQueue, 0);
+	        runTimeout(drainQueue);
 	    }
 	};
 
@@ -1020,7 +1109,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 
 	function createPrototype(proto, alt, key, extras) {
-	  return fn.assign(proto, _StoreMixin2.default, {
+	  return fn.assign(proto, _StoreMixin2['default'], {
 	    displayName: key,
 	    alt: alt,
 	    dispatcher: alt.dispatcher,
@@ -1097,23 +1186,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // bind the store listeners
 	  /* istanbul ignore else */
 	  if (StoreProto.bindListeners) {
-	    _StoreMixin2.default.bindListeners.call(StoreProto, StoreProto.bindListeners);
+	    _StoreMixin2['default'].bindListeners.call(StoreProto, StoreProto.bindListeners);
 	  }
 	  /* istanbul ignore else */
 	  if (StoreProto.observe) {
-	    _StoreMixin2.default.bindListeners.call(StoreProto, StoreProto.observe(alt));
+	    _StoreMixin2['default'].bindListeners.call(StoreProto, StoreProto.observe(alt));
 	  }
 
 	  // bind the lifecycle events
 	  /* istanbul ignore else */
 	  if (StoreProto.lifecycle) {
 	    fn.eachObject(function (eventName, event) {
-	      _StoreMixin2.default.on.call(StoreProto, eventName, event);
+	      _StoreMixin2['default'].on.call(StoreProto, eventName, event);
 	    }, [StoreProto.lifecycle]);
 	  }
 
 	  // create the instance and fn.assign the public methods to the instance
-	  storeInstance = fn.assign(new _AltStore2.default(alt, StoreProto, StoreProto.state !== undefined ? StoreProto.state : {}, StoreModel), StoreProto.publicMethods, {
+	  storeInstance = fn.assign(new _AltStore2['default'](alt, StoreProto, StoreProto.state !== undefined ? StoreProto.state : {}, StoreModel), StoreProto.publicMethods, {
 	    displayName: key,
 	    config: StoreModel.config
 	  });
@@ -1174,7 +1263,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  /* istanbul ignore next */
 	  if (config.datasource) store.registerAsync(config.datasource);
 
-	  storeInstance = fn.assign(new _AltStore2.default(alt, store, store.state !== undefined ? store.state : store, StoreModel), utils.getInternalMethods(StoreModel), config.publicMethods, { displayName: key });
+	  storeInstance = fn.assign(new _AltStore2['default'](alt, store, store.state !== undefined ? store.state : store, StoreModel), utils.getInternalMethods(StoreModel), config.publicMethods, { displayName: key });
 
 	  return storeInstance;
 	}
@@ -1185,11 +1274,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 	exports.getInternalMethods = getInternalMethods;
 	exports.getPrototypeChain = getPrototypeChain;
 	exports.warn = warn;
@@ -1226,7 +1316,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function getPrototypeChain(Obj) {
 	  var methods = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
 
-	  return Obj === Function.prototype ? methods : getPrototypeChain(Object.getPrototypeOf(Obj), fn.assign(methods, getInternalMethods(Obj, true)));
+	  return Obj === Function.prototype ? methods : getPrototypeChain(Object.getPrototypeOf(Obj), fn.assign(getInternalMethods(Obj, true), methods));
 	}
 
 	function warn(msg) {
@@ -1331,7 +1421,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _classCallCheck(this, AltStore);
 
 	    var lifecycleEvents = model.lifecycleEvents;
-	    this.transmitter = (0, _transmitter2.default)();
+	    this.transmitter = (0, _transmitter2['default'])();
 	    this.lifecycle = function (event, x) {
 	      if (lifecycleEvents[event]) lifecycleEvents[event].publish(x);
 	    };
@@ -1464,7 +1554,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return AltStore;
 	}();
 
-	exports.default = AltStore;
+	exports['default'] = AltStore;
 	module.exports = exports['default'];
 
 /***/ },
@@ -1689,7 +1779,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  on: function () {
 	    function on(lifecycleEvent, handler) {
 	      if (lifecycleEvent === 'error') this.handlesOwnErrors = true;
-	      var bus = this.lifecycleEvents[lifecycleEvent] || (0, _transmitter2.default)();
+	      var bus = this.lifecycleEvents[lifecycleEvent] || (0, _transmitter2['default'])();
 	      this.lifecycleEvents[lifecycleEvent] = bus;
 	      return bus.subscribe(handler.bind(this));
 	    }
@@ -1763,7 +1853,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }()
 	};
 
-	exports.default = StoreMixin;
+	exports['default'] = StoreMixin;
 	module.exports = exports['default'];
 
 /***/ },
@@ -1813,7 +1903,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var actionResult = invocationResult;
 
 	    // async functions that return promises should not be dispatched
-	    if (invocationResult !== undefined && !(0, _isPromise2.default)(invocationResult)) {
+	    if (invocationResult !== undefined && !(0, _isPromise2['default'])(invocationResult)) {
 	      if (fn.isFunction(invocationResult)) {
 	        // inner function result should be returned as an action result
 	        actionResult = invocationResult(dispatch, alt);
