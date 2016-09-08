@@ -73,7 +73,7 @@ class AltStore {
       if (model.reduce) {
         handleDispatch(() => {
           const value = model.reduce(this.state, payload)
-          if (value !== undefined) this.state = value
+          if (value !== undefined) this.state = model.state = value
         }, payload)
         if (!this.preventDefault) this.emitChange()
       }
