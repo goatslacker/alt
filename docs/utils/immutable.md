@@ -97,7 +97,7 @@ Last but not least, snapshots and bootstrapping just works when you're using thi
 
 #### `Record`
 
-One of the easiest ways to start getting some of the benefits of immutable is to take advantage of Immutable's [`Record`](http://facebook.github.io/immutable-js/docs/#/Record) types. This method will result in the smallest changes for existing projects. You can read more about them on Facebook's docs, but the best thing about Records is that they enable you to access values the same way you would from a normal JS object (`object.prop`). This means no changes to the view code using the immutable data and our changes only occur in store methods that return data to the view.
+One of the easiest ways to start getting some of the benefits of immutable is to take advantage of Immutable's [`Record`](http://facebook.github.io/immutable-js/docs/#/Record) types. This method will result in the smallest changes for existing projects. You can read more about them on Facebook's docs, but the best thing about Records is that they enable you to access values the same way you would from a normal JS object (`object.prop`). This means no changes to the view code using the immutable data and our changes only occur in store methods that return data to the view. 
 
 Here is an example of how a Record can be used:
 
@@ -131,6 +131,16 @@ class MyComponent extends Component {
     );
   }
 }
+```
+
+Keep in mind that your listeners to store changes will keep receiving the _mutable_ version of the store state because of the implemenation of [`emitChange`](https://github.com/goatslacker/alt/blob/f4de73d6c5d71b4edc7c89c8eddef04dd0be1e6a/src/store/AltStore.js#L22)
+
+```js
+    MyStore.listen(this.onMyStoreChange);
+    ...
+    onMyStoreChange(storeNewState){
+        //storeNewState is not a Record and therefore mutable!
+    }
 ```
 
 #### `fromJS`
