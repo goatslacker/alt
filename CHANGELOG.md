@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.18.6
+
+* Fixes inheritance for actions #678
+
 ## 0.18.5
 
 * Updates transmitter which fixes #665
