@@ -53,8 +53,7 @@ class MyActions {
 
 }
 
-const myActions = {}
-alt.createActions(MyActions, myActions)
+const myActions = alt.createActions(MyActions)
 
 const objActions = alt.createActions({
   hello() { },

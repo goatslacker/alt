@@ -59,7 +59,6 @@
     "coverage": "npm run transpile-cover && babel-node node_modules/.bin/istanbul cover node_modules/.bin/_mocha -- -u exports -R tap --require test/babel test",
     "lint": "eslint src components",
     "postversion": "git push && git push --tags",
-    "prepublish": "npm run lint && npm run build",
     "pretest": "npm run clean && npm run transpile",
     "preversion": "npm run clean && npm run lint",
     "release": "npm run build && mversion patch -m",
