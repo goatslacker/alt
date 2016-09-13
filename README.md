@@ -19,6 +19,11 @@ Check out the [API Reference](http://alt.js.org/docs/) for full in-depth docs. F
 * Extremely [flexible](#flexibility) and unopinionated in how you use flux. Create traditional singletons or use dependency injection.
 * It is terse. No boilerplate.
 
+### Installation
+```bash
+npm install --save alt
+```
+
 ### What does it look like?
 
 Alt
