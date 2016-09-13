@@ -7,7 +7,7 @@ const builtInProto = Object.getOwnPropertyNames(NoopClass.prototype)
 
 export function getInternalMethods(Obj, isProto) {
   const excluded = isProto ? builtInProto : builtIns
-  const obj = isProto ? Obj.prototype : Obj
+  const obj = isProto && typeof Obj === 'function' ? Obj.prototype : Obj
   return Object.getOwnPropertyNames(obj).reduce((value, m) => {
     if (excluded.indexOf(m) !== -1) {
       return value
@@ -19,10 +19,10 @@ export function getInternalMethods(Obj, isProto) {
 }
 
 export function getPrototypeChain(Obj, methods = {}) {
-  return Obj === Function.prototype
+  return Obj === Object.prototype
     ? methods
     : getPrototypeChain(
-        Object.getPrototypeOf(Obj),
+        Object.getPrototypeOf((typeof Obj === 'function') ? Obj.prototype : Obj),
         fn.assign(getInternalMethods(Obj, true), methods)
       )
 }
