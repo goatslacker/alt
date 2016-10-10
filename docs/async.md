@@ -9,9 +9,12 @@ permalink: /docs/async/
 
 A common question for newcomers to flux is "where do I put my async code?". While kicking off the request in your actions, stores, or a util class is ok, the most important thing is how you handle your request. Handling a request should only be done via actions, this ensures that it goes through the dispatcher and that the data flow remains uni-directional.
 
-Alt has this concept called data sources which set up an easy way for you to handle your CRUD operations while keeping best practices. We prefer that you tie these pieces of logic to your stores. Why? Because sometimes you need partial state data in order to compose a request. The data source enforces that you handle the asynchronous responses through actions, and gives you access to store state so you can compose your request.
+Alt has this concept called data sources which set up an easy way for you to handle Reads of your CRUD operations while keeping best practices. We prefer that you tie these pieces of logic to your stores. Why? Because sometimes you need partial state data in order to compose a request. The data source enforces that you handle the asynchronous responses through actions, and gives you access to store state so you can compose your request.
 
-Important note: data sources work with Promises. Make sure you have a Promise polyfill loaded in the browser if you plan on shipping to browsers that don't natively support Promises.
+Important notes:
+
+  - Data sources work with Promises. Make sure you have a Promise polyfill loaded in the browser if you plan on shipping to browsers that don't natively support Promises.
+  - Data sources don't apply to write operations (CUD). For such operations, [Action Creators](/docs/actions) would be an appropriate place to handle them.
 
 ### What it looks like
 
