@@ -39,8 +39,7 @@ const replaceFunction = (j, p) => {
     p.value.params,
     j.blockStatement([
       j.returnStatement(
-        j.functionExpression(
-          null,
+        j.arrowFunctionExpression(
           [j.identifier('dispatch')],
           j.blockStatement(p.value.body.body)
         )
