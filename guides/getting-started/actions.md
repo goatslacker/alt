@@ -14,7 +14,7 @@ We create an action by creating a class, the class' prototype methods will becom
 Whatever value you return from your action will be sent through the Dispatcher and onto the stores. Finally, make sure you export the created actions using `alt.createActions`.
 
 When you create a camelCase function like `updateLocations`, it will be available via:
-- `LocationActions.UPDATE_LOCATION` (camelCase to SCREAMING_SNAKE_CASE)
+- `LocationActions.UPDATE_LOCATIONS` (camelCase to SCREAMING_SNAKE_CASE)
 - `LocationActions.updateLocations`
 
 ---
