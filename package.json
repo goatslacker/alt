@@ -12,7 +12,7 @@
   "devDependencies": {
     "alt-search-docs": "1.0.6",
     "babel-cli": "6.6.5",
-    "babel-core": "6.7.4",
+    "babel-core": "6.21.0",
     "babel-eslint": "5.0.0",
     "babel-loader": "6.2.4",
     "babel-plugin-add-module-exports": "^0.1.2",

@@ -6,12 +6,13 @@ import sinon from 'sinon'
 import TestUtils from 'react-addons-test-utils'
 import ReactDom from 'react-dom'
 
-// TOOD action was called but not dispatched?
 const Actions = {
   buttonClick() {
     setTimeout(() => {
       this.switchComponent()
     }, 10)
+
+    return null
   },
 
   switchComponent() {
