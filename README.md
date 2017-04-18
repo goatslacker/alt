@@ -215,7 +215,7 @@ You won't need an [es6-shim](https://github.com/paulmillr/es6-shim) but you can 
 Alt does depend on ES5 features, the good news is so does React. You can use [es5-shim](https://github.com/es-shims/es5-shim)
 to support those pesky old browsers.
 
-##Typescript Definitions and Support
+## Typescript Definitions and Support
 The typescript definitions for alt are located in the typings directory. This should be included in your project under typings/alt or whatever folder you use to manage your definitions files. You can import the dependencies react and es6-promises, easily with [TSD](https://github.com/DefinitelyTyped/tsd). From here you can reference your typings as per usual with a reference tag ```<reference path="<path>.d.ts" />```. Check the [alt-typescript-tutorial](https://github.com/Shearerbeard/alt-typescript-tutorial) for more information and project examples.
 
 Using Typescript 1.5 you can import with the legacy syntax:
