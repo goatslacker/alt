@@ -1,6 +1,0 @@
-sudo: false
-language: node_js
-script: npm run lint && npm run coverage
-after_script: cat ./coverage/lcov.info | coveralls
-node_js:
-  - "stable"
