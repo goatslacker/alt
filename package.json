@@ -1,0 +1,50 @@
+{
+  "name": "alt",
+  "version": "2.0.0",
+  "description": "A server/browser library for managing state within complex JavaScript applications",
+  "main": "src/alt.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "redux": "^3.7.2",
+    "redux-pack": "^0.1.5",
+    "transmitter": "^3.0.1"
+  },
+  "devDependencies": {
+    "ava": "^0.22.0",
+    "gitbook-cli": "^2.3.2",
+    "nyc": "^11.1.0",
+    "sinon": "^3.2.1"
+  },
+  "scripts": {
+    "lint": "eslint src --ext=.js",
+    "report": "rm -rf coverage && nyc report --reporter=html",
+    "test": "NODE_ENV=development nyc ava test/*-test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/goatslacker/alt.git"
+  },
+  "keywords": [
+    "state",
+    "store",
+    "dispatcher",
+    "actions",
+    "flux",
+    "react",
+    "universal",
+    "isomorphic"
+  ],
+  "author": "Josh Perez <josh@goatslacker.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/goatslacker/alt/issues"
+  },
+  "files": [
+    "README.md",
+    "src",
+    "test"
+  ],
+  "homepage": "https://github.com/goatslacker/alt#readme"
+}
