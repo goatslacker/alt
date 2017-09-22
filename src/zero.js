@@ -39,11 +39,7 @@ function addCompatBranch(alt, branch, reducer) {
     },
   }
 
-  return Object.assign(
-    branchAccessor,
-    addonPublicMethods,
-    addonListeners
-  )
+  return Object.assign(branchAccessor, addonPublicMethods, addonListeners)
 }
 
 function compatReduxReducer(branch, getContext) {
@@ -137,11 +133,8 @@ class AltZero extends Alt {
 
   createAwfulStore(Store, namespace, ...args) {
     const branch = AltZero.storeToBranchDefinition(Store, namespace, args)
-    return addCompatBranch(
-      this,
-      branch,
-      compatReduxReducer(branch, x => x.state)
-    )
+    const reducer = compatReduxReducer(branch, x => x.state)
+    return addCompatBranch(this, branch, reducer)
   }
 
   flush() {
@@ -226,16 +219,14 @@ AltZero.Store = class extends Alt.Branch {
 
         const intercept = spec.interceptResponse || (x => x)
 
-        const makeActionHandler = (action, isError) => {
-          return (x) => {
-            const fire = () => {
-              loadCounter -= 1
-              action(intercept(x, action, args))
-              if (isError) throw x
-              return x
-            }
-            return fire()
+        const makeActionHandler = (action, isError) => x => {
+          const fire = () => {
+            loadCounter -= 1
+            action(intercept(x, action, args))
+            if (isError) throw x
+            return x
           }
+          return fire()
         }
 
         // if we don't have it in cache then fetch it
@@ -243,10 +234,10 @@ AltZero.Store = class extends Alt.Branch {
           loadCounter += 1
           /* istanbul ignore else */
           if (spec.loading) spec.loading(intercept(null, spec.loading, args))
-          return spec.remote(state, ...args).then(
-            makeActionHandler(spec.success),
-            makeActionHandler(spec.error, 1)
-          )
+          const successHandler = makeActionHandler(spec.success)
+          const failureHandler = makeActionHandler(spec.error, 1)
+          return spec.remote(state, ...args)
+            .then(successHandler, failureHandler)
         }
 
         // otherwise emit the change now

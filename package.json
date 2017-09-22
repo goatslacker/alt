@@ -13,12 +13,16 @@
   },
   "devDependencies": {
     "ava": "^0.22.0",
+    "eslint-config-airbnb": "^15.1.0",
+    "eslint-plugin-jsx-a11y": "^5.1.1",
+    "eslint-plugin-react": "^7.3.0",
     "gitbook-cli": "^2.3.2",
     "nyc": "^11.1.0",
-    "sinon": "^3.2.1"
+    "sinon": "^3.2.1",
+    "xo": "^0.18.2"
   },
   "scripts": {
-    "lint": "eslint src --ext=.js",
+    "lint": "xo src/*.js",
     "report": "rm -rf coverage && nyc report --reporter=html",
     "test": "NODE_ENV=development nyc ava test/*-test.js"
   },
@@ -46,5 +50,17 @@
     "src",
     "test"
   ],
+  "xo": {
+    "extends": "airbnb",
+    "rules": {
+      "arrow-parens": 0,
+      "no-param-reassign": 0,
+      "no-prototype-builtins": 0,
+      "semi": 0,
+      "unicorn/catch-error-name": 0,
+      "unicorn/explicit-length-check": 0,
+      "unicorn/filename-case": 0
+    }
+  },
   "homepage": "https://github.com/goatslacker/alt#readme"
 }

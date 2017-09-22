@@ -13,7 +13,7 @@ function notifyActionHandled(branch) {
 }
 
 function setBatchedState(branch) {
-  Object.assign.apply(Object, [branch.state].concat(branch[BATCHED_STATE]))
+  Object.assign(...[branch.state].concat(branch[BATCHED_STATE]))
   branch[BATCHED_STATE] = []
 }
 
@@ -31,15 +31,15 @@ module.exports = class {
 
   respondTo(responseMap) {
     Object.keys(responseMap).forEach(responderName => {
-      if (Array.isArray(responseMap[responderName])) {
-        responseMap[responderName].forEach(actionDispatcher => (
-          this.setActionResponder(actionDispatcher, () => this[responderName])
+      const listOfActionDetails = responseMap[responderName]
+
+      if (Array.isArray(listOfActionDetails)) {
+        listOfActionDetails.forEach(actionDetails => (
+          this.setActionResponder(actionDetails, () => this[responderName])
         ))
       } else {
-        this.setActionResponder(
-          responseMap[responderName],
-          () => this[responderName]
-        )
+        const actionDetails = listOfActionDetails
+        this.setActionResponder(actionDetails, () => this[responderName])
       }
     })
   }
@@ -70,7 +70,7 @@ module.exports = class {
     const { actionDetails } = actionDispatcher
 
     if (typeof actionDetails !== 'object') {
-      throw new Error(`Action dispatcher is unknown`)
+      throw new ReferenceError('Action dispatcher is unknown')
     }
 
     const { name, type } = actionDetails
@@ -79,7 +79,7 @@ module.exports = class {
     if (responder === DONT_HANDLE) return
 
     if (typeof responder !== 'function') {
-      throw new Error(`Action responder does not exist in branch (name "${name}", type "${type}")`)
+      throw new ReferenceError(`Action responder does not exist in branch (name "${name}", type "${type}")`)
     }
 
     if (!this.responders[type]) this.responders[type] = new Set()

@@ -65,7 +65,7 @@ function createAD(namespace, name, getPayload, dispatcher) {
   const type = `${namespace}/${name}`
 
   const actionDispatcher = (...args) => {
-    const payload = getPayload.apply(null, args)
+    const payload = getPayload(...args)
 
     if (payload === PREVENT_DISPATCH) {
       return null
@@ -89,14 +89,11 @@ function emptyReducer() { }
 
 class Alt {
   constructor(middleware = []) {
+    const storeEnhancer = applyMiddleware(reduxPack, ...middleware)
     this.branches = {}
     this.initialState = {}
     this.reducers = {}
-    this.store = createStore(
-      emptyReducer,
-      {},
-      applyMiddleware(reduxPack, ...middleware)
-    )
+    this.store = createStore(emptyReducer, {}, storeEnhancer)
   }
 
   generateActionDispatchers(...actionDispatchers) {
@@ -175,7 +172,7 @@ class Alt {
 Alt.ASYNC_DISPATCH = ASYNC_DISPATCH
 Alt.PREVENT_DISPATCH = PREVENT_DISPATCH
 
-Alt.getActionCreators = function getActionCreators(namespace, actionCreators) {
+Alt.getActionCreators = function (namespace, actionCreators) {
   return Object.keys(actionCreators).reduce((obj, name) => (
     Object.assign(obj, {
       [name]: createAD(namespace, name, actionCreators[name], {
@@ -185,7 +182,7 @@ Alt.getActionCreators = function getActionCreators(namespace, actionCreators) {
   ), {})
 }
 
-Alt.asyncDispatch = function asyncDispatch(promisable, lifecycleCallbacks) {
+Alt.asyncDispatch = function (promisable, lifecycleCallbacks) {
   return {
     type: Alt.ASYNC_DISPATCH,
     promise: Promise.resolve(promisable),
