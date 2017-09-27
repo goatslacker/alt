@@ -13,7 +13,7 @@ function notifyActionHandled(branch) {
 }
 
 function setBatchedState(branch) {
-  Object.assign(...[branch.state].concat(branch[BATCHED_STATE]))
+  branch.state = Object.assign(...[{}, branch.state].concat(branch[BATCHED_STATE]))
   branch[BATCHED_STATE] = []
 }
 
@@ -84,6 +84,10 @@ module.exports = class {
 
     if (!this.responders[type]) this.responders[type] = new Set()
     this.responders[type].add(responder)
+  }
+
+  mutate(state, nextState) {
+    return Object.assign({}, state, nextState)
   }
 
   setState(overrideState) {

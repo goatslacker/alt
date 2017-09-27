@@ -40,23 +40,30 @@ function isPack(action) {
   )
 }
 
+function applyNextState(state, branch, applyState) {
+  if (state) branch.state = state
+  applyState()
+  branch[FLUSH_STATE]()
+}
+
 function reduxReducer(branch) {
   return (state, action) => {
-    if (state) branch.state = state
-
     if (action.type === '@@alt/load' && action.payload[branch.namespace]) {
-      branch.state = action.payload[branch.namespace]
-    } else if (branch.responders[action.type]) {
-      branch.responders[action.type].forEach(responder => (
-        responder.async
-          ? handleAsyncState(branch.state, action, responder.async)
-          : responder.call(branch, action.payload, action)
-      ))
-      branch[FLUSH_STATE]()
-    } else if (branch.otherwise) {
-      branch.otherwise(action)
-      branch[FLUSH_STATE]()
+      return action.payload[branch.namespace]
     }
+
+    if (branch.responders[action.type]) {
+      applyNextState(state, branch, () => (
+        branch.responders[action.type].forEach(responder => (
+          responder.async
+            ? handleAsyncState(branch.state, action, responder.async)
+            : responder.call(branch, action.payload, action)
+        ))
+      ))
+    } else if (branch.otherwise) {
+      applyNextState(state, branch, () => branch.otherwise(action))
+    }
+
     return branch.state
   }
 }
