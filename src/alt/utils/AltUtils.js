@@ -62,6 +62,12 @@ export function fsa(id, type, payload, details) {
   }
 }
 
+export function construct(Target, argumentsList) {
+  return typeof Reflect !== 'undefined'
+    ? Reflect.construct(Target, argumentsList)
+    : new Target(...argumentsList)
+}
+
 export function dispatch(id, actionObj, payload, alt) {
   const data = actionObj.dispatch(payload)
   if (data === undefined) return null

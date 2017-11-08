@@ -143,7 +143,7 @@ export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
     },
   })
 
-  const store = new Store(...argsForClass)
+  const store = utils.construct(Store, argsForClass)
 
   if (config.bindListeners) store.bindListeners(config.bindListeners)
   if (config.datasource) store.registerAsync(config.datasource)

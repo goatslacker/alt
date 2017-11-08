@@ -121,7 +121,7 @@ class Alt {
         }
       }
 
-      fn.assign(actions, new ActionsGenerator(...argsForConstructor))
+      fn.assign(actions, utils.construct(ActionsGenerator, argsForConstructor))
     } else {
       fn.assign(actions, ActionsClass)
     }
