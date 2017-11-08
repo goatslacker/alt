@@ -8,3 +8,5 @@ utils/*
 flux.js
 flux-build.js
 flux-build.min.js
+package-lock.json
+examples
