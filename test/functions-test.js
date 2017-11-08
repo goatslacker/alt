@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import * as fn from '../lib/functions'
+import * as fn from '../utils/functions'
 import Alt from '../dist/alt-with-runtime'
 
 const alt = new Alt()
