@@ -91,7 +91,7 @@ DispatcherRecorder.prototype.replay = function replay(replayTime, done) {
     }
   }
 
-  let next = done || () => {}
+  let next = done || (() => {})
   let i = this.events.length - 1
   while (i >= 0) {
     const event = this.events[i]
