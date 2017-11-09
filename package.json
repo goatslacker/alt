@@ -52,9 +52,9 @@
     "url": "https://github.com/ryank311/alt.git"
   },
   "authors": [
-    "Ryan King <ryan.king@epicgames.com>",
     "Josh Perez <josh@goatslacker.com>",
-    "Jonathan Lehman <jonathan.lehman91@gmail.com>"
+    "Jonathan Lehman <jonathan.lehman91@gmail.com>",
+    "Ryan King <ryan.king@epicgames.com>"
   ],
   "license": "MIT",
   "scripts": {
