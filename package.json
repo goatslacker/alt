@@ -1,7 +1,7 @@
 {
   "name": "alt",
   "version": "1.0.0",
-  "description": "A modern update to alt's flux implementation",
+  "description": "A flux implementation",
   "main": "lib",
   "jsnext:main": "src",
   "dependencies": {
