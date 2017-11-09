@@ -1,7 +1,4 @@
-# modern-alt
-
-### Forked from [alt](https://github.com/goatslacker/alt) and modernized
-We rely pretty heavily on using alt for our flux implementation and rather than trying to switch everything over to redux, we decided that it's best for us (and possibly the community) to fork alt and modernize it with the latest react/babel/webpack niceties.  Given that the old alt implementation has basically been abandoned, we are trying to maintain this fork and keep it up to date, and eventually make it compatible with React 16+
+# alt
 
 Check out the [API Reference](http://alt.js.org/docs/) for full in-depth docs. For a high-level walk-through on flux, take a look at the [Getting Started](http://alt.js.org/guide/) guide. What follows below applies only to the master branch of `alt` and not the latest distribution. Any questions? ask in the gitter room.
 

@@ -1468,7 +1468,7 @@ var AltStore = function () {
 
                 if (actionHandlers) {
                     result = handleDispatch(function () {
-                        actionHandlers.filter(Boolean).every(function (handler) {
+                        return actionHandlers.filter(Boolean).every(function (handler) {
                             return handler.call(model, payload.data, payload.action) !== false;
                         });
                     }, payload);

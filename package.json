@@ -1,6 +1,6 @@
 {
-  "name": "modern-alt",
-  "version": "1.10.0",
+  "name": "alt",
+  "version": "1.0.0",
   "description": "A modern update to alt's flux implementation",
   "main": "lib",
   "jsnext:main": "src",
