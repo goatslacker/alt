@@ -1,5 +1,5 @@
 {
-  "presets": ["airbnb", "stage-0"],
+  "presets": ["env", "babel-preset-react", "babel-preset-stage-0"],
   "plugins": [
     "add-module-exports",
     "transform-class-properties",

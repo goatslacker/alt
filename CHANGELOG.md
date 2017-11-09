@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0
+
+* Upgrade babel, webpack, react versions to latest
+
 ## 0.18.6
 
 * Fixes inheritance for actions #678

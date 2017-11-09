@@ -5,12 +5,15 @@
     "browser": true,
     "es6": true
   },
-  "parser": "babel-eslint",
-  "ecmaFeatures": {
-    "modules": true,
-    "jsx": true
-  },
   "rules": {
-    "semi": [2, "never"],
-  }
+    "indent": [1, 4, {
+      "SwitchCase": 1
+    }],
+    "arrow-body-style": [2, "always"],
+    "class-methods-use-this": 0,
+    "no-console": 0,
+    "no-prototype-builtins": 0,
+    "no-underscore-dangle": 0
+  },
+  "parser": "babel-eslint"
 }
