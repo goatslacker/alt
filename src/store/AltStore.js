@@ -2,110 +2,110 @@ import transmitter from 'transmitter';
 import * as fn from '../functions';
 
 class AltStore {
-    constructor(alt, model, state, StoreModel) {
-        const lifecycleEvents = model.lifecycleEvents;
-        this.transmitter = transmitter();
-        this.lifecycle = (event, x) => {
-            if (lifecycleEvents[event]) lifecycleEvents[event].publish(x);
-        };
-        this.state = state;
+  constructor(alt, model, state, StoreModel) {
+    const lifecycleEvents = model.lifecycleEvents;
+    this.transmitter = transmitter();
+    this.lifecycle = (event, x) => {
+      if (lifecycleEvents[event]) lifecycleEvents[event].publish(x);
+    };
+    this.state = state;
 
-        this.alt = alt;
-        this.preventDefault = false;
-        this.displayName = model.displayName;
-        this.boundListeners = model.boundListeners;
-        this.StoreModel = StoreModel;
-        this.reduce = model.reduce || ((x) => { return x; });
-        this.subscriptions = [];
+    this.alt = alt;
+    this.preventDefault = false;
+    this.displayName = model.displayName;
+    this.boundListeners = model.boundListeners;
+    this.StoreModel = StoreModel;
+    this.reduce = model.reduce || ((x) => { return x; });
+    this.subscriptions = [];
 
-        const output = model.output || ((x) => { return x; });
+    const output = model.output || ((x) => { return x; });
 
-        this.emitChange = () => { return this.transmitter.publish(output(this.state)); };
+    this.emitChange = () => { return this.transmitter.publish(output(this.state)); };
 
-        const handleDispatch = (f, payload) => {
-            try {
-                return f();
-            } catch (e) {
-                if (model.handlesOwnErrors) {
-                    this.lifecycle('error', {
-                        error: e,
-                        payload,
-                        state: this.state
-                    });
-                    return false;
-                }
+    const handleDispatch = (f, payload) => {
+      try {
+        return f();
+      } catch (e) {
+        if (model.handlesOwnErrors) {
+          this.lifecycle('error', {
+            error: e,
+            payload,
+            state: this.state
+          });
+          return false;
+        }
 
-                throw e;
-            }
-        };
+        throw e;
+      }
+    };
 
-        fn.assign(this, model.publicMethods);
+    fn.assign(this, model.publicMethods);
 
-        // Register dispatcher
-        this.dispatchToken = alt.dispatcher.register((payload) => {
-            this.preventDefault = false;
+    // Register dispatcher
+    this.dispatchToken = alt.dispatcher.register((payload) => {
+      this.preventDefault = false;
 
-            this.lifecycle('beforeEach', {
-                payload,
-                state: this.state
+      this.lifecycle('beforeEach', {
+        payload,
+        state: this.state
+      });
+
+      const actionHandlers = model.actionListeners[payload.action];
+
+      if (actionHandlers || model.otherwise) {
+        let result;
+
+        if (actionHandlers) {
+          result = handleDispatch(() => {
+            return actionHandlers.filter(Boolean).every((handler) => {
+              return handler.call(model, payload.data, payload.action) !== false;
             });
+          }, payload);
+        } else {
+          result = handleDispatch(() => {
+            model.otherwise(payload.data, payload.action);
+          }, payload);
+        }
+        if (result !== false && !this.preventDefault) this.emitChange();
+      }
 
-            const actionHandlers = model.actionListeners[payload.action];
+      if (model.reduce) {
+        handleDispatch(() => {
+          const value = model.reduce(this.state, payload);
+          if (value !== undefined) this.state = value;
+        }, payload);
+        if (!this.preventDefault) this.emitChange();
+      }
 
-            if (actionHandlers || model.otherwise) {
-                let result;
+      this.lifecycle('afterEach', {
+        payload,
+        state: this.state
+      });
+    });
 
-                if (actionHandlers) {
-                    result = handleDispatch(() => {
-                        return actionHandlers.filter(Boolean).every((handler) => {
-                            return handler.call(model, payload.data, payload.action) !== false;
-                        });
-                    }, payload);
-                } else {
-                    result = handleDispatch(() => {
-                        model.otherwise(payload.data, payload.action);
-                    }, payload);
-                }
-                if (result !== false && !this.preventDefault) this.emitChange();
-            }
+    this.lifecycle('init');
+  }
 
-            if (model.reduce) {
-                handleDispatch(() => {
-                    const value = model.reduce(this.state, payload);
-                    if (value !== undefined) this.state = value;
-                }, payload);
-                if (!this.preventDefault) this.emitChange();
-            }
+  listen(cb) {
+    if (!fn.isFunction(cb)) throw new TypeError('listen expects a function');
+    const { dispose } = this.transmitter.subscribe(cb);
+    this.subscriptions.push({ cb, dispose });
+    return () => {
+      this.lifecycle('unlisten');
+      dispose();
+    };
+  }
 
-            this.lifecycle('afterEach', {
-                payload,
-                state: this.state
-            });
-        });
+  unlisten(cb) {
+    this.lifecycle('unlisten');
+    this.subscriptions
+      .filter((subscription) => { return subscription.cb === cb; })
+      .forEach((subscription) => { return subscription.dispose(); });
+  }
 
-        this.lifecycle('init');
-    }
-
-    listen(cb) {
-        if (!fn.isFunction(cb)) throw new TypeError('listen expects a function');
-        const { dispose } = this.transmitter.subscribe(cb);
-        this.subscriptions.push({ cb, dispose });
-        return () => {
-            this.lifecycle('unlisten');
-            dispose();
-        };
-    }
-
-    unlisten(cb) {
-        this.lifecycle('unlisten');
-        this.subscriptions
-            .filter((subscription) => { return subscription.cb === cb; })
-            .forEach((subscription) => { return subscription.dispose(); });
-    }
-
-    getState() {
-        return this.StoreModel.config.getState.call(this, this.state);
-    }
+  getState() {
+    return this.StoreModel.config.getState.call(this, this.state);
+  }
 }
 
 export default AltStore;

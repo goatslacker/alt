@@ -64,7 +64,7 @@
     "clean": "rimraf lib",
     "coverage": "npm run transpile-cover && babel-node node_modules/.bin/istanbul cover node_modules/.bin/_mocha -- -u exports -R tap --require test/babel test",
     "lint": "eslint src components",
-    "lint-fix": "eslint --fix src components",
+    "lint-fix": "eslint --fix src test scripts",
     "postversion": "git push && git push --tags",
     "prepublish": "npm run lint && npm run build",
     "pretest": "npm run clean && npm run transpile",

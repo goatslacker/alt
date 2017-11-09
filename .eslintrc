@@ -6,9 +6,6 @@
     "es6": true
   },
   "rules": {
-    "indent": [1, 4, {
-      "SwitchCase": 1
-    }],
     "comma-dangle": [2, "never"],
     "arrow-body-style": [2, "always"],
     "class-methods-use-this": 0,
