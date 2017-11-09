@@ -3475,10 +3475,6 @@ rc@^1.1.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-react-addons-test-utils@~15.6.2:
-  version "15.6.2"
-  resolved "http://nexus-server-01.ol.epicgames.net:8081/nexus/content/groups/npm-all/react-addons-test-utils/-/react-addons-test-utils-15.6.2.tgz#c12b6efdc2247c10da7b8770d185080a7b047156"
-
 react-dom@~15.6.2:
   version "15.6.2"
   resolved "http://nexus-server-01.ol.epicgames.net:8081/nexus/content/groups/npm-all/react-dom/-/react-dom-15.6.2.tgz#41cfadf693b757faf2708443a1d1fd5a02bef730"

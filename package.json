@@ -36,7 +36,6 @@
     "mocha": "^2.2.4",
     "object-assign": "^2.0.0",
     "react": "~15.6.2",
-    "react-addons-test-utils": "~15.6.2",
     "react-dom": "~15.6.2",
     "rimraf": "^2.3.2",
     "sinon": "^1.14.0",
