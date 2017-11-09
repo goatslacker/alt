@@ -35,9 +35,9 @@
     "lunr": "^0.5.9",
     "mocha": "^2.2.4",
     "object-assign": "^2.0.0",
-    "react": "0.14.0",
-    "react-addons-test-utils": "0.14.0",
-    "react-dom": "0.14.0",
+    "react": "~15.6.2",
+    "react-addons-test-utils": "~15.6.2",
+    "react-dom": "~15.6.2",
     "rimraf": "^2.3.2",
     "sinon": "^1.14.0",
     "style-loader": "^0.13.0",
@@ -45,9 +45,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/goatslacker/alt.git"
+    "url": "https://github.com/ryank311/alt.git"
   },
   "authors": [
+    "Ryan King <ryan.king@epicgames.com>",
     "Josh Perez <josh@goatslacker.com>",
     "Jonathan Lehman <jonathan.lehman91@gmail.com>"
   ],

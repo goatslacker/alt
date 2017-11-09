@@ -2,7 +2,6 @@ import { jsdom } from 'jsdom'
 import Alt from '../'
 import React from 'react'
 import { assert } from 'chai'
-import sinon from 'sinon'
 import TestUtils from 'react-addons-test-utils'
 import ReactDom from 'react-dom'
 
@@ -20,7 +19,7 @@ const Actions = {
 
   uhoh() {
     return null
-  }
+  },
 }
 
 function Store(actions) {
@@ -45,9 +44,8 @@ class ComponentA extends React.Component {
   render() {
     if (this.state.active) {
       return <ComponentB alt={this.props.alt} callback={this.props.callback} />
-    } else {
-      return <div />
     }
+    return <div />
   }
 }
 
