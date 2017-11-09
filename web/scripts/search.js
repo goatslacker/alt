@@ -5,10 +5,10 @@ import ReactDOM from 'react-dom'; //eslint-disable-line
 const github = /goatslacker.github.io\/alt/;
 
 if (github.test(location.href)) {
-    location.href = location.href.replace(github, 'alt.js.org');
+  location.href = location.href.replace(github, 'alt.js.org');
 }
 
 ReactDOM.render(
   <SearchApp url="/assets/search.json" />,
-    document.getElementById('alt-search-app')
+  document.getElementById('alt-search-app')
 );
