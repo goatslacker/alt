@@ -37,7 +37,7 @@ function createPrototype(proto, alt, key, extras) {
         lifecycleEvents: {},
         actionListeners: {},
         publicMethods: {},
-        handlesOwnErrors: false,
+        handlesOwnErrors: false
     }, extras);
 }
 
@@ -56,7 +56,7 @@ export function createStoreConfig(globalConfig, StoreModel) {
                 return fn.assign(currentState, nextState);
             }
             return nextState;
-        },
+        }
     }, globalConfig, StoreModel.config);
 }
 
@@ -73,7 +73,7 @@ export function createStoreFromObject(alt, StoreModel, key) {
         },
         setState(nextState) {
             doSetState(this, storeInstance, nextState);
-        },
+        }
     }, StoreModel));
 
     // bind the store listeners
@@ -111,7 +111,7 @@ export function createStoreFromObject(alt, StoreModel, key) {
         StoreProto.publicMethods,
         {
             displayName: key,
-            config: StoreModel.config,
+            config: StoreModel.config
         },
     );
 
@@ -134,7 +134,7 @@ export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
         },
         setState(nextState) {
             doSetState(this, storeInstance, nextState);
-        },
+        }
     });
 
     const store = new Store(...argsForClass);

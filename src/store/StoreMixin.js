@@ -81,7 +81,7 @@ const StoreMixin = {
 
         this.exportPublicMethods(toExport);
         this.exportPublicMethods({
-            isLoading: () => { return loadCounter > 0; },
+            isLoading: () => { return loadCounter > 0; }
         });
     },
 
@@ -159,7 +159,7 @@ const StoreMixin = {
                 this.bindAction(symbol, listener);
             }
         }, [obj]);
-    },
+    }
 };
 
 export default StoreMixin;

@@ -31,7 +31,7 @@ class MyActions {
     justTestingInternalActions() {
         return {
             updateThree: this.updateThree,
-            updateName: this.updateName,
+            updateName: this.updateName
         };
     }
 
@@ -57,7 +57,7 @@ alt.createActions(MyActions, myActions);
 
 const objActions = alt.createActions({
     hello() { },
-    world() { },
+    world() { }
 });
 
 const myShorthandActions = alt.generateActions('actionOne', 'actionTwo');
@@ -79,7 +79,7 @@ class MyStore {
         this.async = false;
 
         this.exportPublicMethods({
-            externalMethodNoStatic: this.externalMethodNoStatic,
+            externalMethodNoStatic: this.externalMethodNoStatic
         });
 
         this._dispatcher = this.dispatcher;
@@ -135,7 +135,7 @@ class SecondStore {
 
         this.exportPublicMethods({
             externalMethodNoStatic: this.externalMethodNoStatic,
-            concatFooWithNoStatic: this.concatFooWithNoStatic,
+            concatFooWithNoStatic: this.concatFooWithNoStatic
         });
 
         this.on('init', () => {
@@ -209,7 +209,7 @@ class LifeCycleStore {
       },
       onDeserialize: (data) => {
           data.deserialized = true; //eslint-disable-line
-      },
+      }
   };
 
   constructor() {
@@ -223,7 +223,7 @@ class LifeCycleStore {
       this.bindListeners({
           test: myActions.updateName,
           test2: [myActions.updateName, myActions.updateTwo],
-          test3: myActions.updateName,
+          test3: myActions.updateName
       });
 
       this.on('init', () => {
@@ -279,7 +279,7 @@ class Model {
             x: this.x,
             y: this.y,
             sum: this.sum,
-            product: this.product,
+            product: this.product
         };
     }
 }
@@ -289,16 +289,16 @@ class InterceptSnapshotStore {
       onSerialize: (state) => {
           return {
               modelData: state.modelData.data,
-              anotherVal: state.anotherVal,
+              anotherVal: state.anotherVal
           };
       },
       onDeserialize: (data) => {
           const obj = {
               modelData: new Model({ x: data.modelData.x, y: data.modelData.y }),
-              anotherVal: data.anotherVal,
+              anotherVal: data.anotherVal
           };
           return obj;
-      },
+      }
   };
 
   constructor() {
@@ -508,9 +508,9 @@ const tests = {
                 x: 2,
                 y: 3,
                 sum: 5,
-                product: 6,
+                product: 6
             },
-            anotherVal: 11,
+            anotherVal: 11
         };
         // serializes snapshot data correctly
         assert.deepEqual(JSON.parse(snapshot).InterceptSnapshotStore, expectedSerializedData, 'interceptSnapshotStore was serialized correctly');
@@ -922,13 +922,14 @@ const tests = {
     'emit change method works from the store': (done) => {
         assert(myStore.getState().async === false, 'store async is false');
 
+        let dispose;
         const listener = () => {
             assert(myStore.getState().async === true, 'store async is true');
             dispose();
             done();
         };
 
-        const dispose = myStore.listen(listener);
+        dispose = myStore.listen(listener);
         myActions.asyncStoreAction();
     },
 
@@ -960,13 +961,14 @@ const tests = {
 
         assert(store.getState().test === false, 'test is false');
 
+        let dispose;
         const listener = () => {
             assert(store.getState().test === true, 'test is true');
             dispose();
             done();
         };
 
-        const dispose = store.listen(listener);
+        dispose = store.listen(listener);
         actions.test();
     },
 
@@ -1007,7 +1009,7 @@ const tests = {
             constructor() {
                 super();
                 this.exportPublicMethods({
-                    baseMethod: this.baseMethod,
+                    baseMethod: this.baseMethod
                 });
             }
         }
@@ -1021,7 +1023,7 @@ const tests = {
         class BadListenerStore {
             constructor() {
                 this.bindListeners({
-                    methodThatDoesNotExist: myActions.updateName,
+                    methodThatDoesNotExist: myActions.updateName
                 });
             }
         }
@@ -1033,7 +1035,7 @@ const tests = {
         class BadListenerStore {
             constructor() {
                 this.bindListeners({
-                    foo: myActions.trolololololol,
+                    foo: myActions.trolololololol
                 });
             }
 
@@ -1054,7 +1056,7 @@ const tests = {
         assert.isObject(snapshot.AltSecondStore, 'AltSecondStore exists');
 
         alt.createUnsavedStore({
-            displayName: 'NoBootstrapObject',
+            displayName: 'NoBootstrapObject'
         });
 
         snapshot = JSON.parse(alt.takeSnapshot());
@@ -1086,9 +1088,9 @@ const tests = {
             displayName: 'just testing',
             state: { x: 0 },
             bindListeners: {
-                hello: action,
+                hello: action
             },
-            hello(x) { this.state.x = x; },
+            hello(x) { this.state.x = x; }
         });
 
         assert.isFunction(action, 'action was created');
@@ -1112,7 +1114,7 @@ const tests = {
             fire() {
                 setTimeout(() => {
                     this.setState({
-                        test: true,
+                        test: true
                     });
                 });
                 return false;
@@ -1152,7 +1154,7 @@ const tests = {
                 return (dispatch) => {
                     dispatch(x);
                 };
-            },
+            }
         });
 
         const token = alt.dispatcher.register((payload) => {
@@ -1181,8 +1183,8 @@ const tests = {
                 this.bindListeners({
                     onRefreshBalanceClaims: ImportKeysActions.saved,
                     onLoadMyAccounts: [
-                        ImportKeysActions.change, ImportKeysActions.saved,
-                    ],
+                        ImportKeysActions.change, ImportKeysActions.saved
+                    ]
                 });
             }
 
@@ -1205,7 +1207,7 @@ const tests = {
             id: 'hello',
             dispatch(data) {
                 return data;
-            },
+            }
         };
 
         const newAlt = new Alt();
@@ -1243,7 +1245,7 @@ const tests = {
             id: 'hello',
             dispatch() {
                 return (dispatch) => { return dispatch(done); };
-            },
+            }
         };
 
         const newAlt = new Alt();
@@ -1293,7 +1295,7 @@ const tests = {
         });
 
         alt.dispatch({ type: 'owl', payload: 'Tawny' });
-    },
+    }
 };
 
 export default tests;

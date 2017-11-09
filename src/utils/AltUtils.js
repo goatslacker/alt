@@ -61,13 +61,13 @@ export function fsa(id, type, payload, details) {
         payload,
         meta: {
             dispatchId: id,
-            ...details,
+            ...details
         },
 
         id,
         action: type,
         data: payload,
-        details,
+        details
     };
 }
 

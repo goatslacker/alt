@@ -9,11 +9,21 @@
     "indent": [1, 4, {
       "SwitchCase": 1
     }],
+    "comma-dangle": [2, "never"],
     "arrow-body-style": [2, "always"],
     "class-methods-use-this": 0,
     "no-console": 0,
+    "no-param-reassign": 0,
+    "func-names": 0,
+    "no-restricted-syntax": 0,
+    "no-plusplus": 0,
+    "no-continue": 0,
     "no-prototype-builtins": 0,
-    "no-underscore-dangle": 0
+    "prefer-rest-params": 0,
+    "no-unused-vars": [2, { "args": "none" }],
+    "no-underscore-dangle": 0,
+    "react/jsx-filename-extension": 0,
+    "react/forbid-prop-types": 0,
   },
   "parser": "babel-eslint"
 }

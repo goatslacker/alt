@@ -32,7 +32,7 @@ class Alt {
                 const fsaDetails = {
                     id: action.type,
                     namespace: action.type,
-                    name: action.type,
+                    name: action.type
                 };
                 return this.dispatcher.dispatch(
                     utils.fsa(id, action.type, action.payload, fsaDetails),
