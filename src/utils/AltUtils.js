@@ -13,7 +13,7 @@ export function getInternalMethods(Obj, isProto) {
       return value
     }
 
-        value[m] = obj[m]; //eslint-disable-line
+    value[m] = obj[m]; //eslint-disable-line
     return value
   }, {})
 }

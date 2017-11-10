@@ -28,7 +28,7 @@ export function snapshot(instance, storeNames = []) {
     store.lifecycle('snapshot')
     const customSnapshot = config.onSerialize &&
       config.onSerialize(store.state)
-        obj[storeName] = customSnapshot || store.getState(); //eslint-disable-line
+      obj[storeName] = customSnapshot || store.getState() //eslint-disable-line
     return obj
   }, {})
 }
@@ -37,8 +37,8 @@ export function saveInitialSnapshot(instance, key) {
   const state = instance.deserialize(
     instance.serialize(instance.stores[key].state),
   )
-    instance._initSnapshot[key] = state; //eslint-disable-line
-    instance._lastSnapshot[key] = state; //eslint-disable-line
+  instance._initSnapshot[key] = state //eslint-disable-line
+  instance._lastSnapshot[key] = state //eslint-disable-line
 }
 
 export function filterSnapshots(instance, state, stores) {
@@ -47,7 +47,7 @@ export function filterSnapshots(instance, state, stores) {
     if (!state[storeName]) {
       throw new ReferenceError(`${storeName} is not a valid store`)
     }
-        obj[storeName] = state[storeName]; //eslint-disable-line
+    obj[storeName] = state[storeName] //eslint-disable-line
     return obj
   }, {})
 }

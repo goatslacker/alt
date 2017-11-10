@@ -39,7 +39,7 @@ const StoreMixin = {
         }
       })
 
-            publicMethods[methodName] = (...args) => { //eslint-disable-line
+        publicMethods[methodName] = (...args) => { //eslint-disable-line
         const state = this.getInstance().getState()
         const value = spec.local && spec.local(state, ...args)
         const shouldFetch = spec.shouldFetch

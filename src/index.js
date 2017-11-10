@@ -91,7 +91,7 @@ class Alt {
   generateActions(...actionNames) {
     const actions = { name: 'global' }
     return this.createActions(actionNames.reduce((obj, action) => {
-            obj[action] = utils.dispatchIdentity; //eslint-disable-line
+      obj[action] = utils.dispatchIdentity; //eslint-disable-line
       return obj
     }, actions))
   }
@@ -110,7 +110,7 @@ class Alt {
     if (fn.isFunction(ActionsClass)) {
       fn.assign(actions, utils.getPrototypeChain(ActionsClass))
       class ActionsGenerator extends ActionsClass {
-                generateActions(...actionNames) { //eslint-disable-line
+        generateActions(...actionNames) {
           actionNames.forEach((actionName) => {
             actions[actionName] = utils.dispatchIdentity
           })
@@ -125,12 +125,12 @@ class Alt {
 
     fn.eachObject((actionName, action) => {
       if (!fn.isFunction(action)) {
-                exportObj[actionName] = action; //eslint-disable-line
+        exportObj[actionName] = action; //eslint-disable-line
         return
       }
 
       // create the action
-            exportObj[actionName] = makeAction( //eslint-disable-line
+      exportObj[actionName] = makeAction( //eslint-disable-line
         this,
         key,
         actionName,
@@ -140,7 +140,7 @@ class Alt {
 
       // generate a constant
       const constant = utils.formatAsConstant(actionName)
-            exportObj[constant] = exportObj[actionName].id; //eslint-disable-line
+      exportObj[constant] = exportObj[actionName].id; //eslint-disable-line
     }, [actions])
 
     return exportObj
@@ -208,7 +208,7 @@ class Alt {
 
   addActions(name, ActionsClass, ...args) {
     this.actions[name] = Array.isArray(ActionsClass)
-            ? this.generateActions.apply(this, ActionsClass) //eslint-disable-line
+      ? this.generateActions.apply(this, ActionsClass) //eslint-disable-line
       : this.createActions(ActionsClass, ...args)
   }
 

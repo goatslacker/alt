@@ -14,7 +14,7 @@ function doSetState(store, storeInstance, state) {
     ? state(storeInstance.state)
     : state
 
-    storeInstance.state = config.setState.call( //eslint-disable-line
+  storeInstance.state = config.setState.call( //eslint-disable-line
     store,
     storeInstance.state,
     nextState,
@@ -42,7 +42,7 @@ function createPrototype(proto, alt, key, extras) {
 }
 
 export function createStoreConfig(globalConfig, StoreModel) {
-    StoreModel.config = fn.assign({ //eslint-disable-line
+  StoreModel.config = fn.assign({ //eslint-disable-line
     getState(state) {
       if (Array.isArray(state)) {
         return state.slice()
