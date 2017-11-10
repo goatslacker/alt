@@ -1,12 +1,12 @@
-import { assert } from 'chai';
-import sinon from 'sinon';
-import Alt from '../';
+import { assert } from 'chai'
+import sinon from 'sinon'
+import Alt from '../'
 
-const alt = new Alt();
-const action = alt.generateActions('fire');
+const alt = new Alt()
+const action = alt.generateActions('fire')
 
-const beforeEach = sinon.spy();
-const afterEach = sinon.spy();
+const beforeEach = sinon.spy()
+const afterEach = sinon.spy()
 
 alt.createStore({
   displayName: 'Store',
@@ -23,43 +23,43 @@ alt.createStore({
   },
 
   change(x) {
-    this.setState({ a: x });
+    this.setState({ a: x })
   }
-});
+})
 
 export default {
   'Before and After hooks': {
     beforeEach() {
-      alt.recycle();
+      alt.recycle()
     },
 
     'before and after hook fire once': function () {
-      action.fire(2);
+      action.fire(2)
 
-      assert.ok(beforeEach.calledOnce);
-      assert.ok(afterEach.calledOnce);
+      assert.ok(beforeEach.calledOnce)
+      assert.ok(afterEach.calledOnce)
     },
 
     'before is called before after': function () {
-      action.fire(2);
+      action.fire(2)
 
-      assert.ok(beforeEach.calledBefore(afterEach));
-      assert.ok(afterEach.calledAfter(beforeEach));
+      assert.ok(beforeEach.calledBefore(afterEach))
+      assert.ok(afterEach.calledAfter(beforeEach))
     },
 
     'args passed in': function () {
-      action.fire(2);
+      action.fire(2)
 
-      assert.ok(beforeEach.args[0].length === 1, '1 arg is passed');
-      assert.ok(afterEach.args[0].length === 1, '1 arg is passed');
+      assert.ok(beforeEach.args[0].length === 1, '1 arg is passed')
+      assert.ok(afterEach.args[0].length === 1, '1 arg is passed')
 
-      assert.ok(beforeEach.args[0][0].payload.data === 2, 'before has payload');
-      assert.ok(afterEach.args[0][0].payload.data === 2, 'after has payload');
+      assert.ok(beforeEach.args[0][0].payload.data === 2, 'before has payload')
+      assert.ok(afterEach.args[0][0].payload.data === 2, 'after has payload')
     },
 
     'before and after get state': function () {
-      let beforeValue = null;
-      let afterValue = null;
+      let beforeValue = null
+      let afterValue = null
 
       alt.createStore({
         displayName: 'SpecialStore',
@@ -69,21 +69,21 @@ export default {
         },
         lifecycle: {
           beforeEach({ state }) {
-            beforeValue = state.a;
+            beforeValue = state.a
           },
           afterEach({ state }) {
-            afterValue = state.a;
+            afterValue = state.a
           }
         },
         change(x) {
-          this.setState({ a: x });
+          this.setState({ a: x })
         }
-      });
+      })
 
-      action.fire(2);
+      action.fire(2)
 
-      assert.ok(beforeValue === 1, 'before has current state');
-      assert.ok(afterValue === 2, 'after has next state');
+      assert.ok(beforeValue === 1, 'before has current state')
+      assert.ok(afterValue === 2, 'after has next state')
     }
   }
-};
+}

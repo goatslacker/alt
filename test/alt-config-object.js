@@ -1,20 +1,20 @@
-import { assert } from 'chai';
-import Alt from '../dist/alt-with-runtime';
+import { assert } from 'chai'
+import Alt from '../dist/alt-with-runtime'
 
 class MyActions {
   constructor() {
-    this.generateActions('changeNumber');
+    this.generateActions('changeNumber')
   }
 }
 
 class MyStore {
   constructor() {
-    this.number = 2;
-    this.letter = 'a';
+    this.number = 2
+    this.letter = 'a'
   }
 
   onChangeNumber() {
-    this.number *= 2;
+    this.number *= 2
   }
 }
 
@@ -29,44 +29,44 @@ export default {
 
     const alt = new Alt({
       dispatcher: new CustomDispatcher()
-    });
-    const dispatcher = alt.dispatcher;
+    })
+    const dispatcher = alt.dispatcher
 
     // uses custom dispatcher
-    assert.equal(typeof dispatcher.extraMethod, 'function');
-    assert.equal(typeof dispatcher.dispatch, 'function');
+    assert.equal(typeof dispatcher.extraMethod, 'function')
+    assert.equal(typeof dispatcher.dispatch, 'function')
   },
 
   'custom serialize/deserialize': function () {
     const CustomSerialize = (data) => {
       return Object.keys(data).reduce((obj, key) => {
-        obj[key] = { wrapper: data[key] };
-        return obj;
-      }, {});
-    };
+        obj[key] = { wrapper: data[key] }
+        return obj
+      }, {})
+    }
     const CustomDeserialize = (data) => {
       return Object.keys(data).reduce((obj, key) => {
-        obj[key] = data[key].wrapper;
-        return obj;
-      }, {});
-    };
+        obj[key] = data[key].wrapper
+        return obj
+      }, {})
+    }
 
     const alt = new Alt({
       serialize: CustomSerialize,
       deserialize: CustomDeserialize
-    });
-    alt.addStore('MyStore', MyStore);
-    alt.addActions('MyActions', MyActions);
-    const snapshot = alt.takeSnapshot();
-    alt.getActions('MyActions').changeNumber();
-    alt.rollback();
+    })
+    alt.addStore('MyStore', MyStore)
+    alt.addActions('MyActions', MyActions)
+    const snapshot = alt.takeSnapshot()
+    alt.getActions('MyActions').changeNumber()
+    alt.rollback()
 
-    assert.deepEqual(snapshot, { MyStore: { wrapper: { number: 2, letter: 'a' } } });
-    assert.deepEqual(alt.getStore('MyStore').getState(), { number: 2, letter: 'a' });
+    assert.deepEqual(snapshot, { MyStore: { wrapper: { number: 2, letter: 'a' } } })
+    assert.deepEqual(alt.getStore('MyStore').getState(), { number: 2, letter: 'a' })
   },
 
   'custom transforms': function () {
-    const alt = new Alt({ storeTransforms: [] });
-    assert.isArray(alt.storeTransforms);
+    const alt = new Alt({ storeTransforms: [] })
+    assert.isArray(alt.storeTransforms)
   }
-};
+}

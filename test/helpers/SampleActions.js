@@ -1,3 +1,3 @@
-import alt from './alt';
+import alt from './alt'
 
-export default alt.generateActions('fire');
+export default alt.generateActions('fire')

@@ -1,17 +1,17 @@
-import { assert } from 'chai';
-import sinon from 'sinon';
-import Alt from '../';
+import { assert } from 'chai'
+import sinon from 'sinon'
+import Alt from '../'
 
 export default {
   'Config state getter and setter': {
     'setting state': function () {
       const setState = sinon.stub().returns({
         foo: 'bar'
-      });
+      })
 
-      const alt = new Alt({ setState });
+      const alt = new Alt({ setState })
 
-      const action = alt.generateActions('fire');
+      const action = alt.generateActions('fire')
 
       const store = alt.createStore({
         displayName: 'store',
@@ -20,36 +20,36 @@ export default {
         },
         state: { x: 1 },
         fire() {
-          this.setState({ x: 2 });
+          this.setState({ x: 2 })
         }
-      });
+      })
 
-      assert(store.getState().x === 1);
+      assert(store.getState().x === 1)
 
-      action.fire();
+      action.fire()
 
-      assert.ok(setState.calledOnce);
-      assert(setState.args[0].length === 2);
-      assert(store.getState().foo === 'bar');
+      assert.ok(setState.calledOnce)
+      assert(setState.args[0].length === 2)
+      assert(store.getState().foo === 'bar')
     },
 
     'getting state': function () {
       const getState = sinon.stub().returns({
         foo: 'bar'
-      });
+      })
 
-      const alt = new Alt({ getState });
+      const alt = new Alt({ getState })
 
       const store = alt.createStore({
         displayName: 'store',
         state: { x: 1 }
-      });
+      })
 
-      assert.isUndefined(store.getState().x);
+      assert.isUndefined(store.getState().x)
 
-      assert.ok(getState.calledOnce);
-      assert(getState.args[0].length === 1);
-      assert(store.getState().foo === 'bar');
+      assert.ok(getState.calledOnce)
+      assert(getState.args[0].length === 1)
+      assert(store.getState().foo === 'bar')
     }
   }
-};
+}

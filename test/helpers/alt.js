@@ -1,3 +1,3 @@
-import Alt from '../../dist/alt-with-runtime';
+import Alt from '../../dist/alt-with-runtime'
 
-export default new Alt();
+export default new Alt()
