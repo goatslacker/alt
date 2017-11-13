@@ -1,6 +1,6 @@
-import Alt from '../'
 import { assert } from 'chai'
 import isPromise from 'is-promise'
+import Alt from '../'
 
 const alt = new Alt()
 
@@ -38,15 +38,15 @@ export default {
       alt.recycle(store)
     },
 
-    'are not dispatched automatically'() {
+    'are not dispatched automatically': function () {
       actions.fetch()
       assert(store.state.dispatched === false, 'async action is not automatically dispatched')
     },
 
-    'return the result of inner function invocation'() {
+    'return the result of inner function invocation': function () {
       const promise = actions.fetchAndDispatch()
       assert(isPromise(promise), 'async action does not return the result of inner function invocation')
       assert(store.state.dispatched === true, 'async action is dispatched when the dispatch is invoked manually')
-    },
-  },
+    }
+  }
 }

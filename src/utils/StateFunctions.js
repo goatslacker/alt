@@ -9,7 +9,7 @@ export function setAppState(instance, data, onStore) {
       const state = store.state
       if (config.onDeserialize) obj[key] = config.onDeserialize(value) || value
       if (fn.isMutableObject(state)) {
-        fn.eachObject(k => delete state[k], [state])
+        fn.eachObject((k) => { return delete state[k] }, [state])
         fn.assign(state, obj[key])
       } else {
         store.state = obj[key]
@@ -28,17 +28,17 @@ export function snapshot(instance, storeNames = []) {
     store.lifecycle('snapshot')
     const customSnapshot = config.onSerialize &&
       config.onSerialize(store.state)
-    obj[storeName] = customSnapshot ? customSnapshot : store.getState()
+      obj[storeName] = customSnapshot || store.getState() //eslint-disable-line
     return obj
   }, {})
 }
 
 export function saveInitialSnapshot(instance, key) {
   const state = instance.deserialize(
-    instance.serialize(instance.stores[key].state)
+    instance.serialize(instance.stores[key].state),
   )
-  instance._initSnapshot[key] = state
-  instance._lastSnapshot[key] = state
+  instance._initSnapshot[key] = state //eslint-disable-line
+  instance._lastSnapshot[key] = state //eslint-disable-line
 }
 
 export function filterSnapshots(instance, state, stores) {
@@ -47,7 +47,7 @@ export function filterSnapshots(instance, state, stores) {
     if (!state[storeName]) {
       throw new ReferenceError(`${storeName} is not a valid store`)
     }
-    obj[storeName] = state[storeName]
+    obj[storeName] = state[storeName] //eslint-disable-line
     return obj
   }, {})
 }

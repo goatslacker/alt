@@ -67,7 +67,7 @@ class TodoStore {
 export default alt.createStore(TodoStore, 'TodoStore');
 ```
 
-View 
+View
 
 Using the [connectToStores](https://github.com/altjs/utils/blob/master/src/connectToStores.js) util from [alt-utils](https://github.com/altjs/utils) package (`npm install alt-utils`)
 

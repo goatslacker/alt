@@ -1,6 +1,6 @@
-import Alt from '../'
 import { assert } from 'chai'
 import sinon from 'sinon'
+import Alt from '../'
 
 const alt = new Alt()
 
@@ -15,16 +15,16 @@ class MyActions {
       'moreActions3',
       'resetRecycled',
       'asyncStoreAction',
-      'updateAnotherVal'
+      'updateAnotherVal',
     )
     this.generateActions('anotherAction')
 
-    this.actionOnThis = function (x) {
+    this.actionOnThis = (x) => {
       return x
     }
   }
 
-  updateName(name) {
+    updateName(name) { //eslint-disable-line
     return name
   }
 
@@ -50,7 +50,6 @@ class MyActions {
   updateThree(a, b, c) {
     return { a, b, c }
   }
-
 }
 
 const myActions = {}
@@ -116,7 +115,7 @@ class MyStore {
   }
 
   externalMethodNoStatic() {
-   return true
+    return true
   }
 }
 
@@ -205,11 +204,11 @@ const secondStore = alt.createStore(SecondStore, 'AltSecondStore')
 class LifeCycleStore {
   static config = {
     onSerialize: (state) => {
-      state.serialized = true
+          state.serialized = true; //eslint-disable-line
       return state
     },
     onDeserialize: (data) => {
-      data.deserialized = true
+          data.deserialized = true; //eslint-disable-line
     }
   };
 
@@ -255,14 +254,14 @@ class ThirdStore {
 
   onUpdateName() {
     this.waitFor(myStore, secondStore) // Not referencing dispatchToken!
-    this.name = secondStore.getState().name + '3'
+    this.name = `${secondStore.getState().name}3`
   }
 }
 
 const thirdStore = alt.createStore(ThirdStore)
 
 class Model {
-  constructor({x, y}) {
+  constructor({ x, y }) {
     this.x = x
     this.y = y
   }
@@ -295,7 +294,7 @@ class InterceptSnapshotStore {
     },
     onDeserialize: (data) => {
       const obj = {
-        modelData: new Model({x: data.modelData.x, y: data.modelData.y}),
+        modelData: new Model({ x: data.modelData.x, y: data.modelData.y }),
         anotherVal: data.anotherVal
       }
       return obj
@@ -305,7 +304,7 @@ class InterceptSnapshotStore {
   constructor() {
     this.bindAction(myActions.updateAnotherVal, this.onUpdateAnotherVal)
 
-    this.modelData = new Model({x: 2, y: 3})
+    this.modelData = new Model({ x: 2, y: 3 })
     this.anotherVal = 5
     this.privateVal = 10
   }
@@ -340,7 +339,7 @@ const alt1 = new Alt()
 const alt2 = new Alt()
 
 function NameActions() { }
-NameActions.prototype.updateName = function (name) {
+NameActions.prototype.updateName = (name) => {
   return name
 }
 
@@ -353,7 +352,7 @@ function NameStore() {
   this.name = 'foo'
 }
 
-NameStore.prototype.onUpdateName = function (name) {
+NameStore.prototype.onUpdateName = function onUpdateName(name) {
   this.name = name
 }
 
@@ -369,10 +368,10 @@ const tests = {
     altInstance.recycle()
     alt1.recycle()
     alt2.recycle()
-    console.warn = consoleWarn
+        console.warn = consoleWarn; //eslint-disable-line
   },
 
-  'alt instance'() {
+  'alt instance': () => {
     assert.isFunction(alt.bootstrap, 'bootstrap function exists')
     assert.isObject(alt.dispatcher, 'dispatcher exists')
     assert.isFunction(alt.dispatcher.register, 'dispatcher function exists for listening to all events')
@@ -382,7 +381,7 @@ const tests = {
     assert.isObject(alt.stores.AltSecondStore, 'store exists in alt.stores')
   },
 
-  'store methods'() {
+  'store methods': () => {
     const storePrototype = Object.getPrototypeOf(myStore)
     const assertMethods = ['constructor', 'listen', 'unlisten', 'getState']
     assert.deepEqual(Object.getOwnPropertyNames(storePrototype), assertMethods, 'methods exist for store')
@@ -391,7 +390,7 @@ const tests = {
     assert.isUndefined(myStore.emit, 'event emitter methods not present')
   },
 
-  'store external methods'() {
+  'store external methods': () => {
     assert.isFunction(myStore.externalMethod, 'static methods are made available')
     assert.isFunction(myStore.externalMethodNoStatic, 'methods via mixin are made available')
     assert(myStore.externalMethod() === true, 'static methods return proper result')
@@ -404,7 +403,7 @@ const tests = {
     assert(secondStore.concatFooWithNoStatic('baz') === 'barbaz', 'static methods may be called with params too')
   },
 
-  'getting state'() {
+  'getting state': () => {
     assert.isObject(myStore.getState()._dispatcher, 'the dispatcher is exposed internally')
 
     assert(lifecycleStore.getState().bootstrapped === false, 'bootstrap has not been called yet')
@@ -415,7 +414,7 @@ const tests = {
     assert(lifecycleStore.getState().deserialized === true, 'deserialize has not been called yet')
   },
 
-  'snapshots and bootstrapping'() {
+  'snapshots and bootstrapping': () => {
     const initialSnapshot = alt.takeSnapshot()
     assert(lifecycleStore.getState().snapshotted === true, 'takeSnapshot was called and the life cycle event was triggered')
 
@@ -427,7 +426,7 @@ const tests = {
     assert(lifecycleStore.getState().deserialized === true, 'deserialize was called and the life cycle event was triggered')
   },
 
-  'existence of actions'() {
+  'existence of actions': () => {
     assert.isFunction(myActions.anotherAction, 'shorthand function created with createAction exists')
     assert.isFunction(myActions.callInternalMethod, 'shorthand function created with createActions exists')
     assert.isFunction(myActions.updateName, 'prototype defined actions exist')
@@ -440,17 +439,17 @@ const tests = {
     assert.isFunction(myActions.actionOnThis, 'actions defined in `this` are functions')
   },
 
-  'existence of constants'() {
+  'existence of constants': () => {
     assert.isDefined(myActions.UPDATE_NAME, 'a constant is created for each action')
     assert.isDefined(myActions.UPDATE_TWO, 'a constant is created for each action')
     assert.isDefined(myActions.CALL_INTERNAL_METHOD, 'a constant is created for each action')
   },
 
-  'helper functions'() {
+  'helper functions': () => {
     assert.isFunction(myActions.updateName.defer, 'actions have a defer method for async flow')
   },
 
-  'internal actions'() {
+  'internal actions': () => {
     const internalActions = myActions.justTestingInternalActions()
     assert.isFunction(internalActions.updateThree, 'actions (below) are available internally through this.actions')
     assert.isFunction(internalActions.updateName, 'actions (above) are available internally through this.actions')
@@ -464,7 +463,7 @@ const tests = {
     assert(myStore.getState().calledInternal === false, 'store has been initialized properly')
   },
 
-  'calling actions'() {
+  'calling actions': () => {
     const actionReturnType = myActions.updateName('bear')
     assert(actionReturnType === 'bear', 'action returns what is dispatched')
 
@@ -474,12 +473,12 @@ const tests = {
     assert(thirdStore.getState().name === 'bear3', 'third store gets its value from secondStore, adds 3')
   },
 
-  'calling internal methods'() {
+  'calling internal methods': () => {
     myActions.callInternalMethod()
     assert(myStore.getState().calledInternal === true, 'internal method has been called successfully by an action')
   },
 
-  'snapshotting'() {
+  snapshotting() {
     myActions.updateName('bear')
     const snapshot = alt.takeSnapshot()
     assert.isString(snapshot, 'a snapshot json is returned')
@@ -491,7 +490,7 @@ const tests = {
     assert(JSON.parse(snapshot).MyStore.name === 'bear', 'the snapshot is not affected by action')
   },
 
-  'specifying stores to snapshot'() {
+  'specifying stores to snapshot': () => {
     const snapshot = alt.takeSnapshot('MyStore', 'AltSecondStore')
     assert.deepEqual(Object.keys(JSON.parse(snapshot)), ['MyStore', 'AltSecondStore'], 'the snapshot includes specified stores')
     assert(Object.keys(JSON.parse(snapshot)).indexOf('LifeCycleStore') === -1, 'the snapshot does not include unspecified stores')
@@ -501,7 +500,7 @@ const tests = {
     assert(Object.keys(JSON.parse(snapshot2)).indexOf('LifeCycleStore') === -1, 'the snapshot does not include unspecified stores')
   },
 
-  'serializing/deserializing snapshot/bootstrap data'(){
+  'serializing/deserializing snapshot/bootstrap data': () => {
     myActions.updateAnotherVal(11)
     const snapshot = alt.takeSnapshot()
     const expectedSerializedData = {
@@ -520,14 +519,14 @@ const tests = {
     assert.deepEqual(interceptSnapshotStore.getModelData(), expectedSerializedData.modelData)
   },
 
-  'mutation'() {
+  mutation() {
     const state = myStore.getState()
     state.name = 'foobar'
     assert(state.name === 'foobar', 'mutated returned state')
     assert(myStore.getState().name === 'first', 'store state was not mutated')
   },
 
-  'rolling back'() {
+  'rolling back': () => {
     const rollbackValue = alt.rollback()
     assert(rollbackValue === undefined, 'rollback returns nothing')
 
@@ -535,13 +534,14 @@ const tests = {
     assert(lifecycleStore.getState().rollback === true, 'rollback lifecycle method was called')
 
     myActions.updateName('blossom')
-    // check that subsequent snapshots overwrite the LAST_SNAPSHOT such that they can be rolled back to
+    // check that subsequent snapshots overwrite the LAST_SNAPSHOT such that
+    // they can be rolled back to
     alt.takeSnapshot()
     alt.rollback()
     assert(myStore.getState().name === 'blossom', 'rolled back to second snapshot')
   },
 
-  'store listening'() {
+  'store listening': () => {
     const mooseChecker = (x) => {
       assert(x.name === 'moose', 'listener for store works')
       assert(myStore.getState().name === 'moose', 'new store state present')
@@ -557,7 +557,7 @@ const tests = {
     assert(myStore.getState().name === 'badger', 'new store state present')
   },
 
-  'unlistening'() {
+  unlistening() {
     assert(myStore.getState().name !== 'moose', 'state has not been updated')
 
     const mooseChecker = sinon.spy()
@@ -574,7 +574,7 @@ const tests = {
     assert.ok(mooseChecker.calledOnce)
   },
 
-  'unlisten lifecycle hook'() {
+  'unlisten lifecycle hook': () => {
     const unlistener = sinon.spy()
     class XStore {
       constructor() {
@@ -584,12 +584,12 @@ const tests = {
     const store = alt.createStore(XStore)
 
     // unlisten directly
-    store.listen(function () { })()
+    store.listen(() => { })()
 
     assert.ok(unlistener.calledOnce, 'unlisten lifecycle hook called')
   },
 
-  'bootstrapping'() {
+  bootstrapping() {
     alt.bootstrap('{"MyStore":{"name":"bee"}}')
     assert(myStore.getState().name === 'bee', 'I can bootstrap many times')
 
@@ -599,7 +599,7 @@ const tests = {
     assert(myStore.getState().name === 'monkey', 'I can bootstrap many times')
   },
 
-  'variadic actions'(done) {
+  'variadic actions': (done) => {
     myActions.updateTwo(4, 2)
     assert(secondStore.getState().foo === 6, 'im able to pass two params into an action')
 
@@ -620,13 +620,13 @@ const tests = {
     })
   },
 
-  'access of stores'() {
+  'access of stores': () => {
     assert(secondStore.foo === undefined, 'cant access state properties that live inside store')
     assert(secondStore.bindAction === undefined, 'cant access action listeners from outside store')
     assert(secondStore.bindActions === undefined, 'cant access action listeners from outside store')
   },
 
-  'deferral of actions'(done) {
+  'deferral of actions': (done) => {
     myActions.updateName('gerenuk')
     assert(myStore.getState().name === 'gerenuk', 'store state was updated properly')
     myActions.updateName.defer('marmot')
@@ -637,7 +637,7 @@ const tests = {
     })
   },
 
-  'getting instance'() {
+  'getting instance': () => {
     assert.isFunction(myActions.getInstanceInside, 'action for getting the instance inside')
     assert(secondStore.getState().instance === null, 'instance is null because it has not been set')
     myActions.getInstanceInside()
@@ -647,7 +647,7 @@ const tests = {
     assert(secondStore.getState().instance.externalMethod() === 'bar', 'calling a static method from instance and able to use this inside')
   },
 
-  'conflicting listeners on a store'() {
+  'conflicting listeners on a store': () => {
     class StoreWithManyListeners {
       constructor() {
         this.bindActions(myActions)
@@ -658,7 +658,7 @@ const tests = {
       onUpdateName() { }
     }
 
-    assert.throw(() => alt.createStore(StoreWithManyListeners), ReferenceError, 'You have multiple action handlers bound to an action: updateName and onUpdateName')
+    assert.throw(() => { return alt.createStore(StoreWithManyListeners) }, ReferenceError, 'You have multiple action handlers bound to an action: updateName and onUpdateName')
 
     class EvilStore {
       updateName() { }
@@ -673,10 +673,10 @@ const tests = {
       onUpdateName() { }
     }
 
-    assert.throw(() => alt.createStore(InnocentStore), ReferenceError, 'You have multiple action handlers bound to an action: updateName and onUpdateName')
+    assert.throw(() => { return alt.createStore(InnocentStore) }, ReferenceError, 'You have multiple action handlers bound to an action: updateName and onUpdateName')
   },
 
-  'registering invalid action handlers'() {
+  'registering invalid action handlers': () => {
     class StoreWithInvalidActionHandlers {
       constructor() {
         this.bindAction(myActions.THIS_DOES_NOT_EXIST, this.trololol)
@@ -685,7 +685,7 @@ const tests = {
       trololol() { }
     }
 
-    assert.throw(() => alt.createStore(StoreWithInvalidActionHandlers), ReferenceError, 'Invalid action reference passed in')
+    assert.throw(() => { return alt.createStore(StoreWithInvalidActionHandlers) }, ReferenceError, 'Invalid action reference passed in')
 
     class StoreWithInvalidActionHandlers2 {
       constructor() {
@@ -693,10 +693,10 @@ const tests = {
       }
     }
 
-    assert.throw(() => alt.createStore(StoreWithInvalidActionHandlers2), TypeError, 'bindAction expects a function')
+    assert.throw(() => { return alt.createStore(StoreWithInvalidActionHandlers2) }, TypeError, 'bindAction expects a function')
   },
 
-  'exporting invalid store methods'() {
+  'exporting invalid store methods': () => {
     class StoreWithInvalidExportType {
       constructor() {
         this.foo = 'bar'
@@ -704,10 +704,10 @@ const tests = {
       }
     }
 
-    assert.throw(() => alt.createStore(StoreWithInvalidExportType), TypeError, 'exportPublicMethods expects a function')
+    assert.throw(() => { return alt.createStore(StoreWithInvalidExportType) }, TypeError, 'exportPublicMethods expects a function')
   },
 
-  'waiting for nothing'() {
+  'waiting for nothing': () => {
     class WaitPlease {
       constructor() {
         this.generateActions('pleaseWait')
@@ -725,10 +725,10 @@ const tests = {
       }
     })
 
-    assert.throw(() => waiter.pleaseWait(), ReferenceError, 'Dispatch tokens not provided')
+    assert.throw(() => { return waiter.pleaseWait() }, ReferenceError, 'Dispatch tokens not provided')
   },
 
-  'cancelling emit'() {
+  'cancelling emit': () => {
     function eventEmittedFail() {
       assert(true === false, 'event was emitted but I did not want it to be')
     }
@@ -738,7 +738,7 @@ const tests = {
     assert(myStore.getState().dontEmitEventCalled === true, 'dont emit event was called successfully and event was not emitted')
   },
 
-  'multiple deferrals'(done) {
+  'multiple deferrals': (done) => {
     myActions.moreActions()
     assert(secondStore.getState().deferrals === 1, 'deferrals is initially set to 1')
     setTimeout(() => {
@@ -747,7 +747,7 @@ const tests = {
     })
   },
 
-  'recycling'() {
+  recycling() {
     alt.recycle()
     assert(myStore.getState().name === 'first', 'recycle sets the state back to its origin')
 
@@ -757,7 +757,7 @@ const tests = {
     assert(secondStore.getState().recycled === true, 'init lifecycle method was called by recycling')
   },
 
-  'flushing'() {
+  flushing() {
     myActions.updateName('goat')
     const flushed = JSON.parse(alt.flush())
     assert(myStore.getState().name === 'first', 'flush is a lot like recycle')
@@ -768,7 +768,7 @@ const tests = {
     assert(secondStore.getState().name === 'butterfly', 'I can update the state again after a flush')
   },
 
-  'recycling single store'() {
+  'recycling single store': () => {
     myActions.updateName('butterfly')
     alt.recycle('MyStore')
     assert(myStore.getState().name === 'first', 'I can recycle specific stores')
@@ -779,11 +779,11 @@ const tests = {
     assert(myStore.getState().name === 'first', 'I can recycle specific stores')
   },
 
-  'recycling invalid stores'() {
-    assert.throw(() => alt.recycle('StoreThatDoesNotExist'), ReferenceError, 'StoreThatDoesNotExist is not a valid store')
+  'recycling invalid stores': () => {
+    assert.throw(() => { return alt.recycle('StoreThatDoesNotExist') }, ReferenceError, 'StoreThatDoesNotExist is not a valid store')
   },
 
-  'alt single instances'() {
+  'alt single instances': () => {
     assert.instanceOf(altInstance, Alt, 'altInstance is an instance of alt')
     assert.isObject(altInstance.dispatcher, 'it has a dispatcher')
     assert.isFunction(altInstance.bootstrap, 'bootstrap function exists')
@@ -804,7 +804,7 @@ const tests = {
     assert(myStore.getState().name === 'first', 'and other singleton store was not affected')
   },
 
-  'multiple alt instances'() {
+  'multiple alt instances': () => {
     nameActions1.updateName('bar')
     nameActions2.updateName('baz')
 
@@ -814,18 +814,18 @@ const tests = {
     assert(myStore.getState().name === 'first', 'other singleton store not affected')
   },
 
-  'actions with the same name'() {
-    const alt = new Alt()
+  'actions with the same name': () => {
+    const newAlt = new Alt()
 
     function UserActions() {
       this.generateActions('update')
     }
-    const ua = alt.createActions(UserActions)
+    const ua = newAlt.createActions(UserActions)
 
     function LinkActions() {
       this.generateActions('update')
     }
-    const la = alt.createActions(LinkActions)
+    const la = newAlt.createActions(LinkActions)
 
     function Store() {
       this.bindAction(ua.UPDATE, this.ua)
@@ -835,15 +835,15 @@ const tests = {
       this.b = 0
     }
 
-    Store.prototype.ua = function () {
+    Store.prototype.ua = function protoUa() {
       this.a = 1
     }
 
-    Store.prototype.la = function () {
+    Store.prototype.la = function protoLa() {
       this.b = 1
     }
 
-    const store = alt.createStore(Store)
+    const store = newAlt.createStore(Store)
 
     ua.update()
     la.update()
@@ -854,17 +854,17 @@ const tests = {
     assert(state.b === 1, 'both actions were called')
   },
 
-  'actions with the same name and same class name'() {
-    const alt = new Alt()
+  'actions with the same name and same class name': () => {
+    const newAlt = new Alt()
 
-    const ua = (function () {
+    const ua = (function ua() {
       function a() { this.generateActions('update') }
-      return alt.createActions(a)
+      return newAlt.createActions(a)
     }())
 
-    const la = (function () {
+    const la = (function la() {
       function a() { this.generateActions('update') }
-      return alt.createActions(a)
+      return newAlt.createActions(a)
     }())
 
     let uaOnce = 0
@@ -890,7 +890,7 @@ const tests = {
       }
     }
 
-    const store = alt.createStore(Store)
+    const store = newAlt.createStore(Store)
 
     ua.update()
     la.update()
@@ -903,7 +903,7 @@ const tests = {
     assert.equal(laOnce, 1, 'actions only called once')
   },
 
-  'dispatching from alt instance'() {
+  'dispatching from alt instance': () => {
     const inst = new AltInstance()
     let called = false
     const listen = (x) => {
@@ -919,27 +919,28 @@ const tests = {
     assert(called === true, 'listener was called')
   },
 
-  'emit change method works from the store'(done) {
+  'emit change method works from the store': (done) => {
     assert(myStore.getState().async === false, 'store async is false')
 
+    let dispose
     const listener = () => {
       assert(myStore.getState().async === true, 'store async is true')
       dispose()
       done()
     }
 
-    const dispose = myStore.listen(listener)
+    dispose = myStore.listen(listener)
     myActions.asyncStoreAction()
   },
 
-  'emit change method works with an isolated store'(done) {
-    const alt = new Alt()
+  'emit change method works with an isolated store': (done) => {
+    const newAlt = new Alt()
 
     function Actions() {
       this.generateActions('test')
     }
 
-    const actions = alt.createActions(Actions)
+    const actions = newAlt.createActions(Actions)
 
     class Store {
       constructor() {
@@ -956,22 +957,23 @@ const tests = {
       }
     }
 
-    const store = alt.createStore(Store)
+    const store = newAlt.createStore(Store)
 
     assert(store.getState().test === false, 'test is false')
 
+    let dispose
     const listener = () => {
       assert(store.getState().test === true, 'test is true')
       dispose()
       done()
     }
 
-    const dispose = store.listen(listener)
+    dispose = store.listen(listener)
     actions.test()
   },
 
-  'extending stores'() {
-    const alt = new Alt()
+  'extending stores': () => {
+    const newAlt = new Alt()
 
     class Other {
       constructor() {
@@ -989,14 +991,14 @@ const tests = {
       }
     }
 
-    const store = alt.createStore(Store)
+    const store = newAlt.createStore(Store)
 
     assert(store.getState().foo === true, 'store inherits properties')
     assert(store.getState().bar === true, 'store properties are available')
     assert(store.getState().baz === true, 'inherited methods can be called')
   },
 
-  'exporting public method of ancestor'() {
+  'exporting public method of ancestor': () => {
     class StoreBase {
       baseMethod() {
         return true
@@ -1017,7 +1019,7 @@ const tests = {
     assert.isFunction(store.baseMethod, 'ancestor methods via export mixin are made available')
   },
 
-  'binding a listener that does not exist'() {
+  'binding a listener that does not exist': () => {
     class BadListenerStore {
       constructor() {
         this.bindListeners({
@@ -1026,10 +1028,10 @@ const tests = {
       }
     }
 
-    assert.throw(() => alt.createStore(BadListenerStore), ReferenceError, 'methodThatDoesNotExist defined but does not exist in BadListenerStore')
+    assert.throw(() => { return alt.createStore(BadListenerStore) }, ReferenceError, 'methodThatDoesNotExist defined but does not exist in BadListenerStore')
   },
 
-  'binding listeners to action that does not exist'() {
+  'binding listeners to action that does not exist': () => {
     class BadListenerStore {
       constructor() {
         this.bindListeners({
@@ -1040,10 +1042,10 @@ const tests = {
       foo() { }
     }
 
-    assert.throw(() => alt.createStore(BadListenerStore), ReferenceError, 'Invalid action reference passed in')
+    assert.throw(() => { return alt.createStore(BadListenerStore) }, ReferenceError, 'Invalid action reference passed in')
   },
 
-  'do not include store in snapshots'() {
+  'do not include store in snapshots': () => {
     function NoBootstrap() { }
 
     alt.createUnsavedStore(NoBootstrap, 'NoBootstrap')
@@ -1063,22 +1065,22 @@ const tests = {
     assert.isObject(snapshot.AltSecondStore, 'AltSecondStore exists')
   },
 
-  'actions with no name are still ok'() {
-    var actions = alt.createActions(function () {
+  'actions with no name are still ok': () => {
+    const actions = alt.createActions(function createActionsTest() {
       this.generateActions('foo')
     })
 
     assert.isFunction(actions.foo, 'action still exists')
   },
 
-  'recycle store that does not exist'() {
+  'recycle store that does not exist': () => {
     assert.doesNotThrow(() => {
       alt.bootstrap('{"AStoreThatIJustMadeUpButDoesNotReallyExist": {}}')
     })
   },
 
-  'creating one off actions'() {
-    const action = alt.createAction('hello', function (x) {
+  'creating one off actions': () => {
+    const action = alt.createAction('hello', (x) => {
       return x
     })
 
@@ -1098,12 +1100,12 @@ const tests = {
     assert(store.getState().x === 1, 'action fires correctly')
   },
 
-  'setState emits a change if not dispatching'(done) {
-    const alt = new Alt()
+  'setState emits a change if not dispatching': (done) => {
+    const newAlt = new Alt()
 
-    const actions = alt.generateActions('fire')
+    const actions = newAlt.generateActions('fire')
 
-    const store = alt.createStore(class Store {
+    const store = newAlt.createStore(class Store {
       constructor() {
         this.bindActions(actions)
         this.test = false
@@ -1130,7 +1132,7 @@ const tests = {
     actions.fire()
   },
 
-  'prepare a payload for bootstrap'() {
+  'prepare a payload for bootstrap': () => {
     const serialized = alt.prepare(myStore, { a: 1, b: 2 })
     const parsed = JSON.parse(serialized)
 
@@ -1145,7 +1147,7 @@ const tests = {
     }, ReferenceError)
   },
 
-  'async dispatches'(done) {
+  'async dispatches': (done) => {
     const AsyncAction = alt.createActions({
       displayName: 'AsyncAction',
       fire(x) {
@@ -1165,18 +1167,18 @@ const tests = {
     AsyncAction.fire(2)
   },
 
-  'listen expects function'() {
+  'listen expects function': () => {
     assert.throws(() => {
       myStore.listen(null)
     }, TypeError, 'listen expects a function')
   },
 
-  'lots of listens'() {
+  'lots of listens': () => {
     const ImportKeysActions = alt.generateActions('change', 'saved')
 
     const call = sinon.spy()
 
-    const BalanceClaimStore = alt.createStore(class {
+        const BalanceClaimStore = alt.createStore(class { //eslint-disable-line
       constructor() {
         this.bindListeners({
           onRefreshBalanceClaims: ImportKeysActions.saved,
@@ -1200,7 +1202,7 @@ const tests = {
     assert(call.calledTwice, 'multiple action handlers are ok')
   },
 
-  'dispatching action creators'() {
+  'dispatching action creators': () => {
     const action = {
       id: 'hello',
       dispatch(data) {
@@ -1208,7 +1210,7 @@ const tests = {
       }
     }
 
-    const alt = new Alt()
+    const newAlt = new Alt()
 
     class Store {
       constructor() {
@@ -1221,48 +1223,48 @@ const tests = {
       }
     }
 
-    const store = alt.createStore(Store)
+    const store = newAlt.createStore(Store)
 
     assert(store.getState().x === null, 'x is null')
 
-    alt.dispatch(action, 3)
+    newAlt.dispatch(action, 3)
 
     assert(store.getState().x === 3, '3 was dispatched')
 
-    alt.dispatch(action, 4)
+    newAlt.dispatch(action, 4)
 
     assert(store.getState().x === 4, '4 was dispatched')
 
-    alt.dispatch(action, undefined)
+    newAlt.dispatch(action, undefined)
 
     assert(store.getState().x === 4, 'undefined means it wont dispatch')
   },
 
-  'dispatching async action creators'(done) {
+  'dispatching async action creators': (done) => {
     const action = {
       id: 'hello',
-      dispatch(data) {
-        return dispatch => dispatch(done)
+      dispatch() {
+        return (dispatch) => { return dispatch(done) }
       }
     }
 
-    const alt = new Alt()
+    const newAlt = new Alt()
 
     class Store {
       constructor() {
         this.bindAction(action, this.hello)
       }
 
-      hello(done) {
-        done()
+      hello(cb) {
+        cb()
       }
     }
 
-    const store = alt.createStore(Store)
-    alt.dispatch(action)
+    newAlt.createStore(Store)
+    newAlt.dispatch(action)
   },
 
-  'is fsa'(done) {
+  'is fsa': (done) => {
     const res = alt.dispatcher.register((x) => {
       assert.isDefined(x.type, 'there is a type')
       assert.isDefined(x.payload, 'there is a payload')
@@ -1279,7 +1281,7 @@ const tests = {
     myActions.updateName('Jane')
   },
 
-  'can dispatch fsa'(done) {
+  'can dispatch fsa': (done) => {
     const res = alt.dispatcher.register((x) => {
       assert.isDefined(x.type, 'there is a type')
       assert(x.type === 'owl')
@@ -1293,7 +1295,7 @@ const tests = {
     })
 
     alt.dispatch({ type: 'owl', payload: 'Tawny' })
-  },
+  }
 }
 
 export default tests

@@ -1,14 +1,14 @@
-import Alt from '../'
 import sinon from 'sinon'
 import { assert } from 'chai'
 import { Promise } from 'es6-promise'
+import Alt from '../'
 
 const alt = new Alt()
 
 const StargazerActions = alt.generateActions(
   'fetchingUsers',
   'usersReceived',
-  'failed'
+  'failed',
 )
 
 const fauxjax = sinon.stub().returns(Promise.resolve([1, 2, 3, 4]))
@@ -16,7 +16,7 @@ const failjax = sinon.stub().returns(Promise.reject(new Error('things broke')))
 
 const api = {
   remote(state) { },
-  local(state) { },
+  local(state) { }
 }
 
 const remote = sinon.stub(api, 'remote', (state, repo = state.repo) => {
@@ -41,20 +41,20 @@ const StargazerSource = {
 
   alwaysFetchUsers: {
     remote,
-    local: () => true,
+    local: () => { return true },
     loading: StargazerActions.fetchingUsers,
     success: StargazerActions.usersReceived,
     error: StargazerActions.failed,
-    shouldFetch: () => true
+    shouldFetch: () => { return true }
   },
 
   neverFetchUsers: {
     remote,
-    local: () => false,
+    local: () => { return false },
     loading: StargazerActions.fetchingUsers,
     success: StargazerActions.usersReceived,
     error: StargazerActions.failed,
-    shouldFetch: () => false
+    shouldFetch: () => { return false }
   },
 
   fetchRepos: {
@@ -109,7 +109,7 @@ const StargazerStore = alt.createStore(class {
 })
 
 export default {
-  'async': {
+  async: {
     beforeEach() {
       global.window = {}
 
@@ -122,24 +122,24 @@ export default {
       delete global.window
     },
 
-    'methods are available'() {
+    'methods are available': function () {
       assert.isFunction(StargazerStore.fetchUsers)
       assert.isFunction(StargazerStore.isLoading)
     },
 
-    'data source with no action'() {
+    'data source with no action': function () {
       assert.throws(() => {
-        const Store = alt.createStore(class {
+        alt.createStore(class {
           constructor() {
             this.registerAsync({
-              derp() { return { success: () => null } }
+              derp() { return { success: () => { return null } } }
             })
           }
         })
       }, Error, /handler must be an action function/)
     },
 
-    'loading state'(done) {
+    'loading state': function (done) {
       const spy = sinon.spy()
       const begin = StargazerStore.listen(spy)
 
@@ -172,7 +172,7 @@ export default {
       assert.ok(StargazerStore.isLoading())
     },
 
-    'data available already'(done) {
+    'data available already': function (done) {
       StargazerActions.usersReceived([1, 2, 3])
 
       const spy = sinon.spy()
@@ -194,7 +194,7 @@ export default {
       assert.notOk(StargazerStore.isLoading())
     },
 
-    'errors'(done) {
+    errors(done) {
       const spy = sinon.spy()
       const count = StargazerStore.listen(spy)
 
@@ -216,19 +216,19 @@ export default {
       assert.ok(StargazerStore.isLoading())
     },
 
-    'shouldFetch is true'() {
+    'shouldFetch is true': function () {
       StargazerStore.alwaysFetchUsers()
       assert.ok(StargazerStore.isLoading(), 'i am loading')
       assert.ok(remote.calledOnce, 'remote was called once')
     },
 
-    'shouldFetch is false'() {
+    'shouldFetch is false': function () {
       StargazerStore.neverFetchUsers()
       assert.notOk(StargazerStore.isLoading(), 'loading now')
       assert(remote.callCount === 0, 'remote was not called')
     },
 
-    'multiple loads'(done) {
+    'multiple loads': function (done) {
       const unsub = StargazerStore.listen((state) => {
         if (state.users === 'TESTTEST') {
           assert.notOk(StargazerStore.isLoading())
@@ -244,7 +244,7 @@ export default {
       assert.ok(StargazerStore.isLoading())
     },
 
-    'as a function'() {
+    'as a function': function () {
       const FauxSource = sinon.stub().returns({})
 
       class FauxStore {
@@ -261,7 +261,7 @@ export default {
       assert.isFunction(store.isLoading)
     },
 
-    'server rendering does not happen unless you lock alt'(done) {
+    'server rendering does not happen unless you lock alt': function (done) {
       delete global.window
 
       const actions = alt.generateActions('test')
@@ -273,7 +273,7 @@ export default {
             return Promise.resolve(true)
           },
           success: actions.test,
-          error: actions.test,
+          error: actions.test
         }
       }
 
@@ -302,6 +302,6 @@ export default {
         alt.trapAsync = false
         done()
       })
-    },
+    }
   }
 }

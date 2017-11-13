@@ -1,6 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-const lunr = require('lunr')
+const lunr = require('lunr'); //eslint-disable-line
 
 const index = lunr(function () {
   this.field('title', { boost: 10 })
@@ -20,11 +20,11 @@ function addDocument(name, idx) {
   const doc = topdoc
     .split('\n')
     .filter(Boolean)
-    .reduce(function (obj, prop) {
+    .reduce((obj, prop) => {
       const keyVal = prop.split(':')
       obj[keyVal[0]] = keyVal[1].trim()
       return obj
-    }, { id: idx, body: body })
+    }, { id: idx, body })
 
   index.add(doc)
 
@@ -46,10 +46,10 @@ function isDir(fullpath) {
 }
 
 function fromDirectory(dir) {
-  return fs.readdirSync(dir).reduce(function (dirs, file) {
+  return fs.readdirSync(dir).reduce((dirs, file) => {
     const fullpath = path.join(dir, file)
     if (isDir(fullpath)) {
-      dirs.push.apply(dirs, fromDirectory(path.join(fullpath)))
+      dirs.push(...fromDirectory(path.join(fullpath)))
     } else if (/.md$/.test(file)) {
       dirs.push(fullpath)
     }

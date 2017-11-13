@@ -1,14 +1,14 @@
+import isPromise from 'is-promise'
 import * as fn from '../functions'
 import * as utils from '../utils/AltUtils'
-import isPromise from 'is-promise'
 
 export default function makeAction(alt, namespace, name, implementation, obj) {
   const id = utils.uid(alt._actionsRegistry, `${namespace}.${name}`)
-  alt._actionsRegistry[id] = 1
+  alt._actionsRegistry[id] = 1; //eslint-disable-line
 
   const data = { id, namespace, name }
 
-  const dispatch = (payload) => alt.dispatch(id, payload, data)
+  const dispatch = (payload) => { return alt.dispatch(id, payload, data) }
 
   // the action itself
   const action = (...args) => {
@@ -31,7 +31,7 @@ export default function makeAction(alt, namespace, name, implementation, obj) {
 
     return actionResult
   }
-  action.defer = (...args) => setTimeout(() => action.apply(null, args))
+  action.defer = (...args) => { return setTimeout(() => { return action(...args) }) }
   action.id = id
   action.data = data
 

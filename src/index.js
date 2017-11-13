@@ -13,7 +13,7 @@ class Alt {
     this.serialize = config.serialize || JSON.stringify
     this.deserialize = config.deserialize || JSON.parse
     this.dispatcher = config.dispatcher || new Dispatcher()
-    this.batchingFunction = config.batchingFunction || (callback => callback())
+    this.batchingFunction = config.batchingFunction || ((callback) => { return callback() })
     this.actions = { global: {} }
     this.stores = {}
     this.storeTransforms = config.storeTransforms || []
@@ -32,10 +32,10 @@ class Alt {
         const fsaDetails = {
           id: action.type,
           namespace: action.type,
-          name: action.type,
+          name: action.type
         }
         return this.dispatcher.dispatch(
-          utils.fsa(id, action.type, action.payload, fsaDetails)
+          utils.fsa(id, action.type, action.payload, fsaDetails),
         )
       }
 
@@ -69,7 +69,7 @@ class Alt {
       if (this.stores[key]) {
         utils.warn(
           `A store named ${key} already exists, double check your store ` +
-          `names or pass in your own custom identifier for each store`
+          'names or pass in your own custom identifier for each store',
         )
       } else {
         utils.warn('Store name was not specified')
@@ -91,7 +91,7 @@ class Alt {
   generateActions(...actionNames) {
     const actions = { name: 'global' }
     return this.createActions(actionNames.reduce((obj, action) => {
-      obj[action] = utils.dispatchIdentity
+      obj[action] = utils.dispatchIdentity; //eslint-disable-line
       return obj
     }, actions))
   }
@@ -104,23 +104,18 @@ class Alt {
     const actions = {}
     const key = utils.uid(
       this._actionsRegistry,
-      ActionsClass.displayName || ActionsClass.name || 'Unknown'
+      ActionsClass.displayName || ActionsClass.name || 'Unknown',
     )
 
     if (fn.isFunction(ActionsClass)) {
       fn.assign(actions, utils.getPrototypeChain(ActionsClass))
       class ActionsGenerator extends ActionsClass {
-        constructor(...args) {
-          super(...args)
-        }
-
         generateActions(...actionNames) {
           actionNames.forEach((actionName) => {
             actions[actionName] = utils.dispatchIdentity
           })
         }
       }
-
       fn.assign(actions, new ActionsGenerator(...argsForConstructor))
     } else {
       fn.assign(actions, ActionsClass)
@@ -130,22 +125,22 @@ class Alt {
 
     fn.eachObject((actionName, action) => {
       if (!fn.isFunction(action)) {
-        exportObj[actionName] = action
+        exportObj[actionName] = action; //eslint-disable-line
         return
       }
 
       // create the action
-      exportObj[actionName] = makeAction(
+      exportObj[actionName] = makeAction( //eslint-disable-line
         this,
         key,
         actionName,
         action,
-        exportObj
+        exportObj,
       )
 
       // generate a constant
       const constant = utils.formatAsConstant(actionName)
-      exportObj[constant] = exportObj[actionName].id
+      exportObj[constant] = exportObj[actionName].id; //eslint-disable-line
     }, [actions])
 
     return exportObj
@@ -161,20 +156,20 @@ class Alt {
     StateFunctions.setAppState(
       this,
       this.serialize(this._lastSnapshot),
-      storeInst => {
+      (storeInst) => {
         storeInst.lifecycle('rollback')
         storeInst.emitChange()
-      }
+      },
     )
   }
 
   recycle(...storeNames) {
     const initialSnapshot = storeNames.length
       ? StateFunctions.filterSnapshots(
-          this,
-          this._initSnapshot,
-          storeNames
-        )
+        this,
+        this._initSnapshot,
+        storeNames,
+      )
       : this._initSnapshot
 
     StateFunctions.setAppState(
@@ -183,7 +178,7 @@ class Alt {
       (storeInst) => {
         storeInst.lifecycle('init')
         storeInst.emitChange()
-      }
+      },
     )
   }
 
@@ -213,7 +208,7 @@ class Alt {
 
   addActions(name, ActionsClass, ...args) {
     this.actions[name] = Array.isArray(ActionsClass)
-      ? this.generateActions.apply(this, ActionsClass)
+      ? this.generateActions.apply(this, ActionsClass) //eslint-disable-line
       : this.createActions(ActionsClass, ...args)
   }
 

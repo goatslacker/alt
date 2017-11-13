@@ -1,5 +1,5 @@
-import Alt from '../'
 import { assert } from 'chai'
+import Alt from '../'
 
 export default {
   'debug mode': {
@@ -7,7 +7,7 @@ export default {
       global.window = {}
     },
 
-    'enable debug mode'() {
+    'enable debug mode': function () {
       const alt = new Alt()
       Alt.debug('an identifier', alt)
 
@@ -23,9 +23,9 @@ export default {
   },
 
   'isomorphic debug mode': {
-    'enable debug mode does not make things explode'() {
+    'enable debug mode does not make things explode': function () {
       const alt = new Alt()
       Alt.debug(alt)
-    },
+    }
   }
 }

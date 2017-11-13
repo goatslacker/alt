@@ -1,10 +1,10 @@
 import { assert } from 'chai'
-import Alt from '../dist/alt-with-runtime'
 import sinon from 'sinon'
+import Alt from '../dist/alt-with-runtime'
 
 export default {
   'catch failed dispatches': {
-    'uncaught dispatches result in an error'() {
+    'uncaught dispatches result in an error': function () {
       const alt = new Alt()
       const actions = alt.generateActions('fire')
 
@@ -18,12 +18,11 @@ export default {
         }
       }
 
-      const uncaught = alt.createStore(Uncaught)
-
-      assert.throws(() => actions.fire())
+      alt.createStore(Uncaught)
+      assert.throws(() => { return actions.fire() })
     },
 
-    'errors can be caught though'() {
+    'errors can be caught though': function () {
       const alt = new Alt()
       const actions = alt.generateActions('fire')
 
@@ -49,7 +48,7 @@ export default {
       caught.listen(storeListener)
 
       assert(caught.getState().x === 0)
-      assert.doesNotThrow(() => actions.fire())
+      assert.doesNotThrow(() => { return actions.fire() })
       assert(caught.getState().x === 1)
 
       assert.notOk(storeListener.calledOnce, 'the store did not emit a change')
@@ -57,7 +56,7 @@ export default {
       caught.unlisten(storeListener)
     },
 
-    'you have to emit changes yourself'() {
+    'you have to emit changes yourself': function () {
       const alt = new Alt()
       const actions = alt.generateActions('fire')
 
@@ -84,12 +83,12 @@ export default {
       const dispose = caughtReturn.listen(storeListener)
 
       assert(caughtReturn.getState().x === 0)
-      assert.doesNotThrow(() => actions.fire())
+      assert.doesNotThrow(() => { return actions.fire() })
       assert(caughtReturn.getState().x === 1)
 
       assert.ok(storeListener.calledOnce)
 
       dispose()
-    },
+    }
   }
 }

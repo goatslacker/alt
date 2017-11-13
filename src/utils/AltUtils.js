@@ -3,7 +3,7 @@ import * as fn from '../functions'
 /*eslint-disable*/
 const builtIns = Object.getOwnPropertyNames(NoopClass)
 const builtInProto = Object.getOwnPropertyNames(NoopClass.prototype)
-/*eslint-enable*/
+/* eslint-enable */
 
 export function getInternalMethods(Obj, isProto) {
   const excluded = isProto ? builtInProto : builtIns
@@ -13,7 +13,7 @@ export function getInternalMethods(Obj, isProto) {
       return value
     }
 
-    value[m] = obj[m]
+    value[m] = obj[m]; //eslint-disable-line
     return value
   }, {})
 }
@@ -22,9 +22,9 @@ export function getPrototypeChain(Obj, methods = {}) {
   return Obj === Function.prototype
     ? methods
     : getPrototypeChain(
-        Object.getPrototypeOf(Obj),
-        fn.assign(getInternalMethods(Obj, true), methods)
-      )
+      Object.getPrototypeOf(Obj),
+      fn.assign(getInternalMethods(Obj, true), methods),
+    )
 }
 
 export function warn(msg) {
@@ -33,22 +33,21 @@ export function warn(msg) {
   if (typeof console !== 'undefined') {
     console.warn(new ReferenceError(msg))
   }
-  /*eslint-enable*/
+  /* eslint-enable */
 }
 
 export function uid(container, name) {
   let count = 0
   let key = name
   while (Object.hasOwnProperty.call(container, key)) {
-    key = name + String(++count)
+    count += 1
+    key = name + String(count)
   }
   return key
 }
 
 export function formatAsConstant(name) {
-  return name.replace(/[a-z]([A-Z])/g, (i) => {
-    return `${i[0]}_${i[1].toLowerCase()}`
-  }).toUpperCase()
+  return name.replace(/[a-z]([A-Z])/g, (i) => { return `${i[0]}_${i[1].toLowerCase()}` }).toUpperCase()
 }
 
 export function dispatchIdentity(x, ...a) {
@@ -62,13 +61,13 @@ export function fsa(id, type, payload, details) {
     payload,
     meta: {
       dispatchId: id,
-      ...details,
+      ...details
     },
 
     id,
     action: type,
     data: payload,
-    details,
+    details
   }
 }
 
@@ -81,11 +80,11 @@ export function dispatch(id, actionObj, payload, alt) {
   const name = type
   const details = { id: type, namespace, name }
 
-  const dispatchLater = x => alt.dispatch(type, x, details)
+  const dispatchLater = (x) => { return alt.dispatch(type, x, details) }
 
   if (fn.isFunction(data)) return data(dispatchLater, alt)
 
-    // XXX standardize this
+  // XXX standardize this
   return alt.dispatcher.dispatch(fsa(id, type, data, details))
 }
 

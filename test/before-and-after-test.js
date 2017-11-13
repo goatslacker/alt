@@ -1,7 +1,6 @@
-import Alt from '../'
 import { assert } from 'chai'
-
 import sinon from 'sinon'
+import Alt from '../'
 
 const alt = new Alt()
 const action = alt.generateActions('fire')
@@ -9,7 +8,7 @@ const action = alt.generateActions('fire')
 const beforeEach = sinon.spy()
 const afterEach = sinon.spy()
 
-const store = alt.createStore({
+alt.createStore({
   displayName: 'Store',
 
   state: { a: 1 },
@@ -25,7 +24,7 @@ const store = alt.createStore({
 
   change(x) {
     this.setState({ a: x })
-  },
+  }
 })
 
 export default {
@@ -34,21 +33,21 @@ export default {
       alt.recycle()
     },
 
-    'before and after hook fire once'() {
+    'before and after hook fire once': function () {
       action.fire(2)
 
       assert.ok(beforeEach.calledOnce)
       assert.ok(afterEach.calledOnce)
     },
 
-    'before is called before after'() {
+    'before is called before after': function () {
       action.fire(2)
 
       assert.ok(beforeEach.calledBefore(afterEach))
       assert.ok(afterEach.calledAfter(beforeEach))
     },
 
-    'args passed in'() {
+    'args passed in': function () {
       action.fire(2)
 
       assert.ok(beforeEach.args[0].length === 1, '1 arg is passed')
@@ -58,11 +57,11 @@ export default {
       assert.ok(afterEach.args[0][0].payload.data === 2, 'after has payload')
     },
 
-    'before and after get state'() {
+    'before and after get state': function () {
       let beforeValue = null
       let afterValue = null
 
-      const store = alt.createStore({
+      alt.createStore({
         displayName: 'SpecialStore',
         state: { a: 1 },
         bindListeners: {
@@ -85,6 +84,6 @@ export default {
 
       assert.ok(beforeValue === 1, 'before has current state')
       assert.ok(afterValue === 2, 'after has next state')
-    },
+    }
   }
 }

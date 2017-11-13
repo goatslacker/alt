@@ -19,7 +19,7 @@ class MyStore {
 }
 
 export default {
-  'custom dispatcher can be specified in alt config'() {
+  'custom dispatcher can be specified in alt config': function () {
     class CustomDispatcher {
       waitFor() {}
       register() {}
@@ -37,10 +37,10 @@ export default {
     assert.equal(typeof dispatcher.dispatch, 'function')
   },
 
-  'custom serialize/deserialize'() {
+  'custom serialize/deserialize': function () {
     const CustomSerialize = (data) => {
       return Object.keys(data).reduce((obj, key) => {
-        obj[key] = {wrapper: data[key]}
+        obj[key] = { wrapper: data[key] }
         return obj
       }, {})
     }
@@ -53,7 +53,7 @@ export default {
 
     const alt = new Alt({
       serialize: CustomSerialize,
-      deserialize: CustomDeserialize,
+      deserialize: CustomDeserialize
     })
     alt.addStore('MyStore', MyStore)
     alt.addActions('MyActions', MyActions)
@@ -61,12 +61,12 @@ export default {
     alt.getActions('MyActions').changeNumber()
     alt.rollback()
 
-    assert.deepEqual(snapshot, {MyStore: {wrapper: {number: 2, letter: 'a'}}})
-    assert.deepEqual(alt.getStore('MyStore').getState(), {number: 2, letter: 'a'})
+    assert.deepEqual(snapshot, { MyStore: { wrapper: { number: 2, letter: 'a' } } })
+    assert.deepEqual(alt.getStore('MyStore').getState(), { number: 2, letter: 'a' })
   },
 
-  'custom transforms'() {
+  'custom transforms': function () {
     const alt = new Alt({ storeTransforms: [] })
     assert.isArray(alt.storeTransforms)
-  },
+  }
 }

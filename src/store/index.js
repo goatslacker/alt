@@ -14,10 +14,10 @@ function doSetState(store, storeInstance, state) {
     ? state(storeInstance.state)
     : state
 
-  storeInstance.state = config.setState.call(
+  storeInstance.state = config.setState.call( //eslint-disable-line
     store,
     storeInstance.state,
-    nextState
+    nextState,
   )
 
   if (!store.alt.dispatcher.isDispatching()) {
@@ -28,7 +28,7 @@ function doSetState(store, storeInstance, state) {
 function createPrototype(proto, alt, key, extras) {
   return fn.assign(proto, StoreMixin, {
     displayName: key,
-    alt: alt,
+    alt,
     dispatcher: alt.dispatcher,
     preventDefault() {
       this.getInstance().preventDefault = true
@@ -37,19 +37,18 @@ function createPrototype(proto, alt, key, extras) {
     lifecycleEvents: {},
     actionListeners: {},
     publicMethods: {},
-    handlesOwnErrors: false,
+    handlesOwnErrors: false
   }, extras)
 }
 
 export function createStoreConfig(globalConfig, StoreModel) {
-  StoreModel.config = fn.assign({
+  StoreModel.config = fn.assign({ //eslint-disable-line
     getState(state) {
       if (Array.isArray(state)) {
         return state.slice()
       } else if (fn.isMutableObject(state)) {
         return fn.assign({}, state)
       }
-
       return state
     },
     setState(currentState, nextState) {
@@ -57,12 +56,12 @@ export function createStoreConfig(globalConfig, StoreModel) {
         return fn.assign(currentState, nextState)
       }
       return nextState
-    },
+    }
   }, globalConfig, StoreModel.config)
 }
 
 export function transformStore(transforms, StoreModel) {
-  return transforms.reduce((Store, transform) => transform(Store), StoreModel)
+  return transforms.reduce((Store, transform) => { return transform(Store) }, StoreModel)
 }
 
 export function createStoreFromObject(alt, StoreModel, key) {
@@ -74,7 +73,7 @@ export function createStoreFromObject(alt, StoreModel, key) {
     },
     setState(nextState) {
       doSetState(this, storeInstance, nextState)
-    },
+    }
   }, StoreModel))
 
   // bind the store listeners
@@ -107,13 +106,13 @@ export function createStoreFromObject(alt, StoreModel, key) {
       alt,
       StoreProto,
       StoreProto.state !== undefined ? StoreProto.state : {},
-      StoreModel
+      StoreModel,
     ),
     StoreProto.publicMethods,
     {
       displayName: key,
-      config: StoreModel.config,
-    }
+      config: StoreModel.config
+    },
   )
 
   return storeInstance
@@ -126,11 +125,7 @@ export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
   // Creating a class here so we don't overload the provided store's
   // prototype with the mixin behaviour and I'm extending from StoreModel
   // so we can inherit any extensions from the provided store.
-  class Store extends StoreModel {
-    constructor(...args) {
-      super(...args)
-    }
-  }
+  class Store extends StoreModel {}
 
   createPrototype(Store.prototype, alt, key, {
     type: 'AltStore',
@@ -139,14 +134,14 @@ export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
     },
     setState(nextState) {
       doSetState(this, storeInstance, nextState)
-    },
+    }
   })
 
   const store = new Store(...argsForClass)
 
   /* istanbul ignore next */
   if (config.bindListeners) store.bindListeners(config.bindListeners)
-    /* istanbul ignore next */
+  /* istanbul ignore next */
   if (config.datasource) store.registerAsync(config.datasource)
 
   storeInstance = fn.assign(
@@ -154,7 +149,7 @@ export function createStoreFromClass(alt, StoreModel, key, ...argsForClass) {
       alt,
       store,
       store.state !== undefined ? store.state : store,
-      StoreModel
+      StoreModel,
     ),
     utils.getInternalMethods(StoreModel),
     config.publicMethods,

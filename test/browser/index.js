@@ -18,15 +18,15 @@ const tests = assign(
 // This code is directly from mocha/lib/interfaces/exports.js
 // with a few modifications
 function manualExports(exports, suite) {
-  var suites = [suite]
+  const suites = [suite]
 
   visit(exports)
 
   function visit(obj) {
     var suite
-    for (var key in obj) {
-      if ('function' == typeof obj[key]) {
-        var fn = obj[key]
+    for (const key in obj) {
+      if (typeof obj[key] === 'function') {
+        const fn = obj[key]
         switch (key) {
           case 'before':
             suites[0].beforeAll(fn)

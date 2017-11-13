@@ -1,5 +1,4 @@
-var path = require('path')
-var webpack = require('webpack')
+const path = require('path')
 
 module.exports = {
   entry: path.join(__dirname, 'scripts', 'search.js'),
@@ -12,7 +11,7 @@ module.exports = {
         include: [
           path.join(__dirname, 'scripts'),
           path.join(__dirname, '..', 'node_modules', 'alt-search-docs', 'src'),
-          path.join(__dirname, '..', 'node_modules', 'alt-search-docs', 'node_modules/react-text-highlight/src'),
+          path.join(__dirname, '..', 'node_modules', 'alt-search-docs', 'node_modules/react-text-highlight/src')
         ],
         loader: 'babel-loader?stage=0'
       },

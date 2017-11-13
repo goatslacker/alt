@@ -1,17 +1,17 @@
-import { jsdom } from 'jsdom'
-import Alt from '../'
 import React from 'react'
+import PropTypes from 'prop-types'
+import { jsdom } from 'jsdom'
 import { assert } from 'chai'
-import sinon from 'sinon'
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 import ReactDom from 'react-dom'
+import Alt from '../'
 
-// TOOD action was called but not dispatched?
 const Actions = {
   buttonClick() {
     setTimeout(() => {
       this.switchComponent()
     }, 10)
+    return null
   },
 
   switchComponent() {
@@ -32,40 +32,48 @@ function Store(actions) {
 }
 
 class ComponentA extends React.Component {
-  constructor(props) {
-    super(props)
+    static propTypes = {
+      alt: PropTypes.object.isRequired,
+      callback: PropTypes.func.isRequired
+    };
 
-    this.state = props.alt.stores.store.getState()
-  }
+    constructor(props) {
+      super(props)
+      this.state = props.alt.stores.store.getState()
+    }
 
-  componentWillMount() {
-    this.props.alt.stores.store.listen(state => this.setState(state))
-  }
+    componentWillMount() {
+      this.props.alt.stores.store.listen((state) => { return this.setState(state) })
+    }
 
-  render() {
-    if (this.state.active) {
-      return <ComponentB alt={this.props.alt} callback={this.props.callback} />
-    } else {
+    render() {
+      if (this.state.active) {
+        return <ComponentB alt={this.props.alt} callback={this.props.callback} />
+      }
       return <div />
     }
-  }
 }
 
-class ComponentB extends React.Component {
-  componentWillMount() {
-    let error = null
-    try {
-      this.props.alt.actions.actions.uhoh()
-    } catch (err) {
-      error = err
-    } finally {
-      this.props.callback(error)
-    }
-  }
+class ComponentB extends React.Component { //eslint-disable-line
+    static propTypes = {
+      alt: PropTypes.object.isRequired,
+      callback: PropTypes.func.isRequired
+    };
 
-  render() {
-    return <div />
-  }
+    componentWillMount() {
+      let error = null
+      try {
+        this.props.alt.actions.actions.uhoh()
+      } catch (err) {
+        error = err
+      } finally {
+        this.props.callback(error)
+      }
+    }
+
+    render() {
+      return <div />
+    }
 }
 
 export default {
@@ -80,7 +88,7 @@ export default {
       delete global.window
     },
 
-    'does not batch'(done) {
+    'does not batch': function (done) {
       const alt = new Alt()
       alt.addActions('actions', Actions)
       alt.addStore('store', Store, alt.actions.actions)
@@ -94,7 +102,7 @@ export default {
       alt.actions.actions.buttonClick()
     },
 
-    'allows batching'(done) {
+    'allows batching': function (done) {
       const alt = new Alt({ batchingFunction: ReactDom.unstable_batchedUpdates })
       alt.addActions('actions', Actions)
       alt.addStore('store', Store, alt.actions.actions)
@@ -106,6 +114,6 @@ export default {
 
       TestUtils.renderIntoDocument(<ComponentA alt={alt} callback={test} />)
       alt.actions.actions.buttonClick()
-    },
+    }
   }
 }

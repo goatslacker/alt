@@ -1,5 +1,5 @@
-import Alt from '../dist/alt-with-runtime'
 import { assert } from 'chai'
+import Alt from '../dist/alt-with-runtime'
 
 const alt = new Alt()
 
@@ -44,24 +44,24 @@ class BindActions {
 
 export default {
   'Exporting listener names': {
-    'when no actions are listened on'() {
+    'when no actions are listened on': function () {
       const myStore = alt.createStore(NoActions)
       assert(myStore.boundListeners.length === 0, 'none are returned')
     },
 
-    'when using bindAction'() {
+    'when using bindAction': function () {
       const myStore = alt.createStore(OneAction)
       assert(myStore.boundListeners.length === 1)
       assert(myStore.boundListeners[0] === Actions.ONE)
     },
 
-    'when using bindListeners'() {
+    'when using bindListeners': function () {
       const myStore = alt.createStore(TwoAction)
       assert(myStore.boundListeners.length === 1)
       assert(myStore.boundListeners[0] === Actions.TWO)
     },
 
-    'when using bindActions'() {
+    'when using bindActions': function () {
       const myStore = alt.createStore(BindActions)
       assert(myStore.boundListeners.length === 2)
       assert(
@@ -70,23 +70,23 @@ export default {
       )
     },
 
-    'dispatching actions'() {
-      const alt = new Alt()
+    'dispatching actions': function () {
+      const newAlt = new Alt()
 
-      const one = alt.generateActions('one')
-      const two = alt.generateActions('one')
+      const one = newAlt.generateActions('one')
+      const two = newAlt.generateActions('one')
 
-      const store = alt.createStore(function Store() {
-        this.bindAction(one.one, function (x) {
+      newAlt.createStore(function Store() {
+        this.bindAction(one.one, (x) => {
           assert(x === 1)
         })
-        this.bindAction(two.one, function (x) {
+        this.bindAction(two.one, (x) => {
           assert(x === 2)
         })
       })
 
-      alt.dispatch('global.one', 1)
-      alt.dispatch('global.one1', 2)
-    },
+      newAlt.dispatch('global.one', 1)
+      newAlt.dispatch('global.one1', 2)
+    }
   }
 }

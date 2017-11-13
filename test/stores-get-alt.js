@@ -4,20 +4,20 @@ import Alt from '../dist/alt-with-runtime'
 const alt = new Alt()
 
 export default {
-  'the stores get the alt instance'() {
+  'the stores get the alt instance': function () {
     class MyStore {
-      constructor(alt) {
-        assert.instanceOf(alt, Alt, 'alt is an instance of Alt')
+      constructor(altInstace) {
+        assert.instanceOf(altInstace, Alt, 'alt is an instance of Alt')
       }
     }
 
     alt.createStore(MyStore, 'MyStore', alt)
   },
 
-  'the actions get the alt instance'() {
+  'the actions get the alt instance': function () {
     class MyActions {
-      constructor(alt) {
-        assert.instanceOf(alt, Alt, 'alt is an instance of Alt')
+      constructor(altInstace) {
+        assert.instanceOf(altInstace, Alt, 'alt is an instance of Alt')
       }
     }
 

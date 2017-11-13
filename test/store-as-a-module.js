@@ -1,6 +1,5 @@
 import assert from 'assert'
 import Alt from '../'
-
 import * as StoreModel from './helpers/SaaM'
 
 const alt = new Alt()
@@ -9,7 +8,7 @@ const store = alt.createStore(StoreModel)
 
 export default {
   'Stores as a Module': {
-    'store state is there'() {
+    'store state is there': function () {
       assert.equal(store.getState(), 1, 'store data is initialized to 1')
 
       actions.increment()

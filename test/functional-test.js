@@ -1,10 +1,10 @@
 import { assert } from 'chai'
-import Alt from '../dist/alt-with-runtime'
 import sinon from 'sinon'
+import Alt from '../dist/alt-with-runtime'
 
 export default {
   'functional goodies for alt': {
-    'observing for changes in a POJO so we get context passed in'() {
+    'observing for changes in a POJO so we get context passed in': function () {
       const alt = new Alt()
 
       const observe = sinon.stub().returns({})
@@ -16,7 +16,7 @@ export default {
       assert(observe.args[0][0] === alt, 'first arg is alt')
     },
 
-    'when observing changes, they are observed'() {
+    'when observing changes, they are observed': function () {
       const alt = new Alt()
       const actions = alt.generateActions('fire')
 
@@ -33,7 +33,7 @@ export default {
       assert(store.boundListeners.length === 1, 'there is 1 action bound')
     },
 
-    'otherwise works like a haskell guard'() {
+    'otherwise works like a haskell guard': function () {
       const alt = new Alt()
       const actions = alt.generateActions('fire', 'test')
 
@@ -68,7 +68,7 @@ export default {
       kill()
     },
 
-    'preventDefault prevents a change event to be emitted'() {
+    'preventDefault prevents a change event to be emitted': function () {
       const alt = new Alt()
       const actions = alt.generateActions('fire')
 
@@ -97,7 +97,7 @@ export default {
       kill()
     },
 
-    'reduce fires on every dispatch if defined'() {
+    'reduce fires on every dispatch if defined': function () {
       const alt = new Alt()
       const actions = alt.generateActions('fire')
 
@@ -107,7 +107,7 @@ export default {
         state: { x: 0 },
 
         reduce(state) {
-          if (state.x >= 3) return
+          if (state.x >= 3) return undefined
           return { x: state.x + 1 }
         }
       })
@@ -120,7 +120,7 @@ export default {
       assert(store.getState().x === 3, 'counter was incremented')
     },
 
-    'reduce doesnt emit if preventDefault'() {
+    'reduce doesnt emit if preventDefault': function () {
       const alt = new Alt()
       const actions = alt.generateActions('fire')
 
@@ -146,7 +146,7 @@ export default {
       unsub()
     },
 
-    'stores have a reduce method'() {
+    'stores have a reduce method': function () {
       const alt = new Alt()
 
       const store = alt.createStore({
@@ -162,7 +162,7 @@ export default {
       const store2 = alt.createStore({
         displayName: 'store2',
 
-        state: { x: 1 },
+        state: { x: 1 }
       })
 
       assert.isFunction(store.reduce)
@@ -170,6 +170,6 @@ export default {
 
       assert(store.reduce(store.state).x === 0)
       assert(store2.reduce(store2.state).x === 1)
-    },
+    }
   }
 }

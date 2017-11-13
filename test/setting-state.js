@@ -1,6 +1,6 @@
 import { assert } from 'chai'
-import Alt from '../dist/alt-with-runtime'
 import sinon from 'sinon'
+import Alt from '../dist/alt-with-runtime'
 
 const alt = new Alt()
 
@@ -25,12 +25,12 @@ class MyStore {
 const myStore = alt.createStore(MyStore)
 
 export default {
-  'setState': {
+  setState: {
     beforeEach() {
       alt.recycle()
     },
 
-    'using setState to set the state'() {
+    'using setState to set the state': function () {
       const spy = sinon.spy()
       const dispose = myStore.listen(spy)
 
@@ -47,7 +47,7 @@ export default {
       assert.ok(spy.calledOnce, 'spy was only called once')
     },
 
-    'by using setState a change event is not emitted twice'() {
+    'by using setState a change event is not emitted twice': function () {
       const spy = sinon.spy()
       const dispose = myStore.listen(spy)
 
@@ -60,10 +60,10 @@ export default {
       dispose()
     },
 
-    'transactional setState'() {
-      const alt = new Alt()
+    'transactional setState': function () {
+      const newAlt = new Alt()
 
-      const actions = alt.generateActions('fire')
+      const newActions = newAlt.generateActions('fire')
       class SetState {
         constructor() {
           this.bindActions(actions)
@@ -79,17 +79,17 @@ export default {
         }
       }
 
-      const store = alt.createStore(SetState)
+      const store = newAlt.createStore(SetState)
 
       assert(store.getState().x === 0, 'x is initially 0')
-      actions.fire()
+      newActions.fire()
       assert(store.getState().x === 1, 'x is 1')
     },
 
-    'transactional setState with failure'() {
-      const alt = new Alt()
+    'transactional setState with failure': function () {
+      const newAlt = new Alt()
 
-      const actions = alt.generateActions('fire')
+      const newActions = newAlt.generateActions('fire')
       class SetState {
         constructor() {
           this.bindActions(actions)
@@ -103,17 +103,17 @@ export default {
         }
       }
 
-      const store = alt.createStore(SetState)
+      const store = newAlt.createStore(SetState)
 
       assert(store.getState().x === 0, 'x is initially 0')
-      assert.throws(() => actions.fire())
+      assert.throws(() => { return newActions.fire() })
       assert(store.getState().x === 0, 'x remains 0')
     },
 
-    'setState no dispatch'() {
-      const alt = new Alt()
+    'setState no dispatch': function () {
+      const newAlt = new Alt()
 
-      const actions = alt.generateActions('fire')
+      newAlt.generateActions('fire')
       class BrokenSetState {
         constructor() {
           this.x = 0
@@ -122,17 +122,16 @@ export default {
       }
 
       assert.throws(() => {
-        alt.createStore(BrokenSetState)
+        newAlt.createStore(BrokenSetState)
       })
     },
 
-    'state is set not replaced'() {
-      const alt = new Alt()
-
-      const actions = alt.generateActions('fire')
+    'state is set not replaced': function () {
+      const newAlt = new Alt()
+      const newActions = newAlt.generateActions('fire')
       class SetState {
         constructor() {
-          this.bindActions(actions)
+          this.bindActions(newActions)
           this.x = 0
           this.y = 0
         }
@@ -141,12 +140,12 @@ export default {
           this.setState({ x: 1 })
         }
       }
-      const store = alt.createStore(SetState)
+      const store = newAlt.createStore(SetState)
 
       assert(store.getState().x === 0, 'x is initially 0')
-      actions.fire()
+      newActions.fire()
       assert(store.getState().x === 1, 'x is now 1')
       assert(store.getState().y === 0, 'y was untouched')
-    },
+    }
   }
 }

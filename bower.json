@@ -8,7 +8,7 @@
   "description": "Alt is a flux implementation that is small (~4.3kb & 400 LOC), well tested, terse, insanely flexible, and forward thinking.",
   "main": "dist/alt.js",
   "devDependencies": {
-    "babel": "^4.0.1",
+    "babel": "^6.25.0",
     "coveralls": "^2.11.2",
     "istanbul": "^0.3.5",
     "mocha": "^2.1.0"

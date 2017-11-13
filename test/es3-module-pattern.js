@@ -1,13 +1,13 @@
-import Alt from '../dist/alt-with-runtime'
 import { assert } from 'chai'
 import sinon from 'sinon'
+import Alt from '../dist/alt-with-runtime'
 
 const alt = new Alt()
 
 const actions = alt.generateActions('fire')
 
 function MyStore() {
-  var privateVariable = true
+    const privateVariable = true; //eslint-disable-line
 
   return {
     displayName: 'MyStore',
@@ -17,7 +17,7 @@ function MyStore() {
     },
 
     publicMethods: {
-      getData: function () {
+      getData() {
         return this.getState().data
       }
     },
@@ -28,7 +28,7 @@ function MyStore() {
       handleFire: actions.FIRE
     },
 
-    handleFire: function (data) {
+    handleFire(data) {
       this.setState({ data })
     }
   }
@@ -43,7 +43,7 @@ export default {
       console.warn = function () { }
     },
 
-    'store method exists'() {
+    'store method exists': function () {
       const storePrototype = Object.getPrototypeOf(myStore)
       const assertMethods = ['constructor', 'listen', 'unlisten', 'getState']
       assert.deepEqual(Object.getOwnPropertyNames(storePrototype), assertMethods, 'methods exist for store')
@@ -52,24 +52,24 @@ export default {
       assert.isUndefined(myStore.emit, 'event emitter methods not present')
     },
 
-    'public methods available'() {
+    'public methods available': function () {
       assert.isFunction(myStore.getData, 'public methods are available')
       assert(myStore.getData() === 1, 'initial store data is set')
     },
 
-    'private and instance variables are not available'() {
+    'private and instance variables are not available': function () {
       assert.isUndefined(myStore.privateVariable, 'encapsulated variables are not available')
       assert.isUndefined(myStore.testProperty, 'instance variables are not available')
     },
 
-    'firing an action'() {
+    'firing an action': function () {
       actions.fire(2)
 
       assert(myStore.getState().data === 2, 'action was fired and handled correctly')
     },
 
-    'adding lifecycle events'() {
-      let spy = sinon.spy()
+    'adding lifecycle events': function () {
+      const spy = sinon.spy()
 
       class TestStore {
         constructor() {
@@ -87,7 +87,7 @@ export default {
       assert(store.getState().foo === 'bar', 'state is set')
     },
 
-    'set state'() {
+    'set state': function () {
       const TestStore = {
         state: { hello: null },
 
@@ -112,7 +112,7 @@ export default {
       assert(store.getState().hello === 'world', 'store state was set using setState')
     },
 
-    'set state in lifecycle'() {
+    'set state in lifecycle': function () {
       const TestStore = {
         state: { test: null },
 
@@ -127,7 +127,7 @@ export default {
       assert(store.getState().test === 'i am here', 'setting state on lifecycle')
     },
 
-    'get instance works'() {
+    'get instance works': function () {
       const TestStore = {
         state: { test: null },
         bindListeners: {
@@ -141,6 +141,6 @@ export default {
       const store = alt.createStore(TestStore)
       actions.fire()
       assert(store.getState().test === store)
-    },
+    }
   }
 }

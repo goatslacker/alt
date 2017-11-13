@@ -1,5 +1,5 @@
-import Alt from '../dist/alt-with-runtime'
 import { assert } from 'chai'
+import Alt from '../dist/alt-with-runtime'
 
 const alt = new Alt()
 const Actions = alt.generateActions('hello')
@@ -20,7 +20,7 @@ const MyStoreModelObj = {
     onHello: Actions.HELLO
   },
 
-  onHello: function () {
+  onHello() {
     this.state.test = 1
   }
 }
@@ -31,7 +31,7 @@ export default {
       alt.recycle()
     },
 
-    'as an object'() {
+    'as an object': function () {
       const MyStore = alt.createStore(MyStoreModelObj)
 
       assert(MyStore.getState().test === 2, 'store state is initially set')
@@ -46,7 +46,7 @@ export default {
       assert(MyStore.getState().test === 1, 'i can change state through actions')
     },
 
-    'as a class'() {
+    'as a class': function () {
       const MyStore = alt.createStore(MyStoreModel, 'MyStore')
 
       assert(MyStore.getState().test === 2, 'store state is initially set')
@@ -59,6 +59,6 @@ export default {
       Actions.hello()
 
       assert(MyStore.getState().test === 1, 'i can change state through actions')
-    },
+    }
   }
 }

@@ -1,10 +1,10 @@
 module.exports = {
-  context: __dirname + '/src',
+  context: `${__dirname}/src`,
   entry: {
-    'alt': ['./index.js'],
+    alt: ['./index.js']
   },
   output: {
-    path: __dirname + '/dist',
+    path: `${__dirname}/dist`,
     filename: '[name].min.js',
     library: 'Alt',
     libraryTarget: 'umd'
@@ -12,8 +12,8 @@ module.exports = {
   module: {
     loaders: [{
       test: /\.js$/,
-      loader: 'babel',
+      loader: 'babel-loader',
       exclude: /node_modules/
     }]
-  },
-};
+  }
+}

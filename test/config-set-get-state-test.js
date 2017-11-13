@@ -1,11 +1,10 @@
-import Alt from '../'
 import { assert } from 'chai'
 import sinon from 'sinon'
-
+import Alt from '../'
 
 export default {
   'Config state getter and setter': {
-    'setting state'() {
+    'setting state': function () {
       const setState = sinon.stub().returns({
         foo: 'bar'
       })
@@ -34,7 +33,7 @@ export default {
       assert(store.getState().foo === 'bar')
     },
 
-    'getting state'() {
+    'getting state': function () {
       const getState = sinon.stub().returns({
         foo: 'bar'
       })
@@ -51,6 +50,6 @@ export default {
       assert.ok(getState.calledOnce)
       assert(getState.args[0].length === 1)
       assert(store.getState().foo === 'bar')
-    },
+    }
   }
 }

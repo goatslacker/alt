@@ -1,5 +1,5 @@
-import * as fn from '../functions'
 import transmitter from 'transmitter'
+import * as fn from '../functions'
 
 class AltStore {
   constructor(alt, model, state, StoreModel) {
@@ -15,12 +15,12 @@ class AltStore {
     this.displayName = model.displayName
     this.boundListeners = model.boundListeners
     this.StoreModel = StoreModel
-    this.reduce = model.reduce || (x => x)
+    this.reduce = model.reduce || ((x) => { return x })
     this.subscriptions = []
 
-    const output = model.output || (x => x)
+    const output = model.output || ((x) => { return x })
 
-    this.emitChange = () => this.transmitter.publish(output(this.state))
+    this.emitChange = () => { return this.transmitter.publish(output(this.state)) }
 
     const handleDispatch = (f, payload) => {
       try {
@@ -30,7 +30,7 @@ class AltStore {
           this.lifecycle('error', {
             error: e,
             payload,
-            state: this.state,
+            state: this.state
           })
           return false
         }
@@ -47,7 +47,7 @@ class AltStore {
 
       this.lifecycle('beforeEach', {
         payload,
-        state: this.state,
+        state: this.state
       })
 
       const actionHandlers = model.actionListeners[payload.action]
@@ -63,10 +63,9 @@ class AltStore {
           }, payload)
         } else {
           result = handleDispatch(() => {
-            return model.otherwise(payload.data, payload.action)
+            model.otherwise(payload.data, payload.action)
           }, payload)
         }
-
         if (result !== false && !this.preventDefault) this.emitChange()
       }
 
@@ -80,7 +79,7 @@ class AltStore {
 
       this.lifecycle('afterEach', {
         payload,
-        state: this.state,
+        state: this.state
       })
     })
 
@@ -100,8 +99,8 @@ class AltStore {
   unlisten(cb) {
     this.lifecycle('unlisten')
     this.subscriptions
-      .filter(subscription => subscription.cb === cb)
-      .forEach(subscription => subscription.dispose())
+      .filter((subscription) => { return subscription.cb === cb })
+      .forEach((subscription) => { return subscription.dispose() })
   }
 
   getState() {

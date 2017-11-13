@@ -1,4 +1,4 @@
-export const isFunction = x => typeof x === 'function'
+export const isFunction = (x) => { return typeof x === 'function' }
 
 export function isMutableObject(target) {
   const Ctor = target.constructor
@@ -25,6 +25,8 @@ export function eachObject(f, o) {
 }
 
 export function assign(target, ...source) {
-  eachObject((key, value) => target[key] = value, source)
+  eachObject((key, value) => {
+      target[key] = value; //eslint-disable-line
+  }, source)
   return target
 }

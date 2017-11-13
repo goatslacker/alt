@@ -12,9 +12,7 @@ const StoreMixin = {
       sourcesArray = Array.isArray(sources[0]) ? sources[0] : sources
     }
 
-    const tokens = sourcesArray.map((source) => {
-      return source.dispatchToken || source
-    })
+    const tokens = sourcesArray.map((source) => { return source.dispatchToken || source })
 
     this.dispatcher.waitFor(tokens)
   },
@@ -41,16 +39,15 @@ const StoreMixin = {
         }
       })
 
-      publicMethods[methodName] = (...args) => {
+        publicMethods[methodName] = (...args) => { //eslint-disable-line
         const state = this.getInstance().getState()
         const value = spec.local && spec.local(state, ...args)
         const shouldFetch = spec.shouldFetch
           ? spec.shouldFetch(state, ...args)
           /*eslint-disable*/
           : value == null
-          /*eslint-enable*/
-        const intercept = spec.interceptResponse || (x => x)
-
+          /* eslint-enable */
+        const intercept = spec.interceptResponse || ((x) => { return x })
         const makeActionHandler = (action, isError) => {
           return (x) => {
             const fire = () => {
@@ -59,7 +56,7 @@ const StoreMixin = {
               if (isError) throw x
               return x
             }
-            return this.alt.trapAsync ? () => fire() : fire()
+            return this.alt.trapAsync ? () => { return fire() } : fire()
           }
         }
 
@@ -70,7 +67,7 @@ const StoreMixin = {
           if (spec.loading) spec.loading(intercept(null, spec.loading, args))
           return spec.remote(state, ...args).then(
             makeActionHandler(spec.success),
-            makeActionHandler(spec.error, 1)
+            makeActionHandler(spec.error, 1),
           )
         }
 
@@ -84,7 +81,7 @@ const StoreMixin = {
 
     this.exportPublicMethods(toExport)
     this.exportPublicMethods({
-      isLoading: () => loadCounter > 0,
+      isLoading: () => { return loadCounter > 0 }
     })
   },
 
@@ -127,15 +124,13 @@ const StoreMixin = {
   bindActions(actions) {
     fn.eachObject((action, symbol) => {
       const matchFirstCharacter = /./
-      const assumedEventHandler = action.replace(matchFirstCharacter, (x) => {
-        return `on${x[0].toUpperCase()}`
-      })
+      const assumedEventHandler = action.replace(matchFirstCharacter, (x) => { return `on${x[0].toUpperCase()}` })
 
       if (this[action] && this[assumedEventHandler]) {
         // If you have both action and onAction
         throw new ReferenceError(
-          `You have multiple action handlers bound to an action: ` +
-          `${action} and ${assumedEventHandler}`
+          'You have multiple action handlers bound to an action: ' +
+          `${action} and ${assumedEventHandler}`,
         )
       }
 
@@ -152,7 +147,7 @@ const StoreMixin = {
 
       if (!listener) {
         throw new ReferenceError(
-          `${methodName} defined but does not exist in ${this.displayName}`
+          `${methodName} defined but does not exist in ${this.displayName}`,
         )
       }
 
@@ -164,7 +159,7 @@ const StoreMixin = {
         this.bindAction(symbol, listener)
       }
     }, [obj])
-  },
+  }
 }
 
 export default StoreMixin
