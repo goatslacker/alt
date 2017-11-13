@@ -191,11 +191,12 @@
       }
     })
     if (superClass) {
-        if (Object.setPrototypeOf) {
-            Object.setPrototypeOf(subClass, superClass)
-        } else {
-            subClass.__proto__ = superClass
-        }
+      if (Object.setPrototypeOf) {
+        Object.setPrototypeOf(subClass, superClass)
+      } else {
+        subClass.__proto__ = superClass //eslint-disable-line
+      }
+    }
   }
 
   babelHelpers.instanceof = function (left, right) {
@@ -289,7 +290,7 @@
       let _e
 
       try {
-        for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+        for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { //eslint-disable-line
           _arr.push(_s.value)
 
           if (i && _arr.length === i) break
@@ -299,9 +300,9 @@
         _e = err
       } finally {
         try {
-          if (!_n && _i.return) _i.return()
+          if (!_n && _i.return) _i.return() //eslint-disable-line
         } finally {
-          if (_d) throw _e
+          if (_d) throw _e //eslint-disable-line
         }
       }
 
@@ -324,7 +325,7 @@
     } else if (Symbol.iterator in Object(arr)) {
       const _arr = []
 
-      for (var _iterator = arr[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
+      for (var _iterator = arr[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) { //eslint-disable-line
         _arr.push(_step.value)
 
         if (i && _arr.length === i) break
@@ -364,10 +365,12 @@
 
   babelHelpers.toConsumableArray = function (arr) {
     if (Array.isArray(arr)) {
-      for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]
-
+      const arr2 = Array(arr.length)
+      for (let i = 0; i < arr.length; i++) {
+        arr2[i] = arr[i]
+      }
       return arr2
     }
     return Array.from(arr)
   }
-}(typeof global === 'undefined' ? self : global)) //eslint-disable-line
+}(typeof global === 'undefined' ? self : global))

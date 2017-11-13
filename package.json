@@ -75,7 +75,7 @@
     "test-node": "babel-node node_modules/.bin/_mocha -u exports -R nyan test",
     "test-node-debug": "babel-node node_modules/.bin/_mocha -u exports -R nyan test --inspect-brk",
     "transpile": "babel src --out-dir lib",
-    "transpile-cover": "babel src --out-dir lib --plugins external-helpers-2",
+    "transpile-cover": "babel src --out-dir lib --plugins external-helpers",
     "version": "npm run build"
   },
   "files": [
