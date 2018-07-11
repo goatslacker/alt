@@ -28,7 +28,7 @@ class SomeCoolActions {
             "firstAction",
             "secondAction",
             "thirdAction",
-            "fourthAction
+            "fourthAction"
         );
     }
 }
@@ -58,7 +58,7 @@ an empty ActionsClass that contains declarations for ghost methods but no implem
              "firstAction",
              "secondAction",
              "thirdAction",
-             "fourthAction
+             "fourthAction"
          );
      }
  }
@@ -81,7 +81,7 @@ class SomeCoolActions extends AbstractActions {
              "firstAction",
              "secondAction",
              "thirdAction",
-             "fourthAction
+             "fourthAction"
          );
          super(config);
      }
