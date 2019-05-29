@@ -150,7 +150,7 @@ const StoreMixin = {
     fn.eachObject((methodName, symbol) => {
       const listener = this[methodName]
 
-      if (!listener) {
+      if (listener !== undefined) {
         throw new ReferenceError(
           `${methodName} defined but does not exist in ${this.displayName}`
         )
