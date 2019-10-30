@@ -24,7 +24,7 @@
     "chai": "^2.3.0",
     "coveralls": "2.11.4",
     "es6-promise": "^2.1.1",
-    "eslint": "1.10.3",
+    "eslint": "6.6.0",
     "eslint-config-airbnb": "2.0.0",
     "eslint-plugin-react": "3.11.3",
     "ghooks": "^0.3.2",
