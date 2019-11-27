@@ -89,19 +89,26 @@ class AltStore {
 
   listen(cb) {
     if (!fn.isFunction(cb)) throw new TypeError('listen expects a function')
-    const { dispose } = this.transmitter.subscribe(cb)
-    this.subscriptions.push({ cb, dispose })
-    return () => {
-      this.lifecycle('unlisten')
-      dispose()
+
+    // Already listening
+    const existing = this.subscriptions.find((s) => s.cb === cb)
+    if (!existing) {
+      const { dispose } = this.transmitter.subscribe(cb)
+      const subscriber = { cb, dispose }
+      this.subscriptions.push(subscriber)
     }
+    return () => this.unlisten(cb)
   }
 
   unlisten(cb) {
     this.lifecycle('unlisten')
-    this.subscriptions
-      .filter(subscription => subscription.cb === cb)
-      .forEach(subscription => subscription.dispose())
+    this.subscriptions = this.subscriptions.filter((s) => {
+      if (s.cb === cb) {
+        s.dispose()
+        return false
+      }
+      return true
+    })
   }
 
   getState() {
