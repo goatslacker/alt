@@ -3,7 +3,7 @@ import Alt from '../'
 import React from 'react'
 import { assert } from 'chai'
 import sinon from 'sinon'
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 import ReactDom from 'react-dom'
 
 // TOOD action was called but not dispatched?
@@ -38,7 +38,7 @@ class ComponentA extends React.Component {
     this.state = props.alt.stores.store.getState()
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.props.alt.stores.store.listen(state => this.setState(state))
   }
 
@@ -52,7 +52,7 @@ class ComponentA extends React.Component {
 }
 
 class ComponentB extends React.Component {
-  componentWillMount() {
+  componentDidMount() {
     let error = null
     try {
       this.props.alt.actions.actions.uhoh()

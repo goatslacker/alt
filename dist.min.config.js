@@ -1,5 +1,6 @@
 module.exports = {
   context: __dirname + '/src',
+  mode: 'production',
   entry: {
     'alt': ['./index.js'],
   },
@@ -10,9 +11,9 @@ module.exports = {
     libraryTarget: 'umd'
   },
   module: {
-    loaders: [{
+    rules: [{
       test: /\.js$/,
-      loader: 'babel',
+      loader: 'babel-loader',
       exclude: /node_modules/
     }]
   },

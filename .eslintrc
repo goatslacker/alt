@@ -5,11 +5,7 @@
     "browser": true,
     "es6": true
   },
-  "parser": "babel-eslint",
-  "ecmaFeatures": {
-    "modules": true,
-    "jsx": true
-  },
+  "parser": "@babel/eslint-parser",
   "rules": {
     "semi": [2, "never"],
   }
